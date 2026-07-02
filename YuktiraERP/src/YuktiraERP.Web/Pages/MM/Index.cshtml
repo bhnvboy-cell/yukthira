@@ -1,0 +1,156 @@
+@page
+@model YuktiraERP.Web.Pages.MM.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Materials Management";
+    var materials = Model.Materials;
+    var vendors = Model.Vendors;
+    var prs = Model.PurchaseRequisitions;
+    var pos = Model.PurchaseOrders;
+    var grns = Model.GoodsReceipts;
+    var stocks = Model.StockItems;
+    var invoices = Model.InvoiceVerifications;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-boxes me-2"></i>Materials Management</h2>
+    <div>
+        <a asp-page="/MM/Material/Create" class="btn btn-primary"><i class="bi bi-plus"></i> Create Material</a>
+        <button class="btn btn-outline-secondary" onclick="alert('Export')"><i class="bi bi-download"></i> Export</button>
+    </div>
+</div>
+<ul class="nav nav-tabs mb-3" id="mmTabs">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#materials">Material Masters</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vendors">Vendors</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#pr">Purchase Requisitions</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#po">Purchase Orders</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#grn">Goods Receipts</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#stock">Stock Overview</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invverif">Invoice Verification</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="materials">
+        <div class="card"><div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm datatable">
+                    <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>UOM</th><th>Stock</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var m in materials)
+                        {
+                            <tr>
+                                <td>@m.Code</td><td>@m.Name</td><td>@m.Type</td><td>@m.UOM</td><td>@m.Stock</td><td>@m.Price.ToString("C2")</td>
+                                <td><span class="badge @(m.Status=="Active"?"bg-success":m.Status=="Low Stock"?"bg-warning":"bg-secondary")">@m.Status</span></td>
+                                <td><a asp-page="/MM/Edit" asp-route-code="@m.Code" class="bi bi-pencil me-2 text-decoration-none"></a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="vendors">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/MM/Vendor/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Vendor</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Tax ID</th><th>Payment Terms</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var v in vendors)
+                    {
+                        <tr>
+                            <td>@v.Code</td><td>@v.Name</td><td>@v.TaxId</td><td>@v.PaymentTerms</td><td>@v.Phone</td>
+                            <td><span class="badge @(v.Status=="Active"?"bg-success":"bg-warning")">@v.Status</span></td>
+                            <td><i class="bi bi-pencil me-2"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="pr">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/MM/PR/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Requisition</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>PR #</th><th>Date</th><th>Requestor</th><th>Item</th><th>Qty</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var r in prs)
+                    {
+                        <tr>
+                            <td>@r.PrNumber</td><td>@r.Date.ToString("d")</td><td>@r.Requestor</td><td>@r.ItemName</td><td>@r.Quantity</td><td>@r.Amount.ToString("C2")</td>
+                            <td><span class="badge bg-info">@r.Status</span></td>
+                            <td><i class="bi bi-pencil me-2"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="po">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/MM/PO/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New PO</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>PO #</th><th>Date</th><th>Vendor</th><th>Item</th><th>Qty</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var o in pos)
+                    {
+                        <tr>
+                            <td>@o.PoNumber</td><td>@o.Date.ToString("d")</td><td>@o.VendorName</td><td>@o.ItemName</td><td>@o.Quantity</td><td>@o.Amount.ToString("C2")</td>
+                            <td><span class="badge @(o.Status=="Approved"?"bg-success":"bg-warning")">@o.Status</span></td>
+                            <td><i class="bi bi-eye me-2"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="grn">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/MM/GRN/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New GRN</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>GRN #</th><th>Date</th><th>PO #</th><th>Material</th><th>Qty Received</th><th>Qty Accepted</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var g in grns)
+                    {
+                        <tr>
+                            <td>@g.GrnNumber</td><td>@g.Date.ToString("d")</td><td>@g.PoNumber</td><td>@g.MaterialName</td><td>@g.QtyReceived</td><td>@g.QtyAccepted</td>
+                            <td><span class="badge @(g.Status=="Posted"?"bg-success":"bg-warning")">@g.Status</span></td>
+                            <td><i class="bi bi-eye"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="stock">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Bin</th><th>Material</th><th>Lot</th><th>Qty</th><th>UOM</th><th>Value</th><th>Min</th><th>Max</th><th>Re-Order</th></tr></thead>
+                <tbody>
+                    @foreach (var s in stocks)
+                    {
+                        <tr>
+                            <td>@s.Bin</td><td>@s.MaterialName</td><td>@s.Lot</td><td>@s.Quantity</td><td>@s.UOM</td><td>@s.Value.ToString("C2")</td><td>@s.MinStock</td><td>@s.MaxStock</td>
+                            <td>                    @if (s.Quantity <= s.MinStock) { <i class="bi bi-exclamation-triangle text-warning"></i> } else { <i class="bi bi-check-circle text-success"></i> }</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="invverif">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/MM/InvoiceVerification/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Invoice</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Invoice #</th><th>Date</th><th>PO #</th><th>Vendor</th><th>Amount</th><th>Matched</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var v in invoices)
+                    {
+                        <tr>
+                            <td>@v.InvoiceNumber</td><td>@v.Date.ToString("d")</td><td>@v.PoNumber</td><td>@v.VendorName</td><td>@v.Amount.ToString("C2")</td><td>@v.MatchedAmount.ToString("C2")</td>
+                            <td><span class="badge @(v.Status=="Matched"?"bg-success":v.Status=="Variance"?"bg-danger":"bg-warning")">@v.Status</span></td>
+                            <td><i class="bi bi-eye"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>

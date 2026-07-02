@@ -1,0 +1,43 @@
+@page
+@model YuktiraERP.Web.Pages.HR.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Human Resources";
+    var employees = Model.Employees;
+    var attendances = Model.Attendances;
+    var appraisals = Model.Appraisals;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-people me-2"></i>Human Resources</h2>
+    <div><a asp-page="/HR/Employee/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Employee</a></div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#employees">Employees</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#attendance">Attendance</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#leave">Leave</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#payroll">Payroll</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#appraisal">Appraisal</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="employees">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Designation</th><th>Mobile</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var emp in employees)
+                    {
+                        <tr>
+                            <td>@emp.Code</td><td>@emp.Name</td><td>@emp.Department</td><td>@emp.Designation</td><td>@emp.Mobile</td>
+                            <td><span class="badge @(emp.Status=="Active"?"bg-success":"bg-warning")">@emp.Status</span></td>
+                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="attendance"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Attendance/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> Mark Attendance</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Employee</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var a in attendances){<tr><td>@a.AttendanceId</td><td>@a.EmployeeName</td><td>@a.Date.ToString("d")</td><td><span class="badge @(a.Status=="Present"?"bg-success":a.Status=="Absent"?"bg-danger":"bg-warning")">@a.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="leave"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Leave/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Leave Request</a></div><p class="text-muted">Leave application with approval workflow, balance tracking, and calendar view.</p></div></div></div>
+    <div class="tab-pane fade" id="payroll"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Payroll/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Payroll Entry</a></div><p class="text-muted">Payroll processing with salary structure, deductions, tax calculation, and payslip generation.</p></div></div></div>
+    <div class="tab-pane fade" id="appraisal"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Appraisal/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Appraisal</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Employee</th><th>Period</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var a in appraisals){<tr><td>@a.AppraisalId</td><td>@a.EmployeeName</td><td>@a.Period</td><td>@a.Rating/5</td><td><span class="badge @(a.Status=="Completed"?"bg-success":"bg-warning")">@a.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+</div>

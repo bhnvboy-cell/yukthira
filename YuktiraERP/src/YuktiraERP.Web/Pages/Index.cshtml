@@ -1,0 +1,11 @@
+@page
+@{
+    if (User?.Identity?.IsAuthenticated == true)
+    {
+        Response.Redirect("/Dashboard");
+    }
+    else
+    {
+        Response.Redirect("/Auth/Login");
+    }
+}

@@ -1,0 +1,123 @@
+@page
+@model YuktiraERP.Web.Pages.TCodeGenerator.DesignerModel
+@{
+    ViewData["Title"] = "T-Code Designer";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-gear me-2"></i>Field Designer: <span id="tcodeName">@Model.Code</span></h2>
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addFieldModal"><i class="bi bi-plus"></i> Add Field</button>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header"><i class="bi bi-layout-three-columns me-1"></i>Fields</div>
+            <div class="card-body">
+                <table class="table table-hover table-sm">
+                    <thead><tr><th>#</th><th>Field Name</th><th>Label</th><th>Type</th><th>Required</th><th>Section</th><th>Actions</th></tr></thead>
+                    <tbody id="fieldsBody">
+                        <tr><td colspan="7" class="text-muted text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header"><i class="bi bi-info-circle me-1"></i>Preview</div>
+            <div class="card-body" id="previewBody">
+                <p class="text-muted small">Fields will appear here</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addFieldModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Add Field</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-2"><label class="form-label">Field Name</label><input id="fldName" class="form-control" placeholder="field_name" /></div>
+                <div class="mb-2"><label class="form-label">Field Label</label><input id="fldLabel" class="form-control" placeholder="Field Label" /></div>
+                <div class="mb-2"><label class="form-label">Data Type</label>
+                    <select id="fldType" class="form-select">
+                        <option value="TEXT">Text</option>
+                        <option value="NUMBER">Number</option>
+                        <option value="DECIMAL">Decimal</option>
+                        <option value="DATE">Date</option>
+                        <option value="DATETIME">DateTime</option>
+                        <option value="BOOLEAN">Boolean</option>
+                        <option value="TEXTAREA">Text Area</option>
+                        <option value="DROPDOWN">Dropdown</option>
+                        <option value="FILE">File</option>
+                    </select>
+                </div>
+                <div class="mb-2"><label class="form-label">Section</label><input id="fldSection" class="form-control" placeholder="General" value="General" /></div>
+                <div class="mb-2">
+                    <div class="form-check"><input id="fldRequired" type="checkbox" class="form-check-input" /><label class="form-check-label">Required</label></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary btn-sm" onclick="addField()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var params = new URLSearchParams(location.search);
+    var tcodeId = params.get('id');
+
+    async function loadFields() {
+        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields');
+        var fields = await res.json();
+        var html = '', preview = '';
+        fields.forEach(function(f, i) {
+            html += '<tr>' +
+                '<td>' + (i + 1) + '</td>' +
+                '<td><code>' + f.fieldName + '</code></td>' +
+                '<td>' + f.fieldLabel + '</td>' +
+                '<td><span class="badge bg-info">' + f.dataType + '</span></td>' +
+                '<td>' + (f.isRequired ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
+                '<td>' + f.sectionName + '</td>' +
+                '<td><button class="btn btn-outline-danger btn-sm" onclick="removeField(\'' + f.id + '\')"><i class="bi bi-x"></i></button></td></tr>';
+
+            preview += '<div class="mb-2"><label class="form-label" style="font-size:11px">' + f.fieldLabel + (f.isRequired ? ' <span class="text-danger">*</span>' : '') + '</label>';
+            if (f.dataType === 'TEXTAREA') preview += '<textarea class="form-control" rows="2" style="font-size:12px"></textarea>';
+            else if (f.dataType === 'BOOLEAN') preview += '<input type="checkbox" class="form-check-input" />';
+            else if (f.dataType === 'DATE') preview += '<input type="date" class="form-control" style="font-size:12px" />';
+            else preview += '<input type="text" class="form-control" style="font-size:12px" />';
+            preview += '</div>';
+        });
+        document.getElementById('fieldsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No fields defined</td></tr>';
+        document.getElementById('previewBody').innerHTML = preview || '<p class="text-muted small">No fields to preview</p>';
+    }
+
+    async function addField() {
+        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                fieldName: document.getElementById('fldName').value,
+                fieldLabel: document.getElementById('fldLabel').value,
+                dataType: document.getElementById('fldType').value,
+                sectionName: document.getElementById('fldSection').value,
+                isRequired: document.getElementById('fldRequired').checked
+            })
+        });
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('addFieldModal')).hide();
+            document.getElementById('fldName').value = '';
+            document.getElementById('fldLabel').value = '';
+            loadFields();
+        }
+    }
+
+    async function removeField(id) {
+        if (!confirm('Remove this field?')) return;
+        await fetch('/api/tcode-generator/fields/' + id, { method: 'DELETE' });
+        loadFields();
+    }
+
+    loadFields();
+</script>

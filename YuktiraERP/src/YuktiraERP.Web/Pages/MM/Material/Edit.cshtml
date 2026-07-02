@@ -1,0 +1,28 @@
+@page
+@model YuktiraERP.Web.Pages.MM.Material.EditModel
+@{ ViewData["Title"] = "Edit Material Master"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Material Master</h5></div>
+<div class="card-body">
+<form method="post">
+<input type="hidden" asp-for="Material.Id" />
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Material.Code" class="form-label"></label><input asp-for="Material.Code" class="form-control" /><span asp-validation-for="Material.Code" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Material.Name" class="form-label"></label><input asp-for="Material.Name" class="form-control" /><span asp-validation-for="Material.Name" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Material.Type" class="form-label"></label><input asp-for="Material.Type" class="form-control" /><span asp-validation-for="Material.Type" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Material.UOM" class="form-label"></label><input asp-for="Material.UOM" class="form-control" /><span asp-validation-for="Material.UOM" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Material.Stock" class="form-label"></label><input asp-for="Material.Stock" class="form-control" /><span asp-validation-for="Material.Stock" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Material.Price" class="form-label"></label><input asp-for="Material.Price" class="form-control" /><span asp-validation-for="Material.Price" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Material.Status" class="form-label"></label><input asp-for="Material.Status" class="form-control" /><span asp-validation-for="Material.Status" class="text-danger small"></span></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

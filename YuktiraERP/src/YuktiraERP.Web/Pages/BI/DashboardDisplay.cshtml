@@ -1,0 +1,17 @@
+@page
+@model YuktiraERP.Web.Pages.BI.DashboardDisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Dashboard Display (BI03)"; }
+<h2><i class="bi bi-speedometer2 me-2"></i>Dashboard Gallery</h2>
+<div class="row mt-3">
+@foreach (var d in Model.Dashboards)
+{
+<div class="col-md-4 mb-3">
+<div class="card"><div class="card-body">
+<h5>@d.Name</h5>
+<p class="text-muted small">@d.Category</p>
+<a asp-page="/BI/Dashboard/Display" class="btn btn-outline-primary btn-sm">Open</a>
+</div></div>
+</div>
+}
+</div>

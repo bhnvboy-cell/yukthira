@@ -1,0 +1,22 @@
+@page
+@model YuktiraERP.Web.Pages.HR.Appraisal.CreateModel
+@{ ViewData["Title"] = "New Appraisal"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Appraisal</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="row mb-3">
+<div class="col-md-4"><label asp-for="Appraisal.EmployeeCode" class="form-label"></label><input asp-for="Appraisal.EmployeeCode" class="form-control" placeholder="EMP-..." /></div>
+<div class="col-md-4"><label asp-for="Appraisal.EmployeeName" class="form-label"></label><input asp-for="Appraisal.EmployeeName" class="form-control" /><span asp-validation-for="Appraisal.EmployeeName" class="text-danger small"></span></div>
+<div class="col-md-4"><label asp-for="Appraisal.Period" class="form-label"></label><input asp-for="Appraisal.Period" class="form-control" placeholder="e.g. Q1 2024" /></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-3"><label asp-for="Appraisal.Rating" class="form-label"></label><select asp-for="Appraisal.Rating" class="form-select"><option value="5">5 - Outstanding</option><option value="4">4 - Exceeds</option><option value="3">3 - Meets</option><option value="2">2 - Below</option><option value="1">1 - Poor</option></select></div>
+<div class="col-md-3"><label asp-for="Appraisal.Status" class="form-label"></label><select asp-for="Appraisal.Status" class="form-select"><option value="Pending">Pending</option><option value="Completed">Completed</option></select></div>
+</div>
+<div class="mb-4"><label asp-for="Appraisal.Comments" class="form-label"></label><textarea asp-for="Appraisal.Comments" class="form-control" rows="3"></textarea></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/HR/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

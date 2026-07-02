@@ -1,0 +1,19 @@
+@page
+@model YuktiraERP.Web.Pages.MM.GoodsReceiptOtherModel
+@{ ViewData["Title"] = "Goods Receipt Other (MB1C)"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Goods Receipt - Other</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="GoodsReceipt.PoNumber" class="form-label">Reference</label><input asp-for="GoodsReceipt.PoNumber" class="form-control" placeholder="Ref number" /></div>
+<div class="col-md-6"><label asp-for="GoodsReceipt.MaterialName" class="form-label">Material</label><input asp-for="GoodsReceipt.MaterialName" class="form-control" /></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-4"><label asp-for="GoodsReceipt.QtyReceived" class="form-label">Quantity</label><input asp-for="GoodsReceipt.QtyReceived" class="form-control" /></div>
+<div class="col-md-4"><label asp-for="GoodsReceipt.QtyAccepted" class="form-label">Accepted</label><input asp-for="GoodsReceipt.QtyAccepted" class="form-control" /></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Post</button><a asp-page="/MM/Index" class="btn btn-outline-secondary">Cancel</a></div>
+</form>
+</div></div>
+</div></div>

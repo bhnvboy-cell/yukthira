@@ -1,0 +1,24 @@
+@page
+@model YuktiraERP.Web.Pages.PM.Order.CreateModel
+@{ ViewData["Title"] = "Create Maintenance Order"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+    <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Maintenance Order</h5></div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row mb-3">
+                <div class="col-md-4"><label asp-for="Order.OrderNumber" class="form-label"></label><input asp-for="Order.OrderNumber" class="form-control" placeholder="MO-001" /></div>
+                <div class="col-md-4"><label asp-for="Order.EquipmentCode" class="form-label"></label><input asp-for="Order.EquipmentCode" class="form-control" placeholder="EQ-001" /></div>
+                <div class="col-md-4"><label asp-for="Order.Priority" class="form-label"></label><select asp-for="Order.Priority" class="form-select"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12"><label asp-for="Order.Description" class="form-label"></label><textarea asp-for="Order.Description" class="form-control" rows="2"></textarea></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4"><label asp-for="Order.ScheduledDate" class="form-label"></label><input asp-for="Order.ScheduledDate" class="form-control" type="date" /></div>
+                <div class="col-md-3"><label asp-for="Order.Cost" class="form-label"></label><input asp-for="Order.Cost" class="form-control" type="number" step="0.01" /></div>
+            </div>
+            <div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a></div>
+        </form>
+    </div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,38 @@
+@page
+@model YuktiraERP.Web.Pages.BI.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "BI Reports";
+    var dashboards = Model.Dashboards;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-graph-up me-2"></i>BI Reports</h2>
+    <div>
+        <a asp-page="/BI/Report/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Create Report</a>
+    </div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#reports">Saved Reports</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#dashboards">Dashboards</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#scheduled">Scheduled</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#kpi">KPI Monitor</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="reports">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Report Name</th><th>Category</th><th>Format</th><th>Last Run</th><th>Created By</th><th>Actions</th></tr></thead>
+                <tbody>
+                    <tr><td>Monthly Sales Summary</td><td>Sales</td><td>PDF</td><td>2024-01-31</td><td>Admin</td><td><i class="bi bi-play-circle me-2"></i><i class="bi bi-pencil"></i></td></tr>
+                    <tr><td>Inventory Valuation</td><td>Inventory</td><td>Excel</td><td>2024-01-30</td><td>Admin</td><td><i class="bi bi-play-circle me-2"></i><i class="bi bi-pencil"></i></td></tr>
+                    <tr><td>Production Output</td><td>Production</td><td>PDF</td><td>2024-01-29</td><td>Manager</td><td><i class="bi bi-play-circle me-2"></i><i class="bi bi-pencil"></i></td></tr>
+                    <tr><td>Aging Report - AP</td><td>Finance</td><td>Excel</td><td>2024-01-28</td><td>Accountant</td><td><i class="bi bi-play-circle me-2"></i><i class="bi bi-pencil"></i></td></tr>
+                    <tr><td>Quality Dashboard</td><td>Quality</td><td>HTML</td><td>2024-01-31</td><td>QC Supervisor</td><td><i class="bi bi-play-circle me-2"></i><i class="bi bi-pencil"></i></td></tr>
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="dashboards"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/BI/Dashboard/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Dashboard</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var d in dashboards){<tr><td>@d.DashboardId</td><td>@d.Name</td><td>@d.Category</td><td><span class="badge bg-success">@d.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="scheduled"><div class="card"><div class="card-body"><p class="text-muted">Scheduled report distribution with email delivery, recurrence patterns, and format selection.</p></div></div></div>
+    <div class="tab-pane fade" id="kpi"><div class="card"><div class="card-body"><p class="text-muted">Real-time KPI monitoring with traffic light indicators, target tracking, and alerts.</p></div></div></div>
+</div>

@@ -1,0 +1,17 @@
+@page
+@model YuktiraERP.Web.Pages.FI.AP.CreateModel
+@{ ViewData["Title"] = "Create AP Entry"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Accounts Payable Entry</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Entry.VendorName" class="form-label"></label><input asp-for="Entry.VendorName" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Entry.Amount" class="form-label"></label><input asp-for="Entry.Amount" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Entry.Status" class="form-label"></label><select asp-for="Entry.Status" class="form-select"><option>Open</option><option>Partially Paid</option><option>Paid</option></select></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/FI/Index" class="btn btn-outline-secondary">Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

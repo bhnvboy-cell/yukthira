@@ -1,0 +1,30 @@
+@page
+@model YuktiraERP.Web.Pages.Transactions.LauncherModel
+@{
+    ViewData["Title"] = "Transaction Launcher (TC01)";
+}
+<h2><i class="bi bi-grid-3x3-gap me-2"></i>Transaction Launcher</h2>
+<p class="text-muted">Type a transaction code or use the search below.</p>
+<div class="input-group mb-4">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <input type="text" id="txSearch" class="form-control form-control-lg" placeholder="Search transactions..." autofocus />
+</div>
+<div id="txResults" class="row g-3"></div>
+@section Scripts {
+<script>
+    const allCodes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Groups.SelectMany(g => g.Codes).Select(c => new { c.Code, c.Name, c.Description, c.Icon, c.Route })));
+    const searchInput = document.getElementById('txSearch');
+    const resultsDiv = document.getElementById('txResults');
+    function render(filter) {
+        const q = (filter || '').toLowerCase();
+        const matches = q ? allCodes.filter(c => c.Code.toLowerCase().includes(q) || c.Name.toLowerCase().includes(q) || (c.Description || '').toLowerCase().includes(q)) : allCodes;
+        resultsDiv.innerHTML = matches.map(c => `<div class="col-md-4 col-lg-3"><div class="card h-100 transaction-card" data-code="${c.Code}" style="cursor:pointer"><div class="card-body text-center"><h5><i class="bi ${c.Icon} me-2"></i>${c.Code}</h5><small class="text-muted">${c.Name}</small></div></div></div>`).join('');
+        document.querySelectorAll('.transaction-card').forEach(el => el.addEventListener('click', function() {
+            const match = allCodes.find(c => c.Code === this.dataset.code);
+            window.location.href = match ? match.Route : '/Transactions/Manage?code=' + this.dataset.code;
+        }));
+    }
+    render('');
+    searchInput.addEventListener('input', e => render(e.target.value));
+</script>
+}

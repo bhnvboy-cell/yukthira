@@ -1,0 +1,58 @@
+@page
+@model YuktiraERP.Web.Pages.PM.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Plant Maintenance";
+    var equipments = Model.Equipments;
+    var plans = Model.Plans;
+    var orders = Model.Orders;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-tools me-2"></i>Plant Maintenance (PM)</h2>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#equip">Equipment</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#plans">Maintenance Plans</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#orders">Maintenance Orders</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="equip">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/PM/Equipment/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Equipment</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Location</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var e in equipments) {
+                        <tr><td>@e.EquipmentCode</td><td>@e.Name</td><td>@e.Type</td><td>@e.Location</td><td>@e.Department</td><td><span class="badge @(e.Status=="Operational"?"bg-success":"bg-warning")">@e.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="plans">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/PM/Plan/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Maintenance Plan</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Equipment</th><th>Frequency</th><th>Est. Hours</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var p in plans) {
+                        <tr><td>@p.PlanCode</td><td>@p.Name</td><td>@p.EquipmentCode</td><td>@p.Frequency</td><td>@p.EstimatedHours</td><td><span class="badge @(p.Status=="Active"?"bg-success":"bg-warning")">@p.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="orders">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/PM/Order/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Maintenance Order</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Order#</th><th>Equipment</th><th>Description</th><th>Priority</th><th>Scheduled</th><th>Completed</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var o in orders) {
+                        <tr><td>@o.OrderNumber</td><td>@o.EquipmentCode</td><td>@o.Description</td><td><span class="badge @(o.Priority=="High"?"bg-danger":"bg-info")">@o.Priority</span></td><td>@o.ScheduledDate.ToString("d")</td><td>@(o.CompletedDate == default ? "--" : o.CompletedDate.ToString("d"))</td><td>@o.Cost.ToString("C0")</td><td><span class="badge bg-secondary">@o.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>

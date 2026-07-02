@@ -1,0 +1,57 @@
+@page
+@model YuktiraERP.Web.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_LoginLayout";
+}
+<div class="login-card">
+    <div class="login-header">
+        <i class="bi bi-cpu"></i>
+        <h3>Yuktira ERP</h3>
+        <p>Intelligence Driven Enterprise Platform</p>
+    </div>
+    <div class="login-body">
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Client Number</label>
+                <input asp-for="Input.ClientNumber" class="form-control" placeholder="Enter client number" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">User ID</label>
+                <input asp-for="Input.UserId" class="form-control" placeholder="Enter user ID" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input asp-for="Input.Password" type="password" class="form-control" placeholder="Enter password" required />
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col">
+                    <label class="form-label">Language</label>
+                    <select asp-for="Input.Language" class="form-select">
+                        <option value="EN">English</option>
+                        <option value="AR">Arabic</option>
+                        <option value="FR">French</option>
+                        <option value="ES">Spanish</option>
+                        <option value="DE">German</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label class="form-label">System</label>
+                    <select asp-for="Input.System" class="form-select">
+                        <option value="DEV">Development</option>
+                        <option value="QA">Quality Assurance</option>
+                        <option value="PROD">Production</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2">Sign In</button>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger mt-3 py-2">@Model.ErrorMessage</div>
+            }
+        </form>
+        <div class="text-center mt-3">
+            <small class="text-muted" style="font-size:11px">&copy; 2025 Yuktira ERP Suite v1.0</small>
+        </div>
+    </div>
+</div>

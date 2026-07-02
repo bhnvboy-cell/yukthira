@@ -1,0 +1,26 @@
+@page
+@using YuktiraERP.Web.Models
+@{
+    ViewData["Title"] = "Tenant Management";
+    var tenants = TenantStore.GetAll();
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-building me-2"></i>Tenant Management</h2>
+    <a asp-page="/Admin/Tenants" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Tenant</a>
+</div>
+<div class="card"><div class="card-body">
+<table class="table table-hover table-sm">
+<thead><tr><th>Tenant ID</th><th>Name</th><th>Subdomain</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+<tbody>
+@foreach (var t in tenants)
+{
+    <tr>
+        <td>@t.TenantId</td><td>@t.Name</td><td>@t.Subdomain</td>
+        <td><span class="badge @(t.Status=="Active"?"bg-success":"bg-secondary")">@t.Status</span></td>
+        <td>@t.CreatedAt.ToString("d")</td>
+        <td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td>
+    </tr>
+}
+</tbody>
+</table>
+</div></div>

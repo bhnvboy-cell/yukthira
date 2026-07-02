@@ -1,0 +1,174 @@
+@page
+@model YuktiraERP.Web.Pages.Transactions.IndexModel
+@{
+    ViewData["Title"] = "Transaction Launcher";
+}
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-keyboard me-2"></i>Transaction Launcher</h2>
+        <a href="/Transactions/Manage" class="btn btn-outline-primary btn-sm"><i class="bi bi-gear"></i> Manage Codes</a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" id="txSearch" class="form-control" placeholder="Type transaction code or name... (e.g., MM01, VA01, FB50)"
+                       autocomplete="off" autofocus>
+                <button class="btn btn-primary" id="txGoBtn" disabled><i class="bi bi-arrow-right"></i> Go</button>
+            </div>
+            <div id="txSuggestions" class="list-group mt-2" style="display:none;position:absolute;z-index:1000;max-height:400px;overflow-y:auto;width:calc(100% - 3rem)"></div>
+        </div>
+    </div>
+
+    @if (Model.Favorites.Any())
+    {
+        <div class="mb-4">
+            <h5 class="text-muted mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Favorites</h5>
+            <div class="row g-2">
+                @foreach (var fav in Model.Favorites)
+                {
+                    <div class="col-md-3 col-sm-6">
+                        <a href="@fav.Route" class="text-decoration-none">
+                            <div class="card border-start border-warning border-3 shadow-sm h-100">
+                                <div class="card-body py-2 d-flex align-items-center gap-2">
+                                    <i class="bi @fav.Icon fs-4 text-warning"></i>
+                                    <div>
+                                        <div class="fw-bold small">@fav.Code</div>
+                                        <div class="text-muted" style="font-size:0.8rem">@fav.Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (Model.Recent.Any())
+    {
+        <div class="mb-4">
+            <h5 class="text-muted mb-3"><i class="bi bi-clock-history me-2"></i>Recent</h5>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var r in Model.Recent.Take(5))
+                {
+                    <a href="@r.Route" class="badge bg-light text-dark text-decoration-none px-3 py-2 border">
+                        <i class="bi @r.Icon me-1"></i> @r.Code - @r.Name
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @foreach (var group in Model.Groups)
+    {
+        <div class="mb-4">
+            <h5 class="text-muted mb-3"><i class="bi @group.Icon me-2"></i>@group.Name</h5>
+            <div class="row g-2">
+                @foreach (var code in group.Codes)
+                {
+                    <div class="col-md-3 col-sm-6">
+                        <a href="@code.Route" class="text-decoration-none tx-item" data-code="@code.Code" data-name="@code.Name">
+                            <div class="card border-start border-primary border-3 shadow-sm h-100 tx-card">
+                                <div class="card-body py-2 d-flex align-items-center gap-2">
+                                    <i class="bi @code.Icon fs-4 text-primary"></i>
+                                    <div>
+                                        <div class="fw-bold small">@code.Code</div>
+                                        <div class="text-muted" style="font-size:0.8rem">@code.Name</div>
+                                        <small class="text-secondary">@code.Module</small>
+                                    </div>
+                                    <div class="ms-auto">
+                                        <button class="btn btn-sm btn-outline-warning fav-btn" data-code-id="@code.Id" title="Toggle favorite"><i class="bi @(code.IsFavorite ? "bi-star-fill" : "bi-star")"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    var searchTimeout;
+    $('#txSearch').on('input', function() {
+        clearTimeout(searchTimeout);
+        var val = $(this).val().trim();
+        if (val.length < 2) { $('#txSuggestions').hide(); $('#txGoBtn').prop('disabled', true); return; }
+        $('#txGoBtn').prop('disabled', false);
+        searchTimeout = setTimeout(function() {
+            $.get('/api/transaction/search?q=' + encodeURIComponent(val), function(data) {
+                var html = '';
+                data.forEach(function(t) {
+                    html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-code="' + t.code + '" data-route="' + t.route + '">';
+                    html += '<i class="bi ' + t.icon + ' fs-5 text-primary"></i>';
+                    html += '<div><strong>' + t.code + '</strong> - ' + t.name + '<br><small class="text-muted">' + t.module + ' | ' + t.group + '</small></div>';
+                    html += '</button>';
+                });
+                if (data.length === 0) html = '<div class="list-group-item text-muted">No transactions found</div>';
+                $('#txSuggestions').html(html).show();
+            });
+        }, 200);
+    });
+
+    $(document).on('click', '#txSuggestions button', function() {
+        var route = $(this).data('route');
+        if (route) window.location.href = route;
+    });
+
+    $('#txGoBtn').on('click', function() {
+        var code = $('#txSearch').val().trim().toUpperCase();
+        if (code) executeTransaction(code);
+    });
+
+    $('#txSearch').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            var code = $(this).val().trim().toUpperCase();
+            if (code) executeTransaction(code);
+        }
+        if (e.key === 'Escape') $('#txSuggestions').hide();
+    });
+
+    function executeTransaction(code) {
+        $.ajax({
+            url: '/api/transaction/' + code + '/execute',
+            method: 'POST',
+            contentType: 'application/json',
+            data: '{}',
+            success: function(res) {
+                if (res.redirectUrl) window.location.href = res.redirectUrl;
+                else showToast(res.message || 'Executed successfully', 'success');
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.message || 'Transaction failed';
+                showToast(msg, 'danger');
+            }
+        });
+    }
+
+    $('.fav-btn').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var btn = $(this);
+        var codeId = btn.data('code-id');
+        $.post('/api/transaction/favorites/' + codeId, function() {
+            btn.find('i').toggleClass('bi-star bi-star-fill');
+        });
+    });
+
+    function showToast(msg, type) {
+        var toast = '<div class="toast align-items-center text-bg-' + type + ' border-0 show position-fixed bottom-0 end-0 m-3" role="alert" style="z-index:9999">';
+        toast += '<div class="d-flex"><div class="toast-body">' + msg + '</div>';
+        toast += '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>';
+        $('body').append(toast);
+        setTimeout(function() { $(toast).remove(); }, 3000);
+    }
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#txSearch, #txSuggestions').length) $('#txSuggestions').hide();
+    });
+</script>
+}

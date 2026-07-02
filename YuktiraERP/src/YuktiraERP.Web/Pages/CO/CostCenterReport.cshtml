@@ -1,0 +1,19 @@
+@page
+@model YuktiraERP.Web.Pages.CO.CostCenterReportModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Cost Center Report (KOB1)"; }
+<h2><i class="bi bi-graph-up me-2"></i>Cost Center Report</h2>
+<div class="card mt-3"><div class="card-body">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Code</th><th>Name</th><th>Manager</th><th>Department</th><th>Planned Budget</th><th>Status</th></tr></thead>
+<tbody>
+@foreach (var cc in Model.CostCenters)
+{
+<tr>
+<td>@cc.Code</td><td>@cc.Name</td><td>@cc.Manager</td><td>@cc.Department</td>
+<td>@cc.PlannedBudget.ToString("C2")</td>
+<td><span class="badge bg-@(cc.Status=="Active"?"success":"secondary")">@cc.Status</span></td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

@@ -1,0 +1,28 @@
+@page
+@model YuktiraERP.Web.Pages.WM.Transfer.EditModel
+@{ ViewData["Title"] = "Edit Warehouse Transfer"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Warehouse Transfer</h5></div>
+<div class="card-body">
+<form method="post">
+<input type="hidden" asp-for="Transfer.Id" />
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Transfer.TransferId" class="form-label"></label><input asp-for="Transfer.TransferId" class="form-control" /><span asp-validation-for="Transfer.TransferId" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Transfer.Date" class="form-label"></label><input asp-for="Transfer.Date" class="form-control" /><span asp-validation-for="Transfer.Date" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Transfer.MaterialName" class="form-label"></label><input asp-for="Transfer.MaterialName" class="form-control" /><span asp-validation-for="Transfer.MaterialName" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Transfer.FromBin" class="form-label"></label><input asp-for="Transfer.FromBin" class="form-control" /><span asp-validation-for="Transfer.FromBin" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Transfer.ToBin" class="form-label"></label><input asp-for="Transfer.ToBin" class="form-control" /><span asp-validation-for="Transfer.ToBin" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Transfer.Quantity" class="form-label"></label><input asp-for="Transfer.Quantity" class="form-control" /><span asp-validation-for="Transfer.Quantity" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Transfer.Status" class="form-label"></label><input asp-for="Transfer.Status" class="form-control" /><span asp-validation-for="Transfer.Status" class="text-danger small"></span></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

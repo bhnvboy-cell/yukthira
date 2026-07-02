@@ -1,0 +1,17 @@
+@page
+@model YuktiraERP.Web.Pages.PP.MrpRunModel
+@{ ViewData["Title"] = "MRP Run (MD01)"; }
+<div class="row justify-content-center"><div class="col-lg-6">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-cpu me-2"></i>MRP Run</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="mb-3"><label asp-for="ProductName" class="form-label">Product</label><input asp-for="ProductName" class="form-control" placeholder="Product to plan" /></div>
+<div class="mb-3"><label asp-for="HorizonDays" class="form-label">Planning Horizon (Days)</label><input asp-for="HorizonDays" class="form-control" type="number" min="1" max="365" /></div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-play me-1"></i>Run MRP</button>
+</form>
+@if (!string.IsNullOrEmpty(Model.Result))
+{
+<div class="alert alert-success mt-3">@Model.Result</div>
+}
+</div></div>
+</div></div>

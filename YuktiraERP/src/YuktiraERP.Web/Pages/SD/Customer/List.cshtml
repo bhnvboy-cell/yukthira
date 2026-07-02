@@ -1,0 +1,26 @@
+@page
+@model YuktiraERP.Web.Pages.SD.Customer.ListModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Customer List"; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h2><i class="bi bi-people me-2"></i>Customers</h2>
+<a asp-page="/SD/Customer/Create" class="btn btn-primary"><i class="bi bi-plus me-1"></i>New Customer</a>
+</div>
+<div class="card"><div class="card-body">
+<div class="table-responsive">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Code</th><th>Name</th><th>Credit Limit</th><th>Payment Terms</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>
+@foreach (var c in Model.Customers)
+{
+<tr>
+<td>@c.Code</td><td>@c.Name</td><td>@c.CreditLimit.ToString("C2")</td><td>@c.PaymentTerms</td><td>@c.Phone</td>
+<td><span class="badge bg-@(c.Status=="Active"?"success":"secondary")">@c.Status</span></td>
+<td>
+<a asp-page="/SD/Customer/Edit" asp-route-id="@c.Id" class="bi bi-pencil me-2 text-decoration-none text-warning"></a>
+<a asp-page="/SD/Customer/Display" asp-route-id="@c.Id" class="bi bi-eye text-decoration-none text-info"></a>
+</td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

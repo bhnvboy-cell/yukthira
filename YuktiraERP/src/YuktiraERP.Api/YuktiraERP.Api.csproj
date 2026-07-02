@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>YuktiraERP.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YuktiraERP.Core\YuktiraERP.Core.csproj" />
+    <ProjectReference Include="..\YuktiraERP.Infrastructure\YuktiraERP.Infrastructure.csproj" />
+    <ProjectReference Include="..\YuktiraERP.WorkflowEngine\YuktiraERP.WorkflowEngine.csproj" />
+    <ProjectReference Include="..\YuktiraERP.AIEngine\YuktiraERP.AIEngine.csproj" />
+    <ProjectReference Include="..\YuktiraERP.ExportEngine\YuktiraERP.ExportEngine.csproj" />
+    <ProjectReference Include="..\YuktiraERP.PluginSdk\YuktiraERP.PluginSdk.csproj" />
+  </ItemGroup>
+</Project>

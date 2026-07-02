@@ -1,0 +1,25 @@
+@page
+@model YuktiraERP.Web.Pages.FI.GL.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "GL Account Display (FS10N)"; }
+<h2><i class="bi bi-book me-2"></i>G/L Account Display</h2>
+<form method="get" class="row g-3 mb-3">
+<div class="col-auto"><select name="AccountCode" class="form-select">
+<option value="">-- Select Account --</option>
+@foreach (var a in Model.Accounts) { <option value="@a.AccountCode" selected="@(a.AccountCode==Model.AccountCode)">@a.AccountCode - @a.AccountName</option> }
+</select></div>
+<div class="col-auto"><button type="submit" class="btn btn-primary">Display</button></div>
+</form>
+@if (Model.Account != null)
+{
+<div class="card"><div class="card-body">
+<dl class="row">
+<dt class="col-sm-3">Account Code</dt><dd class="col-sm-9">@Model.Account.AccountCode</dd>
+<dt class="col-sm-3">Account Name</dt><dd class="col-sm-9">@Model.Account.AccountName</dd>
+<dt class="col-sm-3">Type</dt><dd class="col-sm-9">@Model.Account.Type</dd>
+<dt class="col-sm-3">Category</dt><dd class="col-sm-9">@Model.Account.Category</dd>
+<dt class="col-sm-3">Balance</dt><dd class="col-sm-9">@Model.Account.Balance.ToString("C2")</dd>
+<dt class="col-sm-3">Active</dt><dd class="col-sm-9">@(Model.Account.IsActive ? "Yes" : "No")</dd>
+</dl>
+</div></div>
+}

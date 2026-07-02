@@ -1,0 +1,75 @@
+@page
+@model YuktiraERP.Web.Pages.TCode.ListModel
+@{
+    ViewData["Title"] = Model.Code + " List";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-list me-2"></i>@Model.Code <small class="text-muted fs-6">List</small></h2>
+    <div>
+        <a href="/TCode/Create?tcodeId=@Model.TCodeId&code=@Model.Code" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New</a>
+        <a href="/TCodeGenerator/Designer?id=@Model.TCodeId" class="btn btn-outline-secondary btn-sm"><i class="bi bi-gear"></i></a>
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="mb-3"><input id="searchInput" class="form-control" placeholder="Search..." oninput="loadData()" /></div>
+        <table class="table table-hover table-sm">
+            <thead id="listHeaders"><tr><th>#</th><th>Record ID</th><th>Status</th><th>Workflow</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="dataBody">
+                <tr><td colspan="6" class="text-muted text-center">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    var params = new URLSearchParams(location.search);
+    var tcodeId = params.get('tcodeId');
+    var code = params.get('code');
+    var wfDef = null;
+
+    async function loadWfDef() {
+        if (!wfDef) {
+            var r = await fetch('/api/tcode-generator/workflow-definition');
+            wfDef = await r.json();
+        }
+    }
+
+    function nodeBadge(nodeName) {
+        if (!wfDef) return '<span class="badge bg-secondary">' + nodeName + '</span>';
+        var n = wfDef.nodes.find(function(x) { return x.name === nodeName; });
+        if (!n) return '<span class="badge bg-secondary">' + nodeName + '</span>';
+        var colors = { 'START': 'bg-secondary', 'DATA_ENTRY': 'bg-info', 'APPROVAL': 'bg-warning text-dark', 'POSTING': 'bg-primary', 'END': 'bg-success' };
+        return '<span class="badge ' + (colors[n.name] || 'bg-secondary') + '"><i class="bi ' + n.icon + ' me-1"></i>' + n.label + '</span>';
+    }
+
+    async function loadData() {
+        await loadWfDef();
+        var search = document.getElementById('searchInput').value;
+        var url = '/api/tcode-generator/data/' + tcodeId + '?search=' + encodeURIComponent(search);
+        var res = await fetch(url);
+        var data = await res.json();
+        var html = '';
+        data.forEach(function(r) {
+            html += '<tr>' +
+                '<td>' + r.id.substr(0, 8) + '</td>' +
+                '<td><a href="/TCode/Edit?recordId=' + r.id + '&tcodeId=' + tcodeId + '&code=' + code + '"><strong>' + r.recordId + '</strong></a></td>' +
+                '<td><span class="badge ' + (r.status === 'Completed' ? 'bg-success' : r.status === 'Draft' ? 'bg-secondary' : 'bg-warning') + '">' + r.status + '</span></td>' +
+                '<td>' + nodeBadge(r.workflowNode || 'START') + '</td>' +
+                '<td>' + new Date(r.createdAt).toLocaleDateString() + '</td>' +
+                '<td>' +
+                '  <a href="/TCode/Edit?recordId=' + r.id + '&tcodeId=' + tcodeId + '&code=' + code + '" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a> ' +
+                '  <button class="btn btn-outline-danger btn-sm" onclick="deleteRec(\'' + r.id + '\')"><i class="bi bi-trash"></i></button>' +
+                '</td></tr>';
+        });
+        document.getElementById('dataBody').innerHTML = html || '<tr><td colspan="6" class="text-muted text-center">No records</td></tr>';
+    }
+
+    async function deleteRec(id) {
+        if (!confirm('Delete this record?')) return;
+        await fetch('/api/tcode-generator/data/' + id, { method: 'DELETE' });
+        loadData();
+    }
+
+    loadData();
+</script>

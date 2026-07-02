@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.CRM.Contact.CreateModel
+@{ ViewData["Title"] = "New Contact"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Contact</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Contact.Name" class="form-label"></label><input asp-for="Contact.Name" class="form-control" /><span asp-validation-for="Contact.Name" class="text-danger small"></span></div>
+<div class="col-md-3"><label asp-for="Contact.Email" class="form-label"></label><input asp-for="Contact.Email" class="form-control" type="email" /></div>
+<div class="col-md-3"><label asp-for="Contact.Phone" class="form-label"></label><input asp-for="Contact.Phone" class="form-control" /></div>
+</div>
+<div class="row mb-4">
+<div class="col-md-6"><label asp-for="Contact.Company" class="form-label"></label><input asp-for="Contact.Company" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Contact.Status" class="form-label"></label><select asp-for="Contact.Status" class="form-select"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/CRM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

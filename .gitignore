@@ -1,0 +1,55 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+*.userprefs
+*.vs/
+.vscode/
+**/Debug/
+**/Release/
+*.csproj.user
+
+# NuGet
+packages/
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# Config (local overrides)
+appsettings.Development.json
+appsettings.Production.json
+**/appsettings.*.local.json
+
+# Secrets
+**/appsettings.Secrets.json
+**/secrets.json
+
+# Development config (may contain local passwords)
+**/appsettings.Development.json
+
+# OS
+Thumbs.db
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Docker
+docker-compose.override.yml
+
+# Database backups
+database/backup/*.sql
+!database/backup/disaster_recovery.md
+
+# IDE
+.idea/
+*.sublime-workspace
+*.sublime-project

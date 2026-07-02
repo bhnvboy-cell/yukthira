@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.CO.CostCenter.CreateModel
+@{ ViewData["Title"] = "Create Cost Center"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+    <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Cost Center</h5></div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row mb-3">
+                <div class="col-md-4"><label asp-for="Center.Code" class="form-label"></label><input asp-for="Center.Code" class="form-control" placeholder="CC-1000" /></div>
+                <div class="col-md-4"><label asp-for="Center.Name" class="form-label"></label><input asp-for="Center.Name" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Center.Manager" class="form-label"></label><input asp-for="Center.Manager" class="form-control" /></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4"><label asp-for="Center.Department" class="form-label"></label><input asp-for="Center.Department" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Center.PlannedBudget" class="form-label"></label><input asp-for="Center.PlannedBudget" class="form-control" type="number" step="0.01" /></div>
+            </div>
+            <div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/CO/Index" class="btn btn-outline-secondary">Cancel</a></div>
+        </form>
+    </div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

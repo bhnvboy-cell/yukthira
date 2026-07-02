@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY src/YuktiraERP.Core/YuktiraERP.Core.csproj src/YuktiraERP.Core/
+COPY src/YuktiraERP.Infrastructure/YuktiraERP.Infrastructure.csproj src/YuktiraERP.Infrastructure/
+COPY src/YuktiraERP.AIEngine/YuktiraERP.AIEngine.csproj src/YuktiraERP.AIEngine/
+COPY src/YuktiraERP.PluginSdk/YuktiraERP.PluginSdk.csproj src/YuktiraERP.PluginSdk/
+COPY src/YuktiraERP.Web/YuktiraERP.Web.csproj src/YuktiraERP.Web/
+RUN dotnet restore src/YuktiraERP.Web/YuktiraERP.Web.csproj
+
+COPY src/ src/
+RUN dotnet publish src/YuktiraERP.Web/YuktiraERP.Web.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 5001
+ENTRYPOINT ["dotnet", "YuktiraERP.Web.dll"]

@@ -1,0 +1,65 @@
+@page
+@model YuktiraERP.Web.Pages.SD.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Sales & Distribution";
+    var customers = Model.Customers;
+    var orders = Model.SalesOrders;
+    var inquiries = Model.Inquiries;
+    var quotations = Model.Quotations;
+    var deliveries = Model.Deliveries;
+    var bills = Model.BillingDocuments;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-cart3 me-2"></i>Sales & Distribution</h2>
+    <div><a asp-page="/SD/Customer/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Customer</a></div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#customers">Customers</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#inquiries">Inquiries</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#quotations">Quotations</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#so">Sales Orders</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#deliveries">Deliveries</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#billing">Billing</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="customers">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Credit Limit</th><th>Payment Terms</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var c in customers)
+                    {
+                        <tr>
+                            <td>@c.Code</td><td>@c.Name</td><td>@c.CreditLimit.ToString("C0")</td><td>@c.PaymentTerms</td><td>@c.Phone</td>
+                            <td><span class="badge @(c.Status=="Active"?"bg-success":"bg-warning")">@c.Status</span></td>
+                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-eye"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="inquiries"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/SD/Inquiry/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Inquiry</a></div><table class="table table-hover table-sm"><thead><tr><th>Inquiry #</th><th>Date</th><th>Customer</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var i in inquiries){<tr><td>@i.InquiryNumber</td><td>@i.Date.ToString("d")</td><td>@i.CustomerName</td><td>@i.Description</td><td><span class="badge bg-info">@i.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="quotations"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/SD/Quotation/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Quotation</a></div><table class="table table-hover table-sm"><thead><tr><th>Quote #</th><th>Date</th><th>Customer</th><th>Amount</th><th>Valid Until</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var q in quotations){<tr><td>@q.QuoteNumber</td><td>@q.Date.ToString("d")</td><td>@q.CustomerName</td><td>@q.Amount.ToString("C2")</td><td>@q.ValidUntil.ToString("d")</td><td><span class="badge @(q.Status=="Sent"?"bg-success":"bg-warning")">@q.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="so">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/SD/SalesOrder/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Sales Order</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>SO #</th><th>Customer</th><th>Date</th><th>Items</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var o in orders)
+                    {
+                        <tr>
+                            <td>@o.OrderNumber</td><td>@o.CustomerName</td><td>@o.OrderDate.ToString("d")</td><td>@o.ItemCount</td><td>@o.Amount.ToString("C2")</td>
+                            <td><span class="badge @(o.Status=="Confirmed"?"bg-success":"bg-warning")">@o.Status</span></td>
+                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-truck"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="deliveries"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/SD/Delivery/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Delivery</a></div><table class="table table-hover table-sm"><thead><tr><th>Delivery #</th><th>Date</th><th>SO #</th><th>Customer</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var d in deliveries){<tr><td>@d.DeliveryNumber</td><td>@d.Date.ToString("d")</td><td>@d.SoNumber</td><td>@d.CustomerName</td><td><span class="badge @(d.Status=="Delivered"?"bg-success":"bg-info")">@d.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="billing"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/SD/Billing/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Invoice</a></div><table class="table table-hover table-sm"><thead><tr><th>Invoice #</th><th>Date</th><th>SO #</th><th>Customer</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var b in bills){<tr><td>@b.DocumentNumber</td><td>@b.Date.ToString("d")</td><td>@b.SoNumber</td><td>@b.CustomerName</td><td>@b.Amount.ToString("C2")</td><td><span class="badge @(b.Status=="Paid"?"bg-success":"bg-danger")">@b.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+</div>

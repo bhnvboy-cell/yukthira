@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>YuktiraERP.Tests</RootNamespace>
+    <DisableMsCoverageReferencedPathMaps>true</DisableMsCoverageReferencedPathMaps>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="xunit" Version="2.9.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\YuktiraERP.Core\YuktiraERP.Core.csproj" />
+    <ProjectReference Include="..\YuktiraERP.Infrastructure\YuktiraERP.Infrastructure.csproj" />
+    <ProjectReference Include="..\YuktiraERP.WorkflowEngine\YuktiraERP.WorkflowEngine.csproj" />
+    <ProjectReference Include="..\YuktiraERP.AIEngine\YuktiraERP.AIEngine.csproj" />
+    <ProjectReference Include="..\YuktiraERP.ExportEngine\YuktiraERP.ExportEngine.csproj" />
+  </ItemGroup>
+
+</Project>

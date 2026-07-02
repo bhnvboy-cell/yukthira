@@ -1,0 +1,22 @@
+@page
+@model YuktiraERP.Web.Pages.PP.BOM.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Bill of Material Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Bill of Material Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">BomId</dt><dd class="col-sm-8">@Model.Bom.BomId</dd>
+<dt class="col-sm-4">ProductName</dt><dd class="col-sm-8">@Model.Bom.ProductName</dd>
+<dt class="col-sm-4">ComponentName</dt><dd class="col-sm-8">@Model.Bom.ComponentName</dd>
+<dt class="col-sm-4">Quantity</dt><dd class="col-sm-8">@Model.Bom.Quantity</dd>
+<dt class="col-sm-4">UOM</dt><dd class="col-sm-8">@Model.Bom.UOM</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Bom.Status</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/PP/BOM/Edit" asp-route-id="@Model.Bom.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,11 @@
+@page
+@{
+    ViewData["Title"] = "Administration";
+}
+<h2><i class="bi bi-gear-wide me-2"></i>Administration</h2>
+<div class="row g-3 mt-2">
+    <div class="col-md-3"><a asp-page="/Admin/Users" class="text-decoration-none"><div class="card text-center p-3 h-100"><i class="bi bi-people display-6 text-primary"></i><h6 class="mt-2">User Management</h6></div></a></div>
+    <div class="col-md-3"><a asp-page="/Admin/Plugins" class="text-decoration-none"><div class="card text-center p-3 h-100"><i class="bi bi-puzzle display-6 text-primary"></i><h6 class="mt-2">Plugin Manager</h6></div></a></div>
+    <div class="col-md-3"><a asp-page="/Admin/SystemConfig" class="text-decoration-none"><div class="card text-center p-3 h-100"><i class="bi bi-sliders display-6 text-primary"></i><h6 class="mt-2">System Config</h6></div></a></div>
+    <div class="col-md-3"><a asp-page="/Admin/Tenants" class="text-decoration-none"><div class="card text-center p-3 h-100"><i class="bi bi-building display-6 text-primary"></i><h6 class="mt-2">Tenant Management</h6></div></a></div>
+</div>

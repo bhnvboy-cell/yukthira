@@ -1,0 +1,16 @@
+@page
+@model YuktiraERP.Web.Pages.FI.AP.InvoiceCreateModel
+@{ ViewData["Title"] = "AP Invoice (FB60)"; }
+<div class="row justify-content-center"><div class="col-lg-6">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-receipt me-2"></i>AP Invoice</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="mb-3"><label asp-for="Entry.VendorName" class="form-label"></label><input asp-for="Entry.VendorName" class="form-control" /></div>
+<div class="mb-3"><label asp-for="Entry.Amount" class="form-label"></label><input asp-for="Entry.Amount" class="form-control" type="number" step="0.01" /></div>
+<div class="mb-3"><label asp-for="Entry.PaidAmount" class="form-label">Paid Amount</label><input asp-for="Entry.PaidAmount" class="form-control" type="number" step="0.01" /></div>
+<div class="mb-3"><label asp-for="Entry.Date" class="form-label"></label><input asp-for="Entry.Date" class="form-control" type="date" /></div>
+<div class="mb-3"><label asp-for="Entry.Status" class="form-label"></label><select asp-for="Entry.Status" class="form-select"><option>Open</option><option>Paid</option><option>Cancelled</option></select></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Post</button><a asp-page="/FI/Index" class="btn btn-outline-secondary">Cancel</a></div>
+</form>
+</div></div>
+</div></div>

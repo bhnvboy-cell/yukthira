@@ -1,0 +1,43 @@
+@page
+@model YuktiraERP.Web.Pages.LIMS.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Lab Information Management";
+    var samples = Model.Samples;
+    var specs = Model.Specifications;
+    var instruments = Model.Instruments;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-flask me-2"></i>Lab Information Management</h2>
+    <div><a asp-page="/LIMS/Sample/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Sample</a></div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#samples">Samples</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tests">Test Results</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#specs">Specifications</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#methods">Test Methods</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#instruments">Instruments</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="samples">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Sample ID</th><th>Material</th><th>Source</th><th>Date</th><th>Tests</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var s in samples)
+                    {
+                        <tr>
+                            <td>@s.SampleId</td><td>@s.MaterialName</td><td>@s.Source</td><td>@s.CollectionDate.ToString("d")</td><td>@s.TestCount</td>
+                            <td><span class="badge @(s.Status=="Completed"?"bg-success":s.Status=="In Progress"?"bg-warning":"bg-info")">@s.Status</span></td>
+                            <td><i class="bi bi-eye"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="tests"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/LIMS/TestResult/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Test Result</a></div><p class="text-muted">Test result entry with pass/fail determination, COA generation, and trend charts.</p></div></div></div>
+    <div class="tab-pane fade" id="specs"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/LIMS/Specification/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Specification</a></div><table class="table table-hover table-sm"><thead><tr><th>Spec ID</th><th>Material</th><th>Characteristic</th><th>Min</th><th>Max</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var s in specs){<tr><td>@s.SpecId</td><td>@s.MaterialName</td><td>@s.Characteristic</td><td>@s.MinValue</td><td>@s.MaxValue</td><td><span class="badge bg-success">@s.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="methods"><div class="card"><div class="card-body"><p class="text-muted">Standard operating procedures with version control, approval, and assigned instruments.</p></div></div></div>
+    <div class="tab-pane fade" id="instruments"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/LIMS/Instrument/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Instrument</a></div><table class="table table-hover table-sm"><thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Last Cal</th><th>Next Cal</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var i in instruments){<tr><td>@i.Code</td><td>@i.Name</td><td>@i.Type</td><td>@i.LastCalibration.ToString("d")</td><td>@i.NextCalibration.ToString("d")</td><td><span class="badge @(i.Status=="Operational"?"bg-success":"bg-warning")">@i.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
+</div>

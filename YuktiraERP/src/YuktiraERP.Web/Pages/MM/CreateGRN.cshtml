@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.MM.CreateGRNModel
+@{ ViewData["Title"] = "Create Goods Receipt"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+    <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Goods Receipt</h5></div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row mb-3">
+                <div class="col-md-4"><label asp-for="GRN.PoNumber" class="form-label"></label><input asp-for="GRN.PoNumber" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="GRN.MaterialName" class="form-label"></label><input asp-for="GRN.MaterialName" class="form-control" /></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3"><label asp-for="GRN.QtyReceived" class="form-label"></label><input asp-for="GRN.QtyReceived" class="form-control" /></div>
+                <div class="col-md-3"><label asp-for="GRN.QtyAccepted" class="form-label"></label><input asp-for="GRN.QtyAccepted" class="form-control" /></div>
+                <div class="col-md-3"><label asp-for="GRN.Status" class="form-label"></label><select asp-for="GRN.Status" class="form-select"><option>Pending</option><option>Inspection Pending</option><option>Posted</option><option>Rejected</option></select></div>
+            </div>
+            <div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/Index" class="btn btn-outline-secondary">Cancel</a></div>
+        </form>
+    </div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

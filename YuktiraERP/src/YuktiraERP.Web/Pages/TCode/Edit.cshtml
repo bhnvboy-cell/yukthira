@@ -1,0 +1,117 @@
+@page
+@model YuktiraERP.Web.Pages.TCode.EditModel
+@{
+    ViewData["Title"] = "Edit " + Model.Code;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-pencil me-2"></i>Edit @Model.Code: <small id="recordIdDisplay" class="text-muted"></small></h2>
+    <a href="/TCode/List?tcodeId=@Model.TCodeId&code=@Model.Code" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body py-2">
+        <div id="workflowBar" class="d-flex align-items-center gap-2"></div>
+        <div id="workflowActions" class="mt-2"></div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div id="formContainer">
+            <p class="text-muted">Loading...</p>
+        </div>
+        <button class="btn btn-primary mt-3" id="saveBtn" onclick="submitForm()"><i class="bi bi-save"></i> Save</button>
+    </div>
+</div>
+
+<script>
+    var params = new URLSearchParams(location.search);
+    var tcodeId = params.get('tcodeId');
+    var recordId = params.get('recordId');
+    var code = params.get('code');
+
+    async function loadWorkflow() {
+        var res = await fetch('/api/tcode-generator/data/' + recordId + '/workflow');
+        var wf = await res.json();
+        var bar = document.getElementById('workflowBar');
+        bar.innerHTML = '';
+        wf.nodes.forEach(function(n) {
+            var isActive = n.name === wf.currentNode;
+            var isDone = ['END', 'POSTING'].includes(wf.currentNode) && n.name !== wf.currentNode && n.name !== 'START';
+            var cls = isActive ? 'bg-' + n.color + ' text-white' : 'bg-light text-muted border';
+            bar.innerHTML += '<div class="d-flex align-items-center"><span class="badge rounded-pill ' + cls + ' px-3 py-2"><i class="bi ' + n.icon + ' me-1"></i>' + n.label + '</span><i class="bi bi-chevron-right mx-1 text-muted small"></i></div>';
+        });
+        var actions = document.getElementById('workflowActions');
+        actions.innerHTML = '';
+        wf.availableTransitions.forEach(function(t) {
+            actions.innerHTML += '<button class="btn btn-outline-primary btn-sm me-1" onclick="advance(\'' + t.to + '\')"><i class="bi bi-arrow-right"></i> ' + t.label + '</button>';
+        });
+        document.getElementById('saveBtn').disabled = !wf.canEdit;
+    }
+
+    async function advance(target) {
+        var res = await fetch('/api/tcode-generator/data/' + recordId + '/workflow/advance', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ targetNode: target })
+        });
+        if (res.ok) {
+            loadWorkflow();
+            if (target === 'END') location.href = '/TCode/List?tcodeId=' + tcodeId + '&code=' + code;
+        } else {
+            var err = await res.text();
+            alert('Error: ' + err);
+        }
+    }
+
+    async function loadForm() {
+        var [fieldsRes, recRes] = await Promise.all([
+            fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields'),
+            fetch('/api/tcode-generator/data/record/' + recordId)
+        ]);
+        var fields = await fieldsRes.json();
+        var rec = await recRes.json();
+        document.getElementById('recordIdDisplay').textContent = rec.recordId;
+
+        var html = '<div class="row">';
+        fields.forEach(function(f) {
+            var val = rec.data[f.fieldName] || '';
+            html += '<div class="col-md-' + (f.width > 300 ? '6' : '4') + ' mb-3">';
+            html += '<label class="form-label">' + f.fieldLabel + (f.isRequired ? ' <span class="text-danger">*</span>' : '') + '</label>';
+            if (f.dataType === 'TEXTAREA') html += '<textarea id="f_' + f.fieldName + '" class="form-control" rows="3">' + val + '</textarea>';
+            else if (f.dataType === 'BOOLEAN') html += '<input id="f_' + f.fieldName + '" type="checkbox" class="form-check-input" style="margin-left:4px" ' + (val === true || val === 'true' ? 'checked' : '') + ' />';
+            else if (f.dataType === 'DATE') html += '<input id="f_' + f.fieldName + '" type="date" class="form-control" value="' + val + '" />';
+            else html += '<input id="f_' + f.fieldName + '" type="text" class="form-control" value="' + val + '" />';
+            html += '</div>';
+        });
+        html += '</div>';
+        document.getElementById('formContainer').innerHTML = html;
+    }
+
+    async function submitForm() {
+        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields');
+        var fields = await res.json();
+        var data = {};
+        fields.forEach(function(f) {
+            var el = document.getElementById('f_' + f.fieldName);
+            if (el) {
+                if (f.dataType === 'BOOLEAN') data[f.fieldName] = el.checked;
+                else if (f.dataType === 'NUMBER' || f.dataType === 'DECIMAL') data[f.fieldName] = parseFloat(el.value) || 0;
+                else data[f.fieldName] = el.value;
+            }
+        });
+        var saveRes = await fetch('/api/tcode-generator/data/' + recordId, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if (saveRes.ok) {
+            location.href = '/TCode/List?tcodeId=' + tcodeId + '&code=' + code;
+        } else {
+            alert('Failed to save record');
+        }
+    }
+
+    loadForm();
+    loadWorkflow();
+</script>

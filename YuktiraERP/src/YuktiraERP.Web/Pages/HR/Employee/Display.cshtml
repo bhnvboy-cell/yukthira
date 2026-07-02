@@ -1,0 +1,22 @@
+@page
+@model YuktiraERP.Web.Pages.HR.Employee.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Employee Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Employee Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">Code</dt><dd class="col-sm-8">@Model.Employee.Code</dd>
+<dt class="col-sm-4">Name</dt><dd class="col-sm-8">@Model.Employee.Name</dd>
+<dt class="col-sm-4">Department</dt><dd class="col-sm-8">@Model.Employee.Department</dd>
+<dt class="col-sm-4">Designation</dt><dd class="col-sm-8">@Model.Employee.Designation</dd>
+<dt class="col-sm-4">Mobile</dt><dd class="col-sm-8">@Model.Employee.Mobile</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Employee.Status</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/HR/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/HR/Employee/Edit" asp-route-id="@Model.Employee.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

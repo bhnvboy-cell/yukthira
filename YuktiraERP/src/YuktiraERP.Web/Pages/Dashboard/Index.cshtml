@@ -1,0 +1,394 @@
+@page
+@model YuktiraERP.Web.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Home - Yuktira ERP";
+}
+
+<div class="welcome-bar">
+    <div>
+        <h1>Welcome back, @(User.Identity?.Name ?? "User")</h1>
+        <p>Select a module to get started</p>
+    </div>
+</div>
+
+<div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card color-green" style="cursor:default">
+        <div class="kpi-top">
+            <div class="kpi-icon"><i class="bi bi-boxes"></i></div>
+            <span class="kpi-trend flat"><i class="bi bi-dash"></i>0%</span>
+        </div>
+        <div class="kpi-value">--</div>
+        <div class="kpi-label">Loading...</div>
+    </div>
+    <div class="kpi-card color-green" style="cursor:default">
+        <div class="kpi-top">
+            <div class="kpi-icon"><i class="bi bi-cart3"></i></div>
+            <span class="kpi-trend flat">--</span>
+        </div>
+        <div class="kpi-value">--</div>
+        <div class="kpi-label">Loading...</div>
+    </div>
+    <div class="kpi-card color-green" style="cursor:default">
+        <div class="kpi-top">
+            <div class="kpi-icon"><i class="bi bi-gear"></i></div>
+            <span class="kpi-trend flat">--</span>
+        </div>
+        <div class="kpi-value">--</div>
+        <div class="kpi-label">Loading...</div>
+    </div>
+    <div class="kpi-card color-green" style="cursor:default">
+        <div class="kpi-top">
+            <div class="kpi-icon"><i class="bi bi-clipboard-check"></i></div>
+            <span class="kpi-trend flat">--</span>
+        </div>
+        <div class="kpi-value">--</div>
+        <div class="kpi-label">Loading...</div>
+    </div>
+    <div class="kpi-card color-green" style="cursor:default">
+        <div class="kpi-top">
+            <div class="kpi-icon"><i class="bi bi-flask"></i></div>
+            <span class="kpi-trend flat">--</span>
+        </div>
+        <div class="kpi-value">--</div>
+        <div class="kpi-label">Loading...</div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    @foreach (var qa in Model.QuickActions)
+    {
+        <a href="@qa.Url" class="quick-action" title="@qa.Name">
+            <div class="qa-icon" style="background:@qa.Color"><i class="bi @qa.Icon"></i></div>
+            <span class="qa-label">@qa.Name</span>
+        </a>
+    }
+</div>
+
+<div class="tile-search">
+    <i class="bi bi-search search-icon"></i>
+    <input type="text" id="tileSearch" class="form-control" placeholder="Search modules by name, code, or category..." autocomplete="off">
+</div>
+
+<div class="category-filters" id="categoryFilters">
+    <button class="category-filter active" data-cat="all">All <span class="count">@Model.Modules.Count</span></button>
+    @foreach (var group in Model.Modules.GroupBy(m => m.Category))
+    {
+        <button class="category-filter" data-cat="@group.Key">@group.Key <span class="count">@group.Count()</span></button>
+    }
+</div>
+
+<div id="favoritesSection" class="tile-section" style="display:none">
+    <div class="tile-section-title"><i class="bi bi-star-fill text-warning"></i> Pinned Modules</div>
+    <div class="tile-grid" id="favoritesGrid"></div>
+</div>
+
+<div id="recentSection" class="tile-section" style="display:none">
+    <div class="tile-section-title"><i class="bi bi-clock-history"></i> Recently Used</div>
+    <div class="mini-tile-grid" id="recentGrid"></div>
+</div>
+
+@foreach (var group in Model.Modules.GroupBy(m => m.Category))
+{
+    <div class="tile-section" data-category="@group.Key">
+        <div class="tile-group-header">
+            <div class="group-icon" style="background:@Model.CategoryColor(group.Key)"><i class="bi @Model.CategoryIcon(group.Key)"></i></div>
+            <span class="group-label">@group.Key</span>
+            <span class="group-count">@group.Count() modules</span>
+        </div>
+        <div class="tile-grid">
+            @foreach (var m in group)
+            {
+                <a href="@m.Url" class="tile-card" data-code="@m.Code" data-name="@m.Name" data-category="@m.Category" data-color="@m.Color">
+                    <div class="tile-icon" style="background:@m.Color"><i class="bi @m.Icon"></i></div>
+                    <div class="tile-label">@m.Code</div>
+                    <div class="tile-sub">@m.Name</div>
+                    <button class="tile-fav" data-code="@m.Code" title="Pin module"><i class="bi bi-star"></i></button>
+                </a>
+            }
+        </div>
+    </div>
+}
+
+@section Scripts {
+<script>
+    // ── KPI Cards load ──
+    (function() {
+        var kpiGrid = document.getElementById('kpiGrid');
+        if (!kpiGrid) return;
+        fetch('/api/kpi/dashboard')
+            .then(function(r) { return r.json(); })
+            .then(function(kpis) {
+                if (!kpis || !kpis.length) return;
+                var html = '';
+                kpis.forEach(function(k) {
+                    var trendIcon = k.trend === 'up' ? 'bi-arrow-up' : k.trend === 'down' ? 'bi-arrow-down' : 'bi-dash';
+                    var alertHtml = k.alertMessage ? '<div class="kpi-alert"><i class="bi bi-exclamation-triangle"></i> ' + k.alertMessage + '</div>' : '';
+                    html += '<a href="' + k.drillDownUrl + '" class="kpi-card color-' + k.color + '" title="View ' + k.label + ' details">';
+                    html += '<div class="kpi-top">';
+                    html += '<div class="kpi-icon"><i class="bi ' + k.icon + '"></i></div>';
+                    html += '<span class="kpi-trend ' + k.trend + '"><i class="bi ' + trendIcon + '"></i> ' + k.trendLabel + '</span>';
+                    html += '</div>';
+                    html += '<div class="kpi-value">' + k.displayValue + '</div>';
+                    html += '<div class="kpi-label">' + k.label + '</div>';
+                    html += alertHtml;
+                    html += '</a>';
+                });
+                kpiGrid.innerHTML = html;
+            });
+    })();
+
+    // ── KPI Badges on tiles ──
+    (function() {
+        fetch('/api/kpi/module-badges')
+            .then(function(r) { return r.json(); })
+            .then(function(badges) {
+                if (!badges || !badges.length) return;
+                badges.forEach(function(b) {
+                    var tiles = document.querySelectorAll('.tile-card[data-code="' + b.moduleCode + '"]');
+                    tiles.forEach(function(tile) {
+                        var badge = document.createElement('div');
+                        badge.className = 'kpi-badge ' + b.color;
+                        var trendIcon = b.trend === 'up' ? '&#9650;' : b.trend === 'down' ? '&#9660;' : '';
+                        badge.innerHTML = b.value + (trendIcon ? ' <span class="badge-trend">' + trendIcon + '</span>' : '');
+                        tile.appendChild(badge);
+                    });
+                });
+            });
+    })();
+
+    // ── Tile favorites (localStorage) ──
+    var FAV_KEY = 'yuktira_favorites';
+    var RECENT_KEY = 'yuktira_recent';
+
+    function getFavorites() {
+        try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch(e) { return []; }
+    }
+    function setFavorites(arr) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(arr));
+    }
+    function getRecent() {
+        try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch(e) { return []; }
+    }
+    function setRecent(arr) {
+        localStorage.setItem(RECENT_KEY, JSON.stringify(arr.slice(0, 5)));
+    }
+
+    function addRecent(code) {
+        var arr = getRecent().filter(function(c) { return c !== code; });
+        arr.unshift(code);
+        setRecent(arr);
+    }
+
+    function isFav(code) {
+        return getFavorites().indexOf(code) !== -1;
+    }
+
+    function toggleFav(code) {
+        var arr = getFavorites();
+        var idx = arr.indexOf(code);
+        if (idx === -1) { arr.push(code); } else { arr.splice(idx, 1); }
+        setFavorites(arr);
+        renderFavorites();
+        renderFavButtons();
+    }
+
+    function renderFavButtons() {
+        var favs = getFavorites();
+        document.querySelectorAll('.tile-fav').forEach(function(btn) {
+            var code = btn.getAttribute('data-code');
+            if (favs.indexOf(code) !== -1) {
+                btn.classList.add('active');
+                btn.querySelector('i').className = 'bi bi-star-fill';
+            } else {
+                btn.classList.remove('active');
+                btn.querySelector('i').className = 'bi bi-star';
+            }
+        });
+    }
+
+    function renderFavorites() {
+        var favs = getFavorites();
+        var section = document.getElementById('favoritesSection');
+        var grid = document.getElementById('favoritesGrid');
+        if (!favs.length) { section.style.display = 'none'; return; }
+        section.style.display = '';
+        var html = '';
+        favs.forEach(function(code) {
+            var tile = document.querySelector('.tile-card[data-code="' + code + '"]');
+            if (tile) {
+                html += tile.outerHTML;
+            }
+        });
+        grid.innerHTML = html;
+        grid.querySelectorAll('.tile-fav').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); e.stopPropagation();
+                toggleFav(this.getAttribute('data-code'));
+            });
+        });
+        grid.querySelectorAll('.tile-card').forEach(function(card) {
+            card.addEventListener('click', function() {
+                addRecent(this.getAttribute('data-code'));
+            });
+        });
+    }
+
+    function renderRecent() {
+        var recents = getRecent();
+        var section = document.getElementById('recentSection');
+        var grid = document.getElementById('recentGrid');
+        if (!recents.length) { section.style.display = 'none'; return; }
+        section.style.display = '';
+        var html = '';
+        recents.forEach(function(code) {
+            var tile = document.querySelector('.tile-card[data-code="' + code + '"]');
+            if (tile) {
+                var bg = tile.querySelector('.tile-icon').style.background;
+                var icon = tile.querySelector('.tile-icon i').className;
+                var name = tile.getAttribute('data-name');
+                var url = tile.getAttribute('href');
+                var cat = tile.getAttribute('data-category');
+                html += '<a href="' + url + '" class="mini-tile-card" data-code="' + code + '" data-name="' + name + '" data-category="' + cat + '">';
+                html += '<div class="mini-icon" style="background:' + bg + '"><i class="' + icon + '"></i></div>';
+                html += '<div><div class="mini-label">' + code + '</div><div class="mini-sub">' + name + '</div></div>';
+                html += '</a>';
+            }
+        });
+        grid.innerHTML = html;
+        grid.querySelectorAll('.mini-tile-card').forEach(function(card) {
+            card.addEventListener('click', function() {
+                addRecent(this.getAttribute('data-code'));
+            });
+        });
+    }
+
+    // ── Fuzzy match ──
+    function fuzzyMatch(text, query) {
+        if (!query) return true;
+        text = text.toLowerCase();
+        query = query.toLowerCase().trim();
+        if (text.indexOf(query) !== -1) return true;
+        var qi = 0;
+        for (var i = 0; i < text.length && qi < query.length; i++) {
+            if (text[i] === query[qi]) qi++;
+        }
+        return qi === query.length;
+    }
+
+    function escapeRegex(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlightText(text, query) {
+        if (!query || !query.trim()) return text;
+        var escaped = escapeRegex(query.trim());
+        var re = new RegExp('(' + escaped.split('').join('.*?') + '|' + escaped + ')', 'gi');
+        return text.replace(re, '<mark class="highlight">$1</mark>');
+    }
+
+    // ── Tile search + filter ──
+    var currentCategory = 'all';
+
+    function filterTiles(val) {
+        var q = val.toLowerCase().trim();
+        var hasQuery = q.length > 0;
+
+        document.querySelectorAll('.tile-section[data-category]').forEach(function(section) {
+            var cat = section.getAttribute('data-category');
+            var matchesCat = currentCategory === 'all' || cat === currentCategory;
+            var visibleCount = 0;
+
+            section.querySelectorAll('.tile-card').forEach(function(card) {
+                var code = (card.getAttribute('data-code') || '').toLowerCase();
+                var name = (card.getAttribute('data-name') || '').toLowerCase();
+                var catAttr = (card.getAttribute('data-category') || '').toLowerCase();
+
+                var matchesSearch = !hasQuery ||
+                    fuzzyMatch(code, q) ||
+                    fuzzyMatch(name, q) ||
+                    fuzzyMatch(catAttr, q);
+
+                if (matchesCat && matchesSearch) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+
+                var sub = card.querySelector('.tile-sub');
+                if (sub && hasQuery) {
+                    var origName = card.getAttribute('data-name');
+                    var qq = q;
+                    if (fuzzyMatch(origName, qq)) {
+                        sub.innerHTML = highlightText(origName, qq);
+                    } else {
+                        sub.textContent = origName;
+                    }
+                } else if (sub) {
+                    sub.textContent = card.getAttribute('data-name');
+                }
+
+                var label = card.querySelector('.tile-label');
+                if (label && hasQuery) {
+                    var origCode = card.getAttribute('data-code');
+                    if (fuzzyMatch(origCode, qq || q)) {
+                        label.innerHTML = highlightText(origCode, qq || q);
+                    } else {
+                        label.textContent = origCode;
+                    }
+                }
+            });
+
+            if (matchesCat && visibleCount === 0) {
+                section.style.display = 'none';
+            } else if (matchesCat) {
+                section.style.display = '';
+            }
+        });
+
+        document.querySelectorAll('#favoritesGrid .tile-card, #recentGrid .mini-tile-card').forEach(function(card) {
+            var code = (card.getAttribute('data-code') || '').toLowerCase();
+            var name = (card.getAttribute('data-name') || '').toLowerCase();
+            if (!hasQuery || fuzzyMatch(code, q) || fuzzyMatch(name, q)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // ── Category filter chips ──
+    document.querySelectorAll('.category-filter').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.category-filter').forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            currentCategory = this.getAttribute('data-cat');
+            var searchVal = document.getElementById('tileSearch').value;
+            filterTiles(searchVal);
+        });
+    });
+
+    // ── Search input ──
+    $('#tileSearch').on('input', function() { filterTiles(this.value); });
+
+    // ── Tile click → track recent ──
+    document.querySelectorAll('.tile-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            addRecent(this.getAttribute('data-code'));
+        });
+    });
+
+    // ── Fav buttons ──
+    document.querySelectorAll('.tile-fav').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            toggleFav(this.getAttribute('data-code'));
+        });
+    });
+
+    // ── Init ──
+    renderFavorites();
+    renderRecent();
+    renderFavButtons();
+</script>
+}

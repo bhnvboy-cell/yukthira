@@ -1,0 +1,58 @@
+@page
+@model YuktiraERP.Web.Pages.PS.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Project System";
+    var projects = Model.Projects;
+    var tasks = Model.Tasks;
+    var timesheets = Model.Timesheets;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-diagram-3 me-2"></i>Project System (PS)</h2>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#projects">Projects</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tasks">Tasks</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#timesheets">Timesheets</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="projects">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/PS/Project/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Project</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Manager</th><th>Department</th><th>Budget</th><th>Spent</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var p in projects) {
+                        <tr><td>@p.ProjectCode</td><td>@p.Name</td><td>@p.Manager</td><td>@p.Department</td><td>@p.Budget.ToString("C0")</td><td>@p.Spent.ToString("C0")</td><td>@p.StartDate.ToString("d")</td><td>@p.EndDate.ToString("d")</td><td><span class="badge @(p.Status=="In Progress"?"bg-primary":"bg-info")">@p.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="tasks">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/PS/ProjTask/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Task</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Project</th><th>Assigned To</th><th>Planned Hrs</th><th>Actual Hrs</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var t in tasks) {
+                        <tr><td>@t.TaskCode</td><td>@t.Name</td><td>@t.ProjectCode</td><td>@t.AssignedTo</td><td>@t.PlannedHours</td><td>@t.ActualHours</td><td>@t.StartDate.ToString("d")</td><td>@t.EndDate.ToString("d")</td><td><span class="badge bg-secondary">@t.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="timesheets">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/PS/Timesheet/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Entry</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Employee</th><th>Project</th><th>Task</th><th>Date</th><th>Hours</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var ts in timesheets) {
+                        <tr><td>@ts.EmployeeName</td><td>@ts.ProjectCode</td><td>@ts.TaskCode</td><td>@ts.Date.ToString("d")</td><td>@ts.Hours</td><td>@ts.Description</td><td><span class="badge bg-info">@ts.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>

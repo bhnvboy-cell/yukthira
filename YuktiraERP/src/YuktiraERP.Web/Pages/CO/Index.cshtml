@@ -1,0 +1,73 @@
+@page
+@model YuktiraERP.Web.Pages.CO.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Controlling";
+    var centers = Model.CostCenters;
+    var elements = Model.CostElements;
+    var profits = Model.ProfitCenters;
+    var orders = Model.InternalOrders;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-pie-chart me-2"></i>Controlling (CO)</h2>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#centers">Cost Centers</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#elements">Cost Elements</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#profits">Profit Centers</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#orders">Internal Orders</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="centers">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/CO/CostCenter/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Cost Center</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Manager</th><th>Department</th><th>Budget</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var c in centers) {
+                        <tr><td>@c.Code</td><td>@c.Name</td><td>@c.Manager</td><td>@c.Department</td><td>@c.PlannedBudget.ToString("C0")</td><td><span class="badge @(c.Status=="Active"?"bg-success":"bg-warning")">@c.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="elements">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/CO/CostElement/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Cost Element</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var e in elements) {
+                        <tr><td>@e.Code</td><td>@e.Name</td><td>@e.Type</td><td>@e.Category</td><td><span class="badge @(e.Status=="Active"?"bg-success":"bg-warning")">@e.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="profits">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/CO/ProfitCenter/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Profit Center</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Code</th><th>Name</th><th>Manager</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var p in profits) {
+                        <tr><td>@p.Code</td><td>@p.Name</td><td>@p.Manager</td><td>@p.Department</td><td><span class="badge @(p.Status=="Active"?"bg-success":"bg-warning")">@p.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="orders">
+        <div class="card"><div class="card-body">
+            <div class="mb-2"><a asp-page="/CO/InternalOrder/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Internal Order</a></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Order#</th><th>Name</th><th>Cost Center</th><th>Planned</th><th>Actual</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var o in orders) {
+                        <tr><td>@o.OrderNumber</td><td>@o.Name</td><td>@o.CostCenter</td><td>@o.PlannedCost.ToString("C0")</td><td>@o.ActualCost.ToString("C0")</td><td>@o.StartDate.ToString("d")</td><td>@o.EndDate.ToString("d")</td><td><span class="badge bg-info">@o.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>

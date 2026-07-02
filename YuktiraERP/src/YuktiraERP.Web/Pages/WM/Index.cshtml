@@ -1,0 +1,37 @@
+@page
+@model YuktiraERP.Web.Pages.WM.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Warehouse Management";
+    var items = Model.StockItems;
+    var locations = Model.StorageLocations;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-house-door me-2"></i>Warehouse Management</h2>
+    <div><a asp-page="/WM/Bin/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Inventory Item</a></div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#inventory">Inventory</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#transfers">Transfers</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#locations">Storage Locations</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="inventory">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Material</th><th>Bin</th><th>Lot</th><th>Qty</th><th>UOM</th><th>Value</th><th>Min</th><th>Max</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var s in items)
+                    {
+                        <tr>
+                            <td>@s.MaterialName</td><td>@s.Bin</td><td>@s.Lot</td><td>@s.Quantity</td><td>@s.UOM</td><td>@s.Value.ToString("C2")</td><td>@s.MinStock</td><td>@s.MaxStock</td>
+                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-arrow-right"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="transfers"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/WM/Transfer/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Transfer</a></div><p class="text-muted">Stock transfer orders between storage locations and plants with in-transit tracking.</p></div></div></div>
+    <div class="tab-pane fade" id="locations"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/WM/StorageLocation/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Location</a></div><table class="table table-hover table-sm"><thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Capacity</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var l in locations){<tr><td>@l.Code</td><td>@l.Name</td><td>@l.Type</td><td>@l.Capacity</td><td><span class="badge @(l.Status=="Active"?"bg-success":"bg-secondary")">@l.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
+</div>

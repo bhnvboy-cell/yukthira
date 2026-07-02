@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yuktira-postgres
+    environment:
+      POSTGRES_DB: yuktira_erp
+      POSTGRES_USER: yuktira_admin
+      POSTGRES_PASSWORD: <your-db-password>
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../database/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - yuktira-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yuktira_admin -d yuktira_erp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ..
+      dockerfile: scripts/Dockerfile.api
+    container_name: yuktira-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__YuktiraDb: "Host=postgres;Port=5432;Database=yuktira_erp;Username=yuktira_admin;Password=<your-db-password>"
+      Jwt__Secret: "<your-jwt-secret-min-32-chars>"
+      Jwt__Issuer: "YuktiraERP"
+      Jwt__Audience: "YuktiraERPUsers"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - yuktira-network
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: scripts/Dockerfile.web
+    container_name: yuktira-web
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__YuktiraDb: "Host=postgres;Port=5432;Database=yuktira_erp;Username=yuktira_admin;Password=<your-db-password>"
+    ports:
+      - "5001:5001"
+    depends_on:
+      - api
+    networks:
+      - yuktira-network
+    restart: unless-stopped
+
+  apache:
+    image: httpd:2.4-alpine
+    container_name: yuktira-apache
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../apache-config/yuktira-erp.conf:/usr/local/apache2/conf/extra/yuktira-erp.conf
+      # httpd.conf not provided; uses default Apache config + Include extra/yuktira-erp.conf
+      # - ../apache-config/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ../src/YuktiraERP.Web/wwwroot:/var/www/yuktira/web
+      - ./ssl:/etc/ssl/certs
+    depends_on:
+      - api
+      - web
+    networks:
+      - yuktira-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: yuktira-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - yuktira-network
+    restart: unless-stopped
+
+networks:
+  yuktira-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

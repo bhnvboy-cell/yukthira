@@ -1,0 +1,393 @@
+@page
+@{
+    ViewData["Title"] = "Integration Hub";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-diagram-3 me-2"></i>Integration Hub</h2>
+</div>
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#connectors">Connectors</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#connections">Connections</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#webhooks">Webhooks</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#sync">Data Sync</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mappings">Mapping Rules</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#api-clients">API Clients</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#queue">Queue</a></li>
+</ul>
+<div class="tab-content">
+
+    <!-- ── Connectors ── -->
+    <div class="tab-pane fade show active" id="connectors">
+        <div class="row" id="connectorCards"></div>
+    </div>
+
+    <!-- ── Connections ── -->
+    <div class="tab-pane fade" id="connections">
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddConnection()"><i class="bi bi-plus"></i> Add Connection</button>
+        <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Type</th><th>Base URL</th><th>Auth</th><th>Status</th><th>Actions</th></tr></thead><tbody id="connectionsBody"></tbody></table>
+    </div>
+
+    <!-- ── Webhooks ── -->
+    <div class="tab-pane fade" id="webhooks">
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddWebhook()"><i class="bi bi-plus"></i> Add Webhook</button>
+        <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Event Type</th><th>Target URL</th><th>Active</th><th>Last Triggered</th><th>Actions</th></tr></thead><tbody id="webhooksBody"></tbody></table>
+    </div>
+
+    <!-- ── Data Sync ── -->
+    <div class="tab-pane fade" id="sync">
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddSyncJob()"><i class="bi bi-plus"></i> Add Sync Job</button>
+        <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Type</th><th>Direction</th><th>Schedule</th><th>Last Run</th><th>Result</th><th>Actions</th></tr></thead><tbody id="syncJobsBody"></tbody></table>
+    </div>
+
+    <!-- ── Mapping Rules ── -->
+    <div class="tab-pane fade" id="mappings">
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddMapping()"><i class="bi bi-plus"></i> Add Mapping</button>
+        <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Source</th><th>Target</th><th>Source Entity</th><th>Target Entity</th><th>Active</th><th>Actions</th></tr></thead><tbody id="mappingsBody"></tbody></table>
+    </div>
+
+    <!-- ── API Clients ── -->
+    <div class="tab-pane fade" id="api-clients">
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddApiClient()"><i class="bi bi-plus"></i> Create API Client</button>
+        <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Client ID</th><th>Allowed IPs</th><th>Active</th><th>Actions</th></tr></thead><tbody id="apiClientsBody"></tbody></table>
+    </div>
+
+    <!-- ── Queue ── -->
+    <div class="tab-pane fade" id="queue">
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="processQueue()"><i class="bi bi-play"></i> Process Queue</button>
+        <table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Retries</th><th>Target</th><th>Error</th><th>Created</th></tr></thead><tbody id="queueBody"></tbody></table>
+        <h6 class="mt-3">Dead Letter Queue</h6>
+        <table class="table table-hover table-sm"><thead><tr><th>Type</th><th>Error</th><th>Retries</th><th>Failed At</th><th>Actions</th></tr></thead><tbody id="deadLetterBody"></tbody></table>
+    </div>
+
+</div>
+
+<!-- ── Connection Modal ── -->
+<div class="modal fade" id="connModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Connection</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-2"><label class="form-label">Name</label><input id="cName" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Connector Type</label><select id="cType" class="form-select"></select></div>
+        <div class="mb-2"><label class="form-label">Base URL</label><input id="cUrl" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Auth Type</label><select id="cAuth" class="form-select"></select></div>
+        <div class="mb-2"><label class="form-label">Timeout (s)</label><input id="cTimeout" type="number" class="form-control" value="30" /></div>
+        <div class="mb-2">
+            <button class="btn btn-sm btn-outline-secondary" onclick="testConnection()"><i class="bi bi-plug"></i> Test</button>
+            <span id="testResult" class="ms-2 small"></span>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveConnection()">Save</button>
+    </div>
+</div></div></div>
+
+<!-- ── Webhook Modal ── -->
+<div class="modal fade" id="webhookModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Webhook</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-2"><label class="form-label">Name</label><input id="wName" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Event Type</label><select id="wEvent" class="form-select"></select></div>
+        <div class="mb-2"><label class="form-label">Target URL</label><input id="wUrl" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Secret Key (optional)</label><input id="wSecret" class="form-control" /></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveWebhook()">Save</button>
+    </div>
+</div></div></div>
+
+<!-- ── Sync Job Modal ── -->
+<div class="modal fade" id="syncModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Sync Job</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-2"><label class="form-label">Name</label><input id="sName" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Connector Type</label><select id="sConnector" class="form-select"></select></div>
+        <div class="mb-2"><label class="form-label">Connection</label><select id="sConnection" class="form-select"></select></div>
+        <div class="mb-2"><label class="form-label">Direction</label><select id="sDir" class="form-select"><option>Pull</option><option>Push</option></select></div>
+        <div class="mb-2"><label class="form-label">Entity Type</label><input id="sEntity" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Schedule</label><select id="sSchedule" class="form-select"><option>Manual</option><option>Every 5 min</option><option>Every 15 min</option><option>Hourly</option><option>Daily</option><option>Weekly</option></select></div>
+        <div class="mb-2"><label class="form-label">Conflict Resolution</label><select id="sConflict" class="form-select"><option>SourceWins</option><option>TargetWins</option><option>LatestWins</option><option>Manual</option></select></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveSyncJob()">Save</button>
+    </div>
+</div></div></div>
+
+<!-- ── Mapping Modal ── -->
+<div class="modal fade" id="mapModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Mapping Rule</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="row"><div class="col-md-6 mb-2"><label class="form-label">Name</label><input id="mName" class="form-control" /></div>
+        <div class="col-md-3 mb-2"><label class="form-label">Source System</label><input id="mSrcSys" class="form-control" /></div>
+        <div class="col-md-3 mb-2"><label class="form-label">Target System</label><input id="mTgtSys" class="form-control" /></div></div>
+        <div class="row"><div class="col-md-6 mb-2"><label class="form-label">Source Entity</label><input id="mSrcEnt" class="form-control" /></div>
+        <div class="col-md-6 mb-2"><label class="form-label">Target Entity</label><input id="mTgtEnt" class="form-control" /></div></div>
+        <div class="mb-2"><label class="form-label">Field Mappings</label>
+            <div id="fieldMappings"><div class="row mb-1"><div class="col-4"><input class="form-control form-control-sm" placeholder="Source field" /></div><div class="col-4"><input class="form-control form-control-sm" placeholder="Target field" /></div><div class="col-3"><input class="form-control form-control-sm" placeholder="Default" /></div><div class="col-1"><button class="btn btn-outline-danger btn-sm" onclick="this.parentElement.parentElement.remove()">&times;</button></div></div></div>
+            <button class="btn btn-outline-secondary btn-sm mt-1" onclick="addFieldMapping()"><i class="bi bi-plus"></i> Add Field</button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveMapping()">Save</button>
+    </div>
+</div></div></div>
+
+<!-- ── API Client Modal ── -->
+<div class="modal fade" id="apiClientModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">API Client</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-2"><label class="form-label">Name</label><input id="aName" class="form-control" /></div>
+        <div class="mb-2"><label class="form-label">Allowed IPs (comma-separated)</label><input id="aIps" class="form-control" placeholder="192.168.1.1,10.0.0.0/24" /></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveApiClient()">Save</button>
+    </div>
+</div></div></div>
+
+<!-- ── API Client Credentials Modal ── -->
+<div class="modal fade" id="credsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">API Credentials</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-2"><label class="form-label">Client ID</label><input id="credId" class="form-control" readonly /></div>
+        <div class="mb-2"><label class="form-label">Client Secret</label><input id="credSecret" class="form-control" readonly /></div>
+        <p class="text-warning small">Save these credentials — secret won't be shown again</p>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button></div>
+</div></div></div>
+
+<script>
+    // ── Load Connectors ──
+    async function loadConnectors() {
+        var r = await fetch('/api/integration/connectors');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(c) {
+            html += '<div class="col-md-4 mb-3"><div class="card h-100"><div class="card-body"><h6><i class="bi bi-plugin me-1"></i>' + c.name + '</h6><small class="text-muted">v' + c.version + '</small><p class="small mt-1 mb-2">' + c.description + '</p><div><span class="badge bg-info me-1">' + c.type + '</span>' + c.supportedAuthTypes.map(function(a) { return '<span class="badge bg-secondary me-1">' + a + '</span>'; }).join('') + '</div></div></div></div>';
+        });
+        document.getElementById('connectorCards').innerHTML = html || '<div class="col-12"><p class="text-muted">No connectors loaded</p></div>';
+
+        var opts = '<option value="">-- Select --</option>';
+        list.forEach(function(c) { opts += '<option value="' + c.type + '">' + c.name + '</option>'; });
+        document.getElementById('cType').innerHTML = opts;
+        document.getElementById('sConnector').innerHTML = opts;
+
+        document.getElementById('cType').addEventListener('change', function() {
+            var c = list.find(function(x) { return x.type === this.value; });
+            if (c) {
+                var authOpts = '<option value="">-- Select --</option>';
+                c.supportedAuthTypes.forEach(function(a) { authOpts += '<option value="' + a + '">' + a + '</option>'; });
+                document.getElementById('cAuth').innerHTML = authOpts;
+            }
+        });
+    }
+
+    // ── Connections ──
+    async function loadConnections() {
+        var r = await fetch('/api/integration/connections');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(c) {
+            html += '<tr><td><strong>' + c.name + '</strong></td><td><span class="badge bg-info">' + c.connectorType + '</span></td><td><code class="small">' + c.baseUrl + '</code></td><td>' + c.authType + '</td><td><span class="badge ' + (c.isActive ? 'bg-success' : 'bg-secondary') + '">' + (c.isActive ? 'Active' : 'Inactive') + '</span><br/><small class="text-muted">' + (c.lastTestResult || '-') + '</small></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteConnection(\'' + c.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        document.getElementById('connectionsBody').innerHTML = html || '<tr><td colspan="6" class="text-muted text-center">No connections</td></tr>';
+        // Also populate sync connection dropdown
+        var sOpts = '<option value="">-- Select --</option>';
+        list.forEach(function(c) { sOpts += '<option value="' + c.id + '">' + c.name + '</option>'; });
+        document.getElementById('sConnection').innerHTML = sOpts;
+    }
+
+    function showAddConnection() { resetModal('connModal', ['cName','cUrl']); document.getElementById('cTimeout').value = 30; showModal('connModal'); }
+
+    async function saveConnection() {
+        var dto = { name: get('cName'), connectorType: get('cType'), baseUrl: get('cUrl'), authType: get('cAuth'), timeoutSeconds: parseInt(get('cTimeout')) || 30, isActive: true };
+        await fetch('/api/integration/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        hideModal('connModal'); loadConnections();
+    }
+
+    async function testConnection() {
+        // Use first connection ID for demo or let user create then test
+        document.getElementById('testResult').textContent = 'Testing...';
+        // This is a placeholder - in real scenario, need a connection ID
+        document.getElementById('testResult').textContent = 'Save connection first, then test from list';
+    }
+
+    async function deleteConnection(id) {
+        if (!confirm('Delete this connection?')) return;
+        await fetch('/api/integration/connections/' + id, { method:'DELETE' }); loadConnections();
+    }
+
+    // ── Webhooks ──
+    async function loadWebhooks() {
+        var r = await fetch('/api/integration/webhooks');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(w) {
+            html += '<tr><td>' + w.name + '</td><td><span class="badge bg-primary">' + w.eventType + '</span></td><td><code class="small">' + w.targetUrl + '</code></td><td><span class="badge ' + (w.isActive ? 'bg-success' : 'bg-secondary') + '">' + (w.isActive ? 'Yes' : 'No') + '</span></td><td><small class="text-muted">' + (w.lastTriggeredAt ? new Date(w.lastTriggeredAt).toLocaleString() : '-') + '</small></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteWebhook(\'' + w.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        document.getElementById('webhooksBody').innerHTML = html || '<tr><td colspan="6" class="text-muted text-center">No webhooks</td></tr>';
+    }
+
+    async function loadEventTypes() {
+        var r = await fetch('/api/integration/webhooks/event-types');
+        var list = await r.json();
+        var opts = '<option value="">-- Select --</option>';
+        list.forEach(function(e) { opts += '<option value="' + e + '">' + e + '</option>'; });
+        document.getElementById('wEvent').innerHTML = opts;
+    }
+
+    function showAddWebhook() { resetModal('webhookModal', ['wName','wUrl','wSecret']); showModal('webhookModal'); }
+
+    async function saveWebhook() {
+        var dto = { name: get('wName'), eventType: get('wEvent'), targetUrl: get('wUrl'), secretKey: get('wSecret') || null };
+        await fetch('/api/integration/webhooks', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        hideModal('webhookModal'); loadWebhooks();
+    }
+
+    async function deleteWebhook(id) {
+        if (!confirm('Delete this webhook?')) return;
+        await fetch('/api/integration/webhooks/' + id, { method:'DELETE' }); loadWebhooks();
+    }
+
+    // ── Sync Jobs ──
+    async function loadSyncJobs() {
+        var r = await fetch('/api/integration/sync-jobs');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(j) {
+            html += '<tr><td>' + j.name + '</td><td><span class="badge bg-info">' + j.connectorType + '</span></td><td><span class="badge ' + (j.direction === 'Pull' ? 'bg-success' : 'bg-warning') + '">' + j.direction + '</span></td><td>' + j.scheduleType + '</td><td><small class="text-muted">' + (j.lastRunAt ? new Date(j.lastRunAt).toLocaleString() : '-') + '</small></td><td><span class="badge ' + (j.lastRunResult === 'Success' ? 'bg-success' : 'bg-secondary') + '">' + (j.lastRunResult || '-') + '</span></td><td><button class="btn btn-outline-success btn-sm me-1" onclick="runSyncJob(\'' + j.id + '\')"><i class="bi bi-play"></i></button><button class="btn btn-outline-danger btn-sm" onclick="deleteSyncJob(\'' + j.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        document.getElementById('syncJobsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No sync jobs</td></tr>';
+    }
+
+    function showAddSyncJob() {
+        resetModal('syncModal', ['sName','sEntity']);
+        ['sDir','sSchedule','sConflict'].forEach(function(id) { document.getElementById(id).selectedIndex = 0; });
+        showModal('syncModal');
+    }
+
+    async function saveSyncJob() {
+        var dto = {
+            name: get('sName'), connectorType: get('sConnector'), connectionId: get('sConnection'),
+            direction: get('sDir'), entityType: get('sEntity'), scheduleType: get('sSchedule'),
+            conflictResolution: get('sConflict'), isActive: true
+        };
+        await fetch('/api/integration/sync-jobs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        hideModal('syncModal'); loadSyncJobs();
+    }
+
+    async function runSyncJob(id) {
+        var r = await fetch('/api/integration/sync-jobs/' + id + '/run', { method:'POST' });
+        if (r.ok) { loadSyncJobs(); } else { var err = await r.text(); alert(err); }
+    }
+
+    async function deleteSyncJob(id) {
+        if (!confirm('Delete this sync job?')) return;
+        await fetch('/api/integration/sync-jobs/' + id, { method:'DELETE' }); loadSyncJobs();
+    }
+
+    // ── Mapping Rules ──
+    async function loadMappings() {
+        var r = await fetch('/api/integration/mappings');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(m) {
+            html += '<tr><td>' + m.name + '</td><td><span class="badge bg-info">' + m.sourceSystem + '</span></td><td><span class="badge bg-warning">' + m.targetSystem + '</span></td><td>' + m.sourceEntity + '</td><td>' + m.targetEntity + '</td><td><span class="badge ' + (m.isActive ? 'bg-success' : 'bg-secondary') + '">' + (m.isActive ? 'Yes' : 'No') + '</span></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteMapping(\'' + m.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        document.getElementById('mappingsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No mapping rules</td></tr>';
+    }
+
+    function showAddMapping() {
+        resetModal('mapModal', ['mName','mSrcSys','mTgtSys','mSrcEnt','mTgtEnt']);
+        document.getElementById('fieldMappings').innerHTML = '<div class="row mb-1"><div class="col-4"><input class="form-control form-control-sm" placeholder="Source field" /></div><div class="col-4"><input class="form-control form-control-sm" placeholder="Target field" /></div><div class="col-3"><input class="form-control form-control-sm" placeholder="Default" /></div><div class="col-1"><button class="btn btn-outline-danger btn-sm" onclick="this.parentElement.parentElement.remove()">&times;</button></div></div>';
+        showModal('mapModal');
+    }
+
+    function addFieldMapping() {
+        var d = document.getElementById('fieldMappings');
+        var row = document.createElement('div'); row.className = 'row mb-1';
+        row.innerHTML = '<div class="col-4"><input class="form-control form-control-sm" placeholder="Source field" /></div><div class="col-4"><input class="form-control form-control-sm" placeholder="Target field" /></div><div class="col-3"><input class="form-control form-control-sm" placeholder="Default" /></div><div class="col-1"><button class="btn btn-outline-danger btn-sm" onclick="this.parentElement.parentElement.remove()">&times;</button></div>';
+        d.appendChild(row);
+    }
+
+    async function saveMapping() {
+        var fields = [];
+        document.querySelectorAll('#fieldMappings .row').forEach(function(r) {
+            var inputs = r.querySelectorAll('input');
+            fields.push({ sourceField: inputs[0].value, targetField: inputs[1].value, defaultValue: inputs[2].value || '' });
+        });
+        var dto = {
+            name: get('mName'), sourceSystem: get('mSrcSys'), targetSystem: get('mTgtSys'),
+            sourceEntity: get('mSrcEnt'), targetEntity: get('mTgtEnt'), fieldMappings: fields, isActive: true
+        };
+        await fetch('/api/integration/mappings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        hideModal('mapModal'); loadMappings();
+    }
+
+    async function deleteMapping(id) {
+        if (!confirm('Delete this mapping?')) return;
+        await fetch('/api/integration/mappings/' + id, { method:'DELETE' }); loadMappings();
+    }
+
+    // ── API Clients ──
+    async function loadApiClients() {
+        var r = await fetch('/api/integration/api-clients');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(c) {
+            html += '<tr><td>' + c.name + '</td><td><code>' + c.clientId + '</code></td><td><small class="text-muted">' + (c.allowedIpAddresses && c.allowedIpAddresses.length ? c.allowedIpAddresses.join(', ') : 'All') + '</small></td><td><span class="badge ' + (c.isActive ? 'bg-success' : 'bg-secondary') + '">' + (c.isActive ? 'Yes' : 'No') + '</span></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteApiClient(\'' + c.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        document.getElementById('apiClientsBody').innerHTML = html || '<tr><td colspan="5" class="text-muted text-center">No API clients</td></tr>';
+    }
+
+    function showAddApiClient() { resetModal('apiClientModal', ['aName','aIps']); showModal('apiClientModal'); }
+
+    async function saveApiClient() {
+        var ips = get('aIps').split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+        var r = await fetch('/api/integration/api-clients', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: get('aName'), allowedIpAddresses: ips }) });
+        var creds = await r.json();
+        hideModal('apiClientModal'); loadApiClients();
+        document.getElementById('credId').value = creds.clientId;
+        document.getElementById('credSecret').value = creds.secret;
+        showModal('credsModal');
+    }
+
+    async function deleteApiClient(id) {
+        if (!confirm('Delete this API client?')) return;
+        await fetch('/api/integration/api-clients/' + id, { method:'DELETE' }); loadApiClients();
+    }
+
+    // ── Queue ──
+    async function loadQueue() {
+        var r = await fetch('/api/integration/queue/pending');
+        var list = await r.json();
+        var html = '';
+        list.forEach(function(q) {
+            html += '<tr><td><code>' + q.id.substr(0,8) + '</code></td><td>' + q.messageType + '</td><td><span class="badge bg-warning">' + q.status + '</span></td><td>' + q.retryCount + '</td><td><small class="text-muted">' + (q.targetSystem || '-') + '</small></td><td><small class="text-danger">' + (q.lastError || '-') + '</small></td><td><small class="text-muted">' + new Date(q.createdAt).toLocaleString() + '</small></td></tr>';
+        });
+        document.getElementById('queueBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">Queue empty</td></tr>';
+
+        var d = await fetch('/api/integration/queue/dead-letter');
+        var dead = await d.json();
+        var dh = '';
+        dead.forEach(function(q) {
+            dh += '<tr><td>' + q.messageType + '</td><td><small class="text-danger">' + q.errorMessage + '</small></td><td>' + q.retryAttempts + '</td><td><small class="text-muted">' + new Date(q.failedAt).toLocaleString() + '</small></td><td>-</td></tr>';
+        });
+        document.getElementById('deadLetterBody').innerHTML = dh || '<tr><td colspan="5" class="text-muted text-center">No dead letters</td></tr>';
+    }
+
+    async function processQueue() {
+        await fetch('/api/integration/queue/process', { method:'POST' }); loadQueue();
+    }
+
+    // ── Utilities ──
+    function get(id) { return document.getElementById(id).value; }
+    function showModal(id) { new bootstrap.Modal(document.getElementById(id)).show(); }
+    function hideModal(id) { bootstrap.Modal.getInstance(document.getElementById(id)).hide(); }
+    function resetModal(id, fields) { fields.forEach(function(f) { var el = document.getElementById(f); if (el) el.value = ''; }); }
+
+    // ── Init ──
+    loadConnectors(); loadConnections(); loadWebhooks(); loadSyncJobs(); loadMappings(); loadApiClients(); loadQueue(); loadEventTypes();
+</script>

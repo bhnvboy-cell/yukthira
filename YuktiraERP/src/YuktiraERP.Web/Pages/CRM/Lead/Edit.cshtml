@@ -1,0 +1,25 @@
+@page
+@model YuktiraERP.Web.Pages.CRM.Lead.EditModel
+@{ ViewData["Title"] = "Edit Lead"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Lead</h5></div>
+<div class="card-body">
+<form method="post">
+<input type="hidden" asp-for="Lead.Id" />
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Lead.LeadId" class="form-label"></label><input asp-for="Lead.LeadId" class="form-control" /><span asp-validation-for="Lead.LeadId" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Lead.Company" class="form-label"></label><input asp-for="Lead.Company" class="form-control" /><span asp-validation-for="Lead.Company" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Lead.Contact" class="form-label"></label><input asp-for="Lead.Contact" class="form-control" /><span asp-validation-for="Lead.Contact" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Lead.Source" class="form-label"></label><input asp-for="Lead.Source" class="form-control" /><span asp-validation-for="Lead.Source" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Lead.Value" class="form-label"></label><input asp-for="Lead.Value" class="form-control" /><span asp-validation-for="Lead.Value" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="Lead.Status" class="form-label"></label><input asp-for="Lead.Status" class="form-control" /><span asp-validation-for="Lead.Status" class="text-danger small"></span></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/CRM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

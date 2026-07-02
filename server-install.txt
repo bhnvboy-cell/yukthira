@@ -1,0 +1,321 @@
+======================================================================
+  YUKTIRA ERP — SERVER INSTALLATION & CLIENT CONNECTION GUIDE
+  Version 1.0 | July 2026
+======================================================================
+
+TABLE OF CONTENTS
+  1. Server Requirements
+  2. Installation Steps
+  3. Network & Firewall Configuration
+  4. Domain & SSL Setup
+  5. Starting the Server
+  6. Client Connection
+  7. Multi-Tenant Setup
+  8. Maintenance
+
+======================================================================
+1. SERVER REQUIREMENTS
+======================================================================
+
+Minimum:
+  - OS: Windows Server 2019+ / Ubuntu 22.04+ / RHEL 9+
+  - CPU: 4 cores
+  - RAM: 8 GB
+  - Disk: 50 GB SSD
+  - .NET 10 SDK
+
+Recommended:
+  - OS: Windows Server 2022 / Ubuntu 24.04
+  - CPU: 8 cores
+  - RAM: 16 GB
+  - Disk: 100 GB SSD (separate data disk for PostgreSQL)
+  - PostgreSQL 16 (production)
+
+======================================================================
+2. INSTALLATION STEPS
+======================================================================
+
+STEP 1 — Install .NET 10 SDK
+  Windows:
+    Download from https://dotnet.microsoft.com/download/dotnet/10
+    Run installer
+
+  Ubuntu:
+    > sudo apt update && sudo apt install -y dotnet-sdk-10.0
+
+  Verify:
+    > dotnet --version
+    10.x.x
+
+STEP 2 — Install PostgreSQL 16 (if not using in-memory)
+  Windows:
+    Download from https://www.postgresql.org/download/windows/
+    Run installer, set password for postgres user
+
+  Ubuntu:
+    > sudo apt install -y postgresql-16
+    > sudo systemctl enable postgresql
+    > sudo systemctl start postgresql
+
+  Create Database:
+    > sudo -u postgres psql
+    CREATE DATABASE yuktira_erp;
+    \q
+
+STEP 3 — Deploy Application Files
+  Option A — Clone from Git:
+    > git clone <repo-url> C:\YuktiraERP
+    > cd C:\YuktiraERP\YuktiraERP
+    > dotnet restore YuktiraERP.sln
+    > dotnet publish YuktiraERP.sln -c Release -o C:\YuktiraERP\publish
+
+  Option B — Copy published build:
+    Copy the publish/ folder to the server (e.g. C:\YuktiraERP\publish\)
+    Ensure all DLLs and config files are present.
+
+STEP 4 — Configure Database Connection
+  Edit appsettings.Production.json (or appsettings.json):
+  {
+    "ConnectionStrings": {
+      "YuktiraDb": "Host=localhost;Port=5432;Database=yuktira_erp;Username=postgres;Password=YourPassword"
+    },
+    "Jwt": {
+      "Secret": "<generate-a-min-32-char-secret>",
+      "AccessTokenExpirationHours": 8,
+      "RefreshTokenExpirationDays": 7
+    },
+    "MultiTenant": {
+      "Mode": "Subdomain",
+      "DefaultTenant": "demo"
+    }
+  }
+
+  Generate JWT Secret (PowerShell):
+    > $bytes = [byte[]]::new(32)
+    > (New-Object Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes)
+    > [Convert]::ToBase64String($bytes)
+
+STEP 5 — Initialize Database
+    > cd C:\YuktiraERP\publish
+    > init-db.bat
+
+STEP 6 — Configure Apache Reverse Proxy (see Section 3.2)
+
+======================================================================
+3. NETWORK & FIREWALL CONFIGURATION
+======================================================================
+
+3.1 Ports
+
+  | Port | Service     | Protocol | Access      | Notes                        |
+  |------|-------------|----------|-------------|------------------------------|
+  | 443  | HTTPS       | TCP      | Internet    | Apache/Nginx reverse proxy   |
+  | 80   | HTTP        | TCP      | Internet    | Redirect to HTTPS            |
+  | 5000 | API         | TCP      | Localhost   | Not exposed directly         |
+  | 5001 | Web UI      | TCP      | Localhost   | Not exposed directly         |
+  | 5432 | PostgreSQL  | TCP      | Localhost   | Not exposed externally       |
+
+3.2 Reverse Proxy Setup (Apache)
+
+  Enable modules:
+    > sudo a2enmod proxy proxy_http proxy_balancer lbmethod_byrequests ssl headers
+
+  Configure virtual host (apache-config/yuktira-erp.conf):
+    <VirtualHost *:443>
+      ServerName erp.yourcompany.com
+
+      SSLEngine on
+      SSLCertificateFile /etc/ssl/certs/your-cert.pem
+      SSLCertificateKeyFile /etc/ssl/private/your-key.pem
+
+      # Web UI
+      ProxyPass / http://localhost:5001/
+      ProxyPassReverse / http://localhost:5001/
+
+      # API
+      ProxyPass /api http://localhost:5000/api
+      ProxyPassReverse /api http://localhost:5000/api
+
+      # SignalR (WebSocket)
+      ProxyPass /hubs/notifications ws://localhost:5000/hubs/notifications
+
+      Header always set Strict-Transport-Security "max-age=31536000"
+    </VirtualHost>
+
+  For load-balanced setup, see apache-config/yuktira-erp.conf in the repo.
+
+3.3 Firewall Rules (Windows)
+
+  Open PowerShell as Admin:
+    > New-NetFirewallRule -DisplayName "YuktiraERP HTTPS" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
+    > New-NetFirewallRule -DisplayName "YuktiraERP HTTP" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+
+3.4 Windows Firewall (Ubuntu / UFW)
+
+    > sudo ufw allow 443/tcp
+    > sudo ufw allow 80/tcp
+    > sudo ufw enable
+
+======================================================================
+4. DOMAIN & SSL SETUP
+======================================================================
+
+4.1 DNS Records
+  Point your domain (e.g. erp.yourcompany.com) to the server's public IP.
+
+  For multi-tenant (subdomain mode):
+    tenant1.yourcompany.com  →  server-ip
+    tenant2.yourcompany.com  →  server-ip
+    (All point to the same IP; TenantMiddleware resolves tenant from hostname)
+
+4.2 SSL Certificate (Let's Encrypt)
+    > sudo apt install -y certbot python3-certbot-apache
+    > sudo certbot --apache -d erp.yourcompany.com
+
+  For Windows, use a certificate from a trusted CA or Let's Encrypt via
+  win-acme (https://www.win-acme.com).
+
+======================================================================
+5. STARTING THE SERVER
+======================================================================
+
+5.1 Manual Start
+    > cd C:\YuktiraERP\publish
+    > start.bat
+
+5.2 Run as Windows Service
+  Create service using sc or NSSM:
+    > sc create YuktiraERP binPath="C:\YuktiraERP\publish\start.bat" start=auto
+    > sc start YuktiraERP
+
+  Recommended: Use NSSM (Non-Sucking Service Manager):
+    > nssm install YuktiraERP "C:\YuktiraERP\publish\start.bat"
+    > nssm start YuktiraERP
+
+5.3 Run as systemd Service (Linux)
+  Create /etc/systemd/system/yuktiraerp.service:
+    [Unit]
+    Description=Yuktira ERP Suite
+    After=network.target postgresql.service
+
+    [Service]
+    WorkingDirectory=/opt/YuktiraERP/publish
+    ExecStart=/usr/bin/dotnet /opt/YuktiraERP/publish/YuktiraERP.Api.dll
+    Restart=always
+    RestartSec=10
+    User=www-data
+    Environment=ASPNETCORE_ENVIRONMENT=Production
+    Environment=ASPNETCORE_URLS=http://localhost:5000
+
+    [Install]
+    WantedBy=multi-user.target
+
+  Enable and start:
+    > sudo systemctl daemon-reload
+    > sudo systemctl enable yuktiraerp
+    > sudo systemctl start yuktiraerp
+
+  Check status:
+    > sudo systemctl status yuktiraerp
+
+5.4 Verify Server is Running
+    > curl http://localhost:5000/health
+    Expected: { "status": "Healthy" }
+
+    > curl http://localhost:5001
+    Expected: HTML (Web UI loads)
+
+======================================================================
+6. CLIENT CONNECTION
+======================================================================
+
+6.1 Via Web Browser
+  URL: https://erp.yourcompany.com
+  Login: jdoe / any password
+  Client Number: 1000 (maps to DEMO tenant)
+
+6.2 Client Requirements
+  - Modern web browser (Chrome 120+, Edge 120+, Firefox 120+, Safari 17+)
+  - Internet / VPN connection to reach the server
+  - No additional software installation required
+
+6.3 Network Access
+  On-Premise: Clients connect via local network or VPN to the server IP.
+  Cloud: Clients connect via public domain with SSL.
+
+6.4 API Access (for Integrations)
+  Base URL: https://erp.yourcompany.com/api
+  Authentication: JWT Bearer token (obtain via POST /api/auth/login)
+  Rate Limit: 100 requests per minute per client IP
+
+6.5 Mobile Access (Future)
+  Mobile app (Flutter) planned for v1.3. Until then, mobile browser access
+  is supported.
+
+======================================================================
+7. MULTI-TENANT SETUP
+======================================================================
+
+7.1 Adding a Tenant
+  Connect to PostgreSQL and insert:
+    INSERT INTO yuktira_core.tenants (id, name, code, status, max_users)
+    VALUES (gen_random_uuid(), 'Client Company', 'CLIENT1', 'ACTIVE', 50);
+
+7.2 Tenant Resolution Modes
+  Subdomain (default):
+    client1.yourcompany.com → resolves to tenant CLIENT1
+    Users log in with their tenant-specific URL.
+
+  Header:
+    Requests include X-Tenant-Id header.
+    Suitable for API integrations.
+
+  Path:
+    https://yourcompany.com/client1/api/...
+    URL prefix determines tenant.
+
+  Set mode in appsettings.json:
+    "MultiTenant": { "Mode": "Subdomain" }
+
+7.3 Client Onboarding Checklist
+  [ ] Create tenant record in database
+  [ ] Set up DNS (subdomain or path)
+  [ ] Create admin user for the tenant
+  [ ] Configure tenant-specific settings (number ranges, etc.)
+  [ ] Provide client with login URL and credentials
+  [ ] Verify client can access and use the system
+
+======================================================================
+8. MAINTENANCE
+======================================================================
+
+8.1 Daily Checks
+  - Health endpoints: GET /health, GET /health/ready
+  - Check disk space on server
+  - Verify backup ran successfully
+
+8.2 Updates
+  a) Pull latest code or copy new publish build
+  b) Stop the service:
+       Windows: nssm stop YuktiraERP
+       Linux:   sudo systemctl stop yuktiraerp
+  c) Replace application files
+  d) Run any new database migration scripts
+  e) Start the service:
+       Windows: nssm start YuktiraERP
+       Linux:   sudo systemctl start yuktiraerp
+
+8.3 Monitoring
+  - Prometheus/Grafana planned for v1.1
+  - Monitor API logs at stdout
+  - Check audit logs: GET /api/security/compliance/audit-log
+  - Set up alerts for service failure and disk usage
+
+8.4 Scaling
+  Horizontal: Deploy multiple API instances behind load balancer.
+  Vertical: Increase server resources (CPU, RAM) for larger workloads.
+  Database: Add read replicas for reporting queries.
+
+======================================================================
+END OF DOCUMENT
+======================================================================

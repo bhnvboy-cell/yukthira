@@ -1,0 +1,23 @@
+@page
+@model YuktiraERP.Web.Pages.WM.Transfer.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Warehouse Transfer Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Warehouse Transfer Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">TransferId</dt><dd class="col-sm-8">@Model.Transfer.TransferId</dd>
+<dt class="col-sm-4">Date</dt><dd class="col-sm-8">@Model.Transfer.Date</dd>
+<dt class="col-sm-4">MaterialName</dt><dd class="col-sm-8">@Model.Transfer.MaterialName</dd>
+<dt class="col-sm-4">FromBin</dt><dd class="col-sm-8">@Model.Transfer.FromBin</dd>
+<dt class="col-sm-4">ToBin</dt><dd class="col-sm-8">@Model.Transfer.ToBin</dd>
+<dt class="col-sm-4">Quantity</dt><dd class="col-sm-8">@Model.Transfer.Quantity</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Transfer.Status</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/WM/Transfer/Edit" asp-route-id="@Model.Transfer.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

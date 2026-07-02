@@ -1,0 +1,237 @@
+=============================================================================
+  YUKTIRA ERP SUITE — STANDARD OPERATING PROCEDURES
+  Version 1.0 | July 2026
+=============================================================================
+
+TABLE OF CONTENTS
+  1.  Environment Setup
+  2.  Build & Run
+  3.  Database Initialization
+  4.  Development Workflow
+  5.  Adding a New Module
+  6.  Plugin Development
+  7.  Testing
+  8.  Deployment
+  9.  Backup & Recovery
+  10. Troubleshooting
+
+=============================================================================
+1. ENVIRONMENT SETUP
+=============================================================================
+
+1.1 Prerequisites
+  - .NET 10 SDK
+  - PostgreSQL 16 (optional; in-memory DB used by default)
+  - Git
+  - Visual Studio 2022+ / VS Code
+
+1.2 Initial Clone
+  > git clone <repo-url>
+  > cd YuktiraERP
+
+1.3 Restore Dependencies
+  > dotnet restore YuktiraERP.sln
+
+=============================================================================
+2. BUILD & RUN
+=============================================================================
+
+2.1 Full Solution Build
+  > dotnet build YuktiraERP.sln -c Debug
+
+2.2 Run API Only (port 5000)
+  > cd src/YuktiraERP.Api
+  > dotnet run
+  Access Swagger UI at http://localhost:5000/swagger
+
+2.3 Run Web Only (port 5001)
+  > cd src/YuktiraERP.Web
+  > dotnet run
+  Access Web UI at http://localhost:5001
+
+2.4 Run Both (Quick Start)
+  > start.bat
+  Launches API + Web simultaneously. Login with jdoe / any password.
+
+=============================================================================
+3. DATABASE INITIALIZATION
+=============================================================================
+
+3.1 Using In-Memory Database (Default)
+  No setup required. The application uses EF Core InMemory provider.
+
+3.2 Using PostgreSQL
+  a) Set connection string in appsettings.Development.json:
+     "ConnectionStrings": {
+       "YuktiraDb": "Host=localhost;Database=yuktira_erp;Username=postgres;Password=postgres"
+     }
+
+  b) Run migration scripts:
+     > init-db.bat
+     This executes scripts from database/scripts/ in order (001_core_schema.sql, etc.)
+
+  c) Migration pipeline auto-tracks applied scripts in the migrations table.
+
+=============================================================================
+4. DEVELOPMENT WORKFLOW
+=============================================================================
+
+4.1 Branching Strategy
+  - main       : Production-ready code
+  - develop    : Integration branch
+  - feature/*  : New features (branch off develop)
+  - hotfix/*   : Urgent fixes (branch off main)
+  - release/*  : Release candidates (branch off develop)
+
+4.2 Code Conventions
+  - C#: Follow .NET coding guidelines
+  - Controllers: Group by module under Controllers/Modules/
+  - Services: Business logic in Infrastructure layer
+  - Entities: Define in Core/AllEntities.cs, DbSet in YuktiraDbContext
+
+4.3 Commit Message Format
+  <type>(<scope>): <short description>
+  Types: feat, fix, refactor, test, docs, chore
+  Example: feat(mm): add batch tracking to goods receipt
+
+4.4 PR Checklist
+  - Build passes (dotnet build)
+  - All tests pass (dotnet test)
+  - No warnings
+  - Code reviewed by at least one peer
+
+=============================================================================
+5. ADDING A NEW MODULE
+=============================================================================
+
+  Step 1: Define entities in src/YuktiraERP.Core/AllEntities.cs
+  Step 2: Add DbSet<T> in src/YuktiraERP.Infrastructure/Data/YuktiraDbContext.cs
+  Step 3: Create entity configuration class under Data/Configurations/ for schema mapping
+  Step 4: Create controller in src/YuktiraERP.Api/Controllers/Modules/
+          - Use IRepository<T, Guid> + ITenantContext
+          - Apply [Authorize(Policy = "...")] as needed
+  Step 5: Build and verify module available at api/xx/[controller]
+  Step 6: Register any new services in DI in Program.cs or ServiceCollectionExtensions
+
+=============================================================================
+6. PLUGIN DEVELOPMENT
+=============================================================================
+
+  Refer to docs/plugin-development.md for full SDK reference.
+
+  Quick Start:
+  a) Create a Class Library project referencing YuktiraERP.PluginSdk
+  b) Implement IYuktiraPlugin and any hook interfaces:
+     - IPluginStartupHook  → OnStartupAsync()
+     - IPluginMenuHook     → GetMenuItems()
+     - IPluginDocumentHook → OnDocumentCreate()
+     - IPluginWorkflowHook → OnWorkflowStep()
+  c) Build to plugins/ directory
+  d) Plugin is auto-discovered on next API restart (or hot-reload via API)
+
+=============================================================================
+7. TESTING
+=============================================================================
+
+7.1 Run All Tests
+  > cd src/YuktiraERP.Tests
+  > dotnet test
+
+7.2 Run Specific Category
+  > dotnet test --filter "Category=Unit"
+
+7.3 Run with Verbose Output
+  > dotnet test -v n
+
+7.4 Writing Tests
+  - Use UseInMemoryDatabase with unique DB names (Guid.NewGuid().ToString())
+  - Mock external HTTP calls, not the DB
+  - Test happy path and failure cases
+  - Keep tests independent
+
+=============================================================================
+8. DEPLOYMENT
+=============================================================================
+
+8.1 Local / Development
+  > start.bat
+
+8.2 Docker
+  > scripts\deploy.ps1 -Build -Run
+  Spins up: API container, Web container, PostgreSQL
+
+8.3 Production
+  a) Configure appsettings.Production.json with production DB and JWT settings
+  b) Run init-db.bat on production DB
+  c) Deploy via Docker or direct dotnet publish
+  d) Set up Apache reverse proxy (see apache-config/yuktira-erp.conf)
+  e) Configure health checks: GET /health, GET /health/ready
+
+8.4 Environment Variables (Production)
+  - ConnectionStrings__YuktiraDb
+  - Jwt__Secret
+  - MultiTenant__Mode
+  - Features__EnableMFA
+  (Override appsettings values without modifying config files)
+
+=============================================================================
+9. BACKUP & RECOVERY
+=============================================================================
+
+9.1 Database Backup
+  > scripts\backup.ps1
+  - Uses pg_dump (custom format)
+  - Auto-rotates last 30 backups
+
+9.2 Database Restore
+  > scripts\restore.ps1 -BackupFile "database\backup\yuktira_erp_<date>.sql"
+
+9.3 Scheduled Backup (Windows Task Scheduler)
+  Register daily 2 AM backup via scripts/setup-backup.ps1 (if available)
+  or manually using Task Scheduler with:
+    Program: PowerShell.exe
+    Arguments: -File "<full-path>\scripts\backup.ps1"
+
+9.4 Recovery Scenarios
+  - DB corruption        → Restore latest backup (< 2 hr RTO)
+  - Server failure       → New server + restore latest backup (< 4 hr RTO)
+  - Accidental data loss → Point-in-time recovery from WAL (< 1 hr RTO)
+  - Region outage        → Promote DR replica (< 15 min RTO)
+
+=============================================================================
+10. TROUBLESHOOTING
+=============================================================================
+
+10.1 Build Fails
+  - Run dotnet restore to restore missing packages
+  - Check .NET 10 SDK is installed: dotnet --version
+  - Ensure Visual Studio 2022+ / VS Code has .NET 10 workload
+
+10.2 API Won't Start
+  - Port 5000 already in use? Change port in launchSettings.json or appsettings.json
+  - DB connection failed? Check connection string; fallback to in-memory by removing config
+
+10.3 Login Fails
+  - Default credentials: jdoe / any password, client number 1000
+  - Locked out? Admin can unlock via POST /api/security/unlock-user/{userId}
+  - Check JWT secret is configured (min 32 characters)
+
+10.4 Migration Errors
+  - Manually run scripts in order from database/scripts/
+  - Check migrations table for already-applied scripts
+  - Ensure PostgreSQL 16 is running
+
+10.5 Plugin Not Loading
+  - Verify plugin DLL is in plugins/ directory
+  - Check API logs for plugin load errors (assembly binding, missing deps)
+  - Use POST /api/plugins/{pluginId}/reload for hot reload
+  - Validate plugin implements IYuktiraPlugin interface
+
+10.6 Slow Performance
+  - Enable Debug log level to see EF Core queries
+  - Check DB indexing (especially on tenant_id, audit timestamp columns)
+  - Review performance benchmarks section in README.md
+
+=============================================================================
+END OF DOCUMENT
+=============================================================================

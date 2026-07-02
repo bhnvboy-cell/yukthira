@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.PP.ProductionOrder.CreateModel
+@{ ViewData["Title"] = "New Production Order"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Production Order</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="Order.ProductName" class="form-label"></label><input asp-for="Order.ProductName" class="form-control" /><span asp-validation-for="Order.ProductName" class="text-danger small"></span></div>
+<div class="col-md-3"><label asp-for="Order.Quantity" class="form-label"></label><input asp-for="Order.Quantity" class="form-control" min="1" step="1" /><span asp-validation-for="Order.Quantity" class="text-danger small"></span></div>
+<div class="col-md-3"><label asp-for="Order.Status" class="form-label"></label><select asp-for="Order.Status" class="form-select"><option value="Planned">Planned</option><option value="Released">Released</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
+</div>
+<div class="row mb-4">
+<div class="col-md-4"><label asp-for="Order.StartDate" class="form-label"></label><input asp-for="Order.StartDate" class="form-control" type="date" /></div>
+<div class="col-md-4"><label asp-for="Order.EndDate" class="form-label"></label><input asp-for="Order.EndDate" class="form-control" type="date" /></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

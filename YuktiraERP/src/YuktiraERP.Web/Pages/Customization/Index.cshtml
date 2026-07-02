@@ -1,0 +1,223 @@
+@page
+@{
+    ViewData["Title"] = "Customization";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-sliders me-2"></i>Customization</h2>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#fields">Custom Fields</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tcode-custom">T-Code Custom Fields</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#screens">Screen Layout</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tcode-layout">T-Code Layout</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#workflows">Workflow Rules</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#templates">Print Templates</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="fields">
+        <div class="card"><div class="card-body">
+            <div class="mb-3"><button class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> Add Custom Field</button></div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Module</th><th>Entity</th><th>Field Name</th><th>Type</th><th>Required</th><th>Default</th><th>Actions</th></tr></thead>
+                <tbody>
+                    <tr><td>MM</td><td>Material Master</td><td>Lead Time (Days)</td><td>Number</td><td><span class="badge bg-success">Yes</span></td><td>0</td><td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td></tr>
+                    <tr><td>SD</td><td>Customer</td><td>Payment Terms</td><td>Dropdown</td><td><span class="badge bg-success">Yes</span></td><td>Net 30</td><td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td></tr>
+                    <tr><td>HR</td><td>Employee</td><td>Emergency Contact</td><td>Text</td><td><span class="badge bg-success">Yes</span></td><td></td><td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td></tr>
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+
+    <div class="tab-pane fade" id="tcode-custom">
+        <div class="card"><div class="card-body">
+            <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label class="form-label">Select T-Code</label>
+                    <select id="tcSelect" class="form-select" onchange="loadTCustomFields()">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showAddTCustomField()"><i class="bi bi-plus"></i> Add Field</button>
+                </div>
+            </div>
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Field Name</th><th>Label</th><th>Type</th><th>Required</th><th>Visible</th><th>Validation</th><th>Actions</th></tr></thead>
+                <tbody id="tcFieldsBody">
+                    <tr><td colspan="7" class="text-muted text-center">Select a T-Code above</td></tr>
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+
+    <div class="tab-pane fade" id="screens"><div class="card"><div class="card-body"><p class="text-muted">Drag-drop screen layout designer to rearrange fields, sections, and tabs per role.</p></div></div></div>
+
+    <div class="tab-pane fade" id="tcode-layout">
+        <div class="card"><div class="card-body">
+            <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label class="form-label">Select T-Code</label>
+                    <select id="tcLayoutSelect" class="form-select" onchange="loadTLayout()">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+            </div>
+            <div id="layoutContainer" class="row"></div>
+            <button class="btn btn-primary btn-sm mt-3" onclick="saveTLayout()"><i class="bi bi-save"></i> Save Layout</button>
+        </div></div>
+    </div>
+
+    <div class="tab-pane fade" id="workflows"><div class="card"><div class="card-body"><p class="text-muted">Custom workflow rule engine with conditions, actions, and triggers for business events.</p></div></div></div>
+    <div class="tab-pane fade" id="templates"><div class="card"><div class="card-body"><p class="text-muted">Print/email template designer with placeholders, conditional sections, and multiple formats.</p></div></div></div>
+</div>
+
+<div class="modal fade" id="addTCFieldModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Add Custom Field</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-2"><label class="form-label">Field Name</label><input id="cfName" class="form-control" /></div>
+                <div class="mb-2"><label class="form-label">Field Label</label><input id="cfLabel" class="form-control" /></div>
+                <div class="mb-2"><label class="form-label">Data Type</label>
+                    <select id="cfType" class="form-select">
+                        <option value="TEXT">Text</option><option value="NUMBER">Number</option>
+                        <option value="DECIMAL">Decimal</option><option value="DATE">Date</option>
+                        <option value="BOOLEAN">Boolean</option><option value="TEXTAREA">Text Area</option>
+                        <option value="DROPDOWN">Dropdown</option>
+                    </select>
+                </div>
+                <div class="mb-2"><label class="form-label">Default Value</label><input id="cfDefault" class="form-control" /></div>
+                <div class="mb-2">
+                    <div class="form-check"><input id="cfRequired" type="checkbox" class="form-check-input" /><label class="form-check-label">Required</label></div>
+                    <div class="form-check"><input id="cfVisible" type="checkbox" class="form-check-input" checked /><label class="form-check-label">Visible</label></div>
+                </div>
+                <div class="mb-2"><label class="form-label">Validation Rules (JSON)</label><textarea id="cfValidation" class="form-control" rows="2" placeholder='{"minLength":2,"maxLength":100}'></textarea></div>
+                <div class="mb-2"><label class="form-label">Conditional Visibility (JSON)</label><textarea id="cfVisibility" class="form-control" rows="2" placeholder='{"field":"status","value":"Active"}'></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary btn-sm" onclick="addTCustomField()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function loadTCDefs() {
+        var res = await fetch('/api/tcode-generator/definitions');
+        var data = await res.json();
+        var opts = '<option value="">-- Select --</option>';
+        data.forEach(function(d) { opts += '<option value="' + d.code + '">' + d.code + ' - ' + d.name + '</option>'; });
+        document.getElementById('tcSelect').innerHTML = opts;
+        document.getElementById('tcLayoutSelect').innerHTML = opts;
+    }
+
+    var selectedTCode = '';
+
+    async function loadTCustomFields() {
+        var tc = document.getElementById('tcSelect').value;
+        selectedTCode = tc;
+        if (!tc) { document.getElementById('tcFieldsBody').innerHTML = '<tr><td colspan="7" class="text-muted text-center">Select a T-Code</td></tr>'; return; }
+        var res = await fetch('/api/tcode-customize/' + tc + '/fields');
+        var fields = await res.json();
+        var html = '';
+        fields.forEach(function(f) {
+            html += '<tr><td><code>' + f.fieldName + '</code></td><td>' + f.fieldLabel + '</td>' +
+                '<td><span class="badge bg-info">' + f.dataType + '</span></td>' +
+                '<td>' + (f.isRequired ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
+                '<td>' + (f.isVisible ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
+                '<td><code class="small">' + (f.validationRuleJson && f.validationRuleJson !== '{}' ? 'Yes' : '-') + '</code></td>' +
+                '<td><button class="btn btn-outline-danger btn-sm" onclick="delTCustomField(\'' + f.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        document.getElementById('tcFieldsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No custom fields</td></tr>';
+    }
+
+    function showAddTCustomField() {
+        if (!selectedTCode) { alert('Select a T-Code first'); return; }
+        ['cfName','cfLabel','cfDefault','cfValidation','cfVisibility'].forEach(function(id) { document.getElementById(id).value = ''; });
+        document.getElementById('cfType').value = 'TEXT';
+        document.getElementById('cfRequired').checked = false;
+        document.getElementById('cfVisible').checked = true;
+        new bootstrap.Modal(document.getElementById('addTCFieldModal')).show();
+    }
+
+    async function addTCustomField() {
+        var res = await fetch('/api/tcode-customize/' + selectedTCode + '/fields', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                fieldName: document.getElementById('cfName').value,
+                fieldLabel: document.getElementById('cfLabel').value,
+                dataType: document.getElementById('cfType').value,
+                isRequired: document.getElementById('cfRequired').checked,
+                isVisible: document.getElementById('cfVisible').checked,
+                defaultValue: document.getElementById('cfDefault').value,
+                validationRuleJson: document.getElementById('cfValidation').value || '{}',
+                conditionalVisibilityJson: document.getElementById('cfVisibility').value || '{}'
+            })
+        });
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('addTCFieldModal')).hide();
+            loadTCustomFields();
+        }
+    }
+
+    async function delTCustomField(id) {
+        if (!confirm('Delete this custom field?')) return;
+        await fetch('/api/tcode-customize/fields/' + id, { method: 'DELETE' });
+        loadTCustomFields();
+    }
+
+    async function loadTLayout() {
+        var tc = document.getElementById('tcLayoutSelect').value;
+        if (!tc) { document.getElementById('layoutContainer').innerHTML = '<p class="text-muted">Select a T-Code</p>'; return; }
+        var [fieldsRes, layoutRes] = await Promise.all([
+            fetch('/api/tcode-customize/' + tc + '/fields'),
+            fetch('/api/tcode-customize/' + tc + '/layout')
+        ]);
+        var fields = await fieldsRes.json();
+        var layout = await layoutRes.json();
+        var html = '<div class="col-12"><p class="text-muted small mb-2">Drag fields to reorder, adjust width per column</p></div>';
+        fields.forEach(function(f) {
+            var l = layout.find(function(x) { return x.fieldName === f.fieldName; });
+            html += '<div class="col-md-3 mb-2" draggable="true" data-field="' + f.fieldName + '">' +
+                '<div class="card" style="cursor:grab">' +
+                '<div class="card-body p-2 small">' +
+                '<strong>' + f.fieldLabel + '</strong><br/>' +
+                '<span class="text-muted">' + f.dataType + '</span>' +
+                ' <input type="number" class="form-control form-control-sm d-inline-block" style="width:70px" value="' + (l ? l.width : 200) + '" placeholder="Width" onchange="updateLayoutWidth(\'' + f.fieldName + '\', this.value)" />' +
+                ' <div class="form-check form-check-inline"><input type="checkbox" class="form-check-input" ' + (l && l.isFrozen ? 'checked' : '') + ' onchange="updateLayoutFrozen(\'' + f.fieldName + '\', this.checked)" /><label class="form-check-label" style="font-size:10px">Frozen</label></div>' +
+                '</div></div></div>';
+        });
+        document.getElementById('layoutContainer').innerHTML = html;
+        _currentLayout = fields.map(function(f) {
+            var l = layout.find(function(x) { return x.fieldName === f.fieldName; });
+            return { fieldName: f.fieldName, sectionName: (l ? l.sectionName : 'General'), orderIndex: (l ? l.orderIndex : 0), width: (l ? l.width : 200), isFrozen: (l ? l.isFrozen : false) };
+        });
+    }
+
+    var _currentLayout = [];
+
+    function updateLayoutWidth(fn, w) {
+        var f = _currentLayout.find(function(x) { return x.fieldName === fn; });
+        if (f) f.width = parseInt(w) || 200;
+    }
+
+    function updateLayoutFrozen(fn, v) {
+        var f = _currentLayout.find(function(x) { return x.fieldName === fn; });
+        if (f) f.isFrozen = v;
+    }
+
+    async function saveTLayout() {
+        var tc = document.getElementById('tcLayoutSelect').value;
+        if (!tc) return;
+        await fetch('/api/tcode-customize/' + tc + '/layout', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(_currentLayout.map(function(f, i) { return { ...f, orderIndex: i + 1 }; }))
+        });
+        alert('Layout saved');
+    }
+
+    loadTCDefs();
+</script>

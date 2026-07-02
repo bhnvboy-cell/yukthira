@@ -1,0 +1,18 @@
+@page
+@model YuktiraERP.Web.Pages.CRM.PipelineReportModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Pipeline Report (CRM06)"; }
+<h2><i class="bi bi-graph-up me-2"></i>Pipeline Report</h2>
+<div class="card mt-3"><div class="card-body">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Opportunity</th><th>Company</th><th>Value</th><th>Stage</th><th>Status</th></tr></thead>
+<tbody>
+@foreach (var o in Model.Opportunities)
+{
+<tr>
+<td>@o.OpportunityName</td><td>@o.Company</td><td>@o.Value.ToString("C2")</td><td>@o.Stage</td>
+<td><span class="badge bg-@(o.Status=="Open"?"primary":"success")">@o.Status</span></td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

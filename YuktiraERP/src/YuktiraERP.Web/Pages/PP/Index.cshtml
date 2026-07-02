@@ -1,0 +1,52 @@
+@page
+@model YuktiraERP.Web.Pages.PP.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Production Planning";
+    var plans = Model.ProductionPlans;
+    var workCenters = Model.WorkCenters;
+    var prodOrders = Model.ProductionOrders;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-gear me-2"></i>Production Planning</h2>
+    <div><a asp-page="/PP/Plan/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Create Plan</a></div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#plans">Production Plans</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#bom">Bill of Materials</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#routing">Routing</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#workcenters">Work Centers</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#prodorders">Production Orders</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mrp">MRP</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="plans">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Plan ID</th><th>Product</th><th>Qty</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var p in plans)
+                    {
+                        <tr>
+                            <td>@p.PlanId</td><td>@p.ProductName</td><td>@p.Quantity</td><td>@p.StartDate.ToString("d")</td><td>@p.EndDate.ToString("d")</td>
+                            <td><span class="badge @(p.Status=="Released"?"bg-success":p.Status=="In Progress"?"bg-info":"bg-warning")">@p.Status</span></td>
+                            <td><i class="bi bi-pencil me-2"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="bom"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/BOM/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New BOM</a></div><p class="text-muted">BOM structure with multilevel component explosion, where-used list, and engineering change control.</p></div></div></div>
+    <div class="tab-pane fade" id="routing"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/Routing/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Routing</a></div><p class="text-muted">Production routing with operation sequencing, work center assignment, and standard times.</p></div></div></div>
+    <div class="tab-pane fade" id="workcenters"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/WorkCenter/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Work Center</a></div><table class="table table-hover table-sm"><thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Capacity/Shift</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var w in workCenters){<tr><td>@w.Code</td><td>@w.Name</td><td>@w.Department</td><td>@w.CapacityPerShift</td><td><span class="badge @(w.Status=="Active"?"bg-success":"bg-warning")">@w.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="prodorders"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/ProductionOrder/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Production Order</a></div><table class="table table-hover table-sm"><thead><tr><th>Order #</th><th>Product</th><th>Qty</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var o in prodOrders){<tr><td>@o.OrderNumber</td><td>@o.ProductName</td><td>@o.Quantity</td><td>@o.StartDate.ToString("d")</td><td>@o.EndDate.ToString("d")</td><td><span class="badge @(o.Status=="In Progress"?"bg-info":"bg-warning")">@o.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="mrp"><div class="card"><div class="card-body">
+        <div class="d-flex gap-2 mb-2">
+            <a asp-page="/PP/Mrp" class="btn btn-outline-primary btn-sm"><i class="bi bi-cpu"></i> MRP &amp; Capacity Planning</a>
+            <a asp-page="/PP/MrpRun" class="btn btn-outline-primary btn-sm"><i class="bi bi-play"></i> MRP Run (MD01)</a>
+            <a asp-page="/PP/MrpStock" class="btn btn-outline-primary btn-sm"><i class="bi bi-clipboard-data"></i> Stock / Requirements (MD04)</a>
+        </div>
+        <p class="text-muted mb-0">Material Requirements Planning with BOM explosion, capacity leveling, and AI-powered demand forecasting.</p>
+    </div></div></div>
+</div>

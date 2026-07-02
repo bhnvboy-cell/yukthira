@@ -1,0 +1,22 @@
+@page
+@model YuktiraERP.Web.Pages.SD.Customer.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Customer Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Customer Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">Code</dt><dd class="col-sm-8">@Model.Customer.Code</dd>
+<dt class="col-sm-4">Name</dt><dd class="col-sm-8">@Model.Customer.Name</dd>
+<dt class="col-sm-4">CreditLimit</dt><dd class="col-sm-8">@Model.Customer.CreditLimit</dd>
+<dt class="col-sm-4">PaymentTerms</dt><dd class="col-sm-8">@Model.Customer.PaymentTerms</dd>
+<dt class="col-sm-4">Phone</dt><dd class="col-sm-8">@Model.Customer.Phone</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Customer.Status</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/SD/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/SD/Customer/Edit" asp-route-id="@Model.Customer.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

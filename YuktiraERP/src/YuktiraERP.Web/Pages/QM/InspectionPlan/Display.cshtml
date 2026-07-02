@@ -1,0 +1,22 @@
+@page
+@model YuktiraERP.Web.Pages.QM.InspectionPlan.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Inspection Plan Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Inspection Plan Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">PlanId</dt><dd class="col-sm-8">@Model.Plan.PlanId</dd>
+<dt class="col-sm-4">MaterialName</dt><dd class="col-sm-8">@Model.Plan.MaterialName</dd>
+<dt class="col-sm-4">Characteristic</dt><dd class="col-sm-8">@Model.Plan.Characteristic</dd>
+<dt class="col-sm-4">Method</dt><dd class="col-sm-8">@Model.Plan.Method</dd>
+<dt class="col-sm-4">Frequency</dt><dd class="col-sm-8">@Model.Plan.Frequency</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Plan.Status</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/QM/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/QM/InspectionPlan/Edit" asp-route-id="@Model.Plan.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

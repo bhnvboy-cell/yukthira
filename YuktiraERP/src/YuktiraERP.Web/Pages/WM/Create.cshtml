@@ -1,0 +1,24 @@
+@page
+@model YuktiraERP.Web.Pages.WM.CreateModel
+@{ ViewData["Title"] = "Add Inventory Item"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+    <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Add Inventory Item</h5></div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row mb-3">
+                <div class="col-md-4"><label asp-for="Item.MaterialName" class="form-label"></label><input asp-for="Item.MaterialName" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Item.Bin" class="form-label"></label><input asp-for="Item.Bin" class="form-control" placeholder="A-01-01" /></div>
+                <div class="col-md-2"><label asp-for="Item.Lot" class="form-label"></label><input asp-for="Item.Lot" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Item.UOM" class="form-label"></label><select asp-for="Item.UOM" class="form-select"><option>EA</option><option>KG</option><option>LB</option><option>M</option><option>L</option></select></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-2"><label asp-for="Item.Quantity" class="form-label"></label><input asp-for="Item.Quantity" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Item.MinStock" class="form-label"></label><input asp-for="Item.MinStock" class="form-control" /></div>
+                <div class="col-md-2"><label asp-for="Item.MaxStock" class="form-label"></label><input asp-for="Item.MaxStock" class="form-control" /></div>
+                <div class="col-md-3"><label asp-for="Item.Value" class="form-label"></label><input asp-for="Item.Value" class="form-control" /></div>
+            </div>
+            <div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/WM/Index" class="btn btn-outline-secondary">Cancel</a></div>
+        </form>
+    </div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

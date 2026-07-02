@@ -1,0 +1,41 @@
+@page
+@model YuktiraERP.Web.Pages.QM.IndexModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{
+    ViewData["Title"] = "Quality Management";
+    var lots = Model.InspectionLots;
+    var results = Model.InspectionResults;
+    var decisions = Model.UsageDecisions;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-clipboard-check me-2"></i>Quality Management</h2>
+    <div><a asp-page="/QM/InspectionLot/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Inspection Lot</a></div>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#inspection">Inspection Lots</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#plans">Inspection Plans</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#results">Inspection Results</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#decisions">Usage Decisions</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="inspection">
+        <div class="card"><div class="card-body">
+            <table class="table table-hover table-sm">
+                <thead><tr><th>Lot #</th><th>Material</th><th>Qty</th><th>Inspected</th><th>Pass</th><th>Fail</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var l in lots)
+                    {
+                        <tr>
+                            <td>@l.LotNumber</td><td>@l.MaterialName</td><td>@l.Quantity</td><td>@l.Inspected</td><td>@l.Passed</td><td>@l.Failed</td>
+                            <td><span class="badge @(l.Status=="Accepted"?"bg-success":l.Status=="Pending Review"?"bg-warning":"bg-info")">@l.Status</span></td>
+                            <td><i class="bi bi-eye"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+    <div class="tab-pane fade" id="plans"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/QM/InspectionPlan/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Inspection Plan</a></div><p class="text-muted">Inspection plans with characteristic definitions, sampling procedures, and specification limits.</p></div></div></div>
+    <div class="tab-pane fade" id="results"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/QM/InspectionResult/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Result</a></div><table class="table table-hover table-sm"><thead><tr><th>Result ID</th><th>Lot #</th><th>Characteristic</th><th>Result</th><th>Spec</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var r in results){<tr><td>@r.ResultId</td><td>@r.LotNumber</td><td>@r.Characteristic</td><td>@r.Result</td><td>@r.Specification</td><td><span class="badge @(r.Status=="Passed"?"bg-success":"bg-danger")">@r.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+    <div class="tab-pane fade" id="decisions"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/QM/UsageDecision/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Decision</a></div><table class="table table-hover table-sm"><thead><tr><th>Decision ID</th><th>Lot #</th><th>Material</th><th>Decision</th><th>Date</th><th>Actions</th></tr></thead><tbody>@foreach(var d in decisions){<tr><td>@d.DecisionId</td><td>@d.LotNumber</td><td>@d.MaterialName</td><td>@d.Decision</td><td>@d.DecisionDate.ToString("d")</td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+</div>

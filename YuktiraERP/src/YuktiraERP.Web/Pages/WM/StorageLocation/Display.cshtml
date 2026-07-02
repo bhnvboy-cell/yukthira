@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.WM.StorageLocation.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Storage Location Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Storage Location Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">Code</dt><dd class="col-sm-8">@Model.Location.Code</dd>
+<dt class="col-sm-4">Name</dt><dd class="col-sm-8">@Model.Location.Name</dd>
+<dt class="col-sm-4">Type</dt><dd class="col-sm-8">@Model.Location.Type</dd>
+<dt class="col-sm-4">Capacity</dt><dd class="col-sm-8">@Model.Location.Capacity</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Location.Status</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/WM/StorageLocation/Edit" asp-route-id="@Model.Location.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

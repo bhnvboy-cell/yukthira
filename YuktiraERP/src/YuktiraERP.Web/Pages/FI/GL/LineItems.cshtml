@@ -1,0 +1,20 @@
+@page
+@model YuktiraERP.Web.Pages.FI.GL.LineItemsModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "GL Line Items (FAGLL03)"; }
+<h2><i class="bi bi-list-columns me-2"></i>G/L Line Items</h2>
+<div class="card mt-3"><div class="card-body">
+<div class="table-responsive">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Doc #</th><th>Date</th><th>Account</th><th>Account Name</th><th>Debit</th><th>Credit</th><th>Reference</th><th>Period</th><th>Posted</th></tr></thead>
+<tbody>
+@foreach (var e in Model.Entries)
+{
+<tr>
+<td>@e.DocumentNumber</td><td>@e.EntryDate.ToString("d")</td><td>@e.AccountCode</td><td>@e.AccountName</td>
+<td>@e.Debit.ToString("C2")</td><td>@e.Credit.ToString("C2")</td><td>@e.Reference</td><td>@e.Period</td>
+<td><span class="badge bg-@(e.IsPosted?"success":"secondary")">@(e.IsPosted?"Posted":"Draft")</span></td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

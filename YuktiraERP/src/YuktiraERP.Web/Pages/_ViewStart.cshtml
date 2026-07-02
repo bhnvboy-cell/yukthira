@@ -1,0 +1,5 @@
+@{
+    Layout = Context.User?.Identity?.IsAuthenticated == true
+        ? "Shared/_Layout"
+        : "Shared/_LoginLayout";
+}

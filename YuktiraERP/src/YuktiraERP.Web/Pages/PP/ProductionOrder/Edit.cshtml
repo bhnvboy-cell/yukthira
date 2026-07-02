@@ -1,0 +1,25 @@
+@page
+@model YuktiraERP.Web.Pages.PP.ProductionOrder.EditModel
+@{ ViewData["Title"] = "Edit Production Order"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Production Order</h5></div>
+<div class="card-body">
+<form method="post">
+<input type="hidden" asp-for="ProdOrder.Id" />
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="ProdOrder.OrderNumber" class="form-label"></label><input asp-for="ProdOrder.OrderNumber" class="form-control" /><span asp-validation-for="ProdOrder.OrderNumber" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="ProdOrder.ProductName" class="form-label"></label><input asp-for="ProdOrder.ProductName" class="form-control" /><span asp-validation-for="ProdOrder.ProductName" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="ProdOrder.Quantity" class="form-label"></label><input asp-for="ProdOrder.Quantity" class="form-control" /><span asp-validation-for="ProdOrder.Quantity" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="ProdOrder.StartDate" class="form-label"></label><input asp-for="ProdOrder.StartDate" class="form-control" /><span asp-validation-for="ProdOrder.StartDate" class="text-danger small"></span></div>
+</div>
+<div class="row mb-3">
+<div class="col-md-6"><label asp-for="ProdOrder.EndDate" class="form-label"></label><input asp-for="ProdOrder.EndDate" class="form-control" /><span asp-validation-for="ProdOrder.EndDate" class="text-danger small"></span></div>
+<div class="col-md-6"><label asp-for="ProdOrder.Status" class="form-label"></label><input asp-for="ProdOrder.Status" class="form-control" /><span asp-validation-for="ProdOrder.Status" class="text-danger small"></span></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

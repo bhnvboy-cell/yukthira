@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.HR.PayrollRunModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Payroll History (PR05)"; }
+<h2><i class="bi bi-cash-stack me-2"></i>Payroll Run</h2>
+
+ }
+<div class="card"><div class="card-body">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Payroll ID</th><th>Employee</th><th>Period</th><th>Gross</th><th>Deductions</th><th>Net</th><th>Status</th></tr></thead>
+<tbody>
+@foreach (var p in Model.PayrollEntries)
+{
+<tr>
+<td>@p.PayrollId</td><td>@p.EmployeeName</td><td>@p.Period</td>
+<td>@p.GrossPay.ToString("C2")</td><td>@p.Deductions.ToString("C2")</td><td>@p.NetPay.ToString("C2")</td>
+<td><span class="badge bg-@(p.Status=="Paid"?"success":"secondary")">@p.Status</span></td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

@@ -1,0 +1,281 @@
+@page
+@model YuktiraERP.Web.Pages.PP.MrpModel
+@using YuktiraERP.Core.Interfaces
+@{
+    ViewData["Title"] = "MRP & Capacity Planning";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-cpu me-2"></i>MRP & Capacity Planning</h2>
+</div>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link @(Model.Tab=="mrp"?"active":"")" data-bs-toggle="tab" href="#mrpTab">MRP Explosion</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.Tab=="capacity"?"active":"")" data-bs-toggle="tab" href="#capacityTab">Capacity Load</a></li>
+    <li class="nav-item"><a class="nav-link @(Model.Tab=="forecast"?"active":"")" data-bs-toggle="tab" href="#forecastTab">Forecast & Safety Stock</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade @(Model.Tab=="mrp"?"show active":"")" id="mrpTab">
+        <div class="card mb-3">
+            <div class="card-header"><i class="bi bi-diagram-3 me-1"></i>BOM Explosion</div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="Explode" class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Product</label>
+                        <select asp-for="ProductName" class="form-select" asp-items="@(new SelectList(Model.Products))">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Quantity</label>
+                        <input asp-for="Quantity" class="form-control" min="1" />
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-calculator"></i> Explode BOM</button>
+                        <a asp-page="/PP/Mrp" class="btn btn-outline-secondary btn-sm ms-1">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @if (Model.Suggestions.Any())
+        {
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span><i class="bi bi-clipboard-data me-1"></i>MRP Requirements</span>
+                    <span class="badge bg-info">@Model.Suggestions.Count items</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm mb-0">
+                            <thead><tr><th>Component</th><th>Gross Req</th><th>On Hand</th><th>Safety Stock</th><th>Net Req</th><th>Order Type</th><th>Action</th></tr></thead>
+                            <tbody>
+                                @foreach (var r in Model.Suggestions)
+                                {
+                                    var isShort = r.ShortageQty > 0;
+                                    <tr class="@(isShort?"table-warning":"")">
+                                        <td>@r.MaterialName <small class="text-muted">(@r.MaterialCode)</small></td>
+                                        <td>@r.TotalDemand.ToString("N0")</td>
+                                        <td>@r.CurrentStock.ToString("N0")</td>
+                                        <td>@(r.OpenPoQty > 0 ? r.OpenPoQty.ToString("N0") : "--")</td>
+                                        <td><strong>@r.ShortageQty.ToString("N0")</strong></td>
+                                        <td><span class="badge @(r.SuggestionType=="PURCHASE"?"bg-primary":"bg-success")">@r.SuggestionType</span></td>
+                                        <td>
+                                            @if (isShort)
+                                            {
+                                                <button class="btn btn-sm btn-outline-primary" onclick="alert('Create @r.SuggestionType order for @r.SuggestedQty')">
+                                                    <i class="bi bi-plus"></i> Order @r.SuggestedQty.ToString("N0")
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-success"><i class="bi bi-check-circle"></i> Covered</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">Select a product and quantity above, then click "Explode BOM" to see material requirements.</div>
+        }
+        @if (Model.StockAlerts.Any(a => a.CurrentStock <= a.ReorderPoint))
+        {
+            <div class="card mt-3">
+                <div class="card-header bg-danger text-white"><i class="bi bi-exclamation-triangle me-1"></i>Stock Shortage Alerts</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead><tr><th>Material</th><th>Stock</th><th>Reorder Point</th><th>Safety Stock</th><th>Status</th></tr></thead>
+                        <tbody>
+                            @foreach (var a in Model.StockAlerts.Where(a => a.CurrentStock <= a.ReorderPoint))
+                            {
+                                <tr>
+                                    <td>@a.MaterialName</td>
+                                    <td>@a.CurrentStock.ToString("N0")</td>
+                                    <td>@a.ReorderPoint.ToString("N0")</td>
+                                    <td>@a.SafetyStock.ToString("N0")</td>
+                                    <td><span class="badge bg-danger">REORDER</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="tab-pane fade @(Model.Tab=="capacity"?"show active":"")" id="capacityTab">
+        @if (Model.CapacityLoads.Any())
+        {
+            <div class="row">
+                @foreach (var wc in Model.CapacityLoads)
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between">
+                                <span><strong>@wc.Name</strong> <small class="text-muted">(@wc.Code)</small></span>
+                                <span class="badge @(wc.LoadPercent > 100 ? "bg-danger" : wc.LoadPercent > 80 ? "bg-warning" : "bg-success")">
+                                    @wc.LoadPercent.ToString("F1")%
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress mb-2" style="height:24px">
+                                    <div class="progress-bar @(wc.LoadPercent > 100 ? "bg-danger" : wc.LoadPercent > 80 ? "bg-warning" : "bg-success")"
+                                         style="width:@(Math.Min(wc.LoadPercent, 100))%">
+                                        @wc.LoadPercent.ToString("F1")%
+                                    </div>
+                                </div>
+                                <table class="table table-sm small mb-0">
+                                    <tr><td>Department</td><td>@wc.Department</td></tr>
+                                    <tr><td>Available Hours</td><td>@wc.AvailableHours.ToString("N1")</td></tr>
+                                    <tr><td>Required Hours</td><td>@wc.RequiredHours.ToString("N1")</td></tr>
+                                    <tr><td>Operations</td><td>@wc.OperationCount</td></tr>
+                                    <tr><td>Status</td><td>@wc.Status</td></tr>
+                                </table>
+                                @if (wc.Operations.Any())
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#ops-@wc.Code">
+                                        <i class="bi bi-list"></i> Operations
+                                    </button>
+                                    <div class="collapse mt-2" id="ops-@wc.Code">
+                                        <table class="table table-sm small">
+                                            <thead><tr><th>Order</th><th>Product</th><th>Hours</th></tr></thead>
+                                            <tbody>
+                                                @foreach (var op in wc.Operations)
+                                                {
+                                                    <tr><td>@op.ProductionOrderNumber</td><td>@op.ProductName</td><td>@op.TotalRequiredHours.ToString("N1")</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="card mt-2">
+                <div class="card-header">Load Summary</div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead><tr><th>Work Center</th><th>Available (hrs)</th><th>Required (hrs)</th><th>Load %</th><th>Status</th></tr></thead>
+                        <tbody>
+                            @foreach (var wc in Model.CapacityLoads)
+                            {
+                                var pct = wc.LoadPercent;
+                                <tr>
+                                    <td>@wc.Name</td>
+                                    <td>@wc.AvailableHours.ToString("N1")</td>
+                                    <td>@wc.RequiredHours.ToString("N1")</td>
+                                    <td>
+                                        <div class="progress" style="height:20px">
+                                            <div class="progress-bar @(pct > 100 ? "bg-danger" : pct > 80 ? "bg-warning" : "bg-success")"
+                                                 style="width:@(Math.Min(pct, 100))%">@pct.ToString("F1")%</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (pct > 100) { <span class="badge bg-danger">Overloaded</span> }
+                                        else if (pct > 80) { <span class="badge bg-warning text-dark">Near Capacity</span> }
+                                        else { <span class="badge bg-success">Available</span> }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">No work center load data available. Create work centers, routings, and production orders first.</div>
+        }
+    </div>
+    <div class="tab-pane fade @(Model.Tab=="forecast"?"show active":"")" id="forecastTab">
+        <div class="card mb-3">
+            <div class="card-header"><i class="bi bi-graph-up me-1"></i>Demand Forecast</div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="Forecast" class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Material</label>
+                        <select name="materialId" class="form-select" asp-items="@(new SelectList(Model.Products))">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Forecast Model</label>
+                        <select asp-for="ForecastModel" class="form-select">
+                            <option value="MovingAverage">Moving Average</option>
+                            <option value="WeightedMovingAverage">Weighted Moving Average</option>
+                            <option value="ExponentialSmoothing">Exponential Smoothing</option>
+                            <option value="LinearRegression">Linear Regression</option>
+                            <option value="SeasonalDecomposition">Seasonal Decomposition</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-graph-up"></i> Forecast</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @if (Model.Forecast != null)
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <span><i class="bi bi-graph-up me-1"></i>@Model.Forecast.MaterialName — @Model.Forecast.ModelName</span>
+                    <span class="text-muted small">Next: <strong>@Model.Forecast.NextPeriodForecast.ToString("N0")</strong> &middot; R²: @Model.Forecast.RSquare.ToString("F3") &middot; MAPE: @Model.Forecast.Mape.ToString("F1")%</span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-bordered">
+                        <thead><tr><th>Period</th><th>Historical</th><th>Forecast</th></tr></thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Forecast.PeriodLabels.Count; i++)
+                            {
+                                var hist = i < Model.Forecast.HistoricalDemand.Count ? Model.Forecast.HistoricalDemand[i].ToString("N0") : "--";
+                                var fcast = i >= Model.Forecast.HistoricalDemand.Count - Model.Forecast.ForecastedDemand.Count
+                                    && (i - Model.Forecast.HistoricalDemand.Count + Model.Forecast.ForecastedDemand.Count) >= 0
+                                    && (i - Model.Forecast.HistoricalDemand.Count + Model.Forecast.ForecastedDemand.Count) < Model.Forecast.ForecastedDemand.Count
+                                    ? Model.Forecast.ForecastedDemand[i - Model.Forecast.HistoricalDemand.Count + Model.Forecast.ForecastedDemand.Count].ToString("N0")
+                                    : "--";
+                                <tr class="@(i >= Model.Forecast.HistoricalDemand.Count - Model.Forecast.ForecastedDemand.Count ? "table-info" : "")">
+                                    <td>@Model.Forecast.PeriodLabels[i]</td>
+                                    <td>@hist</td>
+                                    <td>@fcast</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        <div class="card">
+            <div class="card-header"><i class="bi bi-shield-check me-1"></i>Safety Stock & Reorder Points</div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-sm mb-0">
+                    <thead><tr><th>Material</th><th>Avg Demand</th><th>Std Dev</th><th>Safety Stock</th><th>Reorder Point</th><th>Current Stock</th><th>Days of Stock</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var s in Model.StockAlerts)
+                        {
+                            var isCritical = s.CurrentStock <= s.SafetyStock;
+                            var isWarning = s.CurrentStock <= s.ReorderPoint;
+                            <tr class="@(isCritical ? "table-danger" : isWarning ? "table-warning" : "")">
+                                <td>@s.MaterialName <small class="text-muted">(@s.MaterialCode)</small></td>
+                                <td>@s.AverageDemand.ToString("N0")</td>
+                                <td>@s.DemandStdDev.ToString("N1")</td>
+                                <td><strong>@s.SafetyStock.ToString("N0")</strong></td>
+                                <td><strong>@s.ReorderPoint.ToString("N0")</strong></td>
+                                <td>@s.CurrentStock.ToString("N0")</td>
+                                <td>@s.DaysOfStock.ToString("N1")</td>
+                                <td>
+                                    @if (isCritical) { <span class="badge bg-danger">Critical</span> }
+                                    else if (isWarning) { <span class="badge bg-warning text-dark">Reorder</span> }
+                                    else { <span class="badge bg-success">OK</span> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

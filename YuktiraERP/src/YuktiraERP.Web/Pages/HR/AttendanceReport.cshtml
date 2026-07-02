@@ -1,0 +1,18 @@
+@page
+@model YuktiraERP.Web.Pages.HR.AttendanceReportModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Attendance Report (PT60)"; }
+<h2><i class="bi bi-calendar-check me-2"></i>Attendance Report</h2>
+<div class="card mt-3"><div class="card-body">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Attendance ID</th><th>Employee Code</th><th>Employee</th><th>Date</th><th>Status</th></tr></thead>
+<tbody>
+@foreach (var r in Model.Records)
+{
+<tr>
+<td>@r.AttendanceId</td><td>@r.EmployeeCode</td><td>@r.EmployeeName</td><td>@r.Date.ToString("d")</td>
+<td><span class="badge bg-@(r.Status=="Present"?"success":r.Status=="Absent"?"danger":"warning")">@r.Status</span></td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

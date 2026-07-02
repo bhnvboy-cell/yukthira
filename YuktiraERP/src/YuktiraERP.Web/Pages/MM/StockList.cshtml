@@ -1,0 +1,21 @@
+@page
+@model YuktiraERP.Web.Pages.MM.StockListModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Stock List (MB52)"; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h2><i class="bi bi-boxes me-2"></i>Stock List</h2>
+</div>
+<div class="card"><div class="card-body">
+<div class="table-responsive">
+<table class="table table-hover table-sm datatable">
+<thead><tr><th>Bin</th><th>Material</th><th>Lot</th><th>Quantity</th><th>UOM</th><th>Value</th><th>Min Stock</th><th>Max Stock</th></tr></thead>
+<tbody>
+@foreach (var s in Model.StockItems)
+{
+<tr>
+<td>@s.Bin</td><td>@s.MaterialName</td><td>@s.Lot</td><td>@s.Quantity</td><td>@s.UOM</td><td>@s.Value.ToString("C2")</td>
+<td>@s.MinStock</td><td>@s.MaxStock</td>
+</tr>
+}
+</tbody></table>
+</div></div></div>

@@ -1,0 +1,137 @@
+@page
+@{
+    ViewData["Title"] = "Workflow Designer";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-diagram-3 me-2"></i>Workflow Designer</h2>
+    <div>
+        <button class="btn btn-success btn-sm" onclick="saveWorkflow()"><i class="bi bi-save"></i> Save</button>
+        <button class="btn btn-primary btn-sm" onclick="publishWorkflow()"><i class="bi bi-rocket-takeoff"></i> Publish</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-header bg-dark text-white"><small>Node Types</small></div>
+            <div class="card-body p-2">
+                <div class="d-grid gap-1">
+                    <button class="btn btn-outline-success btn-sm" ondragstart="dragStart(event, 'START')" draggable="true">Start</button>
+                    <button class="btn btn-outline-primary btn-sm" ondragstart="dragStart(event, 'TASK')" draggable="true">Task</button>
+                    <button class="btn btn-outline-warning btn-sm" ondragstart="dragStart(event, 'APPROVAL')" draggable="true">Approval</button>
+                    <button class="btn btn-outline-info btn-sm" ondragstart="dragStart(event, 'DECISION')" draggable="true">Decision</button>
+                    <button class="btn btn-outline-secondary btn-sm" ondragstart="dragStart(event, 'TIMER')" draggable="true">Timer</button>
+                    <button class="btn btn-outline-danger btn-sm" ondragstart="dragStart(event, 'END')" draggable="true">End</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-white"><small>Drag nodes from left panel onto the canvas. Connect nodes by clicking source then target.</small></div>
+            <div class="card-body" style="min-height:600px;position:relative;background:#f8f9fa;background-image:radial-gradient(#ccc 1px,transparent 1px);background-size:20px 20px" id="workflowCanvas">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="nodeConfigModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Node Configuration</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <div class="mb-3"><label class="form-label">Label</label><input id="nodeLabel" class="form-control" /></div>
+            <div class="mb-3"><label class="form-label">Type</label><input id="nodeTypeDisplay" class="form-control" readonly /></div>
+            <div id="nodeConfigFields"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="saveNodeConfig()">Save</button>
+        </div>
+    </div></div>
+</div>
+@section Scripts {
+<script>
+    let nodes = []; let edges = []; let selectedNode = null; let nextId = 1;
+    let dragSource = null; let dragTarget = null; let connecting = false;
+
+    function dragStart(evt, type) { evt.dataTransfer.setData('nodeType', type); }
+
+    document.getElementById('workflowCanvas').addEventListener('dragover', function(e) { e.preventDefault(); });
+    document.getElementById('workflowCanvas').addEventListener('drop', function(e) {
+        e.preventDefault();
+        const type = e.dataTransfer.getData('nodeType');
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const id = 'node_' + (nextId++);
+        nodes.push({ id, type, label: type, x, y });
+        renderCanvas();
+    });
+
+    function renderCanvas() {
+        const canvas = document.getElementById('workflowCanvas');
+        canvas.innerHTML = '';
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none');
+        canvas.appendChild(svg);
+
+        edges.forEach(e => {
+            const from = nodes.find(n => n.id === e.from);
+            const to = nodes.find(n => n.id === e.to);
+            if (from && to) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', from.x + 60); line.setAttribute('y1', from.y + 20);
+                line.setAttribute('x2', to.x + 60); line.setAttribute('y2', to.y + 20);
+                line.setAttribute('stroke', '#666'); line.setAttribute('stroke-width', '2');
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+                svg.appendChild(line);
+
+                const midX = (from.x + to.x) / 2 + 60;
+                const midY = (from.y + to.y) / 2 + 20;
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', midX); text.setAttribute('y', midY - 5);
+                text.setAttribute('text-anchor', 'middle'); text.setAttribute('font-size', '10');
+                text.setAttribute('fill', '#666');
+                text.textContent = e.label || '';
+                svg.appendChild(text);
+            }
+        });
+
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = '<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#666"/></marker>';
+        svg.appendChild(defs);
+
+        nodes.forEach(n => {
+            const el = document.createElement('div');
+            el.className = 'workflow-node node-' + n.type.toLowerCase();
+            el.style.cssText = `position:absolute;left:${n.x}px;top:${n.y}px;width:120px;padding:8px;border-radius:8px;text-align:center;cursor:pointer;font-size:12px;font-weight:500;z-index:10`;
+            const colors = { START: '#28a745', TASK: '#007bff', APPROVAL: '#ffc107', DECISION: '#17a2b8', TIMER: '#6c757d', END: '#dc3545' };
+            el.style.background = colors[n.type] || '#6c757d';
+            el.style.color = '#fff';
+            el.style.border = selectedNode === n.id ? '3px solid #000' : '3px solid transparent';
+            el.textContent = n.label;
+            el.onclick = function(e) { e.stopPropagation(); openNodeConfig(n.id); };
+            el.ondblclick = function(e) { e.stopPropagation(); connecting = !connecting; if (connecting) dragSource = n.id; else { dragTarget = n.id; if (dragSource && dragTarget && dragSource !== dragTarget) { edges.push({ from: dragSource, to: dragTarget, label: '' }); renderCanvas(); } connecting = false; } };
+            canvas.appendChild(el);
+        });
+    }
+
+    function openNodeConfig(id) {
+        const node = nodes.find(n => n.id === id);
+        if (!node) return;
+        selectedNode = id;
+        document.getElementById('nodeLabel').value = node.label;
+        document.getElementById('nodeTypeDisplay').value = node.type;
+        document.getElementById('nodeConfigFields').innerHTML = node.type === 'APPROVAL' ?
+            '<div class="mb-3"><label class="form-label">Role</label><select class="form-control"><option>POWER_USER</option><option>ADMIN</option><option>MANAGER</option></select></div>' +
+            '<div class="mb-3"><label class="form-label">Level</label><input type="number" class="form-control" value="1" /></div>' : '';
+        new bootstrap.Modal(document.getElementById('nodeConfigModal')).show();
+    }
+
+    function saveNodeConfig() {
+        const node = nodes.find(n => n.id === selectedNode);
+        if (node) { node.label = document.getElementById('nodeLabel').value; renderCanvas(); }
+        bootstrap.Modal.getInstance(document.getElementById('nodeConfigModal')).hide();
+    }
+
+    function saveWorkflow() { alert('Workflow saved: ' + JSON.stringify({ nodes, edges })); }
+    function publishWorkflow() { alert('Workflow published and activated.'); }
+</script>
+}

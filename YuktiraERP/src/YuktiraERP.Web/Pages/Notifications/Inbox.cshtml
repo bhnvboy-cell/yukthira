@@ -1,0 +1,14 @@
+@page
+@model YuktiraERP.Web.Pages.Notifications.InboxModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Notifications Inbox (NO01)"; }
+<h2><i class="bi bi-bell me-2"></i>Notifications Inbox</h2>
+<div class="card mt-3"><div class="card-body">
+@foreach (var n in Model.Notifications)
+{
+<div class="d-flex align-items-center border-bottom py-2 @(n.IsRead?"":"fw-bold")">
+<div class="me-auto"><small class="text-muted">@n.Channel</small><div>@n.Title</div><small class="text-muted">@n.Message</small></div>
+<span class="badge bg-@(n.IsRead?"secondary":"primary")">@(n.IsRead?"Read":"New")</span>
+</div>
+}
+</div></div></div>

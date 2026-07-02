@@ -1,0 +1,151 @@
+@page
+@model YuktiraERP.Web.Pages.Transactions.ManageModel
+@using YuktiraERP.Core.Domain.Transaction
+@{
+    ViewData["Title"] = "Transaction Code Management";
+}
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-gear-wide me-2"></i>Transaction Code Management</h2>
+        <a href="/Transactions" class="btn btn-outline-primary btn-sm"><i class="bi bi-keyboard"></i> Launcher</a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show">@Model.SuccessMessage<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show">@Model.ErrorMessage<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Transaction Code</h5></div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-2"><label class="form-label small">Code *</label><input name="code" class="form-control form-control-sm" required placeholder="e.g., ZMM01" maxlength="10"></div>
+                        <div class="mb-2"><label class="form-label small">Name *</label><input name="name" class="form-control form-control-sm" required placeholder="My Custom Transaction"></div>
+                        <div class="mb-2"><label class="form-label small">Description</label><input name="description" class="form-control form-control-sm" placeholder="Description"></div>
+                        <div class="mb-2"><label class="form-label small">Module</label>
+                            <select name="module" class="form-select form-select-sm">
+                                <option value="MM">MM - Materials</option>
+                                <option value="SD">SD - Sales</option>
+                                <option value="PP">PP - Production</option>
+                                <option value="QM">QM - Quality</option>
+                                <option value="WM">WM - Warehouse</option>
+                                <option value="FI">FI - Finance</option>
+                                <option value="CO">CO - Controlling</option>
+                                <option value="HR">HR</option>
+                                <option value="CRM">CRM</option>
+                                <option value="LIMS">LIMS</option>
+                                <option value="BI">BI</option>
+                                <option value="Admin">Administration</option>
+                            </select>
+                        </div>
+                        <div class="mb-2"><label class="form-label small">Route</label><input name="route" class="form-control form-control-sm" placeholder="/MM/Material/Create"></div>
+                        <div class="mb-2"><label class="form-label small">Icon (Bootstrap)</label><input name="icon" class="form-control form-control-sm" placeholder="bi-boxes"></div>
+                        <div class="mb-2"><label class="form-label small">Group</label>
+                            <select name="group" class="form-select form-select-sm">
+                                @foreach (var g in Enum.GetValues<TransactionGroup>())
+                                {
+                                    <option value="@g">@g</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-2"><label class="form-label small">Required Role</label>
+                            <select name="requiredRole" class="form-select form-select-sm">
+                                <option value="NORMAL_USER">Normal User</option>
+                                <option value="POWER_USER">Power User</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="SUPER_USER">Super User</option>
+                            </select>
+                        </div>
+                        <button type="submit" asp-page-handler="Create" class="btn btn-primary btn-sm w-100 mt-2"><i class="bi bi-plus"></i> Create Code</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-list me-2"></i>Transaction Codes (@Model.Codes.Count)</h5>
+                    <input type="text" id="filterCodes" class="form-control form-control-sm" style="width:200px" placeholder="Filter...">
+                </div>
+                <div class="card-body p-0" style="max-height:500px;overflow-y:auto">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light"><tr><th>Code</th><th>Name</th><th>Module</th><th>Group</th><th>Role</th><th>Route</th><th style="width:100px">Actions</th></tr></thead>
+                        <tbody>
+                            @foreach (var c in Model.Codes)
+                            {
+                                <tr class="tx-row">
+                                    <td><span class="badge bg-primary">@c.Code</span></td>
+                                    <td>@c.Name</td>
+                                    <td>@c.Module</td>
+                                    <td>@c.Group</td>
+                                    <td>@c.RequiredRole</td>
+                                    <td><code>@c.Route</code></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="@c.Route" class="btn btn-outline-primary" title="Open"><i class="bi bi-box-arrow-up-right"></i></a>
+                                            @if (!c.IsSystem)
+                                            {
+                                                <form method="post" style="display:inline" onsubmit="return confirm('Delete @c.Code?')">
+                                                    <input type="hidden" name="id" value="@c.Id">
+                                                    <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-outline-secondary" disabled title="System code"><i class="bi bi-lock"></i></button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-white"><h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Execution Log (Last 20)</h5></div>
+                <div class="card-body p-0" style="max-height:300px;overflow-y:auto">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light"><tr><th>Time</th><th>Code</th><th>User</th><th>Status</th><th>Duration</th><th>Error</th></tr></thead>
+                        <tbody>
+                            @foreach (var log in Model.Logs)
+                            {
+                                <tr>
+                                    <td><small>@log.Timestamp.ToString("HH:mm:ss")</small></td>
+                                    <td><code>@log.TransactionCode</code></td>
+                                    <td>@log.UserName</td>
+                                    <td>
+                                        <span class="badge @(log.Status == ExecutionStatus.Success ? "bg-success" : log.Status == ExecutionStatus.NotFound ? "bg-warning" : "bg-danger")">
+                                            @log.Status
+                                        </span>
+                                    </td>
+                                    <td>@log.DurationMs ms</td>
+                                    <td><small class="text-danger">@log.ErrorMessage</small></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    $('#filterCodes').on('input', function() {
+        var val = $(this).val().toUpperCase();
+        $('.tx-row').each(function() {
+            $(this).toggle($(this).text().toUpperCase().indexOf(val) > -1);
+        });
+    });
+</script>
+}
