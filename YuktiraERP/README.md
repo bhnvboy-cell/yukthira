@@ -6,13 +6,17 @@ Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - 
 
 ---
 
-## Quick Start
+## Quick Start (No Database Required)
 
 ```batch
+git clone https://github.com/bhnvboy-cell/yukthira.git
+cd yukthira/YuktiraERP
 start.bat
 ```
 
-Then open http://localhost:5001 and login with `jdoe` / any password.
+Then open **http://localhost:5001** and login with:
+- **User**: `jdoe` / any password
+- **Client**: `1000`
 
 ## Prerequisites
 
@@ -305,68 +309,76 @@ Five built-in roles enforced at the authorization policy level:
 
 ---
 
-## Developer Setup Guide
+## Installation & Setup
 
-### 1. Clone & Build
-
-```bash
-git clone <repo>
-cd YuktiraERP
-dotnet restore YuktiraERP.sln
-dotnet build YuktiraERP.sln -c Debug
-```
-
-### 2. Run API (port 5000)
-
-```bash
-cd src/YuktiraERP.Api
-dotnet run
-```
-
-Swagger UI: http://localhost:5000/swagger
-
-### 3. Run Web (port 5001)
-
-```bash
-cd src/YuktiraERP.Web
-dotnet run
-```
-
-Browser: http://localhost:5001
-
-### 4. Run Both (full solution)
+### Option 1: Quick Start (In-Memory, No DB)
 
 ```batch
+git clone https://github.com/bhnvboy-cell/yukthira.git
+cd yukthira/YuktiraERP
 start.bat
 ```
 
-This launches both API and Web projects simultaneously.
+Opens at **http://localhost:5001** — login with `jdoe` / any password.
 
-### 5. Run with PostgreSQL
+### Option 2: Manual (API + Web separately)
 
-Set connection string in `src/YuktiraERP.Api/appsettings.Development.json`:
+```bash
+# Build
+dotnet restore YuktiraERP.sln
+dotnet build YuktiraERP.sln -c Debug
 
-```json
-{
-  "ConnectionStrings": {
-    "YuktiraDb": "Host=localhost;Database=yuktira_erp;Username=postgres;Password=postgres"
-  }
-}
+# Terminal 1 — API (port 5000)
+cd src/YuktiraERP.Api
+dotnet run
+# Swagger: http://localhost:5000/swagger
+
+# Terminal 2 — Web UI (port 5001)
+cd src/YuktiraERP.Web
+dotnet run
+# Browser: http://localhost:5001
 ```
 
-Create the database schema:
+### Option 3: With PostgreSQL
 
 ```batch
-init-db.bat
+# 1. Configure database
+install-db.bat
+
+# 2. Update connection string
+#    Edit src/YuktiraERP.Api/appsettings.Development.json:
+#    "YuktiraDb": "Host=localhost;Port=5432;Database=yuktira_erp;Username=postgres;Password=yourpass"
+
+# 3. Run
+server.bat
 ```
 
-This runs SQL scripts from `database/scripts/` in order (001_core_schema.sql, 002_refresh_tokens.sql). The migration pipeline auto-tracks applied scripts in the `migrations` table.
+### Option 4: Docker
 
-### 6. Login
+```bash
+cd scripts
+.\deploy.ps1 -Build -Run
+# OR
+docker-compose -f scripts\docker-compose.yml up -d
+```
 
-Default credentials: `jdoe` / any password (client number `1000` maps to tenant `DEMO` in code).
+### Option 5: Server Mode (Network Access)
 
-### 7. Debugging
+```batch
+server.bat
+```
+Opens firewall ports 5000/5001 and displays the server's IP for other computers to connect via `http://<server-ip>:5001`.
+
+### Default Login
+
+| User | Role | Password | Client |
+|------|------|----------|--------|
+| jdoe | Power User | any | 1000 |
+| superadmin | Super User | any | 1000 |
+| admin_demo | Admin | any | 1000 |
+| asmith | Normal User | any | 1000 |
+
+### Debugging
 
 - **API logs**: stdout with structured logging via `Console`
 - **Audit logs**: query `GET /api/security/compliance/audit-log` with optional filters (module, date range)
@@ -1082,14 +1094,17 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 ## Deployment Options
 
-| Method | Command |
-|--------|---------|
-| Local (dev) | `start.bat` |
-| Docker | `.\scripts\deploy.ps1 -Build -Run` |
-| Production | `init-db.bat` then `start.bat` |
-| Apache proxy | See `apache-config/yuktira-erp.conf` |
-| Backup | `.\scripts\backup.ps1` |
-| Restore | `.\scripts\restore.ps1 -BackupFile <file>` |
+| Method | Command | Access |
+|--------|---------|--------|
+| Quick start (in-memory) | `start.bat` | http://localhost:5001 |
+| Server mode (network) | `server.bat` | http://YOUR-IP:5001 |
+| Docker | `.\scripts\deploy.ps1 -Build -Run` | http://localhost:5001 |
+| Production (PostgreSQL) | `install-db.bat` then `server.bat` | Configured URL |
+| Apache proxy | See `apache-config/yuktira-erp.conf` | https://erp.yourdomain.com |
+| Database install | `install-db.bat` | Prompts for DB details |
+| Integration test | `integration.bat` | Interactive menu for API |
+| Backup | `.\scripts\backup.ps1` | Daily pg_dump |
+| Restore | `.\scripts\restore.ps1 -BackupFile <file>` | Point-in-time recovery |
 
 ## License
 
