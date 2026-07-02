@@ -10,7 +10,7 @@ Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - 
 
 ```batch
 git clone https://github.com/bhnvboy-cell/yukthira.git
-cd yukthira/YuktiraERP
+cd yukthira\YuktiraERP
 start.bat
 ```
 
@@ -315,7 +315,8 @@ Five built-in roles enforced at the authorization policy level:
 
 ```batch
 git clone https://github.com/bhnvboy-cell/yukthira.git
-cd yukthira/YuktiraERP
+cd yukthira
+cd YuktiraERP
 start.bat
 ```
 
