@@ -39,7 +39,9 @@ public class IndexModel : PageModel
     {
         Core.Domain.Transaction.TransactionGroup.MasterData => "bi-folder",
         Core.Domain.Transaction.TransactionGroup.Transactions => "bi-arrow-left-right",
+        Core.Domain.Transaction.TransactionGroup.Process => "bi-arrow-repeat",
         Core.Domain.Transaction.TransactionGroup.Reports => "bi-file-earmark-bar-graph",
+        Core.Domain.Transaction.TransactionGroup.Configuration => "bi-sliders",
         Core.Domain.Transaction.TransactionGroup.Analytics => "bi-graph-up",
         Core.Domain.Transaction.TransactionGroup.Administration => "bi-gear-wide",
         Core.Domain.Transaction.TransactionGroup.Utilities => "bi-tools",

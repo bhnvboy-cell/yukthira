@@ -1,0 +1,37 @@
+﻿@page
+@model YuktiraERP.Web.Pages.PM.Plan.ListModel
+@{ ViewData["Title"] = "MaintenancePlan List"; }
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-list-ul me-2"></i>MaintenancePlan Records</h2>
+        <a href="/PM/Plan/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i>New MaintenancePlan</a>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body p-0" style="overflow-x:auto">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light"><tr><th>PlanCode</th><th>Name</th><th>EquipmentCode</th><th>Frequency</th><th>TaskDescription</th><th style="width:160px">Actions</th></tr></thead>
+                <tbody>
+                    @if (Model.Items.Count == 0) {
+                        <tr><td colspan="8" class="text-center text-muted py-4">No records found</td></tr>
+                    }
+                    @foreach (var item in Model.Items) {
+                        <tr>
+                            <td>@item.PlanCode</td><td>@item.Name</td><td>@item.EquipmentCode</td><td>@item.Frequency</td><td>@item.TaskDescription</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/PM/Plan/Display?id=@item.Id" class="btn btn-outline-info" title="View"><i class="bi bi-eye"></i></a>
+                                    <a href="/PM/Plan/Edit?id=@item.Id" class="btn btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <form method="post" asp-page-handler="Delete" style="display:inline" onsubmit="return confirm('Delete this record?')">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

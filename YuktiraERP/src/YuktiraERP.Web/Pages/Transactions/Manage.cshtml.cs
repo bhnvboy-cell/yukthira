@@ -10,11 +10,17 @@ namespace YuktiraERP.Web.Pages.Transactions;
 public class ManageModel : PageModel
 {
     private readonly ITransactionCodeService _service;
+    private readonly IModuleCatalog _catalog;
 
-    public ManageModel(ITransactionCodeService service) => _service = service;
+    public ManageModel(ITransactionCodeService service, IModuleCatalog catalog)
+    {
+        _service = service;
+        _catalog = catalog;
+    }
 
     public List<TransactionCodeDto> Codes { get; set; } = new();
     public List<TransactionLogDto> Logs { get; set; } = new();
+    public IReadOnlyList<YuktiraERP.Core.Domain.Modules.ModuleDefinition> Modules { get; set; } = new List<YuktiraERP.Core.Domain.Modules.ModuleDefinition>();
     public string? ErrorMessage { get; set; }
     public string? SuccessMessage { get; set; }
 
@@ -22,6 +28,7 @@ public class ManageModel : PageModel
     {
         Codes = await _service.GetAllAsync();
         Logs = await _service.GetLogAsync(pageSize: 20);
+        Modules = _catalog.Modules;
     }
 
     public async Task<IActionResult> OnPostCreateAsync(string code, string name, string description, string module, string route, string icon, string group, string requiredRole)
@@ -45,6 +52,7 @@ public class ManageModel : PageModel
         catch (Exception ex) { ErrorMessage = ex.Message; }
         Codes = await _service.GetAllAsync();
         Logs = await _service.GetLogAsync(pageSize: 20);
+        Modules = _catalog.Modules;
         return Page();
     }
 
@@ -55,6 +63,7 @@ public class ManageModel : PageModel
         else SuccessMessage = "Transaction deleted";
         Codes = await _service.GetAllAsync();
         Logs = await _service.GetLogAsync(pageSize: 20);
+        Modules = _catalog.Modules;
         return Page();
     }
 

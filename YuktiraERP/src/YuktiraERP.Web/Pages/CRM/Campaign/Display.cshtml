@@ -1,0 +1,16 @@
+﻿@page
+@model YuktiraERP.Web.Pages.CRM.Campaign.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Campaign Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Campaign Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0"><dt class="col-sm-4">CampaignId</dt><dd class="col-sm-8">@(Model.Campaign.CampaignId)</dd><dt class="col-sm-4">Name</dt><dd class="col-sm-8">@(Model.Campaign.Name)</dd><dt class="col-sm-4">Type</dt><dd class="col-sm-8">@(Model.Campaign.Type)</dd><dt class="col-sm-4">StartDate</dt><dd class="col-sm-8">@(Model.Campaign.StartDate)</dd><dt class="col-sm-4">EndDate</dt><dd class="col-sm-8">@(Model.Campaign.EndDate)</dd><dt class="col-sm-4">Budget</dt><dd class="col-sm-8">@(Model.Campaign.Budget)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Campaign.Status)</dd></dl>
+</div>
+<div class="card-footer">
+<a href="/CRM/Campaign/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a href="/CRM/Campaign/Edit?id=@(Model.Campaign.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

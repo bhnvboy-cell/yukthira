@@ -32,10 +32,56 @@ public class WarehouseController : ControllerBase
     }
 
     [HttpGet("transfers")] public async Task<IActionResult> GetTransfers() => Ok(new { data = await _transfers.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("transfers/{id:guid}")]
+    public async Task<IActionResult> GetTransfer(Guid id)
+    {
+        var item = await _transfers.GetByIdAsync(id);
+        return item == null ? NotFound() : Ok(new { data = item, tenantId = _tenant.TenantId });
+    }
     [HttpPost("transfers")] [Authorize(Policy = "PowerUserOrAbove")]
     public async Task<IActionResult> CreateTransfer([FromBody] WarehouseTransferEntity model) { model.Id = Guid.NewGuid(); await _transfers.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    [HttpPut("transfers/{id:guid}")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> UpdateTransfer(Guid id, [FromBody] WarehouseTransferEntity model)
+    {
+        var exists = (await _transfers.FindAsync(e => e.Id == id)).Count > 0;
+        if (!exists) return NotFound();
+        model.Id = id;
+        await _transfers.UpdateAsync(model);
+        return Ok(new { success = true, tenantId = _tenant.TenantId });
+    }
+    [HttpDelete("transfers/{id:guid}")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> DeleteTransfer(Guid id)
+    {
+        var exists = (await _transfers.FindAsync(e => e.Id == id)).Count > 0;
+        if (!exists) return NotFound();
+        await _transfers.DeleteAsync(id);
+        return Ok(new { success = true, tenantId = _tenant.TenantId });
+    }
 
     [HttpGet("storage-locations")] public async Task<IActionResult> GetStorageLocations() => Ok(new { data = await _locations.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("storage-locations/{id:guid}")]
+    public async Task<IActionResult> GetStorageLocation(Guid id)
+    {
+        var item = await _locations.GetByIdAsync(id);
+        return item == null ? NotFound() : Ok(new { data = item, tenantId = _tenant.TenantId });
+    }
     [HttpPost("storage-locations")] [Authorize(Policy = "PowerUserOrAbove")]
     public async Task<IActionResult> CreateStorageLocation([FromBody] StorageLocationEntity model) { model.Id = Guid.NewGuid(); await _locations.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    [HttpPut("storage-locations/{id:guid}")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> UpdateStorageLocation(Guid id, [FromBody] StorageLocationEntity model)
+    {
+        var exists = (await _locations.FindAsync(e => e.Id == id)).Count > 0;
+        if (!exists) return NotFound();
+        model.Id = id;
+        await _locations.UpdateAsync(model);
+        return Ok(new { success = true, tenantId = _tenant.TenantId });
+    }
+    [HttpDelete("storage-locations/{id:guid}")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> DeleteStorageLocation(Guid id)
+    {
+        var exists = (await _locations.FindAsync(e => e.Id == id)).Count > 0;
+        if (!exists) return NotFound();
+        await _locations.DeleteAsync(id);
+        return Ok(new { success = true, tenantId = _tenant.TenantId });
+    }
 }

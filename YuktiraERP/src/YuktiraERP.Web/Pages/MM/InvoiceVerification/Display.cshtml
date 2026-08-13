@@ -1,0 +1,16 @@
+﻿@page
+@model YuktiraERP.Web.Pages.MM.InvoiceVerification.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "InvoiceVerification Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>InvoiceVerification Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0"><dt class="col-sm-4">InvoiceNumber</dt><dd class="col-sm-8">@(Model.Invoice.InvoiceNumber)</dd><dt class="col-sm-4">Date</dt><dd class="col-sm-8">@(Model.Invoice.Date)</dd><dt class="col-sm-4">PoNumber</dt><dd class="col-sm-8">@(Model.Invoice.PoNumber)</dd><dt class="col-sm-4">VendorName</dt><dd class="col-sm-8">@(Model.Invoice.VendorName)</dd><dt class="col-sm-4">Amount</dt><dd class="col-sm-8">@(Model.Invoice.Amount)</dd><dt class="col-sm-4">MatchedAmount</dt><dd class="col-sm-8">@(Model.Invoice.MatchedAmount)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Invoice.Status)</dd></dl>
+</div>
+<div class="card-footer">
+<a href="/MM/InvoiceVerification/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a href="/MM/InvoiceVerification/Edit?id=@(Model.Invoice.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

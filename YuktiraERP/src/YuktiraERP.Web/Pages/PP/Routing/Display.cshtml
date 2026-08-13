@@ -1,0 +1,16 @@
+﻿@page
+@model YuktiraERP.Web.Pages.PP.Routing.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "ProductionRouting Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>ProductionRouting Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0"><dt class="col-sm-4">RoutingId</dt><dd class="col-sm-8">@(Model.Routing.RoutingId)</dd><dt class="col-sm-4">ProductName</dt><dd class="col-sm-8">@(Model.Routing.ProductName)</dd><dt class="col-sm-4">OperationNo</dt><dd class="col-sm-8">@(Model.Routing.OperationNo)</dd><dt class="col-sm-4">WorkCenter</dt><dd class="col-sm-8">@(Model.Routing.WorkCenter)</dd><dt class="col-sm-4">SetupTimeHrs</dt><dd class="col-sm-8">@(Model.Routing.SetupTimeHrs)</dd><dt class="col-sm-4">RunTimeHrs</dt><dd class="col-sm-8">@(Model.Routing.RunTimeHrs)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Routing.Status)</dd></dl>
+</div>
+<div class="card-footer">
+<a href="/PP/Routing/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a href="/PP/Routing/Edit?id=@(Model.Routing.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

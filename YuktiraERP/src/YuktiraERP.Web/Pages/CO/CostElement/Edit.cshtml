@@ -1,0 +1,15 @@
+﻿@page
+@model YuktiraERP.Web.Pages.CO.CostElement.EditModel
+@{ ViewData["Title"] = "Edit CostElement"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit CostElement</h5></div>
+<div class="card-body">
+<form method="post">
+<input type="hidden" asp-for="Element.Id" />
+<div class="row mb-3"><div class="col-md-6"><label asp-for="Element.Code" class="form-label"></label><input asp-for="Element.Code" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Element.Name" class="form-label"></label><input asp-for="Element.Name" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Element.Type" class="form-label"></label><input asp-for="Element.Type" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Element.Category" class="form-label"></label><input asp-for="Element.Category" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Element.Status" class="form-label"></label><input asp-for="Element.Status" class="form-control" type="text" /></div><div class="col-md-6"></div></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a href="/CO/CostElement/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

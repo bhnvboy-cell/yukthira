@@ -1,0 +1,15 @@
+﻿@page
+@model YuktiraERP.Web.Pages.FI.FixedAsset.EditModel
+@{ ViewData["Title"] = "Edit FixedAsset"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit FixedAsset</h5></div>
+<div class="card-body">
+<form method="post">
+<input type="hidden" asp-for="Asset.Id" />
+<div class="row mb-3"><div class="col-md-6"><label asp-for="Asset.AssetCode" class="form-label"></label><input asp-for="Asset.AssetCode" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Asset.AssetName" class="form-label"></label><input asp-for="Asset.AssetName" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Asset.Category" class="form-label"></label><input asp-for="Asset.Category" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Asset.PurchaseDate" class="form-label"></label><input asp-for="Asset.PurchaseDate" class="form-control" type="datetime-local" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Asset.Cost" class="form-label"></label><input asp-for="Asset.Cost" class="form-control" type="number" step="0.01" /></div><div class="col-md-6"><label asp-for="Asset.SalvageValue" class="form-label"></label><input asp-for="Asset.SalvageValue" class="form-control" type="number" step="0.01" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Asset.UsefulLifeYears" class="form-label"></label><input asp-for="Asset.UsefulLifeYears" class="form-control" type="number" /></div><div class="col-md-6"><label asp-for="Asset.Status" class="form-label"></label><input asp-for="Asset.Status" class="form-control" type="text" /></div></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a href="/FI/FixedAsset/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

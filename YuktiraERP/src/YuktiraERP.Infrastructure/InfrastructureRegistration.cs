@@ -18,6 +18,7 @@ public static class InfrastructureRegistration
         var connStr = configuration.GetConnectionString("YuktiraDb");
         if (!string.IsNullOrEmpty(connStr))
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             services.AddDbContext<YuktiraDbContext>(options => options.UseNpgsql(connStr));
         }
         else
@@ -28,6 +29,8 @@ public static class InfrastructureRegistration
         services.AddMemoryCache();
         services.AddHttpClient();
         services.AddHttpContextAccessor();
+
+        services.AddSingleton<IModuleCatalog, ModuleCatalog>();
 
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<ITenantResolver, TenantResolver>();

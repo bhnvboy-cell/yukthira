@@ -12,11 +12,13 @@
 ```powershell
 .\scripts\backup.ps1 -Database "yuktira_erp"
 ```
+Defaults: connects to `127.0.0.1:5432` as `postgres` (matching the app's connection string), writes a custom-format dump to `.\database\backup`, keeps the last 30 backups. Pass `-Password` if your PostgreSQL requires one. PostgreSQL client tools are auto-located (searches `C:\Program Files\PostgreSQL\13-18\bin`).
 
 ## Restore Command
 ```powershell
 .\scripts\restore.ps1 -Database "yuktira_erp" -BackupFile ".\database\backup\yuktira_erp_20240101_020000.sql"
 ```
+Omitting `-BackupFile` restores the most recent backup. Restore prompts for confirmation before overwriting.
 
 ## Failover Procedure
 1. Identify failure — check health endpoints: `GET /health`, `GET /api/health/ready`

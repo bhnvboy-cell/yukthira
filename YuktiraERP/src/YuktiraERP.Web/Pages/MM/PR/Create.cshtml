@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model YuktiraERP.Web.Pages.MM.PR.CreateModel
 @{ ViewData["Title"] = "Create Purchase Requisition"; }
 <div class="row justify-content-center"><div class="col-lg-8">
@@ -14,7 +14,7 @@
 <div class="col-md-3"><label asp-for="Requisition.Amount" class="form-label"></label><input asp-for="Requisition.Amount" class="form-control" /></div>
 <div class="col-md-3"><label asp-for="Requisition.Status" class="form-label"></label><select asp-for="Requisition.Status" class="form-select"><option>Pending</option><option>Approved</option><option>In Review</option><option>Cancelled</option></select></div>
 </div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/Index" class="btn btn-outline-secondary">Cancel</a></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/PR/List" class="btn btn-outline-secondary">Cancel</a></div>
 </form>
 </div></div>
 </div></div>

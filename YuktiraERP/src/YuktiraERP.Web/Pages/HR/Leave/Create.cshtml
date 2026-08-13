@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model YuktiraERP.Web.Pages.HR.Leave.CreateModel
 @{ ViewData["Title"] = "Create Leave Request"; }
 <div class="row justify-content-center"><div class="col-lg-8">
@@ -14,7 +14,7 @@
 <div class="col-md-6"><label asp-for="LeaveRequest.StartDate" class="form-label"></label><input asp-for="LeaveRequest.StartDate" class="form-control" type="date" /></div>
 <div class="col-md-6"><label asp-for="LeaveRequest.EndDate" class="form-label"></label><input asp-for="LeaveRequest.EndDate" class="form-control" type="date" /></div>
 </div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/HR/Leave/List" class="btn btn-outline-secondary">Cancel</a></div>
 </form>
 </div></div>
 </div></div>

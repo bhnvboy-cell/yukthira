@@ -1,13 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using YuktiraERP.Core.Interfaces;
-using YuktiraERP.Infrastructure.Data.Entities;
+
 namespace YuktiraERP.Web.Pages.HR;
+
 public class CreateModel : PageModel
 {
-    private readonly IRepository<EmployeeEntity, Guid> _repo;
-    public CreateModel(IRepository<EmployeeEntity, Guid> repo) { _repo = repo; }
-    [BindProperty] public EmployeeEntity Employee { get; set; } = new();
-    public IActionResult OnGet() => Page();
-    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); await _repo.AddAsync(Employee); return RedirectToPage("/HR/Index"); }
+    public IActionResult OnGet() => RedirectToPage("/HR/Employee/Create");
+    public IActionResult OnPost() => RedirectToPage("/HR/Employee/Create");
 }

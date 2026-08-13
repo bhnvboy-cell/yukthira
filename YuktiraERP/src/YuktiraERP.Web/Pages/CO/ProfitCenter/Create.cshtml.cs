@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
@@ -11,5 +11,5 @@ public class CreateModel : PageModel
     public CreateModel(IRepository<ProfitCenterEntity, Guid> repo) { _repo = repo; }
     [BindProperty] public ProfitCenterEntity Center { get; set; } = new();
     public IActionResult OnGet() => Page();
-    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); await _repo.AddAsync(Center); return RedirectToPage("/CO/Index"); }
+    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); await _repo.AddAsync(Center); return RedirectToPage("/CO/ProfitCenter/List"); }
 }

@@ -1,3 +1,4 @@
+@inject YuktiraERP.Core.Interfaces.IModuleCatalog ModuleCatalog
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,40 +21,18 @@
                 </div>
 
                 <div class="sidebar-body">
-                    <div class="nav-category sidebar-text">Operations</div>
-                    <a href="/MM" class="nav-item" title="Materials Management"><i class="bi bi-boxes"></i><span class="sidebar-text">MM</span></a>
-                    <a href="/SD" class="nav-item" title="Sales &amp; Distribution"><i class="bi bi-cart3"></i><span class="sidebar-text">SD</span></a>
-                    <a href="/WM" class="nav-item" title="Warehouse Management"><i class="bi bi-house-door"></i><span class="sidebar-text">WM</span></a>
-                    <a href="/PP" class="nav-item" title="Production Planning"><i class="bi bi-gear"></i><span class="sidebar-text">PP</span></a>
-                    <a href="/QM" class="nav-item" title="Quality Management"><i class="bi bi-clipboard-check"></i><span class="sidebar-text">QM</span></a>
-                    <a href="/PM" class="nav-item" title="Plant Maintenance"><i class="bi bi-tools"></i><span class="sidebar-text">PM</span></a>
-
-                    <div class="nav-category sidebar-text">Finance</div>
-                    <a href="/FI" class="nav-item" title="Finance"><i class="bi bi-calculator"></i><span class="sidebar-text">FI</span></a>
-                    <a href="/CO" class="nav-item" title="Controlling"><i class="bi bi-pie-chart"></i><span class="sidebar-text">CO</span></a>
-
-                    <div class="nav-category sidebar-text">People</div>
-                    <a href="/HR" class="nav-item" title="Human Resources"><i class="bi bi-people"></i><span class="sidebar-text">HR</span></a>
-                    <a href="/CRM" class="nav-item" title="Customer Relationship"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">CRM</span></a>
-
-                    <div class="nav-category sidebar-text">Projects &amp; Labs</div>
-                    <a href="/PS" class="nav-item" title="Project System"><i class="bi bi-diagram-3"></i><span class="sidebar-text">PS</span></a>
-                    <a href="/LIMS" class="nav-item" title="Lab Information Mgmt"><i class="bi bi-flask"></i><span class="sidebar-text">LIMS</span></a>
-
-                    <div class="nav-category sidebar-text">Analytics</div>
-                    <a href="/BI" class="nav-item" title="BI Reports"><i class="bi bi-graph-up"></i><span class="sidebar-text">BI</span></a>
-                    <a href="/PP/Mrp?tab=forecast" class="nav-item" title="AI Forecasting"><i class="bi bi-cpu"></i><span class="sidebar-text">AI</span></a>
-
-                    <div class="nav-category sidebar-text">System</div>
-                    <a href="/Workflow/Designer" class="nav-item" title="Workflows"><i class="bi bi-arrow-repeat"></i><span class="sidebar-text">WF</span></a>
-                    <a href="/Approval" class="nav-item" title="Approvals"><i class="bi bi-check2-square"></i><span class="sidebar-text">Apprv</span></a>
-                    <a href="/Notifications" class="nav-item" title="Notifications"><i class="bi bi-bell"></i><span class="sidebar-text">Notif</span></a>
-                    <a href="/Transactions" class="nav-item" title="Transaction Codes"><i class="bi bi-keyboard"></i><span class="sidebar-text">TCD</span></a>
-                    <a href="/TCodeGenerator" class="nav-item" title="T-Code Generator"><i class="bi bi-cpu"></i><span class="sidebar-text">TCG</span></a>
-                    <a href="/Audit" class="nav-item" title="Audit Log"><i class="bi bi-journal-text"></i><span class="sidebar-text">Audit</span></a>
-                    <a href="/Admin" class="nav-item" title="Administration"><i class="bi bi-gear-wide"></i><span class="sidebar-text">Admin</span></a>
-                    <a href="/Customization" class="nav-item" title="Customize"><i class="bi bi-sliders"></i><span class="sidebar-text">Cust</span></a>
-                    <a href="/Integration" class="nav-item" title="Integration Hub"><i class="bi bi-hdd-rack"></i><span class="sidebar-text">Int</span></a>
+                    @{
+                        string? lastCat = null;
+                        foreach (var m in ModuleCatalog.Modules)
+                        {
+                            if (m.Category != lastCat)
+                            {
+                                <div class="nav-category sidebar-text">@m.Category</div>
+                                lastCat = m.Category;
+                            }
+                            <a href="@m.BaseRoute" class="nav-item" title="@m.Name"><i class="bi @m.Icon"></i><span class="sidebar-text">@m.Code</span></a>
+                        }
+                    }
                 </div>
 
                 <div class="sidebar-footer">
@@ -69,8 +48,11 @@
                 </div>
             </nav>
 
+            <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
             <div class="app-main-area">
                 <header class="top-bar">
+                    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu"><i class="bi bi-list"></i></button>
                     <div class="top-bar-center">
                         <div class="top-bar-search">
                             <i class="bi bi-search"></i>
@@ -84,6 +66,7 @@
                             <span class="badge bg-danger" id="notifCount" style="display:none">0</span>
                         </a>
                         <a href="/Dashboard" class="top-bar-icon" title="Home"><i class="bi bi-grid-3x3-gap"></i></a>
+                        <a href="#" class="top-bar-icon" id="printBtn" title="Print / Save as PDF"><i class="bi bi-printer"></i></a>
                         <a href="/Auth/Logout" class="top-bar-icon text-danger" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
                     </div>
                 </header>
@@ -168,7 +151,40 @@
 
         $(document).on('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); $('#globalSearch').focus(); }
-            if (e.key === 'Escape') { $('#globalSearch').val(''); $('#globalSearchResults').hide(); }
+            if (e.key === 'Escape') { $('#globalSearch').val(''); $('#globalSearchResults').hide(); closeSidebar(); }
+        });
+
+        // ── Print / Save as PDF ──
+        $('#printBtn').on('click', function(e) {
+            e.preventDefault();
+            // Temporarily expand horizontally-scrolled tables so they print fully
+            $('.table-responsive, [style*="overflow-x:auto"]').each(function() {
+                $(this).addClass('print-expanded');
+            });
+            window.print();
+        });
+
+        $(document).on('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p' && !e.shiftKey) { e.preventDefault(); $('#printBtn').click(); }
+        });
+
+        // ── Mobile sidebar drawer ──
+        function openSidebar() {
+            $('#appSidebar').addClass('sidebar-open');
+            $('#sidebarBackdrop').addClass('show');
+            $('body').addClass('sidebar-lock');
+        }
+        function closeSidebar() {
+            $('#appSidebar').removeClass('sidebar-open');
+            $('#sidebarBackdrop').removeClass('show');
+            $('body').removeClass('sidebar-lock');
+        }
+        $('#sidebarToggle').on('click', function() {
+            if ($('#appSidebar').hasClass('sidebar-open')) { closeSidebar(); } else { openSidebar(); }
+        });
+        $('#sidebarBackdrop').on('click', closeSidebar);
+        $(document).on('click', '.nav-item', function() {
+            if (window.innerWidth <= 991) closeSidebar();
         });
 
         $(document).on('click', function(e) {

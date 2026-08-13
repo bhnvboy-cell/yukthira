@@ -10,13 +10,14 @@ namespace YuktiraERP.Infrastructure.Services;
 public class TransactionCodeService : ITransactionCodeService
 {
     private readonly YuktiraDbContext _db;
+    private readonly IModuleCatalog _catalog;
     private static readonly Dictionary<string, string> RouteMap = new()
     {
         // MM - Materials Management
         ["MM01"] = "/MM/Material/Create", ["MM02"] = "/MM/Material/Edit", ["MM03"] = "/MM/Material/Display",
         ["MMBE"] = "/MM/StockOverview", ["ME11"] = "/MM/Vendor/Create", ["ME12"] = "/MM/Vendor/Edit",
         ["ME13"] = "/MM/Vendor/Display", ["ME21N"] = "/MM/PO/Create", ["ME22N"] = "/MM/PO/Edit",
-        ["ME23N"] = "/MM/PO/Display",         ["MIGO"] = "/MM/GoodsReceipt", ["MIRO"] = "/MM/InvoiceVerification/Create",
+        ["ME23N"] = "/MM/PO/Display",         ["MIGO"] = "/MM/GRN/Create", ["MIRO"] = "/MM/InvoiceVerification/Create",
         ["MB52"] = "/MM/StockList", ["MB1A"] = "/MM/GoodsIssue", ["MB1C"] = "/MM/GoodsReceiptOther",
         // SD - Sales & Distribution
         ["VA01"] = "/SD/SalesOrder/Create", ["VA02"] = "/SD/SalesOrder/Edit", ["VA03"] = "/SD/SalesOrder/Display",
@@ -72,7 +73,11 @@ public class TransactionCodeService : ITransactionCodeService
         ["PM03"] = "/PM/Plan/Create", ["PM04"] = "/PM/Order/Create"
     };
 
-    public TransactionCodeService(YuktiraDbContext db) => _db = db;
+    public TransactionCodeService(YuktiraDbContext db, IModuleCatalog catalog)
+    {
+        _db = db;
+        _catalog = catalog;
+    }
 
     public async Task<List<TransactionCodeDto>> GetAllAsync(string? module = null, TransactionGroup? group = null, string? search = null)
     {
@@ -389,7 +394,7 @@ public class TransactionCodeService : ITransactionCodeService
             var sort = 0;
             foreach (var kvp in RouteMap)
             {
-                var module = kvp.Value.Split('/')[1];
+                var module = GetModuleForRoute(kvp.Value, _catalog);
                 var name = kvp.Key switch
                 {
                     "MM01" => "Create Material", "MM02" => "Change Material", "MM03" => "Display Material",
@@ -438,22 +443,13 @@ public class TransactionCodeService : ITransactionCodeService
                     "PM03" => "Create Maintenance Plan", "PM04" => "Create Maintenance Order",
                     _ => kvp.Key
                 };
-                var group = kvp.Value.Split('/')[1] switch
-                {
-                    "MM" or "SD" or "PP" or "QM" or "WM" or "PS" or "PM" => "Transactions",
-                    "FI" or "CO" => "Reports",
-                    "HR" or "CRM" => "MasterData",
-                    "LIMS" or "BI" => "Analytics",
-                    "Admin" or "Audit" or "Workflow" or "Approval" or "Notifications" or "Transactions" or "Plugins" => "Administration",
-                    _ => "Utilities"
-                };
                 codes.Add(new TransactionCodeEntity
                 {
                     Code = kvp.Key,
                     Name = name,
                     Description = $"{name} ({kvp.Key})",
                     Module = module,
-                    GroupName = group,
+                    GroupName = GetGroupForCode(kvp.Key),
                     Route = kvp.Value,
                     Icon = GetIconForModule(module),
                     SortOrder = sort++,
@@ -462,13 +458,34 @@ public class TransactionCodeService : ITransactionCodeService
                     RequiredRole = GetRequiredRole(module)
                 });
             }
-            var existing = await _db.TransactionCodes.Select(t => t.Code).ToListAsync();
-            var missing = codes.Where(c => !existing.Contains(c.Code)).ToList();
-            if (missing.Count > 0)
+            var existing = await _db.TransactionCodes.ToListAsync();
+            var existingByCode = existing.ToDictionary(t => t.Code);
+            var missing = new List<TransactionCodeEntity>();
+            foreach (var c in codes)
             {
-                _db.TransactionCodes.AddRange(missing);
-                await _db.SaveChangesAsync();
+                if (existingByCode.TryGetValue(c.Code, out var row))
+                {
+                    if (row.IsSystem &&
+                        (row.Route != c.Route || row.Module != c.Module || row.GroupName != c.GroupName ||
+                         row.Icon != c.Icon || row.Name != c.Name || row.RequiredRole != c.RequiredRole))
+                    {
+                        row.Route = c.Route;
+                        row.Module = c.Module;
+                        row.GroupName = c.GroupName;
+                        row.Icon = c.Icon;
+                        row.Name = c.Name;
+                        row.Description = c.Description;
+                        row.RequiredRole = c.RequiredRole;
+                        row.SortOrder = c.SortOrder;
+                    }
+                }
+                else
+                {
+                    missing.Add(c);
+                }
             }
+            if (missing.Count > 0) _db.TransactionCodes.AddRange(missing);
+            await _db.SaveChangesAsync();
             _seeded = true;
         }
         finally
@@ -477,20 +494,79 @@ public class TransactionCodeService : ITransactionCodeService
         }
     }
 
+    private static string GetModuleForRoute(string route, IModuleCatalog catalog)
+    {
+        var def = catalog.ResolveByRoute(route);
+        return def?.Code ?? route.TrimStart('/').Split('/')[0];
+    }
+
+    private static string GetGroupForCode(string code) => code switch
+    {
+        // Master Data
+        "MM01" or "MM02" or "MM03" or "ME11" or "ME12" or "ME13" or
+        "VD01" or "VD02" or "VD03" or "VKD1" or
+        "CS01" or "CS02" or "CS03" or "CR01" or
+        "QS01" or "QS02" or
+        "LS01" or "LS02" or
+        "KA01" or "KA02" or "KA03" or
+        "PA30" or "PA20" or
+        "CRM01" or "CRM02" or "CRM03" or
+        "LM01" or "LM02" or "LM03" or "LM05" or
+        "PS01" or "PS02" or
+        "PM01" or "PM02" or "PM03"
+            => "MasterData",
+        // Transactions
+        "ME21N" or "ME22N" or "ME23N" or "MIGO" or "MIRO" or "MB1A" or "MB1C" or
+        "VA01" or "VA02" or "VA03" or "VLO1N" or "VF01" or
+        "CO01" or "CO02" or "CO03" or
+        "QE01" or "QE02" or "QE03" or "QA01" or "QUD" or
+        "LT01" or "LT02" or "LT03" or
+        "FB50" or "FB60" or "FB70" or "F-03" or "F-28" or
+        "PR01" or
+        "CRM04" or "CRM05" or
+        "LM04" or
+        "PS03" or "PS04" or
+        "PM04"
+            => "Transactions",
+        // Process (MRP run, payroll run, workflow-driven)
+        "MD01" => "Process",
+        // Reports
+        "MMBE" or "MB52" or
+        "VA05" or
+        "MD04" or
+        "FBL1N" or "FBL5N" or "FS10N" or "FAGLL03" or "F.01" or "F.02" or "KOB1" or
+        "PT60" or "PR05" or "PA40" or
+        "CRM06" or
+        "AL01" or "AL02"
+            => "Reports",
+        // Configuration
+        "BI01" or "SU03" or "TC01" or "TC02" or "WF01" or "WF02" or "PL01"
+            => "Configuration",
+        // Administration
+        "SU01" or "SU02" or "AP01" or "AP02" or "NO01" or "AL03"
+            => "Administration",
+        // Analytics
+        "BI02" or "BI03" or "BI04"
+            => "Analytics",
+        _ => "Utilities"
+    };
+
     private static string GetIconForModule(string module) => module switch
     {
         "MM" => "bi-boxes", "SD" => "bi-cart3", "PP" => "bi-gear", "QM" => "bi-clipboard-check",
         "WM" => "bi-house-door", "FI" => "bi-calculator", "CO" => "bi-pie-chart",
         "HR" => "bi-people", "CRM" => "bi-person-lines-fill", "LIMS" => "bi-flask",
-        "BI" => "bi-graph-up", "Admin" => "bi-shield-lock", "Audit" => "bi-journal-text",
-        "Workflow" => "bi-diagram-3", "Approval" => "bi-check2-square",
-        "Notifications" => "bi-bell", "Transactions" => "bi-keyboard", "Plugins" => "bi-puzzle",
+        "BI" => "bi-graph-up", "PLG" => "bi-puzzle", "WF" => "bi-arrow-repeat",
+        "APP" => "bi-check2-square", "NOT" => "bi-bell", "TCD" => "bi-keyboard",
+        "AUD" => "bi-journal-text", "ADM" => "bi-gear-wide", "CST" => "bi-sliders",
+        "INT" => "bi-hdd-rack", "PS" => "bi-diagram-3", "PM" => "bi-tools",
+        "AI" => "bi-cpu",
         _ => "bi-asterisk"
     };
 
     private static string GetRequiredRole(string module) => module switch
     {
-        "Admin" or "Audit" => "ADMIN",
+        "ADM" or "AUD" or "PLG" or "TCG" => "ADMIN",
         "CO" or "FI" => "POWER_USER",
         _ => "NORMAL_USER"
     };

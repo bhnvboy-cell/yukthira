@@ -1,0 +1,16 @@
+﻿@page
+@model YuktiraERP.Web.Pages.CO.ProfitCenter.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "ProfitCenter Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>ProfitCenter Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0"><dt class="col-sm-4">Code</dt><dd class="col-sm-8">@(Model.Center.Code)</dd><dt class="col-sm-4">Name</dt><dd class="col-sm-8">@(Model.Center.Name)</dd><dt class="col-sm-4">Manager</dt><dd class="col-sm-8">@(Model.Center.Manager)</dd><dt class="col-sm-4">Department</dt><dd class="col-sm-8">@(Model.Center.Department)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Center.Status)</dd></dl>
+</div>
+<div class="card-footer">
+<a href="/CO/ProfitCenter/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a href="/CO/ProfitCenter/Edit?id=@(Model.Center.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

@@ -1,0 +1,16 @@
+﻿@page
+@model YuktiraERP.Web.Pages.QM.UsageDecision.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "UsageDecision Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>UsageDecision Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0"><dt class="col-sm-4">DecisionId</dt><dd class="col-sm-8">@(Model.Decision.DecisionId)</dd><dt class="col-sm-4">LotNumber</dt><dd class="col-sm-8">@(Model.Decision.LotNumber)</dd><dt class="col-sm-4">MaterialName</dt><dd class="col-sm-8">@(Model.Decision.MaterialName)</dd><dt class="col-sm-4">Decision</dt><dd class="col-sm-8">@(Model.Decision.Decision)</dd><dt class="col-sm-4">Notes</dt><dd class="col-sm-8">@(Model.Decision.Notes)</dd><dt class="col-sm-4">DecisionDate</dt><dd class="col-sm-8">@(Model.Decision.DecisionDate)</dd></dl>
+</div>
+<div class="card-footer">
+<a href="/QM/UsageDecision/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a href="/QM/UsageDecision/Edit?id=@(Model.Decision.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

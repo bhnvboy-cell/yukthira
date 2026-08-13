@@ -30,18 +30,10 @@
                         <div class="mb-2"><label class="form-label small">Description</label><input name="description" class="form-control form-control-sm" placeholder="Description"></div>
                         <div class="mb-2"><label class="form-label small">Module</label>
                             <select name="module" class="form-select form-select-sm">
-                                <option value="MM">MM - Materials</option>
-                                <option value="SD">SD - Sales</option>
-                                <option value="PP">PP - Production</option>
-                                <option value="QM">QM - Quality</option>
-                                <option value="WM">WM - Warehouse</option>
-                                <option value="FI">FI - Finance</option>
-                                <option value="CO">CO - Controlling</option>
-                                <option value="HR">HR</option>
-                                <option value="CRM">CRM</option>
-                                <option value="LIMS">LIMS</option>
-                                <option value="BI">BI</option>
-                                <option value="Admin">Administration</option>
+                                @foreach (var m in Model.Modules)
+                                {
+                                    <option value="@m.Code">@m.Code - @m.Name</option>
+                                }
                             </select>
                         </div>
                         <div class="mb-2"><label class="form-label small">Route</label><input name="route" class="form-control form-control-sm" placeholder="/MM/Material/Create"></div>

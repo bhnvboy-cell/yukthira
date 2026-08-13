@@ -27,6 +27,7 @@ appsettings.Production.json
 # Secrets
 **/appsettings.Secrets.json
 **/secrets.json
+password.txt
 
 # Development config (may contain local passwords)
 **/appsettings.Development.json

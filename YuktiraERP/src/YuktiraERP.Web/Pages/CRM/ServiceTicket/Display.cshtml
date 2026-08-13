@@ -1,0 +1,16 @@
+﻿@page
+@model YuktiraERP.Web.Pages.CRM.ServiceTicket.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "ServiceTicket Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>ServiceTicket Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0"><dt class="col-sm-4">TicketId</dt><dd class="col-sm-8">@(Model.Ticket.TicketId)</dd><dt class="col-sm-4">CustomerName</dt><dd class="col-sm-8">@(Model.Ticket.CustomerName)</dd><dt class="col-sm-4">Subject</dt><dd class="col-sm-8">@(Model.Ticket.Subject)</dd><dt class="col-sm-4">Priority</dt><dd class="col-sm-8">@(Model.Ticket.Priority)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Ticket.Status)</dd><dt class="col-sm-4">CreatedDate</dt><dd class="col-sm-8">@(Model.Ticket.CreatedDate)</dd></dl>
+</div>
+<div class="card-footer">
+<a href="/CRM/ServiceTicket/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a href="/CRM/ServiceTicket/Edit?id=@(Model.Ticket.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+</div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+
