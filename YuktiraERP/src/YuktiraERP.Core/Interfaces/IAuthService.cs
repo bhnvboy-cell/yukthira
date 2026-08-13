@@ -37,7 +37,7 @@ public interface IAuthService
     Task<LoginResponse> LoginAsync(LoginRequest request, string ipAddress, string deviceInfo);
     Task LogoutAsync(Guid userId);
     Task<LoginResponse> RefreshTokenAsync(string refreshToken);
-    Task<UserProfile> GetUserProfileAsync(Guid userId);
+    Task<UserProfile> GetUserProfileAsync(Guid userId, Guid? tenantId);
     Task<List<string>> GetUserPermissionsAsync(Guid userId, Guid? tenantId);
     Task<bool> ValidateTokenAsync(string token);
 }

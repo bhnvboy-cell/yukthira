@@ -12,7 +12,11 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-echo [1/3] Building...
+echo [0/4] Stopping any running Yuktira instances...
+call kill.bat
+echo.
+
+echo [1/4] Building...
 dotnet build YuktiraERP.sln -c Debug -q
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Build failed!
@@ -21,12 +25,16 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo   OK.
 
-echo [2/3] Starting API on port 5000...
+echo [2/4] Starting API on port 5000...
 start "Yuktira-API" dotnet run --project src\YuktiraERP.Api -c Debug
-timeout /t 6 >nul
+timeout /t 8 /nobreak >nul
 
-echo [3/3] Starting Web UI on port 5001...
+echo [3/4] Starting Web UI on port 5001...
 start "Yuktira-Web" dotnet run --project src\YuktiraERP.Web -c Debug
+timeout /t 8 /nobreak >nul
+
+echo [4/4] Opening browser...
+start "" http://localhost:5001
 
 echo.
 echo ===========================================

@@ -1,4 +1,5 @@
 @page
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
 @using YuktiraERP.Web.Models
 @{
     ViewData["Title"] = "Tenant Management";

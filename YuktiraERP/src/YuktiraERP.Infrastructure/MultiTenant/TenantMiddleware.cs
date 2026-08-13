@@ -38,11 +38,9 @@ public class TenantResolver : ITenantResolver
 {
     public Guid? ResolveTenant(HttpContext context)
     {
-        if (context.Request.Headers.TryGetValue("X-Tenant-Id", out var headerTenantId))
-        {
-            if (Guid.TryParse(headerTenantId, out var tid))
-                return tid;
-        }
+        // NOTE: X-Tenant-Id is deliberately NOT trusted — it is client-controlled and
+        // could be used to switch tenants. Tenant identity must come from the authenticated
+        // user's claims (see TenantContext), never from request headers.
 
         var host = context.Request.Host.Host;
         if (!string.IsNullOrEmpty(host))

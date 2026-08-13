@@ -218,19 +218,6 @@ public static class CustomFieldStore
     public static void Delete(Guid id) { }
 }
 
-public static class AdminUserStore
-{
-    private static readonly List<AdminUser> _items = new()
-    {
-        new() { UserId = "USR-001", UserName = "admin", Email = "admin@yuktira.com", Role = "SUPER_USER", IsActive = true },
-        new() { UserId = "USR-002", UserName = "jdoe", Email = "jdoe@yuktira.com", Role = "POWER_USER", IsActive = true },
-        new() { UserId = "USR-003", UserName = "asmith", Email = "asmith@yuktira.com", Role = "READ_ONLY", IsActive = false },
-    };
-    public static List<AdminUser> GetAll() => _items.ToList();
-    public static void Add(AdminUser u) => _items.Add(u);
-    public static void Delete(string id) => _items.RemoveAll(x => x.UserId == id);
-}
-
 public static class TenantStore
 {
     private static readonly List<Tenant> _items = new()

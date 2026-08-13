@@ -60,7 +60,9 @@ public class AuthController : ControllerBase
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized(new { error = "Invalid user identity" });
-        var profile = await _authService.GetUserProfileAsync(userId);
+        var tenantClaim = User.FindFirst("TenantId")?.Value;
+        var tenantId = tenantClaim != null && Guid.TryParse(tenantClaim, out var t) ? t : (Guid?)null;
+        var profile = await _authService.GetUserProfileAsync(userId, tenantId);
         return Ok(profile);
     }
 

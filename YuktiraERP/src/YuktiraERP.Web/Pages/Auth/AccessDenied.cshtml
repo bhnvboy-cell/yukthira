@@ -1,0 +1,19 @@
+@page
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_LoginLayout";
+}
+<div class="login-card">
+    <div class="login-header">
+        <i class="bi bi-shield-lock"></i>
+        <h3>Access Denied</h3>
+        <p>Yuktira ERP Suite</p>
+    </div>
+    <div class="login-body text-center">
+        <p class="text-muted">You do not have permission to access this page.</p>
+        <p class="text-muted small">Contact your administrator if you believe this is a mistake.</p>
+        <a href="/Dashboard" class="btn btn-primary w-100 py-2">Go to Dashboard</a>
+        <a href="/Auth/Logout" class="btn btn-outline-secondary w-100 py-2 mt-2">Sign In as Different User</a>
+    </div>
+</div>

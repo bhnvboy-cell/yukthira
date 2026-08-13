@@ -48,12 +48,14 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid credentials");
         }
 
+        var tenant = await _db.Tenants.FirstOrDefaultAsync(t =>
+            t.Code == request.ClientNumber && t.Status == "ACTIVE");
+        if (tenant == null)
+            throw new UnauthorizedAccessException("Invalid client number");
+
         user.FailedLoginAttempts = 0;
         user.LockedUntil = null;
         user.LastLoginAt = DateTime.UtcNow;
-
-        var tenant = await _db.Tenants.FirstOrDefaultAsync(t =>
-            t.Code == request.ClientNumber && t.Status == "ACTIVE");
 
         var permissions = await ResolvePermissionsAsync(user.Id, user.Role, tenant?.Id);
         var userProfile = new UserProfile
@@ -76,7 +78,8 @@ public class AuthService : IAuthService
         _db.RefreshTokens.Add(new RefreshTokenEntity
         {
             UserId = user.Id,
-            Token = refreshToken,
+            Token = HashToken(refreshToken),
+            TenantId = tenant?.Id,
             ExpiresAt = expiresAt.AddDays(7),
             DeviceInfo = deviceInfo,
             IpAddress = ipAddress
@@ -101,7 +104,7 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponse> RefreshTokenAsync(string refreshToken)
     {
-        var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken && !t.IsRevoked);
+        var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == HashToken(refreshToken) && !t.IsRevoked);
         if (stored == null || stored.ExpiresAt <= DateTime.UtcNow)
             throw new UnauthorizedAccessException("Invalid or expired refresh token");
 
@@ -112,7 +115,7 @@ public class AuthService : IAuthService
         if (user.LockedUntil.HasValue && user.LockedUntil > DateTime.UtcNow)
             throw new UnauthorizedAccessException("Account is locked");
 
-        var tenant = await _db.Tenants.FirstOrDefaultAsync();
+        var tenant = stored.TenantId.HasValue ? await _db.Tenants.FindAsync(stored.TenantId.Value) : null;
         var permissions = await ResolvePermissionsAsync(user.Id, user.Role, tenant?.Id);
         var userProfile = new UserProfile
         {
@@ -132,12 +135,13 @@ public class AuthService : IAuthService
         var expiresAt = DateTime.UtcNow.AddHours(8);
 
         stored.IsRevoked = true;
-        stored.ReplacedByToken = newRefreshToken;
+        stored.ReplacedByToken = HashToken(newRefreshToken);
 
         _db.RefreshTokens.Add(new RefreshTokenEntity
         {
             UserId = user.Id,
-            Token = newRefreshToken,
+            Token = HashToken(newRefreshToken),
+            TenantId = stored.TenantId,
             ExpiresAt = expiresAt.AddDays(7),
             DeviceInfo = stored.DeviceInfo,
             IpAddress = stored.IpAddress
@@ -153,12 +157,11 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<UserProfile> GetUserProfileAsync(Guid userId)
+    public async Task<UserProfile> GetUserProfileAsync(Guid userId, Guid? tenantId)
     {
         var user = await _db.AdminUsers.FindAsync(userId);
         if (user == null) throw new UnauthorizedAccessException("User not found");
-        var tenant = await _db.Tenants.FirstOrDefaultAsync();
-        var permissions = await ResolvePermissionsAsync(user.Id, user.Role, tenant?.Id);
+        var permissions = await ResolvePermissionsAsync(user.Id, user.Role, tenantId);
         return new UserProfile
         {
             UserId = user.Id,
@@ -167,7 +170,7 @@ public class AuthService : IAuthService
             Email = user.Email,
             Role = user.Role,
             Language = "EN",
-            TenantId = tenant?.Id,
+            TenantId = tenantId,
             IsSuperUser = user.IsSuperUser,
             Permissions = permissions
         };
@@ -185,11 +188,10 @@ public class AuthService : IAuthService
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"] ?? "YuktiraERPSuperSecretKey2024!@#$%^&*()Minimum32Chars");
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
+                IssuerSigningKey = new SymmetricSecurityKey(GetJwtKey()),
                 ValidateIssuer = true,
                 ValidIssuer = _configuration["Jwt:Issuer"] ?? "YuktiraERP",
                 ValidateAudience = true,
@@ -241,8 +243,7 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(UserProfile profile)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            _configuration["Jwt:Secret"] ?? "YuktiraERPSuperSecretKey2024!@#$%^&*()Minimum32Chars"));
+        var key = new SymmetricSecurityKey(GetJwtKey());
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var claims = new List<Claim>
         {
@@ -270,5 +271,16 @@ public class AuthService : IAuthService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         return Convert.ToBase64String(randomBytes);
+    }
+
+    private static string HashToken(string token) =>
+        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+
+    private byte[] GetJwtKey()
+    {
+        var secret = _configuration["Jwt:Secret"];
+        if (string.IsNullOrWhiteSpace(secret) || secret.Length < 32)
+            throw new InvalidOperationException("JWT signing secret (Jwt:Secret) is not configured or too short.");
+        return Encoding.UTF8.GetBytes(secret);
     }
 }

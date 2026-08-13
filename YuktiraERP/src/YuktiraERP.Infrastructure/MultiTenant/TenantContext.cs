@@ -17,10 +17,13 @@ public class TenantContext : ITenantContext
         get
         {
             var context = _httpContextAccessor.HttpContext;
-            if (context?.Items["TenantId"] is Guid tid)
+            // Tenant must always come from the authenticated identity (server-issued claim),
+            // never from client-supplied headers or URL segments, to prevent cross-tenant access.
+            if (context?.User?.Identity?.IsAuthenticated == true &&
+                context.User.FindFirst("TenantId")?.Value is string s && Guid.TryParse(s, out var tid))
                 return tid;
-            if (context?.User?.FindFirst("TenantId")?.Value is string s && Guid.TryParse(s, out var tid2))
-                return tid2;
+            if (context?.Items["TenantId"] is Guid itemTid)
+                return itemTid;
             return Guid.Empty;
         }
     }

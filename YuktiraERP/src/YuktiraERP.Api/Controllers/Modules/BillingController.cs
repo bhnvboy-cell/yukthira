@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Infrastructure.Data.Entities;
+
 namespace YuktiraERP.Api.Controllers.Modules;
+
 [ApiController]
 [Route("api/sd/[controller]")]
 [Authorize]
-public class BillingController : ControllerBase
+public class BillingController : ModuleCrudControllerBase<BillingDocumentEntity>
 {
-    private readonly ITenantContext _tenant;
-    public BillingController(ITenantContext tenant) => _tenant = tenant;
-    [HttpGet] public IActionResult GetAll() => Ok(new { data = new[] { new { DocumentNumber = "INV-24001" } }, tenantId = _tenant.TenantId });
-    [HttpPost] public IActionResult Create([FromBody] object model) => Ok(new { success = true, tenantId = _tenant.TenantId });
+    public BillingController(IRepository<BillingDocumentEntity, Guid> repo, ITenantContext tenant) : base(repo, tenant) { }
 }

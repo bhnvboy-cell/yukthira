@@ -27,10 +27,12 @@ public static class InfrastructureRegistration
 
         services.AddMemoryCache();
         services.AddHttpClient();
+        services.AddHttpContextAccessor();
 
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<ITenantResolver, TenantResolver>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<INumberRangeService, NumberRangeService>();

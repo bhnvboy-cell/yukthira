@@ -51,12 +51,12 @@ public class IndexModel : PageModel
 
         QuickActions = new List<QuickAction>
         {
-            new() { Name = "Create PO",      Icon = "bi-cart-plus",    Color = "#2563eb", Url = "/MM/PurchaseOrder/Create" },
+            new() { Name = "Create PO",      Icon = "bi-cart-plus",    Color = "#2563eb", Url = "/MM/PO/Create" },
             new() { Name = "Create SO",      Icon = "bi-file-earmark", Color = "#059669", Url = "/SD/SalesOrder/Create" },
-            new() { Name = "Create Sample",  Icon = "bi-flask",        Color = "#7c3aed", Url = "/QM/Sample/Create" },
+            new() { Name = "Create Sample",  Icon = "bi-flask",        Color = "#7c3aed", Url = "/LIMS/Sample/Create" },
             new() { Name = "Create Prod Order", Icon = "bi-gear",      Color = "#d97706", Url = "/PP/ProductionOrder/Create" },
-            new() { Name = "Create GRN",     Icon = "bi-box-seam",     Color = "#0891b2", Url = "/WM/GRN/Create" },
-            new() { Name = "QC Result",      Icon = "bi-clipboard-data", Color = "#dc2626", Url = "/QM/Result/Create" },
+            new() { Name = "Create GRN",     Icon = "bi-box-seam",     Color = "#0891b2", Url = "/MM/GRN/Create" },
+            new() { Name = "QC Result",      Icon = "bi-clipboard-data", Color = "#dc2626", Url = "/QM/InspectionResult/Create" },
         };
     }
 

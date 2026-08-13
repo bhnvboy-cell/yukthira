@@ -63,7 +63,13 @@ public class TransactionCodeService : ITransactionCodeService
         ["AP01"] = "/Approval/Pending", ["AP02"] = "/Approval/History",
         ["NO01"] = "/Notifications/Inbox",
         ["TC01"] = "/Transactions/Launcher", ["TC02"] = "/Transactions/Manage",
-        ["PL01"] = "/Plugins/Manage"
+        ["PL01"] = "/Plugins/Manage",
+        // PS - Project System
+        ["PS01"] = "/PS/Project/Create", ["PS02"] = "/PS/Project/Display",
+        ["PS03"] = "/PS/ProjTask/Create", ["PS04"] = "/PS/Timesheet/Create",
+        // PM - Plant Maintenance
+        ["PM01"] = "/PM/Equipment/Create", ["PM02"] = "/PM/Equipment/Display",
+        ["PM03"] = "/PM/Plan/Create", ["PM04"] = "/PM/Order/Create"
     };
 
     public TransactionCodeService(YuktiraDbContext db) => _db = db;
@@ -379,7 +385,6 @@ public class TransactionCodeService : ITransactionCodeService
         try
         {
             if (_seeded) return;
-            if (await _db.TransactionCodes.AnyAsync()) { _seeded = true; return; }
             var codes = new List<TransactionCodeEntity>();
             var sort = 0;
             foreach (var kvp in RouteMap)
@@ -427,11 +432,15 @@ public class TransactionCodeService : ITransactionCodeService
                     "AP01" => "Pending Approvals", "AP02" => "Approval History",
                     "NO01" => "Notifications", "TC01" => "Transaction Launcher",
                     "TC02" => "Transaction Management", "PL01" => "Plugin Management",
+                    "PS01" => "Create Project", "PS02" => "Display Project",
+                    "PS03" => "Create Project Task", "PS04" => "Create Timesheet",
+                    "PM01" => "Create Equipment", "PM02" => "Display Equipment",
+                    "PM03" => "Create Maintenance Plan", "PM04" => "Create Maintenance Order",
                     _ => kvp.Key
                 };
                 var group = kvp.Value.Split('/')[1] switch
                 {
-                    "MM" or "SD" or "PP" or "QM" or "WM" => "Transactions",
+                    "MM" or "SD" or "PP" or "QM" or "WM" or "PS" or "PM" => "Transactions",
                     "FI" or "CO" => "Reports",
                     "HR" or "CRM" => "MasterData",
                     "LIMS" or "BI" => "Analytics",
@@ -453,8 +462,13 @@ public class TransactionCodeService : ITransactionCodeService
                     RequiredRole = GetRequiredRole(module)
                 });
             }
-            _db.TransactionCodes.AddRange(codes);
-            await _db.SaveChangesAsync();
+            var existing = await _db.TransactionCodes.Select(t => t.Code).ToListAsync();
+            var missing = codes.Where(c => !existing.Contains(c.Code)).ToList();
+            if (missing.Count > 0)
+            {
+                _db.TransactionCodes.AddRange(missing);
+                await _db.SaveChangesAsync();
+            }
             _seeded = true;
         }
         finally

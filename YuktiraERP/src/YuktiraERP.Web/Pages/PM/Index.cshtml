@@ -23,7 +23,7 @@
                 <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Location</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody>
                     @foreach (var e in equipments) {
-                        <tr><td>@e.EquipmentCode</td><td>@e.Name</td><td>@e.Type</td><td>@e.Location</td><td>@e.Department</td><td><span class="badge @(e.Status=="Operational"?"bg-success":"bg-warning")">@e.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
+                        <tr><td><a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id">@e.EquipmentCode</a></td><td>@e.Name</td><td>@e.Type</td><td>@e.Location</td><td>@e.Department</td><td><span class="badge @(e.Status=="Operational"?"bg-success":"bg-warning")">@e.Status</span></td><td><a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id" class="btn btn-outline-secondary btn-sm"><i class="bi bi-eye"></i></a></td></tr>
                     }
                 </tbody>
             </table>

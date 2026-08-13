@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace YuktiraERP.Api.Middleware;
 
@@ -16,8 +18,8 @@ public class ApiThrottlingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-        var tracker = _clients.GetOrAdd(clientIp, _ => new ClientRequestTracker());
+        var bucketKey = ResolveBucketKey(context);
+        var tracker = _clients.GetOrAdd(bucketKey, _ => new ClientRequestTracker());
 
         lock (tracker)
         {
@@ -45,6 +47,33 @@ public class ApiThrottlingMiddleware
         }
 
         await _next(context);
+    }
+
+    private static string ResolveBucketKey(HttpContext context)
+    {
+        var authHeader = context.Request.Headers.Authorization.ToString();
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+                var subject = jwt.Subject;
+                if (string.IsNullOrEmpty(subject))
+                    subject = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(subject))
+                    subject = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                if (!string.IsNullOrEmpty(subject))
+                    return $"user:{subject}";
+            }
+            catch
+            {
+                // fall through to IP bucketing for malformed tokens
+            }
+        }
+
+        return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
 
     private class ClientRequestTracker

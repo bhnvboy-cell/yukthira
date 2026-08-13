@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Core.Interfaces;
 
 namespace YuktiraERP.Web.Pages.Transactions;
 
+[Authorize]
 public class LauncherModel : PageModel
 {
     private readonly ITransactionCodeService _service;

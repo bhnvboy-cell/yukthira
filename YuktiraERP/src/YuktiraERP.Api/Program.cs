@@ -2,16 +2,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using YuktiraERP.Api.Controllers;
 using YuktiraERP.Api.Middleware;
 using YuktiraERP.Infrastructure;
+using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.MultiTenant;
 using YuktiraERP.AIEngine;
 using YuktiraERP.ExportEngine;
 using YuktiraERP.Infrastructure.Hubs;
+using YuktiraERP.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Conventions.Add(new ApiVersionRouteConvention()));
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -58,19 +61,35 @@ builder.Services.AddYuktiraInfrastructure(builder.Configuration);
 builder.Services.AddYuktiraAIEngine();
 builder.Services.AddYuktiraExportEngine();
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:5001", "http://127.0.0.1:5001" };
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", p => p.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+    options.AddPolicy("AllowWebApp", p => p
+        .WithOrigins(allowedOrigins)
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials());
 });
 
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 var app = builder.Build();
 
-app.UseMiddleware<ApiThrottlingMiddleware>();
+// Seed database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    await seeder.SeedAsync();
+}
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseSecurityHeaders();
+app.UseMiddleware<ApiThrottlingMiddleware>(builder.Configuration.GetValue<int>("Throttling:MaxRequestsPerMinute", 100));
 app.UseMiddleware<TenantMiddleware>();
 app.UseMiddleware<AuditMiddleware>();
-app.UseCors("AllowAll");
+app.UseCors("AllowWebApp");
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,4 +1,5 @@
 @page
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
 @model YuktiraERP.Web.Pages.TCodeGenerator.IndexModel
 @{
     ViewData["Title"] = "T-Code Generator";

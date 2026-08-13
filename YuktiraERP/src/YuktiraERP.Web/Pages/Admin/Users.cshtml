@@ -1,25 +1,120 @@
 @page
-@using YuktiraERP.Web.Models
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@model YuktiraERP.Web.Pages.Admin.UsersModel
 @{
     ViewData["Title"] = "User Management";
-    var users = AdminUserStore.GetAll();
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2><i class="bi bi-people me-2"></i>User Management</h2>
-    <a asp-page="/Admin/Users" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New User</a>
+    <span class="text-muted small">@Model.Users.Count user(s)</span>
 </div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsError ? "alert-danger" : "alert-success") alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-4"><div class="card-header bg-primary text-white"><i class="bi bi-person-plus"></i> Create User</div><div class="card-body">
+<form method="post" asp-page-handler="Create">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <label class="form-label small text-muted">User ID</label>
+            <input class="form-control form-control-sm" asp-for="Input.UserId" required />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">Email</label>
+            <input class="form-control form-control-sm" asp-for="Input.Email" type="email" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small text-muted">Role</label>
+            <select class="form-select form-select-sm" asp-for="Input.Role">
+                @foreach (var r in YuktiraERP.Web.Pages.Admin.UsersModel.Roles)
+                {
+                    <option value="@r" selected="@(r == "READ_ONLY")">@r</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small text-muted">Password</label>
+            <input class="form-control form-control-sm" asp-for="Input.Password" type="password" required />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg"></i> Create</button>
+        </div>
+    </div>
+</form>
+</div></div>
+
 <div class="card"><div class="card-body">
-<table class="table table-hover table-sm">
-<thead><tr><th>User ID</th><th>Username</th><th>Email</th><th>Role</th><th>Active</th><th>Created</th><th>Actions</th></tr></thead>
+<table class="table table-hover table-sm align-middle">
+<thead><tr>
+    <th>User ID</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th>
+</tr></thead>
 <tbody>
-@foreach (var u in users)
+@foreach (var u in Model.Users)
 {
     <tr>
-        <td>@u.UserId</td><td>@u.UserName</td><td>@u.Email</td>
-        <td><span class="badge @(u.Role=="SUPER_USER"?"bg-danger":u.Role=="POWER_USER"?"bg-warning":"bg-secondary")">@u.Role</span></td>
-        <td>@if(u.IsActive){<i class="bi bi-check-circle text-success"></i>}else{<i class="bi bi-x-circle text-danger"></i>}</td>
-        <td>@u.CreatedAt.ToString("d")</td>
-        <td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td>
+        <td>
+            @u.UserName
+            @if (u.IsSuperUser) { <span class="badge bg-danger">SUPER</span> }
+        </td>
+        <td>@(string.IsNullOrEmpty(u.Email) ? "—" : u.Email)</td>
+        <td>
+            <form method="post" asp-page-handler="Update" class="d-inline-flex align-items-center gap-1">
+                <input type="hidden" name="UpdateId" value="@u.Id" />
+                <input type="hidden" name="UpdateEmail" value="@u.Email" />
+                <select name="UpdateRole" class="form-select form-select-sm" style="width:auto;">
+                    @foreach (var r in YuktiraERP.Web.Pages.Admin.UsersModel.Roles)
+                    {
+                        <option value="@r" selected="@(r == u.Role)">@r</option>
+                    }
+                </select>
+                <div class="form-check form-check-inline m-0">
+                    <input type="checkbox" class="form-check-input" name="UpdateActive" value="true" checked="@u.IsActive" id="active_@u.Id" />
+                    <label class="form-check-label small" for="active_@u.Id">Active</label>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Save role/active"><i class="bi bi-check-lg"></i></button>
+            </form>
+        </td>
+        <td>
+            @if (!u.IsActive) { <span class="badge bg-secondary">Inactive</span> }
+            else if (u.IsLocked) { <span class="badge bg-warning text-dark">Locked</span> }
+            else { <span class="badge bg-success">Active</span> }
+        </td>
+        <td class="small text-muted">@(u.LastLoginAt?.ToString("yyyy-MM-dd HH:mm") ?? "never")</td>
+        <td>
+            <div class="d-inline-flex gap-1 flex-wrap">
+                @if (u.IsActive)
+                {
+                    <form method="post" asp-page-handler="Deactivate" class="d-inline">
+                        <input type="hidden" name="DeactivateId" value="@u.Id" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Deactivate"><i class="bi bi-x-circle"></i></button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="Activate" class="d-inline">
+                        <input type="hidden" name="ActivateId" value="@u.Id" />
+                        <button type="submit" class="btn btn-outline-success btn-sm" title="Activate"><i class="bi bi-check-circle"></i></button>
+                    </form>
+                }
+                @if (u.IsLocked)
+                {
+                    <form method="post" asp-page-handler="Unlock" class="d-inline">
+                        <input type="hidden" name="UnlockId" value="@u.Id" />
+                        <button type="submit" class="btn btn-outline-warning btn-sm" title="Unlock"><i class="bi bi-unlock"></i></button>
+                    </form>
+                }
+                <form method="post" asp-page-handler="ResetPassword" class="d-inline-flex align-items-center gap-1">
+                    <input type="hidden" name="ResetId" value="@u.Id" />
+                    <input type="password" name="NewPassword" class="form-control form-control-sm" style="width:150px;" placeholder="New password" required />
+                    <button type="submit" class="btn btn-outline-primary btn-sm" title="Reset password"><i class="bi bi-key"></i></button>
+                </form>
+            </div>
+        </td>
     </tr>
 }
 </tbody>

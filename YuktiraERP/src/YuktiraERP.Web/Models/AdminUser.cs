@@ -1,15 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 namespace YuktiraERP.Web.Models;
-public class AdminUser
-{
-    [Required, StringLength(20)] public string UserId { get; set; } = "USR-" + Guid.NewGuid().ToString()[..4];
-    [Required, StringLength(100)] public string UserName { get; set; } = string.Empty;
-    [StringLength(100)] public string Email { get; set; } = string.Empty;
-    [StringLength(20)] public string Role { get; set; } = "READ_ONLY";
-    public bool IsActive { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.Today;
-}
-
 public class Tenant
 {
     [Required, StringLength(20)] public string TenantId { get; set; } = "TNT-" + Guid.NewGuid().ToString()[..4];
