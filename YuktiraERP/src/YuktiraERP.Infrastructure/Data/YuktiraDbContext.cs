@@ -105,6 +105,8 @@ public class YuktiraDbContext : DbContext
     public DbSet<SystemConfigEntity> SystemConfigs => Set<SystemConfigEntity>();
     // Integration
     public DbSet<WebhookEntity> Webhooks => Set<WebhookEntity>();
+    public DbSet<EdiTradingPartnerEntity> EdiTradingPartners => Set<EdiTradingPartnerEntity>();
+    public DbSet<EdiAcknowledgmentEntity> EdiAcknowledgmentLogs => Set<EdiAcknowledgmentEntity>();
     public DbSet<ApiClientEntity> ApiClients => Set<ApiClientEntity>();
     public DbSet<IntegrationQueueEntity> IntegrationQueues => Set<IntegrationQueueEntity>();
     public DbSet<IntegrationDeadLetterEntity> IntegrationDeadLetters => Set<IntegrationDeadLetterEntity>();

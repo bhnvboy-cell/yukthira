@@ -109,6 +109,54 @@ public class AuthService : IAuthService
         await _db.SaveChangesAsync();
     }
 
+    public async Task<LoginResponse> ImpersonateAsync(Guid actorUserId, Guid targetUserId)
+    {
+        var actor = await _db.AdminUsers.FindAsync(actorUserId);
+        if (actor == null || !actor.IsSuperUser)
+            throw new UnauthorizedAccessException("Impersonation requires superuser rights");
+
+        var target = await _db.AdminUsers.FindAsync(targetUserId);
+        if (target == null || !target.IsActive)
+            throw new UnauthorizedAccessException("Target user not found or inactive");
+
+        var permissions = await ResolvePermissionsAsync(target.Id, target.Role, null);
+        var userProfile = new UserProfile
+        {
+            UserId = target.Id,
+            Username = target.UserName,
+            FullName = target.UserName,
+            Email = target.Email,
+            Role = target.Role,
+            Language = "EN",
+            TenantId = null,
+            IsSuperUser = target.IsSuperUser,
+            Permissions = permissions
+        };
+
+        var accessToken = GenerateJwtToken(userProfile);
+        var expiresAt = DateTime.UtcNow.AddMinutes(30);
+        _db.AuditLogs.Add(new AuditLogEntity
+        {
+            Id = Guid.NewGuid(),
+            TenantId = null,
+            UserId = actorUserId,
+            UserName = actor.UserName,
+            ModuleName = "Security",
+            EntityName = "AdminUser",
+            ActionType = "Impersonate",            Description = $"Superuser {actor.UserName} impersonated {target.UserName}",
+            Timestamp = DateTime.UtcNow
+        });
+        await _db.SaveChangesAsync();
+
+        return new LoginResponse
+        {
+            AccessToken = accessToken,
+            RefreshToken = "",
+            ExpiresAt = expiresAt,
+            UserProfile = userProfile
+        };
+    }
+
     public async Task<LoginResponse> RefreshTokenAsync(string refreshToken)
     {
         var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == HashToken(refreshToken) && !t.IsRevoked);

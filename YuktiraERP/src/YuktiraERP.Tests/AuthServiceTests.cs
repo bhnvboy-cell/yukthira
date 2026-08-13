@@ -126,4 +126,73 @@ public class AuthServiceTests
             ClientNumber = "DEMO"
         }, "127.0.0.1", "test-device"));
     }
+
+    [Fact]
+    public async Task ImpersonateAsync_SuperUserIssuesTokenForTarget()
+    {
+        var db = CreateInMemoryDb();
+        var actor = new AdminUserEntity
+        {
+            Id = Guid.NewGuid(),
+            UserName = "super",
+            PasswordHash = HashPassword("Super@123"),
+            Email = "super@yuktira.com",
+            Role = "SuperAdmin",
+            IsActive = true,
+            IsSuperUser = true
+        };
+        var target = new AdminUserEntity
+        {
+            Id = Guid.NewGuid(),
+            UserName = "tester001",
+            PasswordHash = HashPassword("Test@123"),
+            Email = "tester@yuktira.com",
+            Role = "READ_ONLY",
+            IsActive = true
+        };
+        db.AdminUsers.AddRange(actor, target);
+        await db.SaveChangesAsync();
+
+        var service = new AuthService(db, CreateConfig());
+        var result = await service.ImpersonateAsync(actor.Id, target.Id);
+
+        Assert.NotNull(result.AccessToken);
+        Assert.True(result.AccessToken.Length > 0);
+        Assert.Equal(target.Id, result.UserProfile.UserId);
+        Assert.Equal("tester001", result.UserProfile.Username);
+
+        var audit = await db.AuditLogs.FirstOrDefaultAsync(a => a.ActionType == "Impersonate");
+        Assert.NotNull(audit);
+        Assert.Equal(actor.Id, audit.UserId);
+    }
+
+    [Fact]
+    public async Task ImpersonateAsync_NonSuperUser_Throws()
+    {
+        var db = CreateInMemoryDb();
+        var actor = new AdminUserEntity
+        {
+            Id = Guid.NewGuid(),
+            UserName = "normal",
+            PasswordHash = HashPassword("Normal@123"),
+            Email = "normal@yuktira.com",
+            Role = "READ_ONLY",
+            IsActive = true,
+            IsSuperUser = false
+        };
+        var target = new AdminUserEntity
+        {
+            Id = Guid.NewGuid(),
+            UserName = "tester002",
+            PasswordHash = HashPassword("Test@123"),
+            Email = "tester2@yuktira.com",
+            Role = "READ_ONLY",
+            IsActive = true
+        };
+        db.AdminUsers.AddRange(actor, target);
+        await db.SaveChangesAsync();
+
+        var service = new AuthService(db, CreateConfig());
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.ImpersonateAsync(actor.Id, target.Id));
+    }
 }

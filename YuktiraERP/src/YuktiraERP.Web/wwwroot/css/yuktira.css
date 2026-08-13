@@ -165,6 +165,63 @@
 [data-theme="premium"] .tile-card { background: var(--card-bg); border: 1px solid var(--border-color); }
 [data-theme="premium"] .tile-card:hover { border-color: var(--accent); }
 
+/* ── Dark theme (explicit dark mode) ── */
+[data-theme="dark"] {
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+  --primary-light: #93c5fd;
+  --bg-main: #0b1220;
+  --card-bg: #121a2b;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #1e293b;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --accent: #38bdf8;
+  --accent-light: #7dd3fc;
+  --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #38bdf8 100%);
+  --topbar-bg: #0f1a2e;
+  --topbar-border: #1e293b;
+  --topbar-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  --tile-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  --tile-shadow-hover: 0 8px 24px rgba(0,0,0,0.6);
+  --tile-radius: 6px;
+  --sidebar-bg: #0b1220;
+  --sidebar-hover: #1a2740;
+  --sidebar-active: rgba(96,165,250,0.18);
+  --sidebar-text: rgba(255,255,255,0.55);
+  --sidebar-text-hover: #ffffff;
+  --sidebar-divider: rgba(255,255,255,0.07);
+}
+[data-theme="dark"] body { background: var(--bg-main); color: var(--text-primary); }
+[data-theme="dark"] .card { background: var(--card-bg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+[data-theme="dark"] .card-header { background: rgba(96,165,250,0.05); border-bottom: 1px solid var(--border-color); }
+[data-theme="dark"] .table th { color: var(--text-secondary); border-bottom-color: var(--border-color); }
+[data-theme="dark"] .table td { border-bottom-color: var(--border-color); color: var(--text-primary); }
+[data-theme="dark"] .table-hover tbody tr:hover { background: rgba(96,165,250,0.06); }
+[data-theme="dark"] .nav-tabs .nav-link { color: var(--text-secondary); }
+[data-theme="dark"] .nav-tabs .nav-link.active { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+[data-theme="dark"] .btn-primary { background: var(--primary); border-color: var(--primary); }
+[data-theme="dark"] .btn-primary:hover { background: var(--primary-dark); }
+[data-theme="dark"] .btn-outline-primary { color: var(--accent); border-color: var(--accent); }
+[data-theme="dark"] .btn-outline-primary:hover { background: var(--accent); color: #0b1220; }
+[data-theme="dark"] .form-control, [data-theme="dark"] .form-select { background: #0f1a2e; border: 1px solid var(--border-color); color: var(--text-primary); }
+[data-theme="dark"] .form-control:focus, [data-theme="dark"] .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(96,165,250,0.15); }
+[data-theme="dark"] .top-bar { border-bottom: 1px solid var(--border-color); }
+[data-theme="dark"] .top-bar-search input { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+[data-theme="dark"] .top-bar-search input:focus { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+[data-theme="dark"] .top-bar-search i { color: var(--accent); }
+[data-theme="dark"] .tile-card { background: var(--card-bg); border: 1px solid var(--border-color); }
+[data-theme="dark"] .tile-card:hover { border-color: rgba(96,165,250,0.3); }
+[data-theme="dark"] .hybrid-sidebar .nav-item:hover { background: var(--sidebar-hover); }
+[data-theme="dark"] .hybrid-sidebar .nav-item.active { background: var(--sidebar-active); color: var(--accent-light) !important; border-left: 2px solid var(--primary); }
+[data-theme="dark"] h2 { color: var(--text-primary); }
+[data-theme="dark"] h2 i, [data-theme="dark"] h2 .bi { color: var(--accent); }
+
 [data-theme="modern"] .tile-group-header { border-left-color: var(--primary); }
 [data-theme="modern"] .tile-card:hover { border-color: rgba(37,99,235,0.15); box-shadow: 0 8px 20px rgba(37,99,235,0.08); }
 [data-theme="modern"] .mini-tile-card:hover { border-color: rgba(37,99,235,0.12); }
@@ -360,6 +417,7 @@ body {
 .sidebar-footer .theme-btn[data-theme="modern"] { background: #2563eb; }
 .sidebar-footer .theme-btn[data-theme="classic"] { background: #1e3a5f; }
 .sidebar-footer .theme-btn[data-theme="premium"] { background: #c9952c; }
+.sidebar-footer .theme-btn[data-theme="dark"] { background: #475569; }
 
 /* ── Main area (top bar + content) ── */
 .app-main-area {

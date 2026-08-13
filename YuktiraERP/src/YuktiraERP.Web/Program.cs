@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 using YuktiraERP.AIEngine;
 using YuktiraERP.Infrastructure;
 using YuktiraERP.Infrastructure.Data;
@@ -10,7 +11,22 @@ using YuktiraERP.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: Path.Combine(AppContext.BaseDirectory, "logs", "web-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 14,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+builder.Host.UseSerilog();
+
 builder.Services.AddRazorPages();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<YuktiraDbContext>("database", Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy);
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
 {
@@ -68,6 +84,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseSecurityHeaders();
+app.UseSerilogRequestLogging();
 app.UseMiddleware<TenantMiddleware>();
 app.UseRequestLocalization();
 app.UseStaticFiles();
@@ -79,5 +96,6 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

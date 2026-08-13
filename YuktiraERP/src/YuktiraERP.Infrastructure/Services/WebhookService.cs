@@ -21,6 +21,7 @@ public class WebhookService : IWebhookService
         "grn.created", "grn.verified",
         "po.created", "po.approved", "po.received",
         "so.created", "so.confirmed", "so.shipped",
+        "order.created", "order.updated", "order.shipped",
         "notification.sent", "integration.sync.completed"
     };
 
@@ -33,43 +34,47 @@ public class WebhookService : IWebhookService
             .ToListAsync();
 
         foreach (var hook in hooks)
-        {
-            var envelope = new
-            {
-                event_type = eventType,
-                tenant_id = tenantId.ToString(),
-                entity_type = entityType,
-                entity_id = entityId,
-                data = payload,
-                timestamp = DateTime.UtcNow
-            };
-            var json = JsonSerializer.Serialize(envelope);
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            if (!string.IsNullOrEmpty(hook.SecretKey))
-                content.Headers.Add("X-Webhook-Secret", hook.SecretKey);
+            await DispatchSingleAsync(hook, eventType, entityType, entityId, payload);
 
-            try
-            {
-                var resp = await _http.PostAsync(hook.TargetUrl, content);
-                hook.LastTriggeredAt = DateTime.UtcNow;
-                _db.WebhookDeliveryLogs.Add(new WebhookDeliveryLogEntity
-                {
-                    TenantId = tenantId, WebhookId = hook.Id, EventType = eventType,
-                    TargetUrl = hook.TargetUrl, StatusCode = (int)resp.StatusCode,
-                    IsSuccess = resp.IsSuccessStatusCode, AttemptedAt = DateTime.UtcNow
-                });
-            }
-            catch (Exception ex)
-            {
-                _db.WebhookDeliveryLogs.Add(new WebhookDeliveryLogEntity
-                {
-                    TenantId = tenantId, WebhookId = hook.Id, EventType = eventType,
-                    TargetUrl = hook.TargetUrl, StatusCode = 0, IsSuccess = false,
-                    ErrorMessage = ex.Message, AttemptedAt = DateTime.UtcNow
-                });
-            }
-        }
         if (hooks.Count > 0) await _db.SaveChangesAsync();
+    }
+
+    private async Task DispatchSingleAsync(WebhookEntity hook, string eventType, string entityType, string entityId, object? payload)
+    {
+        var envelope = new
+        {
+            event_type = eventType,
+            tenant_id = hook.TenantId.ToString(),
+            entity_type = entityType,
+            entity_id = entityId,
+            data = payload,
+            timestamp = DateTime.UtcNow
+        };
+        var json = JsonSerializer.Serialize(envelope);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        if (!string.IsNullOrEmpty(hook.SecretKey))
+            content.Headers.Add("X-Webhook-Secret", hook.SecretKey);
+
+        try
+        {
+            var resp = await _http.PostAsync(hook.TargetUrl, content);
+            hook.LastTriggeredAt = DateTime.UtcNow;
+            _db.WebhookDeliveryLogs.Add(new WebhookDeliveryLogEntity
+            {
+                TenantId = hook.TenantId, WebhookId = hook.Id, EventType = eventType,
+                TargetUrl = hook.TargetUrl, StatusCode = (int)resp.StatusCode,
+                IsSuccess = resp.IsSuccessStatusCode, AttemptedAt = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _db.WebhookDeliveryLogs.Add(new WebhookDeliveryLogEntity
+            {
+                TenantId = hook.TenantId, WebhookId = hook.Id, EventType = eventType,
+                TargetUrl = hook.TargetUrl, StatusCode = 0, IsSuccess = false,
+                ErrorMessage = ex.Message, AttemptedAt = DateTime.UtcNow
+            });
+        }
     }
 
     public async Task<List<WebhookDeliveryLogDto>> GetDeliveryLogsAsync(Guid tenantId, Guid webhookId, int page = 1, int pageSize = 20)
@@ -90,7 +95,12 @@ public class WebhookService : IWebhookService
     {
         var log = await _db.WebhookDeliveryLogs.FirstOrDefaultAsync(l => l.Id == logId && l.TenantId == tenantId);
         if (log == null) return false;
-        await DispatchAsync(tenantId, log.EventType, "", "", null);
+
+        var hook = await _db.Webhooks.FirstOrDefaultAsync(w => w.Id == log.WebhookId && w.TenantId == tenantId && w.IsActive);
+        if (hook == null) return false;
+
+        await DispatchSingleAsync(hook, log.EventType, "", "", null);
+        await _db.SaveChangesAsync();
         return true;
     }
 

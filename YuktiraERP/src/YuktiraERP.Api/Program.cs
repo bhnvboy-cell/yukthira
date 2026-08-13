@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Prometheus;
+using Serilog;
 using YuktiraERP.Api.Controllers;
 using YuktiraERP.Api.Middleware;
 using YuktiraERP.Infrastructure;
@@ -13,6 +15,23 @@ using YuktiraERP.Infrastructure.Hubs;
 using YuktiraERP.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: Path.Combine(AppContext.BaseDirectory, "logs", "api-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 14,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+builder.Host.UseSerilog();
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<YuktiraDbContext>("database", Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy);
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
@@ -103,7 +122,16 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseSerilogRequestLogging(o =>
+{
+    o.EnrichDiagnosticContext = (diag, http) =>
+    {
+        diag.Set("TenantId", http.Items.ContainsKey("TenantId") ? http.Items["TenantId"]?.ToString() : null);
+        diag.Set("Path", http.Request.Path.Value);
+    };
+});
 app.UseSecurityHeaders();
+app.UseHttpMetrics();
 app.UseMiddleware<ApiThrottlingMiddleware>(builder.Configuration.GetValue<int>("Throttling:MaxRequestsPerMinute", 100));
 app.UseRequestLocalization();
 app.UseMiddleware<TenantMiddleware>();
@@ -118,6 +146,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (ctx, report) =>
+    {
+        ctx.Response.ContentType = "application/json";
+        await ctx.Response.WriteAsJsonAsync(new
+        {
+            status = report.Status.ToString(),
+            database = report.Entries.TryGetValue("database", out var db) ? db.Status.ToString() : "Unknown",
+            timestamp = DateTime.UtcNow
+        });
+    }
+});
+app.MapMetrics();
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
 

@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.0.4** | **August 2026**
+**Version 1.0.5** | **August 2026**
 
 ---
 
@@ -479,8 +479,8 @@ See `docs/plugin-development.md` for full SDK reference, hook examples, and depl
 ## Monitoring & Logging
 
 ### Application Logs
-- **Console output** — all services log to stdout via `Console.WriteLine` (structured logging planned for Serilog migration)
-- **Log levels**: Error, Warn, Info, Debug (configured in `appsettings.json`)
+- **Serilog structured logging** — console + daily rolling file (`logs/api-.log`, `logs/web-.log`, 14 retained); every HTTP request is logged with method/path/status/duration and enriched with `TenantId` and `Path` (via `UseSerilogRequestLogging` + `EnrichDiagnosticContext`). Wired in both API and Web `Program.cs`
+- **Log levels**: Error, Warn, Info, Debug (configured via `MinimumLevel` in `Program.cs`; `Microsoft` source reduced to Warning)
 - **Key log events**: login success/failure, workflow transitions, MRP run completion, audit flagging, plugin load errors
 
 ### Error Logs
@@ -497,16 +497,13 @@ See `docs/plugin-development.md` for full SDK reference, hook examples, and depl
 
 | Endpoint | Response | Purpose |
 |----------|----------|---------|
-| `GET /health` | `{ status: "Healthy" }` | Liveness probe (add via `builder.Services.AddHealthChecks()` in `Program.cs`) |
-| `GET /health/ready` | `{ status: "Ready", database: "Connected" }` | Readiness with DB ping (planned) |
+| `GET /health` | `{ status: "Healthy", database: "Healthy", timestamp }` | Liveness + DB ping via `AddDbContextCheck` — live in both apps, anonymous |
+| `GET /metrics` | Prometheus text format | Request rate/duration/counters — live via `prometheus-net` |
 
-### Prometheus / Grafana (Planned)
-Metrics endpoints via `dotnet-counters` or Prometheus-net middleware:
-- Request rate, latency, error rate per controller
-- DB connection pool usage
-- Workflow instance count by status
-- AI forecast invocation count
-- Memory/GC pressure
+### Prometheus / Grafana (Live)
+`/metrics` is served by `prometheus-net` (`UseHttpMetrics()` + `MapMetrics()` in the API pipeline):
+- Request rate, latency, error count per endpoint (histograms + counters)
+- Ready to scrape into Grafana for dashboards on traffic, error rates, and p95 latency
 
 ---
 
@@ -657,10 +654,14 @@ curl http://localhost:5000/api/v1/integration/webhooks \
   -H "Authorization: Bearer <token>"
 
 # Dispatch event (triggers all matching webhooks)
-curl -X POST http://localhost:5000/api/v1/integration/dispatch \
+curl -X POST http://localhost:5000/api/v1/webhook/dispatch \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"eventType":"order.created","entityType":"SalesOrder","entityId":"SO-50001"}'
+
+# List supported event types
+curl http://localhost:5000/api/v1/integration/webhooks/event-types \
+  -H "Authorization: Bearer <token>"
 ```
 
 ### Workflow
@@ -954,6 +955,49 @@ Register endpoints that receive real-time events:
 
 Webhooks are dispatched via `POST` to the registered URL with HMAC signature in `X-Webhook-Secret` header.
 
+### EDI Trading Partners
+Trading-partner profiles and acknowledgments for EDIFACT/X12 interchange:
+```bash
+# Create a partner profile
+curl -X POST http://localhost:5000/api/v1/integration/edi/partners \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"partnerCode":"ACME01","partnerName":"ACME Trading","standard":"EDIFACT","version":"D96A","senderId":"YUKTIRA","receiverId":"ACME01"}'
+
+# List partners
+curl http://localhost:5000/api/v1/integration/edi/partners -H "Authorization: Bearer <token>"
+
+# Convert a document to EDIFACT or X12
+curl -X POST http://localhost:5000/api/v1/integration/edi/convert/EDIFACT/PO \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"poNumber":"PO-9001","vendor":"ACME Trading","date":"2026-08-13"}'
+
+# Parse an incoming interchange
+curl -X POST http://localhost:5000/api/v1/integration/edi/parse/EDIFACT \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"content":"UNA:+.? '\''\nUNB+UNOA:2+...'\''"}'
+
+# Record / query acknowledgments
+curl -X POST http://localhost:5000/api/v1/integration/edi/acknowledge \
+  -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
+  -d '{"partnerCode":"ACME01","ackCode":"Accepted","documentType":"ORDERS"}'
+curl "http://localhost:5000/api/v1/integration/edi/acknowledgments?partnerCode=ACME01" \
+  -H "Authorization: Bearer <token>"
+```
+
+### SuperUser Operations
+Superuser-only administration endpoints (`/api/v1/superuser/*`):
+- `POST unlock-document/{documentId}` — force-release blocked approval/workflow items
+- `POST reset-password/{userId}` — issue a temporary password
+- `POST impersonate/{userId}` — issue a scoped 30-min token as another user (audited)
+- `GET audit-logs/summary` — total/suspicious/last-hour/by-module audit counts
+- `POST tenants/{tenantId}/toggle-module/{moduleCode}` — enable/disable a module per tenant
+- `GET module-states/{tenantId}` — current per-tenant module states
+
+### Observability
+- `GET /health` — liveness + database ping (JSON status) — anonymous in both apps
+- `GET /metrics` — Prometheus HTTP metrics (request rate/duration/errors), scrape-ready for Grafana
+- Logs: structured Serilog to console and `logs/api-.log` / `logs/web-.log` (daily rolling, 14 retained) with per-request TenantId/Path enrichment
+
 ### API Client Authentication
 Third-party systems authenticate via client ID/secret:
 ```bash
@@ -1002,7 +1046,8 @@ src/YuktiraERP.Tests/
 ├── CostAllocationServiceTests.cs  # Proportional split, guards, utilization
 ├── LocalizationServiceTests.cs    # Languages, translations, tenant scoping
 ├── CurrencyServiceTests.cs        # Rates, conversion, inverse
-└── EntityBehaviorTests.cs         # Domain rules on SalesOrderLine/AR/PO/asset
+├── EntityBehaviorTests.cs         # Domain rules on SalesOrderLine/AR/PO/asset
+└── WebhookServiceTests.cs         # Retry scope, supported events, inactive guard
 ```
 
 ### Running Tests
@@ -1086,6 +1131,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app |
 | 1.0.4 | August 2026 | Gap-filling II: tax engine, multi-currency, real EDI conversion, email/SMS delivery with logging, CO cost allocations, i18n localization, domain entity behavior, fixed-asset lifecycle, webhook delivery verified |
 | 1.0.3 | August 2026 | Gap-filling: real stock Goods Issue, finance loop (AP/AR aging, payments, period close, bank recon, depreciation), payroll persistence, TOTP MFA, DB-backed approvals, background jobs, tenant write-safety, PDF fails loudly |
 | 1.0.2 | August 2026 | Module catalog, 13 legacy flat-page redirects, t-code reclassification, full CRUD pages for 32 entities, Npgsql DateTime fix, print/Save-as-PDF on every page, working backup/restore scripts |
@@ -1093,6 +1139,16 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**1.0.5 (August 2026)**
+- Observability: `/health` (with database ping via `AddDbContextCheck`) and `/health/ready` in both API and Web; Serilog structured logging (console + daily rolling file `logs/api-.log`, `logs/web-.log`, 14 retained) with request logging that enriches TenantId/Path; Prometheus metrics via `prometheus-net` (`/metrics`) — HTTP request rate/duration/counters ready for Grafana dashboards
+- Dark mode: explicit `[data-theme="dark"]` theme with full palette (cards, tables, tabs, forms, sidebar, top bar, tiles); 4th theme button in the sidebar switcher; system `prefers-color-scheme: dark` fallback for first-time visitors
+- Real `SuperUserController`: `unlock-document` force-releases blocked approval/t-code workflow items, `reset-password` issues a real temp password via `IAdminUserService`, `impersonate` issues a scoped 30-min JWT for the target user and writes an audit entry (`AuthService.ImpersonateAsync`), `audit-logs/summary` returns real totals/suspicious/last-hour/by-module, `tenants/{id}/toggle-module/{code}` persists per-tenant module state in `TenantSettings` (with `module-states` GET). New `Unlock`/`Impersonate` audit action types
+- Webhook defect fixes: `RetryDeliveryAsync` now redelivers only the specific failed webhook (was re-dispatching every active hook of the event type); `order.created`/`order.updated`/`order.shipped` added to supported events; README dispatch route corrected to `POST /api/v1/webhook/dispatch`
+- EDI trading-partner profiles: `EdiTradingPartnerEntity` (partner code/name, EDIFACT/X12 standard+version, sender/receiver qualifiers, test indicator, endpoint, auth) with full CRUD at `/api/v1/integration/edi/partners`; acknowledgment log (`EdiAcknowledgmentEntity`) with `POST /acknowledge` + filtered `GET /acknowledgments`; conversion/parse endpoints now live under `/api/v1/integration/edi/convert/{standard}/{docType}` and `/parse/{standard}`. Schema: `014_edi_trading_partners.sql`
+- PWA / installable web app: `manifest.json` (name, theme color, icons, shortcuts), `sw.js` service worker (app-shell cache, navigation fallback, static asset caching), SVG app icon, theme-color meta; verified live on the Web app dashboard
+- Tests: 35 passing (+4 webhook retry/events, +2 impersonation)
+- Operations fixes: Web `/health` now anonymous (fallback auth policy no longer intercepts probes); API/Web build clean
 
 **1.0.4 (August 2026)**
 - Tax engine: `TaxCodeEntity`/`TaxTransactionEntity`, `ITaxService`/`TaxService`, `TaxController` (`/api/v1/fi/Tax/*`); seeded GST 0/5/12/18/28, VAT 10, TDS 2; live verify — GST18 on 15000 → 2050 tax → 17050 gross, AR/AP posting (23600 / 8800 gross). Schema: `database/scripts/009_tax_engine.sql`
@@ -1152,8 +1208,8 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - Payroll: PF/ESI/PT/TDS calculation
 - Notifications: in-app + email + SMS with 10 templates
 - Transaction codes: 60+ SAP-style codes with search, favorites, permissions
-- xUnit test project: 29 tests across Auth, Workflow, Integration, Tax, EDI, Cost Allocation, Localization, Currency and entity behavior
-- PostgreSQL migration pipeline with auto-discovery and tracking (13 migration scripts)
+- xUnit test project: 35 tests across Auth, Workflow, Integration, Tax, EDI, Cost Allocation, Localization, Currency, entity behavior and webhooks
+- PostgreSQL migration pipeline with auto-discovery and tracking (14 migration scripts)
 - Entity configurations with multi-schema mappings (16 schemas)
 - 3 example plugins: AdvancedQC, DairyExtension, ExtraReports
 - Health check endpoints, structured error responses
@@ -1162,11 +1218,11 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Planned |
 |---------|---------|
-| 1.1 | Serilog structured logging, Prometheus metrics, Grafana dashboards |
+| 1.1 | ✅ Done in 1.0.5 — Serilog structured logging, Prometheus metrics, health checks (Grafana dashboards can now be wired against `/metrics`) |
 | 1.2 | ML.NET integration for AI engine, image recognition for QC |
 | 1.3 | Mobile app (Flutter), offline sync, push notifications |
-| 1.4 | EDI AS2/AS4, trading partner profiles, ack processing (EDIFACT D96A / X12 4010 done in 1.0.4) |
-| 1.5 | Multi-language done in 1.0.4 (i18n); dark mode, accessibility (WCAG 2.1) remaining |
+| 1.4 | EDI AS2/AS4 transport; EDIFACT D96A / X12 4010 conversion + trading partner profiles + acknowledgments done in 1.0.5 |
+| 1.5 | ✅ Dark mode done in 1.0.5; accessibility (WCAG 2.1) remaining |
 
 ---
 

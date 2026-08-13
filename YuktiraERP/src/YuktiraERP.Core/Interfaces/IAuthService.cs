@@ -43,6 +43,7 @@ public class UserProfile
 public interface IAuthService
 {
     Task<LoginResponse> LoginAsync(LoginRequest request, string ipAddress, string deviceInfo);
+    Task<LoginResponse> ImpersonateAsync(Guid actorUserId, Guid targetUserId);
     Task LogoutAsync(Guid userId);
     Task<LoginResponse> RefreshTokenAsync(string refreshToken);
     Task<UserProfile> GetUserProfileAsync(Guid userId, Guid? tenantId);

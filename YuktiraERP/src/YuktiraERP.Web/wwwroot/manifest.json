@@ -1,0 +1,43 @@
+{
+  "name": "Yuktira ERP",
+  "short_name": "Yuktira",
+  "description": "Unified ERP suite - Materials, Sales, Production, Quality, Finance, HR and more",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "orientation": "any",
+  "lang": "en",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "/images/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/Dashboard",
+      "description": "Open dashboard"
+    },
+    {
+      "name": "Sales Orders",
+      "url": "/SD/SalesOrder",
+      "description": "Manage sales orders"
+    },
+    {
+      "name": "Purchase Orders",
+      "url": "/MM/PO",
+      "description": "Manage purchase orders"
+    }
+  ]
+}
