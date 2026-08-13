@@ -241,10 +241,99 @@ public class FinanceController : ControllerBase
         model.Id = Guid.NewGuid();
         model.AssetCode = string.IsNullOrEmpty(model.AssetCode) ? $"FA-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..18] : model.AssetCode;
         if (model.PurchaseDate != default) model.PurchaseDate = DateTime.SpecifyKind(model.PurchaseDate, DateTimeKind.Utc);
+        try { model.ValidateLifecycle(); }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
         _db.FixedAssets.Add(model);
         await _db.SaveChangesAsync();
         return Ok(new { success = true, id = model.Id, assetCode = model.AssetCode, tenantId = _tenant.TenantId });
     }
+
+    [HttpGet("fixed-assets/{id:guid}")]
+    public async Task<IActionResult> GetFixedAsset(Guid id)
+    {
+        var item = await _db.FixedAssets.FirstOrDefaultAsync(a => a.Id == id);
+        return item == null ? NotFound() : Ok(new { data = item, tenantId = _tenant.TenantId });
+    }
+
+    [HttpPut("fixed-assets/{id:guid}")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> UpdateFixedAsset(Guid id, [FromBody] FixedAssetEntity model)
+    {
+        var item = await _db.FixedAssets.FirstOrDefaultAsync(a => a.Id == id);
+        if (item == null) return NotFound();
+        try { model.ValidateLifecycle(); }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+
+        item.AssetName = model.AssetName;
+        item.Category = model.Category;
+        item.Cost = model.Cost;
+        item.SalvageValue = model.SalvageValue;
+        item.UsefulLifeYears = model.UsefulLifeYears;
+        item.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return Ok(new { success = true, id = item.Id, tenantId = _tenant.TenantId });
+    }
+
+    [HttpPost("fixed-assets/{id:guid}/dispose")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> DisposeFixedAsset(Guid id)
+    {
+        var item = await _db.FixedAssets.FirstOrDefaultAsync(a => a.Id == id);
+        if (item == null) return NotFound();
+        if (item.Status != "Active") return BadRequest(new { error = $"Asset is {item.Status}; only Active assets can be disposed" });
+
+        var bookValue = item.BookValue(DateTime.UtcNow);
+        item.MarkScrapped();
+        item.UpdatedAt = DateTime.UtcNow;
+
+        await _accounting.PostJournalEntryAsync(new JournalPostingRequest
+        {
+            DocumentNumber = item.AssetCode,
+            EntryDate = DateTime.UtcNow,
+            Reference = "F-ASSET-DISPOSE",
+            Description = $"Disposal of fixed asset {item.AssetCode} ({item.AssetName}) at book value",
+            Lines = new List<JournalLine>
+            {
+                new() { AccountCode = "1400", Debit = bookValue },
+                new() { AccountCode = "1300", Credit = bookValue }
+            }
+        });
+
+        await _db.SaveChangesAsync();
+        return Ok(new { success = true, id = item.Id, status = item.Status, bookValue, tenantId = _tenant.TenantId });
+    }
+
+    [HttpPost("fixed-assets/{id:guid}/transfer")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> TransferFixedAsset(Guid id, [FromBody] AssetTransferRequest request)
+    {
+        var item = await _db.FixedAssets.FirstOrDefaultAsync(a => a.Id == id);
+        if (item == null) return NotFound();
+        if (item.Status == "Scrapped") return BadRequest(new { error = "Scrapped assets cannot be transferred" });
+        if (string.IsNullOrWhiteSpace(request.ToDepartment)) return BadRequest(new { error = "Target department is required" });
+
+        var bookValue = item.BookValue(DateTime.UtcNow);
+        item.MarkTransferred();
+        item.UpdatedAt = DateTime.UtcNow;
+
+        await _accounting.PostJournalEntryAsync(new JournalPostingRequest
+        {
+            DocumentNumber = item.AssetCode,
+            EntryDate = DateTime.UtcNow,
+            Reference = "F-ASSET-TRANSFER",
+            Description = $"Transfer of fixed asset {item.AssetCode} to {request.ToDepartment} (book value)",
+            Lines = new List<JournalLine>
+            {
+                new() { AccountCode = "1300", Debit = bookValue },
+                new() { AccountCode = "1300", Credit = bookValue }
+            }
+        });
+
+        await _db.SaveChangesAsync();
+        return Ok(new { success = true, id = item.Id, status = item.Status, toDepartment = request.ToDepartment, bookValue, tenantId = _tenant.TenantId });
+    }
+
+    public class AssetTransferRequest { public string ToDepartment { get; set; } = ""; }
 
     [HttpPost("ap/{id:guid}/pay")]
     [Authorize(Policy = "PowerUserOrAbove")]
@@ -283,8 +372,9 @@ public class FinanceController : ControllerBase
         if (entry == null) return NotFound();
         if (entry.Status == "Paid") return BadRequest(new { error = "Entry is already paid" });
 
+        try { entry.ApplyReceipt(entry.Amount); }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
         entry.Status = "Paid";
-        entry.ReceivedAmount = entry.Amount;
         entry.UpdatedAt = DateTime.UtcNow;
 
         await _accounting.PostJournalEntryAsync(new JournalPostingRequest

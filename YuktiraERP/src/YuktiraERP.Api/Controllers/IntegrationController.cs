@@ -282,9 +282,53 @@ public class IntegrationController : ControllerBase
         return Ok(await qsvc.GetDeadLetterAsync(GetTenantId()));
     }
 
+    // ── EDI conversion ──
+
+    [HttpPost("edi/convert/edifact")]
+    public async Task<IActionResult> ConvertToEdifact([FromBody] EdiConversionRequest req)
+    {
+        try
+        {
+            var svc = HttpContext.RequestServices.GetRequiredService<IEdiService>();
+            var result = await svc.ConvertToEdifactAsync(req.Data, req.DocumentType);
+            return Ok(new { format = "EDIFACT", documentType = req.DocumentType, content = result });
+        }
+        catch (ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpPost("edi/convert/x12")]
+    public async Task<IActionResult> ConvertToX12([FromBody] EdiConversionRequest req)
+    {
+        try
+        {
+            var svc = HttpContext.RequestServices.GetRequiredService<IEdiService>();
+            var result = await svc.ConvertToX12Async(req.Data, req.DocumentType);
+            return Ok(new { format = "X12", documentType = req.DocumentType, content = result });
+        }
+        catch (ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpPost("edi/parse/edifact")]
+    public async Task<IActionResult> ParseEdifact([FromBody] EdiParseRequest req)
+    {
+        var svc = HttpContext.RequestServices.GetRequiredService<IEdiService>();
+        var result = await svc.ParseEdifactAsync(req.Content);
+        return Ok(new { format = "EDIFACT", parsed = result });
+    }
+
+    [HttpPost("edi/parse/x12")]
+    public async Task<IActionResult> ParseX12([FromBody] EdiParseRequest req)
+    {
+        var svc = HttpContext.RequestServices.GetRequiredService<IEdiService>();
+        var result = await svc.ParseX12Async(req.Content);
+        return Ok(new { format = "X12", parsed = result });
+    }
+
     private Guid GetTenantId() =>
         Guid.TryParse(User.FindFirst("TenantId")?.Value, out var tid) ? tid : Guid.Empty;
 }
 
 public record CreateWebhookRequest(string Name, string EventType, string TargetUrl, string? SecretKey);
 public record CreateApiClientRequest(string Name, string[]? AllowedIpAddresses);
+public record EdiConversionRequest(string DocumentType, object Data);
+public record EdiParseRequest(string Content);

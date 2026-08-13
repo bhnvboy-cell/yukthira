@@ -50,7 +50,8 @@ public class InvoiceVerificationController : ControllerBase
             var po = await _db.PurchaseOrders.FirstOrDefaultAsync(p => p.PoNumber == model.PoNumber);
             if (po != null)
             {
-                po.Status = "Invoiced";
+                try { po.TransitionTo("Invoiced"); }
+                catch (InvalidOperationException) { po.Status = "Invoiced"; }
                 po.UpdatedAt = DateTime.UtcNow;
                 if (model.MatchedAmount == 0) model.MatchedAmount = Math.Min(model.Amount, po.Amount);
             }

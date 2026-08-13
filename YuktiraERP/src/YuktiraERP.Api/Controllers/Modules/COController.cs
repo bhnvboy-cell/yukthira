@@ -14,6 +14,7 @@ public class COController : ControllerBase
     private readonly IRepository<CostElementEntity, Guid> _costElements;
     private readonly IRepository<ProfitCenterEntity, Guid> _profitCenters;
     private readonly IRepository<InternalOrderEntity, Guid> _internalOrders;
+    private readonly ICostAllocationService _allocations;
     private readonly ITenantContext _tenant;
 
     public COController(
@@ -21,12 +22,14 @@ public class COController : ControllerBase
         IRepository<CostElementEntity, Guid> costElements,
         IRepository<ProfitCenterEntity, Guid> profitCenters,
         IRepository<InternalOrderEntity, Guid> internalOrders,
+        ICostAllocationService allocations,
         ITenantContext tenant)
     {
         _costCenters = costCenters;
         _costElements = costElements;
         _profitCenters = profitCenters;
         _internalOrders = internalOrders;
+        _allocations = allocations;
         _tenant = tenant;
     }
 
@@ -136,5 +139,76 @@ public class COController : ControllerBase
         if (!exists) return NotFound();
         await _internalOrders.DeleteAsync(id);
         return Ok(new { success = true, tenantId = _tenant.TenantId });
+    }
+
+    // ── Cost allocation engine ──
+    [HttpGet("allocation/rules")]
+    public async Task<IActionResult> GetAllocationRules()
+    {
+        var result = await _allocations.GetRulesAsync(_tenant.TenantId);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    [HttpPost("allocation/rules")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> CreateAllocationRule([FromBody] CostAllocationRuleDto request)
+    {
+        try
+        {
+            var result = await _allocations.CreateRuleAsync(_tenant.TenantId, request);
+            return Ok(new { success = true, data = result, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpPut("allocation/rules/{id:guid}")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> UpdateAllocationRule(Guid id, [FromBody] CostAllocationRuleDto request)
+    {
+        try
+        {
+            var result = await _allocations.UpdateRuleAsync(_tenant.TenantId, id, request);
+            if (result == null) return NotFound();
+            return Ok(new { success = true, data = result, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpDelete("allocation/rules/{id:guid}")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> DeleteAllocationRule(Guid id)
+    {
+        await _allocations.DeleteRuleAsync(_tenant.TenantId, id);
+        return Ok(new { success = true, tenantId = _tenant.TenantId });
+    }
+
+    [HttpPost("allocation/run")] [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> RunAllocation([FromBody] CostAllocationRunRequest request)
+    {
+        try
+        {
+            var createdBy = User.Identity?.Name ?? "";
+            var result = await _allocations.RunAllocationAsync(_tenant.TenantId, request, createdBy);
+            return Ok(new { success = true, data = result, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpGet("allocation/runs")]
+    public async Task<IActionResult> GetAllocationRuns([FromQuery] int limit = 50)
+    {
+        var result = await _allocations.GetRunsAsync(_tenant.TenantId, limit);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    [HttpGet("allocation/runs/{id:guid}/details")]
+    public async Task<IActionResult> GetAllocationDetails(Guid id)
+    {
+        var result = await _allocations.GetRunDetailsAsync(_tenant.TenantId, id);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    [HttpGet("allocation/runs/{id:guid}/utilization")]
+    public async Task<IActionResult> GetUtilization(Guid id)
+    {
+        var result = await _allocations.GetUtilizationAsync(_tenant.TenantId, id);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
     }
 }

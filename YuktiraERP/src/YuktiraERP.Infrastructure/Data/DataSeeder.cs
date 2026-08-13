@@ -35,6 +35,8 @@ public class DataSeeder
         await SeedCoreUsersAsync();
         await SeedMasterDataAsync();
         await SeedSalesDataAsync();
+        await SeedTaxCodesAsync();
+        await SeedCurrenciesAsync();
         await SeedSystemConfigsAsync();
     }
 
@@ -209,6 +211,47 @@ public class DataSeeder
         };
         await _db.Set<AccountEntity>().AddRangeAsync(accounts);
         await _db.SaveChangesAsync();
+    }
+
+    private async Task SeedTaxCodesAsync()
+    {
+        var tenant = await _db.Set<TenantEntity>().FirstOrDefaultAsync();
+        if (tenant == null) return;
+
+        if (!await _db.Set<TaxCodeEntity>().AnyAsync(t => t.TenantId == tenant.Id))
+        {
+            var taxCodes = new List<TaxCodeEntity>
+            {
+                new() { TenantId = tenant.Id, Code = "GST0", Name = "GST Exempt", Rate = 0, TaxType = "GST", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "GST5", Name = "GST 5%", Rate = 5, TaxType = "GST", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "GST12", Name = "GST 12%", Rate = 12, TaxType = "GST", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "GST18", Name = "GST 18%", Rate = 18, TaxType = "GST", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "GST28", Name = "GST 28%", Rate = 28, TaxType = "GST", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "VAT10", Name = "VAT 10%", Rate = 10, TaxType = "VAT", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "TDS2", Name = "TDS 2%", Rate = 2, TaxType = "TDS", TaxAccountCode = "2300", IsCompound = false, IsActive = true },
+            };
+            await _db.Set<TaxCodeEntity>().AddRangeAsync(taxCodes);
+            await _db.SaveChangesAsync();
+        }
+    }
+
+    private async Task SeedCurrenciesAsync()
+    {
+        var tenant = await _db.Set<TenantEntity>().FirstOrDefaultAsync();
+        if (tenant == null) return;
+
+        if (!await _db.Set<CurrencyEntity>().AnyAsync(c => c.TenantId == tenant.Id))
+        {
+            var currencies = new List<CurrencyEntity>
+            {
+                new() { TenantId = tenant.Id, Code = "USD", Name = "US Dollar", Symbol = "$", IsBase = true, DecimalPlaces = 2, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "EUR", Name = "Euro", Symbol = "€", IsBase = false, DecimalPlaces = 2, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "INR", Name = "Indian Rupee", Symbol = "₹", IsBase = false, DecimalPlaces = 2, IsActive = true },
+                new() { TenantId = tenant.Id, Code = "GBP", Name = "British Pound", Symbol = "£", IsBase = false, DecimalPlaces = 2, IsActive = true },
+            };
+            await _db.Set<CurrencyEntity>().AddRangeAsync(currencies);
+            await _db.SaveChangesAsync();
+        }
     }
 
     private async Task SeedBetaTestersAsync()

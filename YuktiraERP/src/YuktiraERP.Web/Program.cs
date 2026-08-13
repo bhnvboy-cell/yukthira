@@ -11,6 +11,14 @@ using YuktiraERP.Infrastructure.Security;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
+{
+    var supported = new[] { "en", "hi", "ta", "te", "kn", "ml", "fr", "es" };
+    options.SetDefaultCulture("en")
+        .AddSupportedCultures(supported)
+        .AddSupportedUICultures(supported);
+});
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddSignalR();
@@ -61,6 +69,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSecurityHeaders();
 app.UseMiddleware<TenantMiddleware>();
+app.UseRequestLocalization();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();

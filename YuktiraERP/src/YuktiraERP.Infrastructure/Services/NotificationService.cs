@@ -1,6 +1,5 @@
 using System.Net.Mail;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
@@ -10,12 +9,14 @@ namespace YuktiraERP.Infrastructure.Services;
 public class NotificationService : INotificationService
 {
     private readonly YuktiraDbContext _db;
-    private readonly IConfiguration _configuration;
+    private readonly IEmailSender _emailSender;
+    private readonly ISmsSender _smsSender;
 
-    public NotificationService(YuktiraDbContext db, IConfiguration configuration)
+    public NotificationService(YuktiraDbContext db, IEmailSender emailSender, ISmsSender smsSender)
     {
         _db = db;
-        _configuration = configuration;
+        _emailSender = emailSender;
+        _smsSender = smsSender;
     }
 
     public async Task SendAsync(SendNotificationRequest request)
@@ -32,10 +33,11 @@ public class NotificationService : INotificationService
         _db.Notifications.Add(notification);
         await _db.SaveChangesAsync();
 
+        var tenantId = request.TenantId ?? Guid.Empty;
         if (request.Channel is NotificationChannelType.Email or NotificationChannelType.All)
-            await SendEmailAsync(request);
+            await SendEmailAsync(request, tenantId);
         if (request.Channel is NotificationChannelType.SMS or NotificationChannelType.All)
-            SendSms(request);
+            await SendSmsAsync(request, tenantId);
     }
 
     public async Task SendToRoleAsync(Guid tenantId, string roleCode, SendNotificationRequest request)
@@ -95,45 +97,31 @@ public class NotificationService : INotificationService
             .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsRead, true));
     }
 
-    private async Task SendEmailAsync(SendNotificationRequest request)
+    private async Task SendEmailAsync(SendNotificationRequest request, Guid tenantId)
     {
-        try
+        var user = await _db.AdminUsers.FindAsync(request.UserId);
+        var to = user?.Email ?? $"{request.UserId}@yuktira.com";
+        await _emailSender.SendAsync(new EmailMessage
         {
-            var smtpHost = _configuration["Email:SmtpHost"];
-            var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
-            var username = _configuration["Email:Username"];
-            var password = _configuration["Email:Password"];
-            var useSsl = bool.Parse(_configuration["Email:UseSsl"] ?? "true");
-
-            if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(username))
-            {
-                Console.WriteLine($"[EMAIL-FALLBACK] To: {request.UserId} | Subject: {request.Title} | Body: {request.Message}");
-                return;
-            }
-
-            using var client = new SmtpClient(smtpHost, smtpPort)
-            {
-                Credentials = new System.Net.NetworkCredential(username, password),
-                EnableSsl = useSsl
-            };
-
-            var user = await _db.AdminUsers.FindAsync(request.UserId);
-            var toEmail = user?.Email ?? $"{request.UserId}@yuktira.com";
-
-            await client.SendMailAsync(
-                new MailMessage(username, toEmail, request.Title, request.Message)
-                {
-                    IsBodyHtml = request.Message.Contains('<') && request.Message.Contains('>')
-                });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[EMAIL-FAILED] {ex.GetType().Name}: {ex.Message}");
-        }
+            To = to,
+            Subject = request.Title,
+            Body = request.Message,
+            IsHtml = request.Message.Contains('<') && request.Message.Contains('>'),
+            TemplateCode = request.TemplateCode,
+            TemplateData = request.TemplateData
+        }, tenantId);
     }
 
-    private void SendSms(SendNotificationRequest request)
+    private async Task SendSmsAsync(SendNotificationRequest request, Guid tenantId)
     {
-        Console.WriteLine($"[SMS] To: {request.UserId} | Message: {request.Message}");
+        var user = await _db.AdminUsers.FindAsync(request.UserId);
+        var to = user?.UserId ?? request.UserId.ToString();
+        await _smsSender.SendAsync(new SmsMessage
+        {
+            To = to,
+            Body = request.Message,
+            TemplateCode = request.TemplateCode,
+            TemplateData = request.TemplateData
+        }, tenantId);
     }
 }

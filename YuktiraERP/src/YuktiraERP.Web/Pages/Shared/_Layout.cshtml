@@ -66,6 +66,17 @@
                             <span class="badge bg-danger" id="notifCount" style="display:none">0</span>
                         </a>
                         <a href="/Dashboard" class="top-bar-icon" title="Home"><i class="bi bi-grid-3x3-gap"></i></a>
+                        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon" style="margin:0;display:inline-flex">
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <select name="culture" onchange="this.form.submit()" style="background:transparent;border:1px solid var(--sidebar-text-hover,#666);border-radius:4px;color:var(--sidebar-text-hover,#ccc);font-size:12px;padding:2px 4px" title="Language">
+                                <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en")">EN</option>
+                                <option value="hi" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hi")">हिन्दी</option>
+                                <option value="ta" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ta")">தமிழ்</option>
+                                <option value="te" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "te")">తెలుగు</option>
+                                <option value="fr" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fr")">FR</option>
+                                <option value="es" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "es")">ES</option>
+                            </select>
+                        </form>
                         <a href="#" class="top-bar-icon" id="printBtn" title="Print / Save as PDF"><i class="bi bi-printer"></i></a>
                         <a href="/Auth/Logout" class="top-bar-icon text-danger" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
                     </div>

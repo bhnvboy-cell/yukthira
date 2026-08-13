@@ -14,6 +14,19 @@ using YuktiraERP.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
+{
+    var supported = new[] { "en", "hi", "ta", "te", "kn", "ml", "fr", "es" };
+    options.SetDefaultCulture("en")
+        .AddSupportedCultures(supported)
+        .AddSupportedUICultures(supported)
+        .RequestCultureProviders.Clear();
+    options.RequestCultureProviders.Add(new Microsoft.AspNetCore.Localization.AcceptLanguageHeaderRequestCultureProvider());
+    options.RequestCultureProviders.Add(new Microsoft.AspNetCore.Localization.QueryStringRequestCultureProvider());
+    options.RequestCultureProviders.Add(new Microsoft.AspNetCore.Localization.CookieRequestCultureProvider());
+});
+
 builder.Services.AddControllers(options => options.Conventions.Add(new ApiVersionRouteConvention()));
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
@@ -92,6 +105,7 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseSecurityHeaders();
 app.UseMiddleware<ApiThrottlingMiddleware>(builder.Configuration.GetValue<int>("Throttling:MaxRequestsPerMinute", 100));
+app.UseRequestLocalization();
 app.UseMiddleware<TenantMiddleware>();
 app.UseMiddleware<AuditMiddleware>();
 app.UseCors("AllowWebApp");

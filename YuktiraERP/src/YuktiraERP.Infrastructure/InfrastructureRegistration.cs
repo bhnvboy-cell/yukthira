@@ -43,6 +43,8 @@ public static class InfrastructureRegistration
         services.AddScoped<IAdminUserService, AdminUserService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
+        services.AddScoped<ISmsSender, TwilioSmsSender>();
         services.AddScoped<INumberRangeService, NumberRangeService>();
         services.AddScoped<IApprovalService, ApprovalService>();
         services.AddScoped<IDashboardService, DashboardService>();
@@ -71,6 +73,10 @@ public static class InfrastructureRegistration
         services.AddScoped<ICapacityPlanningService, CapacityPlanningService>();
         services.AddScoped<IPredictabilityService, PredictabilityService>();
         services.AddScoped<IAccountingService, AccountingService>();
+        services.AddScoped<ITaxService, TaxService>();
+        services.AddScoped<ICurrencyService, CurrencyService>();
+        services.AddScoped<ICostAllocationService, CostAllocationService>();
+        services.AddScoped<ILocalizationService, LocalizationService>();
         services.AddScoped<IPayrollService, PayrollService>();
         services.AddScoped<ITransactionCodeService, TransactionCodeService>();
         services.AddScoped<IWorkflowEngine, WorkflowService>();

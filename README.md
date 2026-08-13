@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.0.2** | **August 2026**
+**Version 1.0.4** | **August 2026**
 
 ---
 
@@ -40,7 +40,7 @@ Then open **http://localhost:5001** and login with:
 │   ├── YuktiraERP.PluginSdk/       Plugin SDK — interfaces, assembly loader, 4 hook types, hot reload, sandboxing
 │   └── plugins/                    Example plugins (AdvancedQC, Dairy, Reports) — see `docs/plugin-development.md`
 ├── database/
-│   ├── scripts/                    SQL migration scripts (001–007)
+│   ├── scripts/                    SQL migration scripts (001–013)
 │   └── backup/                     Disaster recovery runbook
 ├── scripts/                        Docker, deploy, build scripts
 ├── apache-config/                  Reverse proxy config
@@ -373,7 +373,7 @@ dotnet run
 ### Option 3: Initialize the Database
 
 ```batch
-# 1. Run the DB bootstrap script (creates yuktira_erp, applies 001–007 migrations, seeds sample data)
+# 1. Run the DB bootstrap script (creates yuktira_erp, applies 001–013 migrations, seeds sample data)
 init-db.bat
 
 # 2. Connection string (both API and Web use the same key)
@@ -983,7 +983,7 @@ Outbound message queue with retry and dead-letter handling:
 Built-in middleware (registered in `Program.cs`) limits requests to **100/min per client IP**. Returns `429 Too Many Requests` with `X-RateLimit-*` headers when exceeded.
 
 ### EDI / B2B Connectors
-- EDIFACT / X12 conversion stubs via `IEdiService` (`POST /api/v1/integration/edi/convert`)
+- Real EDIFACT D96A + X12 4010 converters via `IEdiService` (`POST /api/v1/integration/edi/convert/edifact|/x12`, `POST /api/v1/integration/edi/parse/edifact|/x12`)
 - Trading partner profile management (planned)
 - Automated acknowledgment processing (planned)
 
@@ -994,9 +994,15 @@ Built-in middleware (registered in `Program.cs`) limits requests to **100/min pe
 ### Test Project Structure
 ```
 src/YuktiraERP.Tests/
-├── AuthServiceTests.cs         # Login validation, password policy, lockout
-├── WorkflowServiceTests.cs     # Start workflow, inactive guard
-└── IntegrationHubTests.cs      # Webhook CRUD, API client validation, IP whitelist
+├── AuthServiceTests.cs            # Login validation, password policy, lockout
+├── WorkflowServiceTests.cs        # Start workflow, inactive guard
+├── IntegrationHubTests.cs         # Webhook CRUD, API client validation, IP whitelist
+├── TaxServiceTests.cs             # Tax calc, posting, duplicate codes
+├── EdiServiceTests.cs             # EDIFACT/X12 convert + parse round-trips
+├── CostAllocationServiceTests.cs  # Proportional split, guards, utilization
+├── LocalizationServiceTests.cs    # Languages, translations, tenant scoping
+├── CurrencyServiceTests.cs        # Rates, conversion, inverse
+└── EntityBehaviorTests.cs         # Domain rules on SalesOrderLine/AR/PO/asset
 ```
 
 ### Running Tests
@@ -1080,12 +1086,25 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.0.4 | August 2026 | Gap-filling II: tax engine, multi-currency, real EDI conversion, email/SMS delivery with logging, CO cost allocations, i18n localization, domain entity behavior, fixed-asset lifecycle, webhook delivery verified |
 | 1.0.3 | August 2026 | Gap-filling: real stock Goods Issue, finance loop (AP/AR aging, payments, period close, bank recon, depreciation), payroll persistence, TOTP MFA, DB-backed approvals, background jobs, tenant write-safety, PDF fails loudly |
 | 1.0.2 | August 2026 | Module catalog, 13 legacy flat-page redirects, t-code reclassification, full CRUD pages for 32 entities, Npgsql DateTime fix, print/Save-as-PDF on every page, working backup/restore scripts |
 | 1.0.1 | August 2026 | API versioning, Web /api layer, PS/PM transaction codes, seed reconciliation, security hardening |
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**1.0.4 (August 2026)**
+- Tax engine: `TaxCodeEntity`/`TaxTransactionEntity`, `ITaxService`/`TaxService`, `TaxController` (`/api/v1/fi/Tax/*`); seeded GST 0/5/12/18/28, VAT 10, TDS 2; live verify — GST18 on 15000 → 2050 tax → 17050 gross, AR/AP posting (23600 / 8800 gross). Schema: `database/scripts/009_tax_engine.sql`
+- Multi-currency: `CurrencyEntity`/`ExchangeRateEntity`, `ICurrencyService`/`CurrencyService`, `CurrencyController` (`/api/v1/fi/Currency/*`); seeded USD (base) / EUR / INR / GBP; live verify — direct (EUR→USD 1.18), inverse (USD→EUR ≈0.8474), same-currency 1, revaluation. Schema: `010_currency.sql`
+- Email + SMS delivery: `MessageDeliveryEntity` with `IEmailSender`/`SmtpEmailSender` and `ISmsSender`/`TwilioSmsSender`; `NotificationService` rewired (no console fakes); `NotificationDeliveryController` (`/api/v1/comm/NotificationDelivery/*`) with send + delivery log; live verify — email attempts real SMTP and logs `Failed` with reason, SMS logs `Unconfigured` without creds, full notification flow logs delivery. Schema: `011_message_delivery.sql`
+- Real EDI conversion: `EdiService` rewritten with real EDIFACT D96A (ORDERS/INVOIC/RECADV) and X12 4010 (850/810/861) segment builders + LIN/QTY/MOA/DTM and BEG/PO1/IT1/CTT/TDS parsers; `POST /api/v1/integration/edi/convert/{edifact|x12}` and `/parse/{edifact|x12}`; round-trip verified, 5 unit tests
+- CO cost allocations: `CostAllocationRuleEntity`/`RunEntity`/`DetailEntity`, `ICostAllocationService`/`CostAllocationService`; rules CRUD, proportional run on a basis (headcount, etc.), run history, per-center details, budget utilization; live verify — 10000 split 8000/2000 on 80/20 headcount. Schema: `012_cost_allocation.sql`
+- i18n / localization: request-localization middleware (en, hi, ta, te, kn, ml, fr, es) in both apps; `LanguageEntity`/`TranslationEntity`, `ILocalizationService`/`LocalizationService`, `LanguageController` (`/api/v1/i18n/*`); DB-backed per-tenant translation store (upsert/read/delete); Web top-bar culture switcher (`HomeController.SetLanguage`, cookie-based, returns to current page). Schema: `013_localization.sql`
+- Domain entity behavior: encapsulated rules on key entities (`EntityBehaviors.cs`) — `SalesOrderLine.SetPricing`, `FixedAsset.ValidateLifecycle/AnnualDepreciation/BookValue/MarkScrapped/MarkTransferred`, `AREntry.ApplyReceipt/OutstandingAmount`, PO/PR/Delivery guarded status transitions (`CanTransitionTo`); controllers now route through the rules (AR payment, PO invoice transition, fixed-asset create)
+- Fixed-asset lifecycle: dispose/transfer beyond depreciation — `POST /api/v1/fi/Finance/fixed-assets/{id}/dispose|/transfer` compute book value, transition status, and post GL (dispose: debit 1400 / credit 1300; transfer: zero-net 1300 memo); guards (only Active disposals, no transfer of scrapped); live verified incl. re-dispose rejection
+- Webhook delivery logging verified end-to-end: dispatch to a live listener delivered with `X-Webhook-Secret` and logged `200/success`; a dead target logged `isSuccess=false` with connection error; delivery log readable via `/api/v1/integration/webhooks/{id}/logs`
+- Tests: 29 passing (tax, EDI, cost allocation, localization, entity behavior, plus existing auth/workflow/integration)
 
 **1.0.3 (August 2026)**
 - Stock integrity: Goods Issue now deducts real stock from `MaterialMaster`, validates quantity/availability, and records a `StockMovement` (document, material, qty, before/after, reference); GRN receipt and reversal record stock movements too
@@ -1133,8 +1152,8 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - Payroll: PF/ESI/PT/TDS calculation
 - Notifications: in-app + email + SMS with 10 templates
 - Transaction codes: 60+ SAP-style codes with search, favorites, permissions
-- xUnit test project: 8 tests across Auth, Workflow, Integration services
-- PostgreSQL migration pipeline with auto-discovery and tracking (6 migration scripts)
+- xUnit test project: 29 tests across Auth, Workflow, Integration, Tax, EDI, Cost Allocation, Localization, Currency and entity behavior
+- PostgreSQL migration pipeline with auto-discovery and tracking (13 migration scripts)
 - Entity configurations with multi-schema mappings (16 schemas)
 - 3 example plugins: AdvancedQC, DairyExtension, ExtraReports
 - Health check endpoints, structured error responses
@@ -1146,8 +1165,8 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.1 | Serilog structured logging, Prometheus metrics, Grafana dashboards |
 | 1.2 | ML.NET integration for AI engine, image recognition for QC |
 | 1.3 | Mobile app (Flutter), offline sync, push notifications |
-| 1.4 | Full EDI AS2/AS4 support, trading partner profiles, EDIFACT/X12 mapper |
-| 1.5 | Multi-language (i18n), dark mode, accessibility (WCAG 2.1) |
+| 1.4 | EDI AS2/AS4, trading partner profiles, ack processing (EDIFACT D96A / X12 4010 done in 1.0.4) |
+| 1.5 | Multi-language done in 1.0.4 (i18n); dark mode, accessibility (WCAG 2.1) remaining |
 
 ---
 
@@ -1169,7 +1188,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | Docker | `.\scripts\deploy.ps1 -Build -Run` | http://localhost:5001 |
 | Production (PostgreSQL) | `init-db.bat` then `run-api.bat` + `run-web.bat` | Configured URL |
 | Apache proxy | See `apache-config/yuktira-erp.conf` | https://erp.yourdomain.com |
-| Database install | `init-db.bat` | Creates DB, applies 001–007, seeds sample data |
+| Database install | `init-db.bat` | Creates DB, applies 001–013, seeds sample data |
 | Stop all | `kill.bat` | Stops running YuktiraERP dotnet processes |
 | Backup | `.\scripts\backup.ps1` | Daily pg_dump |
 | Restore | `.\scripts\restore.ps1 -BackupFile <file>` | Point-in-time recovery |

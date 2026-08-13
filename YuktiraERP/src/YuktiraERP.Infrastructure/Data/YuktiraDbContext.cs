@@ -85,6 +85,16 @@ public class YuktiraDbContext : DbContext
     // Accounting
     public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
     public DbSet<GeneralLedgerEntryEntity> GeneralLedgerEntries => Set<GeneralLedgerEntryEntity>();
+    public DbSet<TaxCodeEntity> TaxCodes => Set<TaxCodeEntity>();
+    public DbSet<TaxTransactionEntity> TaxTransactions => Set<TaxTransactionEntity>();
+    public DbSet<CurrencyEntity> Currencies => Set<CurrencyEntity>();
+    public DbSet<ExchangeRateEntity> ExchangeRates => Set<ExchangeRateEntity>();
+    public DbSet<MessageDeliveryEntity> MessageDeliveries => Set<MessageDeliveryEntity>();
+    public DbSet<CostAllocationRuleEntity> CostAllocationRules => Set<CostAllocationRuleEntity>();
+    public DbSet<CostAllocationRunEntity> CostAllocationRuns => Set<CostAllocationRunEntity>();
+    public DbSet<CostAllocationDetailEntity> CostAllocationDetails => Set<CostAllocationDetailEntity>();
+    public DbSet<LanguageEntity> Languages => Set<LanguageEntity>();
+    public DbSet<TranslationEntity> Translations => Set<TranslationEntity>();
     // Cross-cutting
     public DbSet<ApprovalRequestEntity> ApprovalRequests => Set<ApprovalRequestEntity>();
     public DbSet<CustomFieldEntity> CustomFields => Set<CustomFieldEntity>();
