@@ -132,6 +132,13 @@ public class YuktiraDbContext : DbContext
     public DbSet<WorkflowEdgeEntity> WorkflowEdges => Set<WorkflowEdgeEntity>();
     public DbSet<WorkflowInstanceEntity> WorkflowInstances => Set<WorkflowInstanceEntity>();
     public DbSet<WorkflowHistoryEntity> WorkflowHistories => Set<WorkflowHistoryEntity>();
+    // Stock movements + finance loop
+    public DbSet<StockMovementEntity> StockMovements => Set<StockMovementEntity>();
+    public DbSet<FiscalPeriodEntity> FiscalPeriods => Set<FiscalPeriodEntity>();
+    public DbSet<BankReconciliationEntity> BankReconciliations => Set<BankReconciliationEntity>();
+    public DbSet<PaymentEntity> Payments => Set<PaymentEntity>();
+    public DbSet<DepreciationScheduleEntity> DepreciationSchedules => Set<DepreciationScheduleEntity>();
+    public DbSet<ApprovalStepEntity> ApprovalSteps => Set<ApprovalStepEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("yuktira_core");

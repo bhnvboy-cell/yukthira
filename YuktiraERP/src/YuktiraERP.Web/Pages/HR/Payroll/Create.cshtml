@@ -6,16 +6,24 @@
 <div class="card-body">
 <form method="post">
 <div class="row mb-3">
-<div class="col-md-6"><label asp-for="Entry.EmployeeName" class="form-label"></label><input asp-for="Entry.EmployeeName" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Entry.Period" class="form-label"></label><input asp-for="Entry.Period" class="form-control" placeholder="January 2024" /></div>
-<div class="col-md-3"><label asp-for="Entry.Status" class="form-label"></label><select asp-for="Entry.Status" class="form-select"><option>Draft</option><option>Posted</option><option>Cancelled</option></select></div>
+<div class="col-md-6"><label asp-for="Calculation.EmployeeName" class="form-label">Employee Name</label><input asp-for="Calculation.EmployeeName" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Entry.Period" class="form-label">Period</label><input asp-for="Entry.Period" class="form-control" placeholder="January 2026" /></div>
+<div class="col-md-3"><label asp-for="Entry.Status" class="form-label">Status</label><select asp-for="Entry.Status" class="form-select"><option>Draft</option><option selected>Posted</option><option>Cancelled</option></select></div>
+</div>
+<h6 class="text-muted mt-3 mb-2">Monthly Pay Components</h6>
+<div class="row mb-3">
+<div class="col-md-3"><label asp-for="Calculation.BasicPay" class="form-label">Basic Pay</label><input asp-for="Calculation.BasicPay" type="number" step="0.01" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Calculation.HRA" class="form-label">HRA</label><input asp-for="Calculation.HRA" type="number" step="0.01" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Calculation.Conveyance" class="form-label">Conveyance</label><input asp-for="Calculation.Conveyance" type="number" step="0.01" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Calculation.MedicalAllowance" class="form-label">Medical Allowance</label><input asp-for="Calculation.MedicalAllowance" type="number" step="0.01" class="form-control" /></div>
 </div>
 <div class="row mb-3">
-<div class="col-md-3"><label asp-for="Entry.GrossPay" class="form-label"></label><input asp-for="Entry.GrossPay" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Entry.Deductions" class="form-label"></label><input asp-for="Entry.Deductions" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Entry.NetPay" class="form-label"></label><input asp-for="Entry.NetPay" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Calculation.SpecialAllowance" class="form-label">Special Allowance</label><input asp-for="Calculation.SpecialAllowance" type="number" step="0.01" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Calculation.OtherAllowance" class="form-label">Other Allowance</label><input asp-for="Calculation.OtherAllowance" type="number" step="0.01" class="form-control" /></div>
+<div class="col-md-3"><label asp-for="Calculation.Bonus" class="form-label">Bonus</label><input asp-for="Calculation.Bonus" type="number" step="0.01" class="form-control" /></div>
 </div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/HR/Payroll/List" class="btn btn-outline-secondary">Cancel</a></div>
+<div class="alert alert-info py-2 mb-3"><i class="bi bi-calculator me-1"></i>PF (12% of basic, cap ₹15,000), ESI (0.75% if gross ≤ ₹21,000), Professional Tax and TDS are computed automatically.</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Calculate &amp; Save</button><a asp-page="/HR/Payroll/List" class="btn btn-outline-secondary">Cancel</a></div>
 </form>
 </div></div>
 </div></div>

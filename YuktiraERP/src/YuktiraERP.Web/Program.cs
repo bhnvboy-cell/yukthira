@@ -52,6 +52,11 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAsync();
+
+    // Load plugins from the plugins/ folder (logs & activates IYuktiraPlugin assemblies)
+    var loader = scope.ServiceProvider.GetRequiredService<YuktiraERP.PluginSdk.PluginLoader>();
+    try { loader.LoadAll(); }
+    catch (Exception ex) { System.Console.WriteLine($"[PluginLoader] failed to load plugins: {ex.Message}"); }
 }
 
 app.UseSecurityHeaders();

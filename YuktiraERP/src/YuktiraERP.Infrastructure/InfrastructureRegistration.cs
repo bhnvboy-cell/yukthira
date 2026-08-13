@@ -16,14 +16,19 @@ public static class InfrastructureRegistration
     public static IServiceCollection AddYuktiraInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connStr = configuration.GetConnectionString("YuktiraDb");
+        services.AddScoped<TenantSaveChangesInterceptor>();
         if (!string.IsNullOrEmpty(connStr))
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            services.AddDbContext<YuktiraDbContext>(options => options.UseNpgsql(connStr));
+            services.AddDbContext<YuktiraDbContext>((sp, options) => options
+                .UseNpgsql(connStr)
+                .AddInterceptors(sp.GetRequiredService<TenantSaveChangesInterceptor>()));
         }
         else
         {
-            services.AddDbContext<YuktiraDbContext>(options => options.UseInMemoryDatabase("YuktiraERP"));
+            services.AddDbContext<YuktiraDbContext>((sp, options) => options
+                .UseInMemoryDatabase("YuktiraERP")
+                .AddInterceptors(sp.GetRequiredService<TenantSaveChangesInterceptor>()));
         }
 
         services.AddMemoryCache();
@@ -74,6 +79,8 @@ public static class InfrastructureRegistration
         services.AddScoped<ITCodeGeneratorService, TCodeGeneratorService>();
         services.AddScoped<ITCodeCustomizationService, TCodeCustomizationService>();
         services.AddScoped<CacheService>();
+        services.AddHostedService<IntegrationQueueBackgroundService>();
+        services.AddHostedService<MrpSchedulerBackgroundService>();
 
         RegisterRepositories(services);
 

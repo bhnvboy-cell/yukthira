@@ -322,11 +322,18 @@ h3{{color:#1a237e;margin-top:25px}}
                 GlobalSettings = { PaperSize = DinkToPdf.PaperKind.A4, Orientation = DinkToPdf.Orientation.Portrait },
                 Objects = { new DinkToPdf.ObjectSettings { HtmlContent = html } }
             };
-            return converter.Convert(doc);
+            var pdf = converter.Convert(doc);
+            if (pdf == null || pdf.Length == 0)
+                throw new InvalidOperationException("PDF conversion returned an empty result");
+            return pdf;
         }
-        catch
+        catch (Exception ex)
         {
-            return Encoding.UTF8.GetBytes(html);
+            // Never silently return HTML bytes under a .pdf extension.
+            throw new InvalidOperationException(
+                "PDF export requires the native wkhtmltox library that DinkToPdf depends on. " +
+                "Install the wkhtmltox native library (wkhtmltox.dll / libwkhtmltox.so) into the app folder, " +
+                "or use the browser Print / Save-as-PDF option in the Web UI. Underlying error: " + ex.Message, ex);
         }
     }
 

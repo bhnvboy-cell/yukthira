@@ -1080,13 +1080,25 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.0.3 | August 2026 | Gap-filling: real stock Goods Issue, finance loop (AP/AR aging, payments, period close, bank recon, depreciation), payroll persistence, TOTP MFA, DB-backed approvals, background jobs, tenant write-safety, PDF fails loudly |
 | 1.0.2 | August 2026 | Module catalog, 13 legacy flat-page redirects, t-code reclassification, full CRUD pages for 32 entities, Npgsql DateTime fix, print/Save-as-PDF on every page, working backup/restore scripts |
 | 1.0.1 | August 2026 | API versioning, Web /api layer, PS/PM transaction codes, seed reconciliation, security hardening |
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
 
-**1.0.2 (August 2026)**
+**1.0.3 (August 2026)**
+- Stock integrity: Goods Issue now deducts real stock from `MaterialMaster`, validates quantity/availability, and records a `StockMovement` (document, material, qty, before/after, reference); GRN receipt and reversal record stock movements too
+- Finance loop: `AccountingService` expanded with AP/AR aging buckets, payment posting (FIFO settlement of oldest open AP/AR entry + GL effect), fiscal period open/close, bank reconciliation (statement vs ledger + difference), and fixed-asset depreciation scheduling — all tenant-scoped and exposed via `/api/v1/fi/Finance/*`
+- Payroll persistence: the HR Payroll Create page now calls `IPayrollService`, computes gross/deductions/net, and saves the payroll entry (with tenant) instead of writing an empty record
+- Multi-tenancy: `TenantSaveChangesInterceptor` auto-stamps `TenantId` on every insert; StockOverview, MRP, GRN, Invoice Verification, and Goods Issue now query/filter by the logged-in tenant (removed `Guid.Empty` leaks)
+- Background jobs: `IntegrationQueueBackgroundService` (outbound queue drained every 30s) and `MrpSchedulerBackgroundService` (daily MRP run for all active tenants) — both `IHostedService` registered in DI, verified running at startup
+- Approvals: `ApprovalService` rewritten to persist to DB (`ApprovalRequests` + `ApprovalSteps`), supporting create/approve (up to 3 levels)/reject/escalate and pending list — no more static in-memory state
+- MFA: real RFC 6238 TOTP (`MfaTotpService`, no external package) with setup/enable/disable endpoints, `MfaCode` on login, and per-user `MfaEnabled`/`MfaSecret`; verified full cycle end-to-end
+- PDF export: `ConvertHtmlToPdf` now throws a clear actionable error when the native `wkhtmltox` library is missing instead of silently returning HTML bytes under a `.pdf` name; browser Print / Save-as-PDF remains the supported path
+- Plugins: `PluginLoader.LoadAll()` invoked at startup in both API and Web with failure logging
+- Docs: `architecture.md` corrected to match reality (single `yuktira_core` schema, no CI/CD files yet, MFA/background jobs now implemented, PDF caveat documented)
+- Schema: `database/scripts/007_new_entities.sql` (StockMovements, FiscalPeriods, BankReconciliations, Payments, DepreciationSchedules, ApprovalSteps) and `008_tenantid_columns.sql` (TenantId on APEntrys/AREntrys/PayrollEntrys/goods_receipts/invoice_verifications/AdminUsers.MfaSecret)
 - Backup/restore scripts fixed and verified end-to-end: `backup.ps1` / `restore.ps1` now auto-locate PostgreSQL client tools (`C:\Program Files\PostgreSQL\13-18\bin`), default to the app's `postgres` user on `127.0.0.1:5432`, accept an optional `-Password`, and rename the reserved `$Host` param to `$Server` — tested with a real dump (custom format, 30-backup rotation) and a full restore into a scratch database (99 tables verified)
 - Print / Save-as-PDF: global Print button in the top bar (and `Ctrl+P`) on every page with a print stylesheet that hides chrome (sidebar/top bar/action buttons), expands scrolled tables, and produces clean paper-friendly output in the browser print dialog (incl. "Save as PDF")
 - Module registry: new `ModuleCatalog` (24 modules in 6 categories with icons/colors) drives the Dashboard tiles, sidebar navigation, and transaction-code module/group classification; exposed via `IModuleCatalog` (Core) implemented in Infrastructure as a singleton

@@ -48,6 +48,13 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid credentials");
         }
 
+        if (user.MfaEnabled)
+        {
+            if (string.IsNullOrWhiteSpace(request.MfaCode) ||
+                !MfaTotpService.VerifyCode(user.MfaSecret, request.MfaCode, DateTime.UtcNow))
+                throw new UnauthorizedAccessException("Two-factor authentication code is invalid or expired");
+        }
+
         var tenant = await _db.Tenants.FirstOrDefaultAsync(t =>
             t.Code == request.ClientNumber && t.Status == "ACTIVE");
         if (tenant == null)
@@ -205,6 +212,45 @@ public class AuthService : IAuthService
         {
             return Task.FromResult(false);
         }
+    }
+
+    public async Task<MfaSetupResult> SetupMfaAsync(Guid userId)
+    {
+        var user = await _db.AdminUsers.FindAsync(userId);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        var secret = MfaTotpService.GenerateSecret();
+        user.MfaSecret = secret;
+        user.MfaEnabled = false;
+        await _db.SaveChangesAsync();
+
+        var account = Uri.EscapeDataString($"{user.UserName}@{_configuration["Jwt:Issuer"] ?? "YuktiraERP"}");
+        var otpUri = $"otpauth://totp/{account}?secret={secret}&issuer={_configuration["Jwt:Issuer"] ?? "YuktiraERP"}";
+
+        return new MfaSetupResult { Secret = secret, OtpAuthUri = otpUri, Enabled = false };
+    }
+
+    public async Task<bool> VerifyAndEnableMfaAsync(Guid userId, string code)
+    {
+        var user = await _db.AdminUsers.FindAsync(userId);
+        if (user == null || string.IsNullOrEmpty(user.MfaSecret)) return false;
+        if (!MfaTotpService.VerifyCode(user.MfaSecret, code, DateTime.UtcNow)) return false;
+
+        user.MfaEnabled = true;
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task DisableMfaAsync(Guid userId, string code)
+    {
+        var user = await _db.AdminUsers.FindAsync(userId);
+        if (user == null || !user.MfaEnabled) throw new UnauthorizedAccessException("MFA is not enabled");
+        if (!MfaTotpService.VerifyCode(user.MfaSecret, code, DateTime.UtcNow))
+            throw new UnauthorizedAccessException("Two-factor authentication code is invalid or expired");
+
+        user.MfaEnabled = false;
+        user.MfaSecret = "";
+        await _db.SaveChangesAsync();
     }
 
     private async Task<List<string>> ResolvePermissionsAsync(Guid userId, string role, Guid? tenantId)

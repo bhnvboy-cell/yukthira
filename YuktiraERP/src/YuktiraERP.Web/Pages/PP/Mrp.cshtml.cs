@@ -13,14 +13,16 @@ public class MrpModel : PageModel
     private readonly ICapacityPlanningService _capService;
     private readonly IPredictabilityService _predService;
     private readonly YuktiraDbContext _db;
+    private readonly ITenantContext _tenant;
 
     public MrpModel(IMrpService mrpService, ICapacityPlanningService capService,
-        IPredictabilityService predService, YuktiraDbContext db)
+        IPredictabilityService predService, YuktiraDbContext db, ITenantContext tenant)
     {
         _mrpService = mrpService;
         _capService = capService;
         _predService = predService;
         _db = db;
+        _tenant = tenant;
     }
 
     public List<MrpSuggestionDto> Suggestions { get; set; } = new();
@@ -41,16 +43,16 @@ public class MrpModel : PageModel
 
         if (Tab == "mrp" || string.IsNullOrEmpty(Tab))
         {
-            Suggestions = await _mrpService.RunMrpAsync(Guid.Empty);
-            StockAlerts = await _predService.GetStockAlertsAsync(Guid.Empty);
+            Suggestions = await _mrpService.RunMrpAsync(_tenant.TenantId);
+            StockAlerts = await _predService.GetStockAlertsAsync(_tenant.TenantId);
         }
         else if (Tab == "capacity")
         {
-            CapacityLoads = await _capService.CalculateLoadAsync(Guid.Empty);
+            CapacityLoads = await _capService.CalculateLoadAsync(_tenant.TenantId);
         }
         else if (Tab == "forecast")
         {
-            StockAlerts = await _predService.CalculateAllSafetyStockAsync(Guid.Empty);
+            StockAlerts = await _predService.CalculateAllSafetyStockAsync(_tenant.TenantId);
         }
     }
 
@@ -80,9 +82,9 @@ public class MrpModel : PageModel
             })).ToList();
         }
         else
-            Suggestions = await _mrpService.RunMrpAsync(Guid.Empty);
+            Suggestions = await _mrpService.RunMrpAsync(_tenant.TenantId);
 
-        StockAlerts = await _predService.GetStockAlertsAsync(Guid.Empty);
+        StockAlerts = await _predService.GetStockAlertsAsync(_tenant.TenantId);
         Tab = "mrp";
         return Page();
     }
@@ -100,8 +102,8 @@ public class MrpModel : PageModel
             _ => Core.Interfaces.ForecastModel.ExponentialSmoothing
         };
         if (materialId != Guid.Empty)
-            Forecast = await _predService.ForecastDemandAsync(Guid.Empty, materialId, 6, model);
-        StockAlerts = await _predService.CalculateAllSafetyStockAsync(Guid.Empty);
+            Forecast = await _predService.ForecastDemandAsync(_tenant.TenantId, materialId, 6, model);
+        StockAlerts = await _predService.CalculateAllSafetyStockAsync(_tenant.TenantId);
         Tab = "forecast";
         return Page();
     }

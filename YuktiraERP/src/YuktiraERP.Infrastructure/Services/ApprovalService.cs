@@ -1,59 +1,130 @@
+using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Infrastructure.Data;
+using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Infrastructure.Services;
 
 public class ApprovalService : IApprovalService
 {
-    private static readonly List<ApprovalRequestDto> _approvals = new();
+    private readonly YuktiraDbContext _db;
 
-    public Task<Guid> CreateApprovalRequestAsync(Guid tenantId, string module, string documentType, string documentId, string documentNumber, decimal amount, Guid requestedBy)
+    public ApprovalService(YuktiraDbContext db) { _db = db; }
+
+    public async Task<Guid> CreateApprovalRequestAsync(Guid tenantId, string module, string documentType, string documentId, string documentNumber, decimal amount, Guid requestedBy)
     {
-        var id = Guid.NewGuid();
-        _approvals.Add(new ApprovalRequestDto
+        var entity = new ApprovalRequestEntity
         {
-            Id = id,
-            Module = module,
-            DocumentType = documentType,
-            DocumentNumber = documentNumber,
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            RequestId = $"APPROVAL-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..22],
+            Type = documentType,
+            Subject = $"{module} {documentType} {documentNumber}",
+            Requestor = requestedBy.ToString(),
+            RequestDate = DateTime.UtcNow,
             Amount = amount,
-            RequestedByName = requestedBy.ToString(),
-            CurrentLevel = 1,
-            MaxLevel = 3,
-            Status = "PENDING",
-            CreatedAt = DateTime.UtcNow
-        });
-        return Task.FromResult(id);
+            Status = "Pending"
+        };
+        _db.ApprovalRequests.Add(entity);
+        await _db.SaveChangesAsync();
+        return entity.Id;
     }
 
-    public Task<bool> ApproveAsync(Guid approvalRequestId, Guid approverId, string? comments = null)
+    public async Task<bool> ApproveAsync(Guid approvalRequestId, Guid approverId, string? comments = null)
     {
-        var req = _approvals.FirstOrDefault(a => a.Id == approvalRequestId);
-        if (req != null)
+        var req = await _db.ApprovalRequests.FindAsync(approvalRequestId);
+        if (req == null) return false;
+        if (req.Status == "Approved" || req.Status == "Rejected") return false;
+
+        var level = (await _db.ApprovalSteps.CountAsync(s => s.ApprovalRequestId == req.Id)) + 1;
+        _db.ApprovalSteps.Add(new ApprovalStepEntity
         {
-            req.CurrentLevel++;
-            if (req.CurrentLevel > req.MaxLevel)
-                req.Status = "APPROVED";
-        }
-        return Task.FromResult(req != null);
+            TenantId = req.TenantId,
+            ApprovalRequestId = req.Id,
+            Level = level,
+            ApproverName = approverId.ToString(),
+            Status = "Approved",
+            Comments = comments ?? "",
+            ActionedAt = DateTime.UtcNow
+        });
+
+        req.Status = level >= 3 ? "Approved" : "Pending";
+        req.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return true;
     }
 
-    public Task<bool> RejectAsync(Guid approvalRequestId, Guid approverId, string reason)
+    public async Task<bool> RejectAsync(Guid approvalRequestId, Guid approverId, string reason)
     {
-        var req = _approvals.FirstOrDefault(a => a.Id == approvalRequestId);
-        if (req != null) req.Status = "REJECTED";
-        return Task.FromResult(req != null);
+        var req = await _db.ApprovalRequests.FindAsync(approvalRequestId);
+        if (req == null) return false;
+
+        req.Status = "Rejected";
+        req.UpdatedAt = DateTime.UtcNow;
+        _db.ApprovalSteps.Add(new ApprovalStepEntity
+        {
+            TenantId = req.TenantId,
+            ApprovalRequestId = req.Id,
+            Level = (await _db.ApprovalSteps.CountAsync(s => s.ApprovalRequestId == req.Id)) + 1,
+            ApproverName = approverId.ToString(),
+            Status = "Rejected",
+            Comments = reason,
+            ActionedAt = DateTime.UtcNow
+        });
+        await _db.SaveChangesAsync();
+        return true;
     }
 
-    public Task<bool> EscalateAsync(Guid approvalRequestId)
+    public async Task<bool> EscalateAsync(Guid approvalRequestId)
     {
-        var req = _approvals.FirstOrDefault(a => a.Id == approvalRequestId);
-        if (req != null) req.Status = "ESCALATED";
-        return Task.FromResult(req != null);
+        var req = await _db.ApprovalRequests.FindAsync(approvalRequestId);
+        if (req == null) return false;
+
+        req.Status = "Escalated";
+        req.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return true;
     }
 
-    public Task<List<ApprovalRequestDto>> GetPendingApprovalsAsync(Guid tenantId, Guid userId)
-        => Task.FromResult(_approvals.Where(a => a.Status == "PENDING").ToList());
+    public async Task<List<ApprovalRequestDto>> GetPendingApprovalsAsync(Guid tenantId, Guid userId)
+    {
+        var requests = await _db.ApprovalRequests
+            .Where(a => a.TenantId == tenantId && a.Status == "Pending")
+            .OrderByDescending(a => a.RequestDate)
+            .ToListAsync();
 
-    public Task<ApprovalRequestDto?> GetApprovalByIdAsync(Guid id)
-        => Task.FromResult(_approvals.FirstOrDefault(a => a.Id == id));
+        return requests.Select(a => new ApprovalRequestDto
+        {
+            Id = a.Id,
+            Module = a.Subject.Split(' ').FirstOrDefault() ?? "",
+            DocumentType = a.Type,
+            DocumentNumber = a.Subject,
+            Amount = a.Amount ?? 0,
+            RequestedByName = a.Requestor,
+            CurrentLevel = _db.ApprovalSteps.Count(s => s.ApprovalRequestId == a.Id) + 1,
+            MaxLevel = 3,
+            Status = a.Status,
+            CreatedAt = a.RequestDate
+        }).ToList();
+    }
+
+    public async Task<ApprovalRequestDto?> GetApprovalByIdAsync(Guid id)
+    {
+        var a = await _db.ApprovalRequests.FindAsync(id);
+        if (a == null) return null;
+
+        return new ApprovalRequestDto
+        {
+            Id = a.Id,
+            Module = a.Subject.Split(' ').FirstOrDefault() ?? "",
+            DocumentType = a.Type,
+            DocumentNumber = a.Subject,
+            Amount = a.Amount ?? 0,
+            RequestedByName = a.Requestor,
+            CurrentLevel = await _db.ApprovalSteps.CountAsync(s => s.ApprovalRequestId == a.Id) + 1,
+            MaxLevel = 3,
+            Status = a.Status,
+            CreatedAt = a.RequestDate
+        };
+    }
 }

@@ -1,7 +1,7 @@
 # YUKTIRA ERP SUITE — Architecture Document
 
 ## Overview
-Yuktira (Sanskrit: युक्ति — "logic, intelligence, strategic reasoning") is a comprehensive enterprise ERP platform built on modern, scalable architecture. It features multi-tenancy, a BPMN workflow engine, AI forecasting, MRP, plugin SDK, export engine, and real-time notifications via SignalR.
+Yuktira (Sanskrit: युक्ति — "logic, intelligence, strategic reasoning") is a comprehensive enterprise ERP platform built on ASP.NET Core. It features multi-tenancy, a BPMN workflow engine, AI forecasting, MRP, a plugin SDK, an export engine, and real-time notifications via SignalR.
 
 ## Technology Stack
 
@@ -10,11 +10,11 @@ Yuktira (Sanskrit: युक्ति — "logic, intelligence, strategic reason
 | Frontend | ASP.NET Core Razor Pages, Bootstrap 5, jQuery, Chart.js, SignalR JS client |
 | API | ASP.NET Core Web API 10.0, REST, JWT |
 | Backend | .NET 10, C# 13 |
-| Database | PostgreSQL 16 (18 schemas), Entity Framework Core |
+| Database | PostgreSQL (single `yuktira_core` schema), Entity Framework Core |
 | Real-Time | SignalR (NotificationHub) |
-| Reverse Proxy | Apache HTTP Server 2.4 |
-| Container | Docker, Docker Compose |
-| CI/CD | GitHub Actions (recommended) |
+| Reverse Proxy | Apache HTTP Server 2.4 (apache-config/ provided) |
+| Container | Docker (Dockerfile.api, Dockerfile.web, docker-compose.yml provided) |
+| CI/CD | GitHub Actions (recommended — no workflow files checked in yet) |
 
 ## Solution Structure
 
@@ -27,24 +27,24 @@ YuktiraERP/
 │   ├── YuktiraERP.Web/            # Razor Pages Web UI (port 5001)
 │   ├── YuktiraERP.Tests/          # xUnit unit/integration tests
 │   ├── YuktiraERP.WorkflowEngine/ # BPMN workflow runtime
-│   ├── YuktiraERP.AIEngine/       # ML forecasting (9 models)
+│   ├── YuktiraERP.AIEngine/       # ML forecasting models
 │   ├── YuktiraERP.ExportEngine/   # XLSX/CSV/PDF/HTML export — 9 templates
-│   ├── YuktiraERP.PluginSdk/      # Plugin SDK — 4 hook types, hot reload, sandboxing
+│   ├── YuktiraERP.PluginSdk/      # Plugin SDK — hooks, hot reload, sandboxing
 │   └── plugins/                    # Example plugins (AdvancedQC, Dairy, Reports)
 ├── database/
-│   ├── scripts/                    # Migration scripts (001–006)
-│   └── backup/                     # Disaster recovery runbook
-├── scripts/                        # Docker, deploy, build scripts
+│   ├── scripts/                    # Schema/data scripts
+│   └── backup/                     # Disaster recovery runbook + scripts
+├── scripts/                        # Build, backup/restore scripts
 ├── apache-config/                  # Reverse proxy config
 └── docs/                           # Documentation
 ```
 
 ## Multi-Tenant Architecture
 
-- **Isolation**: Shared database, `tenant_id` column on all tenant entities
-- **Resolution Modes**: Subdomain (`tenant.yourcompany.com`), URL segment (`/tenant/`), HTTP header (`X-Tenant-Id`), JWT claim
-- **Middleware**: `TenantMiddleware` resolves and injects tenant context per request; all downstream queries scoped to tenant
-- **Tenant Data**: 16 database schemas (`yuktira_core`, `yuktira_mm`, `yuktira_sd`, `yuktira_fi`, etc.) with per-tenant row-level isolation
+- **Isolation**: Shared database with a `tenant_id` column on tenant-scoped entities; the `TenantSaveChangesInterceptor` automatically stamps `TenantId` on insert, and queries are filtered via `ITenantContext`.
+- **Resolution Modes**: HTTP header (`X-Tenant-Id`), JWT claim; subdomain/URL-segment modes are supported by `TenantMiddleware` design.
+- **Middleware**: `TenantMiddleware` resolves and injects tenant context per request.
+- **Data layout**: Single schema (`yuktira_core`); tables named by pluralized entity names (e.g. `MaterialMasters`).
 
 ## Authentication Flow
 
@@ -52,24 +52,24 @@ YuktiraERP/
 2. Server validates credentials, checks lockout status, enforces password policy
 3. Generates JWT (access + refresh tokens); refresh token rotation with revocation
 4. Cookie-based auth for Web UI, Bearer token for API
-5. Optional MFA (TOTP), IP/device logging, account lockout on max failed attempts
-6. Suspicious activity detection (new IP, failed login spikes, after-hours DELETE, IP/device mismatch)
+5. **MFA (TOTP)** — RFC 6238 codes via authenticator app; setup/enable/disable endpoints
+6. Account lockout on max failed attempts; login/IP/device logging
 
 ## Module Architecture
 
 Each ERP module (MM, SD, PP, QM, WM, FI, HR, CRM, LIMS, BI, CO, PS, PM):
-- Has its own PostgreSQL schema (`yuktira_mm`, `yuktira_sd`, etc.)
 - Uses shared services (audit, notification, workflow, approval)
 - Integrates via common interfaces and events
 - Supports plugin extensions via Plugin SDK
-- Transaction codes (60+ SAP-style) for navigation
+- Transaction codes (SAP-style) for navigation
+- Sits in the shared `yuktira_core` schema (no per-module schemas)
 
 ## Key Design Patterns
 
 - **Domain-Driven Design**: Core domain models with rich behavior
-- **Repository Pattern**: `IRepository<T, TId>` data access abstraction
+- **Service Layer**: `I*Service` interfaces consumed by controllers/pages
 - **Strategy Pattern**: Plugin engine, approval matrix, AI forecasting models
-- **Observer Pattern**: Webhooks, notification triggers, SignalR hub
+- **Observer Pattern**: Notification triggers, SignalR hub
 - **Chain of Responsibility**: Workflow engine, multi-level approval
 - **Middleware Pipeline**: Tenant resolution → Audit logging → Exception handling → API throttling
 
@@ -79,16 +79,19 @@ Each ERP module (MM, SD, PP, QM, WM, FI, HR, CRM, LIMS, BI, CO, PS, PM):
 DB-backed BPMN runtime with node types: START, TASK, APPROVAL, DECISION, TIMER, API_CALL, EMAIL, SMS, CONDITION, END. Conditional edge evaluation, expression evaluator, simulation mode, full execution history.
 
 ### AI Engine
-9 forecasting models: Moving Average, Weighted MA, Exponential Smoothing, Linear Regression, Seasonal Decomposition, Holt-Winters (triple exponential smoothing), ARIMA (differencing + AR + MA), anomaly detection (ZScore/IQR/MAD), accuracy dashboard (MAPE/MAE/RMSE/R²).
+Forecasting models including Moving Average, Weighted MA, Exponential Smoothing, Linear Regression, Seasonal Decomposition, Holt-Winters, and anomaly detection (ZScore/IQR/MAD), with an accuracy dashboard (MAPE/MAE/RMSE/R²).
 
 ### MRP Engine
-Multi-level BOM explosion, gross/net requirement calculation, shortage detection, planned order generation, capacity leveling, multi-plant planning, vendor lead-time integration, SAP-style exception messages, run history tracking.
+Multi-level BOM explosion, gross/net requirement calculation, shortage detection, planned order generation, capacity leveling, multi-plant planning, vendor lead-time integration, SAP-style exception messages, run history tracking, and a daily scheduled background run for all tenants.
 
 ### Export Engine
-XLSX/CSV/TXT/PDF/HTML output with 9 document templates: PO, SO, INVOICE, COA, GRN, PROD_ORDER, QC_REPORT, PAYSLIP, FIN_STMT.
+XLSX/CSV/TXT/HTML output with 9 document templates (PO, SO, INVOICE, COA, GRN, PROD_ORDER, QC_REPORT, PAYSLIP, FIN_STMT). PDF output is available in the Web UI via browser Print / Save-as-PDF; server-side PDF (DinkToPdf) requires the native `wkhtmltox` library to be installed and reports a clear error if it is missing.
 
 ### Plugin SDK
-4 hook interfaces: `IPluginStartupHook`, `IPluginMenuHook`, `IPluginDocumentHook`, `IPluginWorkflowHook`. Hot reload, sandboxed execution, per-tenant enable/disable, DB-backed settings and permissions.
+Hook interfaces (`IPluginStartupHook`, `IPluginMenuHook`, `IPluginDocumentHook`, `IPluginWorkflowHook`), hot reload, sandboxed execution. `PluginLoader.LoadAll()` is invoked at application startup and logs any failures.
+
+### Background Jobs
+`IntegrationQueueBackgroundService` processes outbound integration messages every 30 seconds; `MrpSchedulerBackgroundService` runs MRP shortage detection once per day for all active tenants. Both are `IHostedService` implementations registered in DI.
 
 ## Real-Time (SignalR)
 
@@ -105,12 +108,11 @@ XLSX/CSV/TXT/PDF/HTML output with 9 document templates: PO, SO, INVOICE, COA, GR
 - Apache load balancing across multiple API nodes (`balancer://api-cluster`)
 - PostgreSQL connection pooling
 - API throttling middleware (100 req/min per client IP)
-- Health check endpoints: `GET /health`, `GET /health/ready`
 
 ## Security
 
 - **RBAC**: Super User, Admin, Power User, Normal User, Read-Only — enforced via `[Authorize(Policy = "...")]`
 - **Password Policy**: Configurable min length, max failed attempts, lockout duration, password change tracking
-- **Audit Trail**: Every CREATE/UPDATE/DELETE/LOGIN/APPROVAL/EXPORT/API_CALL logged with old/new JSONB snapshots, IP, device, user agent
-- **Compliance**: GDPR-ready, GMP-ready, ISO 27001 alignment, immutable audit log (append-only)
-- **Suspicious Detection**: Automated flagging of anomalous activity patterns
+- **MFA**: Optional TOTP two-factor authentication per user
+- **Audit Trail**: CREATE/UPDATE/DELETE/LOGIN/APPROVAL/EXPORT/API_CALL logged with snapshots, IP, device, user agent
+- **Compliance**: GDPR-ready, GMP-ready, ISO 27001 alignment, append-only audit log

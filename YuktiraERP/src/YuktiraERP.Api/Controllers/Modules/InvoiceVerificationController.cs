@@ -24,14 +24,14 @@ public class InvoiceVerificationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var items = await _db.InvoiceVerifications.OrderByDescending(v => v.Date).ToListAsync();
+        var items = await _db.InvoiceVerifications.Where(v => v.TenantId == _tenant.TenantId).OrderByDescending(v => v.Date).ToListAsync();
         return Ok(new { data = items, tenantId = _tenant.TenantId });
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var item = await _db.InvoiceVerifications.FindAsync(id);
+        var item = await _db.InvoiceVerifications.FirstOrDefaultAsync(v => v.Id == id && v.TenantId == _tenant.TenantId);
         return item == null ? NotFound() : Ok(new { data = item, tenantId = _tenant.TenantId });
     }
 
@@ -40,6 +40,7 @@ public class InvoiceVerificationController : ControllerBase
     public async Task<IActionResult> Create([FromBody] InvoiceVerificationEntity model)
     {
         model.Id = Guid.NewGuid();
+        model.TenantId = _tenant.TenantId;
         model.InvoiceNumber = string.IsNullOrEmpty(model.InvoiceNumber) ? $"IV-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..18] : model.InvoiceNumber;
         model.Date = model.Date == default ? DateTime.UtcNow : DateTime.SpecifyKind(model.Date, DateTimeKind.Utc);
         model.Status = "Verified";
@@ -60,6 +61,7 @@ public class InvoiceVerificationController : ControllerBase
             _db.APEntries.Add(new APEntryEntity
             {
                 Id = Guid.NewGuid(),
+                TenantId = _tenant.TenantId,
                 DocumentNumber = $"AP-{model.InvoiceNumber}",
                 Date = model.Date,
                 VendorName = model.VendorName,

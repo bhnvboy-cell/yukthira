@@ -9,6 +9,14 @@ public class LoginRequest
     public string Password { get; set; } = string.Empty;
     public string Language { get; set; } = "EN";
     public string System { get; set; } = "DEV";
+    public string? MfaCode { get; set; }
+}
+
+public class MfaSetupResult
+{
+    public string Secret { get; set; } = "";
+    public string OtpAuthUri { get; set; } = "";
+    public bool Enabled { get; set; }
 }
 
 public class LoginResponse
@@ -40,4 +48,7 @@ public interface IAuthService
     Task<UserProfile> GetUserProfileAsync(Guid userId, Guid? tenantId);
     Task<List<string>> GetUserPermissionsAsync(Guid userId, Guid? tenantId);
     Task<bool> ValidateTokenAsync(string token);
+    Task<MfaSetupResult> SetupMfaAsync(Guid userId);
+    Task<bool> VerifyAndEnableMfaAsync(Guid userId, string code);
+    Task DisableMfaAsync(Guid userId, string code);
 }

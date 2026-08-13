@@ -34,6 +34,7 @@ public class FinanceController : ControllerBase
     public async Task<IActionResult> GetLedger()
     {
         var entries = await _db.GeneralLedgerEntries
+            .Where(e => e.TenantId == _tenant.TenantId)
             .OrderByDescending(e => e.EntryDate)
             .Take(500)
             .ToListAsync();
@@ -58,7 +59,7 @@ public class FinanceController : ControllerBase
     [HttpGet("trial-balance")]
     public async Task<IActionResult> TrialBalance([FromQuery] DateTime? asOfDate)
     {
-        var result = await _accounting.GetTrialBalanceAsync(asOfDate);
+        var result = await _accounting.GetTrialBalanceAsync(_tenant.TenantId, asOfDate);
         return Ok(new { data = result, tenantId = _tenant.TenantId });
     }
 
@@ -67,7 +68,7 @@ public class FinanceController : ControllerBase
     {
         var fromDate = from ?? DateTime.Today.AddMonths(-1);
         var toDate = to ?? DateTime.Today;
-        var result = await _accounting.GetProfitAndLossAsync(fromDate, toDate);
+        var result = await _accounting.GetProfitAndLossAsync(_tenant.TenantId, fromDate, toDate);
         return Ok(new { data = result, fromDate, toDate, tenantId = _tenant.TenantId });
     }
 
@@ -75,14 +76,14 @@ public class FinanceController : ControllerBase
     public async Task<IActionResult> BalanceSheet([FromQuery] DateTime? asOfDate)
     {
         var date = asOfDate ?? DateTime.Today;
-        var result = await _accounting.GetBalanceSheetAsync(date);
+        var result = await _accounting.GetBalanceSheetAsync(_tenant.TenantId, date);
         return Ok(new { data = result, asOfDate = date, tenantId = _tenant.TenantId });
     }
 
     [HttpGet("ap")]
     public async Task<IActionResult> GetAP()
     {
-        var items = await _db.APEntries.OrderByDescending(e => e.Date).ToListAsync();
+        var items = await _db.APEntries.Where(e => e.TenantId == _tenant.TenantId).OrderByDescending(e => e.Date).ToListAsync();
         return Ok(new { data = items, tenantId = _tenant.TenantId });
     }
 
@@ -91,6 +92,7 @@ public class FinanceController : ControllerBase
     public async Task<IActionResult> CreateAP([FromBody] APEntryEntity model)
     {
         model.Id = Guid.NewGuid();
+        model.TenantId = _tenant.TenantId;
         model.DocumentNumber = string.IsNullOrEmpty(model.DocumentNumber) ? $"AP-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..18] : model.DocumentNumber;
         if (model.Date != default) model.Date = DateTime.SpecifyKind(model.Date, DateTimeKind.Utc);
         _db.APEntries.Add(model);
@@ -101,7 +103,7 @@ public class FinanceController : ControllerBase
     [HttpGet("ar")]
     public async Task<IActionResult> GetAR()
     {
-        var items = await _db.AREntries.OrderByDescending(e => e.Date).ToListAsync();
+        var items = await _db.AREntries.Where(e => e.TenantId == _tenant.TenantId).OrderByDescending(e => e.Date).ToListAsync();
         return Ok(new { data = items, tenantId = _tenant.TenantId });
     }
 
@@ -110,11 +112,119 @@ public class FinanceController : ControllerBase
     public async Task<IActionResult> CreateAR([FromBody] AREntryEntity model)
     {
         model.Id = Guid.NewGuid();
+        model.TenantId = _tenant.TenantId;
         model.DocumentNumber = string.IsNullOrEmpty(model.DocumentNumber) ? $"AR-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid():N}"[..18] : model.DocumentNumber;
         if (model.Date != default) model.Date = DateTime.SpecifyKind(model.Date, DateTimeKind.Utc);
         _db.AREntries.Add(model);
         await _db.SaveChangesAsync();
         return Ok(new { success = true, id = model.Id, documentNumber = model.DocumentNumber, tenantId = _tenant.TenantId });
+    }
+
+    // ── Finance loop endpoints: AP/AR aging ──
+    [HttpGet("aging/ap")]
+    public async Task<IActionResult> ApAging([FromQuery] DateTime? asOf)
+    {
+        var result = await _accounting.GetAccountsPayableAgingAsync(_tenant.TenantId, asOf ?? DateTime.Today);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    [HttpGet("aging/ar")]
+    public async Task<IActionResult> ArAging([FromQuery] DateTime? asOf)
+    {
+        var result = await _accounting.GetAccountsReceivableAgingAsync(_tenant.TenantId, asOf ?? DateTime.Today);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    // ── Payments ──
+    [HttpPost("payments")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> PostPayment([FromBody] PaymentRequest request)
+    {
+        try
+        {
+            await _accounting.PostPaymentAsync(_tenant.TenantId, request);
+            return Ok(new { success = true, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpGet("payments")]
+    public async Task<IActionResult> GetPayments([FromQuery] int limit = 50)
+    {
+        var result = await _accounting.GetPaymentHistoryAsync(_tenant.TenantId, limit);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    // ── Period close ──
+    [HttpPost("periods/open")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> OpenPeriod([FromBody] PeriodCloseRequest request)
+    {
+        try
+        {
+            await _accounting.OpenPeriodAsync(_tenant.TenantId, request);
+            return Ok(new { success = true, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpPost("periods/{period}/close")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> ClosePeriod(string period)
+    {
+        try
+        {
+            await _accounting.ClosePeriodAsync(_tenant.TenantId, period, User.Identity?.Name ?? "");
+            return Ok(new { success = true, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpGet("periods")]
+    public async Task<IActionResult> GetPeriods()
+    {
+        var result = await _accounting.GetFiscalPeriodsAsync(_tenant.TenantId);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    // ── Bank reconciliation ──
+    [HttpPost("bank-reconciliation")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> PostBankReconciliation([FromBody] BankReconciliationRequest request)
+    {
+        try
+        {
+            await _accounting.PostBankReconciliationAsync(_tenant.TenantId, request);
+            return Ok(new { success = true, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpGet("bank-reconciliation")]
+    public async Task<IActionResult> GetBankReconciliations([FromQuery] int limit = 50)
+    {
+        var result = await _accounting.GetBankReconciliationsAsync(_tenant.TenantId, limit);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
+    }
+
+    // ── Depreciation ──
+    [HttpPost("depreciation/run")]
+    [Authorize(Policy = "PowerUserOrAbove")]
+    public async Task<IActionResult> RunDepreciation([FromBody] DepreciationRunRequest request)
+    {
+        try
+        {
+            await _accounting.RunDepreciationAsync(_tenant.TenantId, request);
+            return Ok(new { success = true, tenantId = _tenant.TenantId });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { error = ex.Message }); }
+    }
+
+    [HttpGet("depreciation")]
+    public async Task<IActionResult> GetDepreciation([FromQuery] string? period = null)
+    {
+        var result = await _accounting.GetDepreciationScheduleAsync(_tenant.TenantId, period);
+        return Ok(new { data = result, tenantId = _tenant.TenantId });
     }
 
     [HttpGet("fixed-assets")]
