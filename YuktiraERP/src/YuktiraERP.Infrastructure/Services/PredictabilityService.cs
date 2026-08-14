@@ -19,7 +19,7 @@ public class PredictabilityService : IPredictabilityService
     public async Task<DemandForecastDto> ForecastDemandAsync(Guid tenantId, Guid materialId, int forecastPeriods, ForecastModel model = ForecastModel.ExponentialSmoothing)
     {
         var material = await _db.Set<MaterialMasterEntity>().FindAsync(materialId);
-        var historicalDemand = await GetDemandHistoryFromDbAsync(material?.Name ?? "");
+        var historicalDemand = await GetDemandHistoryFromDbAsync(tenantId, material?.Name ?? "");
 
         var result = await _aiEngine.ForecastAsync(historicalDemand, forecastPeriods, model);
 
@@ -47,7 +47,7 @@ public class PredictabilityService : IPredictabilityService
         var material = await _db.Set<MaterialMasterEntity>().FindAsync(materialId);
         if (material == null) return new SafetyStockResult();
 
-        var demandHistory = await GetDemandHistoryFromDbAsync(material.Name);
+        var demandHistory = await GetDemandHistoryFromDbAsync(tenantId, material.Name);
         var avgDemand = demandHistory.Count > 0 ? demandHistory.Average() : 0;
         var stdDev = demandHistory.Count > 1
             ? Math.Sqrt(demandHistory.Select(d => Math.Pow((double)(d - avgDemand), 2)).Average())
@@ -102,7 +102,7 @@ public class PredictabilityService : IPredictabilityService
         return results;
     }
 
-    private async Task<List<decimal>> GetDemandHistoryFromDbAsync(string materialName)
+    private async Task<List<decimal>> GetDemandHistoryFromDbAsync(Guid tenantId, string materialName)
     {
         var confirmedSOs = await _db.Set<SalesOrderEntity>()
             .Where(s => s.Status == "Confirmed" || s.Status == "Completed").ToListAsync();
@@ -110,7 +110,7 @@ public class PredictabilityService : IPredictabilityService
         var lines = await _db.Set<SalesOrderLineEntity>()
             .Where(l => l.MaterialName == materialName && soIds.Contains(l.SalesOrderId)).ToListAsync();
         var prodOrders = await _db.Set<ProductionOrderEntity>()
-            .Where(p => p.ProductName == materialName && p.Status != "Cancelled").ToListAsync();
+            .Where(p => p.ProductName == materialName && p.Status != "Cancelled" && p.TenantId == tenantId).ToListAsync();
 
         if (lines.Count == 0 && prodOrders.Count == 0)
         {

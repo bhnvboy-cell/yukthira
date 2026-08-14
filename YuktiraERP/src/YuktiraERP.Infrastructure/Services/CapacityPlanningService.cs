@@ -15,9 +15,9 @@ public class CapacityPlanningService : ICapacityPlanningService
 
     public async Task<List<WorkCenterLoadDto>> CalculateLoadAsync(Guid tenantId, DateTime? startDate = null, DateTime? endDate = null)
     {
-        var workCenters = await _db.Set<WorkCenterEntity>().ToListAsync();
-        var routings = await _db.Set<ProductionRoutingEntity>().Where(r => r.Status == "Active").ToListAsync();
-        var prodOrders = await _db.Set<ProductionOrderEntity>().Where(o => o.Status == "Planned" || o.Status == "In Progress").ToListAsync();
+        var workCenters = await _db.Set<WorkCenterEntity>().Where(w => w.TenantId == tenantId).ToListAsync();
+        var routings = await _db.Set<ProductionRoutingEntity>().Where(r => r.Status == "Active" && r.TenantId == tenantId).ToListAsync();
+        var prodOrders = await _db.Set<ProductionOrderEntity>().Where(o => (o.Status == "Planned" || o.Status == "In Progress") && o.TenantId == tenantId).ToListAsync();
         var result = new List<WorkCenterLoadDto>();
 
         var start = startDate ?? DateTime.Today;
@@ -74,15 +74,15 @@ public class CapacityPlanningService : ICapacityPlanningService
         return result;
     }
 
-    public async Task<WorkCenterLoadDto?> GetWorkCenterLoadAsync(Guid workCenterId, DateTime startDate, DateTime endDate)
+    public async Task<WorkCenterLoadDto?> GetWorkCenterLoadAsync(Guid tenantId, Guid workCenterId, DateTime startDate, DateTime endDate)
     {
-        var loads = await CalculateLoadAsync(Guid.Empty, startDate, endDate);
+        var loads = await CalculateLoadAsync(tenantId, startDate, endDate);
         return loads.FirstOrDefault(l => l.WorkCenterId == workCenterId);
     }
 
-    public async Task<List<OperationLoadDetailDto>> GetOperationsForWorkCenterAsync(Guid workCenterId, DateTime startDate, DateTime endDate)
+    public async Task<List<OperationLoadDetailDto>> GetOperationsForWorkCenterAsync(Guid tenantId, Guid workCenterId, DateTime startDate, DateTime endDate)
     {
-        var loads = await CalculateLoadAsync(Guid.Empty, startDate, endDate);
+        var loads = await CalculateLoadAsync(tenantId, startDate, endDate);
         return loads.Where(l => l.WorkCenterId == workCenterId).SelectMany(l => l.Operations).ToList();
     }
 }

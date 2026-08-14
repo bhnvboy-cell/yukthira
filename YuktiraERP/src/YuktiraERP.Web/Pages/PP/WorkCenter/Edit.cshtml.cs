@@ -8,14 +8,15 @@ namespace YuktiraERP.Web.Pages.PP.WorkCenter;
 public class EditModel : PageModel
 {
     private readonly IRepository<WorkCenterEntity, Guid> _repo;
-    public EditModel(IRepository<WorkCenterEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public EditModel(IRepository<WorkCenterEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     [BindProperty] public WorkCenterEntity WorkCenter { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
         if (id == null || id == Guid.Empty) return RedirectToPage("/PP/WorkCenter/List");
         var entity = await _repo.GetByIdAsync(id.Value);
-        if (entity == null) return NotFound();
+        if (entity == null || entity.TenantId != _tenant.TenantId) return NotFound();
         WorkCenter = entity;
         return Page();
     }
@@ -23,6 +24,7 @@ public class EditModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
+        WorkCenter.TenantId = _tenant.TenantId;
         await _repo.UpdateAsync(WorkCenter);
         return RedirectToPage("/PP/WorkCenter/List");
     }

@@ -24,7 +24,7 @@ public class MrpService : IMrpService
         var stockItems = await _db.Set<StockItemEntity>().ToListAsync();
         var salesOrders = await _db.Set<SalesOrderEntity>()
             .Where(s => s.Status == "Confirmed" || s.Status == "Completed").ToListAsync();
-        var demandData = await BuildDemandDictionaryAsync(materials, salesOrders);
+        var demandData = await BuildDemandDictionaryAsync(tenantId, materials, salesOrders);
         var vendors = await _db.Set<VendorEntity>().Where(v => v.Status == "Active").ToListAsync();
         var vendorLeadTimes = await _db.Set<VendorLeadTimeEntity>().ToListAsync();
         var result = new List<MrpSuggestionDto>();
@@ -33,7 +33,7 @@ public class MrpService : IMrpService
         foreach (var mat in materials.Where(m => materialId == null || m.Id == materialId.Value))
         {
             var stock = stockItems.Where(s => s.MaterialName == mat.Name).Sum(s => s.Quantity);
-            var demand = await CalculateTotalDemandAsync(mat.Name);
+            var demand = await CalculateTotalDemandAsync(tenantId, mat.Name);
             var openPo = await GetOpenPurchaseOrdersAsync(mat.Name);
             var demandHistory = demandData.TryGetValue(mat.Name, out var dh) ? dh : new List<decimal> { 100 };
             var safetyStock = CalculateStatisticalSafetyStock(demandHistory, 0.95);
@@ -162,15 +162,15 @@ public class MrpService : IMrpService
         return alerts;
     }
 
-    public async Task<List<MrpExplosionResult>> ExplodeBomAsync(MrpRunRequest request)
+    public async Task<List<MrpExplosionResult>> ExplodeBomAsync(Guid tenantId, MrpRunRequest request)
     {
         var results = new List<MrpExplosionResult>();
-        var boms = await _db.Set<BillOfMaterialEntity>().Where(b => b.Status == "Active").ToListAsync();
+        var boms = await _db.Set<BillOfMaterialEntity>().Where(b => b.Status == "Active" && b.TenantId == tenantId).ToListAsync();
         var materials = await _db.Set<MaterialMasterEntity>().ToListAsync();
         var productName = request.ProductName ?? "";
         var quantity = request.Quantity;
 
-        var exploded = await MultiLevelExplosionAsync(Guid.Empty, productName, quantity);
+        var exploded = await MultiLevelExplosionAsync(tenantId, productName, quantity);
         var grouped = exploded.GroupBy(r => r.ParentProduct);
 
         foreach (var group in grouped)
@@ -196,12 +196,12 @@ public class MrpService : IMrpService
     public async Task<List<MrpRequirementDto>> MultiLevelExplosionAsync(Guid tenantId, string productName, decimal quantity, int maxLevel = 10)
     {
         var requirements = new List<MrpRequirementDto>();
-        var boms = await _db.Set<BillOfMaterialEntity>().Where(b => b.Status == "Active").ToListAsync();
+        var boms = await _db.Set<BillOfMaterialEntity>().Where(b => b.Status == "Active" && b.TenantId == tenantId).ToListAsync();
         var materials = await _db.Set<MaterialMasterEntity>().ToListAsync();
         var stockItems = await _db.Set<StockItemEntity>().ToListAsync();
         var salesOrders = await _db.Set<SalesOrderEntity>()
             .Where(s => s.Status == "Confirmed" || s.Status == "Completed").ToListAsync();
-        var demandData = await BuildDemandDictionaryAsync(materials, salesOrders);
+        var demandData = await BuildDemandDictionaryAsync(tenantId, materials, salesOrders);
 
         await ExplodeLevelAsync(productName, quantity, 0, boms, materials, stockItems, demandData, requirements, maxLevel);
         return requirements;
@@ -269,7 +269,7 @@ public class MrpService : IMrpService
         var stockItems = await _db.Set<StockItemEntity>().ToListAsync();
         var salesOrders = await _db.Set<SalesOrderEntity>()
             .Where(s => s.Status == "Confirmed" || s.Status == "Completed").ToListAsync();
-        var demandData = await BuildDemandDictionaryAsync(materials, salesOrders);
+        var demandData = await BuildDemandDictionaryAsync(tenantId, materials, salesOrders);
         var plants = await _db.Set<PlantEntity>()
             .Where(p => p.TenantId == tenantId && p.IsActive)
             .ToListAsync();
@@ -288,7 +288,7 @@ public class MrpService : IMrpService
             if (plantCodes.Count == 0) continue;
 
             var stock = stockItems.Where(s => s.MaterialName == mat.Name).Sum(s => s.Quantity);
-            var demand = await CalculateTotalDemandAsync(mat.Name);
+            var demand = await CalculateTotalDemandAsync(tenantId, mat.Name);
             var openPo = await GetOpenPurchaseOrdersAsync(mat.Name);
             var demandHistory = demandData.TryGetValue(mat.Name, out var dh) ? dh : new List<decimal> { 100 };
             var safetyStock = CalculateStatisticalSafetyStock(demandHistory, 0.95);
@@ -356,7 +356,7 @@ public class MrpService : IMrpService
     public async Task<List<MrpCapacityPlanDto>> CalculateCapacityLevelingAsync(Guid tenantId, DateTime start, DateTime end)
     {
         var loads = await _capacityService.CalculateLoadAsync(tenantId, start, end);
-        var workCenters = await _db.Set<WorkCenterEntity>().ToListAsync();
+        var workCenters = await _db.Set<WorkCenterEntity>().Where(w => w.TenantId == tenantId).ToListAsync();
         var result = new List<MrpCapacityPlanDto>();
 
         foreach (var load in loads)
@@ -418,7 +418,7 @@ public class MrpService : IMrpService
         var stockItems = await _db.Set<StockItemEntity>().ToListAsync();
         var salesOrders = await _db.Set<SalesOrderEntity>()
             .Where(s => s.Status == "Confirmed" || s.Status == "Completed").ToListAsync();
-        var demandData = await BuildDemandDictionaryAsync(materials, salesOrders);
+        var demandData = await BuildDemandDictionaryAsync(tenantId, materials, salesOrders);
         var vendors = await _db.Set<VendorEntity>().Where(v => v.Status == "Active").ToListAsync();
         var vendorLeadTimes = await _db.Set<VendorLeadTimeEntity>().ToListAsync();
         var result = new List<MrpSuggestionDto>();
@@ -429,7 +429,7 @@ public class MrpService : IMrpService
         foreach (var mat in filteredMaterials)
         {
             var stock = stockItems.Where(s => s.MaterialName == mat.Name).Sum(s => s.Quantity);
-            var demand = await CalculateTotalDemandAsync(mat.Name);
+            var demand = await CalculateTotalDemandAsync(tenantId, mat.Name);
             var openPo = await GetOpenPurchaseOrdersAsync(mat.Name);
             var demandHistory = demandData.TryGetValue(mat.Name, out var dh) ? dh : new List<decimal> { 100 };
             var safetyStock = CalculateStatisticalSafetyStock(demandHistory, 0.95);
@@ -595,10 +595,10 @@ public class MrpService : IMrpService
         }
     }
 
-    private async Task<decimal> CalculateTotalDemandAsync(string materialName)
+    private async Task<decimal> CalculateTotalDemandAsync(Guid tenantId, string materialName)
     {
-        var prodOrders = await _db.Set<ProductionOrderEntity>().Where(o => o.Status != "Completed").ToListAsync();
-        var boms = await _db.Set<BillOfMaterialEntity>().Where(b => b.Status == "Active").ToListAsync();
+        var prodOrders = await _db.Set<ProductionOrderEntity>().Where(o => o.Status != "Completed" && o.TenantId == tenantId).ToListAsync();
+        var boms = await _db.Set<BillOfMaterialEntity>().Where(b => b.Status == "Active" && b.TenantId == tenantId).ToListAsync();
         decimal demand = 0;
 
         foreach (var order in prodOrders)
@@ -642,11 +642,11 @@ public class MrpService : IMrpService
     };
 
     private async Task<Dictionary<string, List<decimal>>> BuildDemandDictionaryAsync(
-        List<MaterialMasterEntity> materials, List<SalesOrderEntity> salesOrders)
+        Guid tenantId, List<MaterialMasterEntity> materials, List<SalesOrderEntity> salesOrders)
     {
         var dict = new Dictionary<string, List<decimal>>();
         var prodOrders = await _db.Set<ProductionOrderEntity>()
-            .Where(p => p.Status != "Cancelled").ToListAsync();
+            .Where(p => p.Status != "Cancelled" && p.TenantId == tenantId).ToListAsync();
         var allLines = await _db.Set<SalesOrderLineEntity>().ToListAsync();
         var soIds = salesOrders.Select(s => s.Id).ToHashSet();
         allLines = allLines.Where(l => soIds.Contains(l.SalesOrderId)).ToList();

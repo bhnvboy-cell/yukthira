@@ -8,13 +8,16 @@ namespace YuktiraERP.Web.Pages.PP.Routing;
 public class ListModel : PageModel
 {
     private readonly IRepository<ProductionRoutingEntity, Guid> _repo;
-    public ListModel(IRepository<ProductionRoutingEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public ListModel(IRepository<ProductionRoutingEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     public List<ProductionRoutingEntity> Items { get; set; } = new();
 
-    public async Task OnGetAsync() => Items = await _repo.GetAllAsync();
+    public async Task OnGetAsync() => Items = await _repo.FindAsync(x => x.TenantId == _tenant.TenantId);
 
     public async Task<IActionResult> OnPostDeleteAsync(Guid id)
     {
+        var item = await _repo.GetByIdAsync(id);
+        if (item == null || item.TenantId != _tenant.TenantId) return NotFound();
         await _repo.DeleteAsync(id);
         return RedirectToPage();
     }

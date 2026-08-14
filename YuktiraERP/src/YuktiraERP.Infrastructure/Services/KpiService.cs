@@ -278,11 +278,11 @@ public class KpiService : IKpiService
     private async Task<decimal> CalculateProductionEfficiencyAsync(Guid tenantId)
     {
         var planned = await _db.Set<ProductionOrderEntity>()
-            .Where(p => p.Status == "Completed" || p.Status == "InProgress")
+            .Where(p => (p.Status == "Completed" || p.Status == "InProgress") && p.TenantId == tenantId)
             .SumAsync(p => p.Quantity);
         if (planned == 0) return 100;
         var actual = await _db.Set<ProductionOrderEntity>()
-            .Where(p => p.Status == "Completed" && p.EndDate >= DateTime.UtcNow.AddDays(-30))
+            .Where(p => p.Status == "Completed" && p.EndDate >= DateTime.UtcNow.AddDays(-30) && p.TenantId == tenantId)
             .SumAsync(p => p.Quantity);
         return Math.Round(actual / planned * 100, 1);
     }

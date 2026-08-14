@@ -6,8 +6,9 @@ namespace YuktiraERP.Web.Pages.PP.ProductionOrder;
 public class CreateModel : PageModel
 {
     private readonly IRepository<ProductionOrderEntity, Guid> _repo;
-    public CreateModel(IRepository<ProductionOrderEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public CreateModel(IRepository<ProductionOrderEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     [BindProperty] public ProductionOrderEntity Order { get; set; } = new();
     public IActionResult OnGet() => Page();
-    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); await _repo.AddAsync(Order); return RedirectToPage("/PP/Index"); }
+    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); Order.TenantId = _tenant.TenantId; await _repo.AddAsync(Order); return RedirectToPage("/PP/Index"); }
 }

@@ -1131,7 +1131,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app |
+| 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app, PP module tenant isolation, webhook dispatch consolidation, real SAP HANA connector, CVE fixes |
 | 1.0.4 | August 2026 | Gap-filling II: tax engine, multi-currency, real EDI conversion, email/SMS delivery with logging, CO cost allocations, i18n localization, domain entity behavior, fixed-asset lifecycle, webhook delivery verified |
 | 1.0.3 | August 2026 | Gap-filling: real stock Goods Issue, finance loop (AP/AR aging, payments, period close, bank recon, depreciation), payroll persistence, TOTP MFA, DB-backed approvals, background jobs, tenant write-safety, PDF fails loudly |
 | 1.0.2 | August 2026 | Module catalog, 13 legacy flat-page redirects, t-code reclassification, full CRUD pages for 32 entities, Npgsql DateTime fix, print/Save-as-PDF on every page, working backup/restore scripts |
@@ -1149,6 +1149,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - PWA / installable web app: `manifest.json` (name, theme color, icons, shortcuts), `sw.js` service worker (app-shell cache, navigation fallback, static asset caching), SVG app icon, theme-color meta; verified live on the Web app dashboard
 - Tests: 35 passing (+4 webhook retry/events, +2 impersonation)
 - Operations fixes: Web `/health` now anonymous (fallback auth policy no longer intercepts probes); API/Web build clean
+- Tenant isolation for Production Planning (PP) module: `WorkCenterEntity`, `ProductionRoutingEntity`, `ProductionOrderEntity`, `ProductionPlanEntity`, `BillOfMaterialEntity` now carry `TenantId`; migration `015_pp_tenant_scoping.sql` adds the column + indexes and backfills existing rows to the first tenant; all PP readers filtered by tenant (`CapacityPlanningService`, `KpiService` production-efficiency, `MrpService` demand/explosion/capacity queries, `PredictabilityService` demand history), all writers assign `TenantId` (`ProductionController`, seeder, all PP Web pages: Index, MrpStock, WorkCenter/Routing/Plan/BOM/ProductionOrder Create/List/Display/Edit). Fixed `TransactionCodeService` execution logs to record the real transaction id; fixed `ExplodeBomAsync` to run with the caller's tenant (was `Guid.Empty`); rewired `IntegrationHubService.DispatchWebhookEventAsync` to the single webhook-dispatch path (was a `Console.WriteLine` duplicate that skipped delivery logging); replaced the `SapHanaConnector` stub with a real HTTP connector; upgraded `System.Security.Cryptography.Xml` 10.0.10 (removes high-severity CVEs)
 
 **1.0.4 (August 2026)**
 - Tax engine: `TaxCodeEntity`/`TaxTransactionEntity`, `ITaxService`/`TaxService`, `TaxController` (`/api/v1/fi/Tax/*`); seeded GST 0/5/12/18/28, VAT 10, TDS 2; live verify — GST18 on 15000 → 2050 tax → 17050 gross, AR/AP posting (23600 / 8800 gross). Schema: `database/scripts/009_tax_engine.sql`
@@ -1209,7 +1210,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - Notifications: in-app + email + SMS with 10 templates
 - Transaction codes: 60+ SAP-style codes with search, favorites, permissions
 - xUnit test project: 35 tests across Auth, Workflow, Integration, Tax, EDI, Cost Allocation, Localization, Currency, entity behavior and webhooks
-- PostgreSQL migration pipeline with auto-discovery and tracking (14 migration scripts)
+- PostgreSQL migration pipeline with auto-discovery and tracking (15 migration scripts)
 - Entity configurations with multi-schema mappings (16 schemas)
 - 3 example plugins: AdvancedQC, DairyExtension, ExtraReports
 - Health check endpoints, structured error responses

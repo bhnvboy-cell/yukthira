@@ -6,8 +6,9 @@ namespace YuktiraERP.Web.Pages.PP.WorkCenter;
 public class CreateModel : PageModel
 {
     private readonly IRepository<WorkCenterEntity, Guid> _repo;
-    public CreateModel(IRepository<WorkCenterEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public CreateModel(IRepository<WorkCenterEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     [BindProperty] public WorkCenterEntity WorkCenter { get; set; } = new();
     public IActionResult OnGet() => Page();
-    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); await _repo.AddAsync(WorkCenter); return RedirectToPage("/PP/WorkCenter/List"); }
+    public async Task<IActionResult> OnPostAsync() { if (!ModelState.IsValid) return Page(); WorkCenter.TenantId = _tenant.TenantId; await _repo.AddAsync(WorkCenter); return RedirectToPage("/PP/WorkCenter/List"); }
 }

@@ -59,7 +59,7 @@ public interface IMrpService
     Task<List<MrpSuggestionDto>> RunMrpAsync(Guid tenantId, Guid? materialId = null);
     Task RefreshStockViewAsync();
     Task<List<MrpSuggestionDto>> GetShortageAlertsAsync(Guid tenantId);
-    Task<List<MrpExplosionResult>> ExplodeBomAsync(MrpRunRequest request);
+    Task<List<MrpExplosionResult>> ExplodeBomAsync(Guid tenantId, MrpRunRequest request);
     Task<List<MrpRequirementDto>> CalculateNetRequirementsAsync(Guid tenantId, string productName, decimal quantity, DateTime needByDate);
     Task<List<MrpRequirementDto>> MultiLevelExplosionAsync(Guid tenantId, string productName, decimal quantity, int maxLevel = 10);
     Task<List<MrpRunHistoryDto>> GetRunHistoryAsync(Guid tenantId, int limit = 20);

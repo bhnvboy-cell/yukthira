@@ -5,7 +5,8 @@ namespace YuktiraERP.Web.Pages.PP;
 public class MrpStockModel : PageModel
 {
     private readonly IRepository<ProductionPlanEntity, Guid> _repo;
-    public MrpStockModel(IRepository<ProductionPlanEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public MrpStockModel(IRepository<ProductionPlanEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     public List<ProductionPlanEntity> Plans { get; set; } = new();
-    public async Task OnGetAsync() { Plans = await _repo.GetAllAsync(); }
+    public async Task OnGetAsync() { Plans = await _repo.FindAsync(x => x.TenantId == _tenant.TenantId); }
 }

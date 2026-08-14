@@ -6,19 +6,21 @@ namespace YuktiraERP.Web.Pages.PP.BOM;
 public class EditModel : PageModel
 {
     private readonly IRepository<BillOfMaterialEntity, Guid> _repo;
-    public EditModel(IRepository<BillOfMaterialEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public EditModel(IRepository<BillOfMaterialEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     [BindProperty] public BillOfMaterialEntity Bom { get; set; } = new();
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
         if (id == null || id == Guid.Empty) return RedirectToPage("/PP/Index");
         var entity = await _repo.GetByIdAsync(id.Value);
-        if (entity == null) return NotFound();
+        if (entity == null || entity.TenantId != _tenant.TenantId) return NotFound();
         Bom = entity;
         return Page();
     }
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
+        Bom.TenantId = _tenant.TenantId;
         await _repo.UpdateAsync(Bom);
         return RedirectToPage("/PP/Index");
     }

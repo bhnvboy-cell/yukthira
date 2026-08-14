@@ -31,6 +31,6 @@ public class OperationLoadDetailDto
 public interface ICapacityPlanningService
 {
     Task<List<WorkCenterLoadDto>> CalculateLoadAsync(Guid tenantId, DateTime? startDate = null, DateTime? endDate = null);
-    Task<WorkCenterLoadDto?> GetWorkCenterLoadAsync(Guid workCenterId, DateTime startDate, DateTime endDate);
-    Task<List<OperationLoadDetailDto>> GetOperationsForWorkCenterAsync(Guid workCenterId, DateTime startDate, DateTime endDate);
+    Task<WorkCenterLoadDto?> GetWorkCenterLoadAsync(Guid tenantId, Guid workCenterId, DateTime startDate, DateTime endDate);
+    Task<List<OperationLoadDetailDto>> GetOperationsForWorkCenterAsync(Guid tenantId, Guid workCenterId, DateTime startDate, DateTime endDate);
 }

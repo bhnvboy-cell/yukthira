@@ -184,7 +184,7 @@ public class TransactionCodeService : ITransactionCodeService
             if (entity.Status != "Active")
             {
                 sw.Stop();
-                await LogExecutionAsync(code, userId, tenantId, ipAddress, ExecutionStatus.Failed, sw.ElapsedMilliseconds, error: "Transaction is inactive");
+                await LogExecutionAsync(code, userId, tenantId, ipAddress, ExecutionStatus.Failed, sw.ElapsedMilliseconds, error: "Transaction is inactive", transactionCodeId: entity.Id);
                 return new ExecuteTransactionResult { Status = ExecutionStatus.Failed, Message = "Transaction is inactive", DurationMs = sw.ElapsedMilliseconds };
             }
 
@@ -195,7 +195,7 @@ public class TransactionCodeService : ITransactionCodeService
             }
 
             sw.Stop();
-            await LogExecutionAsync(code, userId, tenantId, ipAddress, ExecutionStatus.Success, sw.ElapsedMilliseconds, requestData: parameters?.ToString());
+            await LogExecutionAsync(code, userId, tenantId, ipAddress, ExecutionStatus.Success, sw.ElapsedMilliseconds, requestData: parameters?.ToString(), transactionCodeId: entity.Id);
             return new ExecuteTransactionResult
             {
                 Status = ExecutionStatus.Success,
@@ -350,11 +350,11 @@ public class TransactionCodeService : ITransactionCodeService
         }).ToList();
     }
 
-    private async Task LogExecutionAsync(string code, Guid? userId, Guid? tenantId, string? ipAddress, ExecutionStatus status, long durationMs, string? error = null, string? requestData = null)
+    private async Task LogExecutionAsync(string code, Guid? userId, Guid? tenantId, string? ipAddress, ExecutionStatus status, long durationMs, string? error = null, string? requestData = null, Guid? transactionCodeId = null)
     {
         _db.TransactionLogs.Add(new TransactionLogEntity
         {
-            TransactionCodeId = Guid.Empty,
+            TransactionCodeId = transactionCodeId ?? Guid.Empty,
             TransactionCode = code,
             UserId = userId,
             UserName = userId.HasValue ? (await _db.AdminUsers.FindAsync(userId.Value))?.UserName ?? "" : "",

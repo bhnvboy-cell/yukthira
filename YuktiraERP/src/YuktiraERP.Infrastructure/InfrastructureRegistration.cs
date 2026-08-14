@@ -60,7 +60,7 @@ public static class InfrastructureRegistration
             var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient();
             var reg = new ConnectorRegistry();
             reg.Register(new SapS4HanaConnector(http));
-            reg.Register(new SapHanaConnector());
+            reg.Register(new SapHanaConnector(http));
             reg.Register(new OracleErpConnector(http));
             reg.Register(new MesConnector(http));
             reg.Register(new LimsConnector(http));

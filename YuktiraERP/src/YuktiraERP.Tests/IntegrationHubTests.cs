@@ -24,7 +24,7 @@ public class IntegrationHubTests
         var db = new YuktiraDbContext(options);
         var httpClient = new HttpClient();
 
-        var service = new IntegrationHubService(db, httpClient);
+        var service = new IntegrationHubService(db, new WebhookService(db, httpClient));
 
         var tenantId = Guid.NewGuid();
         await service.RegisterWebhookAsync(tenantId, "Test Hook", "order.created", "https://example.com/hook", "secret-123");
@@ -44,7 +44,7 @@ public class IntegrationHubTests
         var db = new YuktiraDbContext(options);
         var httpClient = new HttpClient();
 
-        var service = new IntegrationHubService(db, httpClient);
+        var service = new IntegrationHubService(db, new WebhookService(db, httpClient));
 
         var tenantId = Guid.NewGuid();
         await service.RegisterWebhookAsync(tenantId, "Test", "event.test", "https://example.com/hook");
@@ -80,7 +80,7 @@ public class IntegrationHubTests
         await db.SaveChangesAsync();
 
         var httpClient = new HttpClient();
-        var service = new IntegrationHubService(db, httpClient);
+        var service = new IntegrationHubService(db, new WebhookService(db, httpClient));
 
         var allowed = await service.ValidateApiClientAsync("client-1", "secret-1", "192.168.1.100");
         Assert.True(allowed);

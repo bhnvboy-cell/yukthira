@@ -8,14 +8,15 @@ namespace YuktiraERP.Web.Pages.PP.Plan;
 public class DisplayModel : PageModel
 {
     private readonly IRepository<ProductionPlanEntity, Guid> _repo;
-    public DisplayModel(IRepository<ProductionPlanEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public DisplayModel(IRepository<ProductionPlanEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     public ProductionPlanEntity Plan { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
         if (id == null || id == Guid.Empty) return RedirectToPage("/PP/Plan/List");
         var entity = await _repo.GetByIdAsync(id.Value);
-        if (entity == null) return NotFound();
+        if (entity == null || entity.TenantId != _tenant.TenantId) return NotFound();
         Plan = entity;
         return Page();
     }

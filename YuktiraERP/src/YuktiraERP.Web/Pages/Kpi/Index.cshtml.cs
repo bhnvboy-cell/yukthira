@@ -11,12 +11,14 @@ public class IndexModel : PageModel
     private readonly IKpiService _kpiService;
     private readonly IPredictabilityService _predictabilityService;
     private readonly IAIEngine _aiEngine;
+    private readonly ITenantContext _tenant;
 
-    public IndexModel(IKpiService kpiService, IPredictabilityService predictabilityService, IAIEngine aiEngine)
+    public IndexModel(IKpiService kpiService, IPredictabilityService predictabilityService, IAIEngine aiEngine, ITenantContext tenant)
     {
         _kpiService = kpiService;
         _predictabilityService = predictabilityService;
         _aiEngine = aiEngine;
+        _tenant = tenant;
     }
 
     public KpiCardDto CurrentKpi { get; set; } = new();
@@ -30,7 +32,7 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnGetAsync(string code)
     {
         KpiCode = code;
-        var tenantId = Guid.Empty; // placeholder - extracted from tenant context in real app
+        var tenantId = _tenant.TenantId;
 
         CurrentKpi = await _kpiService.GetDrillDownKpiAsync(tenantId, code);
         KpiName = CurrentKpi.Label;

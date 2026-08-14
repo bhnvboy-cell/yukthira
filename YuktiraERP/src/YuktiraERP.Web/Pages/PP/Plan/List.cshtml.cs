@@ -8,13 +8,16 @@ namespace YuktiraERP.Web.Pages.PP.Plan;
 public class ListModel : PageModel
 {
     private readonly IRepository<ProductionPlanEntity, Guid> _repo;
-    public ListModel(IRepository<ProductionPlanEntity, Guid> repo) { _repo = repo; }
+    private readonly ITenantContext _tenant;
+    public ListModel(IRepository<ProductionPlanEntity, Guid> repo, ITenantContext tenant) { _repo = repo; _tenant = tenant; }
     public List<ProductionPlanEntity> Items { get; set; } = new();
 
-    public async Task OnGetAsync() => Items = await _repo.GetAllAsync();
+    public async Task OnGetAsync() => Items = await _repo.FindAsync(x => x.TenantId == _tenant.TenantId);
 
     public async Task<IActionResult> OnPostDeleteAsync(Guid id)
     {
+        var item = await _repo.GetByIdAsync(id);
+        if (item == null || item.TenantId != _tenant.TenantId) return NotFound();
         await _repo.DeleteAsync(id);
         return RedirectToPage();
     }

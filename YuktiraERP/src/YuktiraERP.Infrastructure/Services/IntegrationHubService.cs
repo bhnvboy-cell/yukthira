@@ -11,51 +11,16 @@ namespace YuktiraERP.Infrastructure.Services;
 public class IntegrationHubService : IIntegrationHub
 {
     private readonly YuktiraDbContext _db;
-    private readonly HttpClient _httpClient;
+    private readonly IWebhookService _webhookService;
 
-    public IntegrationHubService(YuktiraDbContext db, HttpClient httpClient)
+    public IntegrationHubService(YuktiraDbContext db, IWebhookService webhookService)
     {
         _db = db;
-        _httpClient = httpClient;
+        _webhookService = webhookService;
     }
 
-    public async Task DispatchWebhookEventAsync(WebhookEvent webhookEvent)
-    {
-        var hooks = await _db.Webhooks
-            .Where(w => w.TenantId == webhookEvent.TenantId && w.EventType == webhookEvent.EventType && w.IsActive)
-            .ToListAsync();
-
-        foreach (var hook in hooks)
-        {
-            try
-            {
-                var payload = JsonSerializer.Serialize(new
-                {
-                    event_type = webhookEvent.EventType,
-                    tenant_id = webhookEvent.TenantId.ToString(),
-                    entity_type = webhookEvent.EntityType,
-                    entity_id = webhookEvent.EntityId,
-                    data = webhookEvent.Payload,
-                    timestamp = DateTime.UtcNow
-                });
-
-                var content = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
-                if (!string.IsNullOrEmpty(hook.SecretKey))
-                    content.Headers.Add("X-Webhook-Secret", hook.SecretKey);
-
-                var response = await _httpClient.PostAsync(hook.TargetUrl, content);
-                hook.LastTriggeredAt = DateTime.UtcNow;
-                Console.WriteLine($"[WEBHOOK] {hook.EventType} -> {hook.TargetUrl}: {response.StatusCode}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[WEBHOOK ERROR] {hook.EventType} -> {hook.TargetUrl}: {ex.Message}");
-            }
-        }
-
-        if (hooks.Count > 0)
-            await _db.SaveChangesAsync();
-    }
+    public Task DispatchWebhookEventAsync(WebhookEvent webhookEvent)
+        => _webhookService.DispatchAsync(webhookEvent.TenantId, webhookEvent.EventType, webhookEvent.EntityType, webhookEvent.EntityId, webhookEvent.Payload);
 
     public async Task RegisterWebhookAsync(Guid tenantId, string name, string eventType, string targetUrl, string? secretKey = null)
     {

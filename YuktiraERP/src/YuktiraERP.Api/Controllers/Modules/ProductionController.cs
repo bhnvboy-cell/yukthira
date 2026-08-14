@@ -33,23 +33,23 @@ public class ProductionController : ControllerBase
         _tenant = tenant;
     }
 
-    [HttpGet("plans")] public async Task<IActionResult> GetPlans() => Ok(new { data = await _plans.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("plans")] public async Task<IActionResult> GetPlans() => Ok(new { data = await _plans.FindAsync(p => p.TenantId == _tenant.TenantId), tenantId = _tenant.TenantId });
     [HttpPost("plans")] [Authorize(Policy = "PowerUserOrAbove")]
-    public async Task<IActionResult> CreatePlan([FromBody] ProductionPlanEntity model) { model.Id = Guid.NewGuid(); await _plans.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    public async Task<IActionResult> CreatePlan([FromBody] ProductionPlanEntity model) { model.Id = Guid.NewGuid(); model.TenantId = _tenant.TenantId; await _plans.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
 
-    [HttpGet("bom")] public async Task<IActionResult> GetBOM() => Ok(new { data = await _bom.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("bom")] public async Task<IActionResult> GetBOM() => Ok(new { data = await _bom.FindAsync(b => b.TenantId == _tenant.TenantId), tenantId = _tenant.TenantId });
     [HttpPost("bom")] [Authorize(Policy = "PowerUserOrAbove")]
-    public async Task<IActionResult> CreateBOM([FromBody] BillOfMaterialEntity model) { model.Id = Guid.NewGuid(); await _bom.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    public async Task<IActionResult> CreateBOM([FromBody] BillOfMaterialEntity model) { model.Id = Guid.NewGuid(); model.TenantId = _tenant.TenantId; await _bom.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
 
-    [HttpGet("routing")] public async Task<IActionResult> GetRouting() => Ok(new { data = await _routing.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("routing")] public async Task<IActionResult> GetRouting() => Ok(new { data = await _routing.FindAsync(r => r.TenantId == _tenant.TenantId), tenantId = _tenant.TenantId });
     [HttpPost("routing")] [Authorize(Policy = "PowerUserOrAbove")]
-    public async Task<IActionResult> CreateRouting([FromBody] ProductionRoutingEntity model) { model.Id = Guid.NewGuid(); await _routing.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    public async Task<IActionResult> CreateRouting([FromBody] ProductionRoutingEntity model) { model.Id = Guid.NewGuid(); model.TenantId = _tenant.TenantId; await _routing.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
 
-    [HttpGet("workcenters")] public async Task<IActionResult> GetWorkCenters() => Ok(new { data = await _workCenters.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("workcenters")] public async Task<IActionResult> GetWorkCenters() => Ok(new { data = await _workCenters.FindAsync(w => w.TenantId == _tenant.TenantId), tenantId = _tenant.TenantId });
     [HttpPost("workcenters")] [Authorize(Policy = "PowerUserOrAbove")]
-    public async Task<IActionResult> CreateWorkCenter([FromBody] WorkCenterEntity model) { model.Id = Guid.NewGuid(); await _workCenters.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    public async Task<IActionResult> CreateWorkCenter([FromBody] WorkCenterEntity model) { model.Id = Guid.NewGuid(); model.TenantId = _tenant.TenantId; await _workCenters.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
 
-    [HttpGet("production-orders")] public async Task<IActionResult> GetProductionOrders() => Ok(new { data = await _orders.GetAllAsync(), tenantId = _tenant.TenantId });
+    [HttpGet("production-orders")] public async Task<IActionResult> GetProductionOrders() => Ok(new { data = await _orders.FindAsync(o => o.TenantId == _tenant.TenantId), tenantId = _tenant.TenantId });
     [HttpPost("production-orders")] [Authorize(Policy = "PowerUserOrAbove")]
-    public async Task<IActionResult> CreateProductionOrder([FromBody] ProductionOrderEntity model) { model.Id = Guid.NewGuid(); await _orders.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
+    public async Task<IActionResult> CreateProductionOrder([FromBody] ProductionOrderEntity model) { model.Id = Guid.NewGuid(); model.TenantId = _tenant.TenantId; await _orders.AddAsync(model); return Ok(new { success = true, id = model.Id, tenantId = _tenant.TenantId }); }
 }

@@ -68,7 +68,7 @@ public class MrpModel : PageModel
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddDays(14)
             };
-            var explosion = await _mrpService.ExplodeBomAsync(request);
+            var explosion = await _mrpService.ExplodeBomAsync(_tenant.TenantId, request);
             Suggestions = explosion.SelectMany(e => e.Requirements.Select(r => new MrpSuggestionDto
             {
                 MaterialName = r.ComponentName,

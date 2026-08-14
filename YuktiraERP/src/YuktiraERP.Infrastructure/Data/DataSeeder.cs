@@ -86,6 +86,9 @@ public class DataSeeder
 
     private async Task SeedMasterDataAsync()
     {
+        var tenant = await _db.Set<TenantEntity>().FirstOrDefaultAsync();
+        var seedTenantId = tenant?.Id ?? Guid.NewGuid();
+
         if (!await _db.Set<MaterialMasterEntity>().AnyAsync())
         {
             var materials = new List<MaterialMasterEntity>
@@ -138,9 +141,9 @@ public class DataSeeder
         {
             var boms = new List<BillOfMaterialEntity>
             {
-                new() { BomId = "BOM-001", ProductName = "Finished Product A", ComponentName = "Raw Material X", Quantity = 2, UOM = "KG", Status = "Active" },
-                new() { BomId = "BOM-002", ProductName = "Finished Product A", ComponentName = "Raw Material Y", Quantity = 0.5m, UOM = "KG", Status = "Active" },
-                new() { BomId = "BOM-003", ProductName = "Finished Product A", ComponentName = "Packaging Box", Quantity = 1, UOM = "EA", Status = "Active" },
+                new() { TenantId = seedTenantId, BomId = "BOM-001", ProductName = "Finished Product A", ComponentName = "Raw Material X", Quantity = 2, UOM = "KG", Status = "Active" },
+                new() { TenantId = seedTenantId, BomId = "BOM-002", ProductName = "Finished Product A", ComponentName = "Raw Material Y", Quantity = 0.5m, UOM = "KG", Status = "Active" },
+                new() { TenantId = seedTenantId, BomId = "BOM-003", ProductName = "Finished Product A", ComponentName = "Packaging Box", Quantity = 1, UOM = "EA", Status = "Active" },
             };
             await _db.Set<BillOfMaterialEntity>().AddRangeAsync(boms);
             await _db.SaveChangesAsync();
