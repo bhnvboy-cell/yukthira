@@ -26,10 +26,7 @@ public class MovementTypeEngineServiceTests
     private MovementTypeEngineService CreateService(YuktiraDbContext db)
     {
         var logger = new Mock<ILogger<MovementTypeEngineService>>();
-        var goodsMovementService = new Mock<IGoodsMovementService>();
-        var batchService = new Mock<IBatchService>();
-        var inventoryService = new Mock<IInventoryService>();
-        return new MovementTypeEngineService(db, logger.Object, goodsMovementService.Object, batchService.Object, inventoryService.Object);
+        return new MovementTypeEngineService(db, logger.Object);
     }
 
     private async Task SeedMovementTypes(YuktiraDbContext db, Guid tenantId)

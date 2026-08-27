@@ -165,18 +165,6 @@ namespace YuktiraERP.Infrastructure.Services
             _logger = logger;
         }
 
-        // Backward-compatible constructor for tests that pass mocks
-        public MovementTypeEngineService(YuktiraDbContext context, ILogger<MovementTypeEngineService> logger, IGoodsMovementService goodsMovementService, object batchService, object inventoryService)
-            : this(context, logger)
-        {
-        }
-
-        // Additional overload with typed batch/inventory for test compatibility
-        public MovementTypeEngineService(YuktiraDbContext context, ILogger<MovementTypeEngineService> logger, IGoodsMovementService goodsMovementService, YuktiraERP.Infrastructure.Caching.IBatchService batchService, YuktiraERP.Core.Interfaces.IInventoryService inventoryService)
-            : this(context, logger)
-        {
-        }
-
         public async Task<MovementTypeEntity?> GetMovementTypeAsync(int movementType, Guid tenantId)
         {
             return await _context.MovementTypes

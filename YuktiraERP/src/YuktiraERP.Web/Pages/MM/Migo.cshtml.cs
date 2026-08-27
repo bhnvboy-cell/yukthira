@@ -24,7 +24,7 @@ public class MigoModel : PageModel
     }
 
     [BindProperty]
-    public MovementPostRequest Request { get; set; } = new()
+    public new MovementPostRequest Request { get; set; } = new()
     {
         PostingDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
         DocumentDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),

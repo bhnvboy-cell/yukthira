@@ -6,7 +6,7 @@ using YuktiraERP.Infrastructure.Services;
 namespace YuktiraERP.Api.Controllers.Modules;
 
 [ApiController]
-[Route("api/v1/mm/movement-types")]
+[Route("api/mm/movement-types")]
 [Authorize]
 public class MovementTypeController : ControllerBase
 {
