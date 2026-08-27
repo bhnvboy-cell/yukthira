@@ -9,4 +9,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Interfaces\IMovementTypeEngineService.cs" />
+  </ItemGroup>
 </Project>

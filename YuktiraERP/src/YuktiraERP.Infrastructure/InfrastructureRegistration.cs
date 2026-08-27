@@ -135,6 +135,8 @@ public static class InfrastructureRegistration
         services.AddScoped<IBatchService, BatchService>();
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IGoodsMovementService, GoodsMovementService>();
+        services.AddScoped<YuktiraERP.Core.Interfaces.IMovementTypeEngineService, MovementTypeEngineService>();
+        services.AddScoped<YuktiraERP.Infrastructure.Services.IMovementTypeEngineService, MovementTypeEngineService>();
         services.AddScoped<IProductionOrderService, ProductionOrderService>();
         services.AddScoped<IBankService, BankService>();
         services.AddScoped<IDepartmentKeyService, DepartmentKeyService>();

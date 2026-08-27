@@ -158,6 +158,15 @@ public class YuktiraDbContext : DbContext
     public DbSet<PaymentEntity> Payments => Set<PaymentEntity>();
     public DbSet<DepreciationScheduleEntity> DepreciationSchedules => Set<DepreciationScheduleEntity>();
     public DbSet<ApprovalStepEntity> ApprovalSteps => Set<ApprovalStepEntity>();
+    // Movement Type Registry (MIGO)
+    public DbSet<MovementTypeEntity> MovementTypes => Set<MovementTypeEntity>();
+    public DbSet<MovementTypeCategoryEntity> MovementTypeCategories => Set<MovementTypeCategoryEntity>();
+    public DbSet<MovementTypeStockTypeEntity> MovementTypeStockTypes => Set<MovementTypeStockTypeEntity>();
+    public DbSet<MovementTypePostingRuleEntity> MovementTypePostingRules => Set<MovementTypePostingRuleEntity>();
+    public DbSet<MovementTypeIntegrationEntity> MovementTypeIntegrations => Set<MovementTypeIntegrationEntity>();
+    public DbSet<MovementDocumentEntity> MovementDocuments => Set<MovementDocumentEntity>();
+    public DbSet<MovementDocumentLineEntity> MovementDocumentLines => Set<MovementDocumentLineEntity>();
+    public DbSet<MovementTypeWorkflowEntity> MovementTypeWorkflows => Set<MovementTypeWorkflowEntity>();
     // Procure-to-Pay
     public DbSet<PurchaseRequisitionItemEntity> PurchaseRequisitionItems => Set<PurchaseRequisitionItemEntity>();
     public DbSet<PurchaseOrderItemEntity> PurchaseOrderItems => Set<PurchaseOrderItemEntity>();

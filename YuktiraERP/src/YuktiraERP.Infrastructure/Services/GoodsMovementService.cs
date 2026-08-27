@@ -25,10 +25,18 @@ public class BackflushResult
 public class GoodsMovementService : IGoodsMovementService
 {
     private readonly YuktiraDbContext _db;
+    private readonly YuktiraERP.Core.Interfaces.IMovementTypeEngineService? _mvtEngine;
 
     public GoodsMovementService(YuktiraDbContext db)
     {
         _db = db;
+        _mvtEngine = null;
+    }
+
+    public GoodsMovementService(YuktiraDbContext db, YuktiraERP.Core.Interfaces.IMovementTypeEngineService mvtEngine)
+    {
+        _db = db;
+        _mvtEngine = mvtEngine;
     }
 
     public async Task<GoodsMovementResult> PostGoodsIssueAsync(string materialName, decimal quantity, string reason, string reference, string movementType, string userId)
@@ -36,8 +44,27 @@ public class GoodsMovementService : IGoodsMovementService
         var material = await _db.MaterialMasters.FirstOrDefaultAsync(m => m.Name == materialName)
             ?? throw new InvalidOperationException($"Material {materialName} not found");
 
-        if (material.Stock < quantity)
-            throw new InvalidOperationException($"Insufficient stock for {materialName}. Available: {material.Stock}, Requested: {quantity}");
+        if (_mvtEngine != null && int.TryParse(movementType, out var mvtNum))
+        {
+            var tenantId = material.Id != Guid.Empty ? Guid.Empty : Guid.Empty;
+            var mvtConfig = await _mvtEngine.GetMovementTypeAsync(mvtNum, tenantId);
+            if (mvtConfig != null)
+            {
+                if (!mvtConfig.IsActive)
+                    throw new InvalidOperationException($"Movement type {mvtNum} is inactive");
+
+                if (!mvtConfig.AllowsNegativeStock && material.Stock < quantity)
+                    throw new InvalidOperationException($"Insufficient stock for {materialName}. Available: {material.Stock}, Requested: {quantity}");
+
+                if (mvtConfig.RequiresReference && string.IsNullOrEmpty(reference))
+                    throw new InvalidOperationException($"Movement type {mvtNum} requires a reference document");
+            }
+        }
+        else
+        {
+            if (material.Stock < quantity)
+                throw new InvalidOperationException($"Insufficient stock for {materialName}. Available: {material.Stock}, Requested: {quantity}");
+        }
 
         var stockBefore = material.Stock;
         material.Stock -= quantity;
