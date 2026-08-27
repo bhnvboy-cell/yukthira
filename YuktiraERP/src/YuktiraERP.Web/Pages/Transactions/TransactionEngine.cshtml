@@ -1,0 +1,203 @@
+@page "/Transactions/Engine/{code}"
+@model YuktiraERP.Web.Pages.Transactions.TransactionEngineModel
+@{
+    ViewData["Title"] = Model.Config?.Title ?? Model.Code;
+    Layout = Model.Config != null ? "_Layout" : "_Layout";
+}
+
+@if (Model.Config == null)
+{
+    <div class="container-fluid py-5 text-center">
+        <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+        <h2 class="mt-3">Transaction Not Found</h2>
+        <p class="text-muted">No layout configuration found for <strong>@Model.Code</strong></p>
+        <a href="/Transactions" class="btn btn-primary mt-3"><i class="bi bi-arrow-left me-1"></i>Back to Launcher</a>
+    </div>
+}
+else
+{
+    <div class="tcode-engine" data-tcode="@Model.Config.TCode" data-module="@Model.Config.Module">
+        <!-- Tier 1: Title Bar / Toolbar -->
+        <div class="tcode-toolbar">
+            <div class="tcode-toolbar-left">
+                <span class="tcode-module-badge">@Model.Config.Module</span>
+                <span class="tcode-title"><i class="bi @Model.Config.Icon me-2"></i>@Model.Config.Title</span>
+                <span class="tcode-subtitle">Transaction Code: <strong>@Model.Config.TCode</strong></span>
+            </div>
+            <div class="tcode-toolbar-right">
+                @foreach (var action in Model.Config.ToolbarActions)
+                {
+                    <button type="button" class="btn btn-sm tcode-toolbar-btn tcode-btn-@action.Style"
+                            data-action="@action.Handler" @(action.Disabled ? "disabled" : "")
+                            title="@(!string.IsNullOrEmpty(action.Tooltip) ? action.Tooltip : action.Label)">
+                        <i class="bi @action.Icon"></i>
+                        <span class="tcode-toolbar-label">@action.Label</span>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Tier 2: Metadata Panel -->
+        @if (Model.Config.Metadata.Any())
+        {
+            <div class="tcode-metadata">
+                <div class="tcode-metadata-grid">
+                    @foreach (var field in Model.Config.Metadata)
+                    {
+                        <div class="tcode-meta-field">
+                            <label class="tcode-meta-label">@field.Label</label>
+                            @if (field.Editable)
+                            {
+                                @if (field.Type == "date")
+                                {
+                                    <input type="date" class="tcode-meta-input" value="@field.Value" data-key="@field.Key" />
+                                }
+                                else
+                                {
+                                    <input type="text" class="tcode-meta-input" value="@field.Value" data-key="@field.Key" placeholder="@field.Label" />
+                                }
+                            }
+                            else
+                            {
+                                <span class="tcode-meta-value" data-key="@field.Key">@field.Value</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Tier 3: Tab Bar -->
+        @if (Model.Config.Tabs.Any())
+        {
+            <div class="tcode-tab-bar">
+                @foreach (var tab in Model.Config.Tabs)
+                {
+                    <button type="button" class="tcode-tab @(tab.Active ? "active" : "")" data-tab="@tab.Id">
+                        <i class="bi @tab.Icon"></i>
+                        <span>@tab.Label</span>
+                    </button>
+                }
+            </div>
+        }
+
+        <!-- Tier 4: Data Grid (Table Toolbar + Table) -->
+        <div class="tcode-grid-area">
+            <div class="tcode-table-toolbar">
+                <div class="tcode-table-toolbar-left">
+                    @if (Model.Config.TableToolbar.ShowSearch)
+                    {
+                        <div class="tcode-table-search">
+                            <i class="bi bi-search"></i>
+                            <input type="text" placeholder="Filter..." class="tcode-filter-input" aria-label="Filter table rows" />
+                        </div>
+                    }
+                    @if (Model.Config.TableToolbar.ShowAddRow)
+                    {
+                        <button type="button" class="btn btn-sm tcode-table-btn" data-action="addRow" title="Add row">
+                            <i class="bi bi-plus-lg"></i><span>Add Row</span>
+                        </button>
+                    }
+                    @if (Model.Config.TableToolbar.ShowDeleteRow)
+                    {
+                        <button type="button" class="btn btn-sm tcode-table-btn" data-action="deleteRow" title="Delete selected" disabled id="deleteRowBtn">
+                            <i class="bi bi-trash"></i><span>Delete</span>
+                        </button>
+                    }
+                </div>
+                <div class="tcode-table-toolbar-right">
+                    @foreach (var custom in Model.Config.TableToolbar.CustomActions)
+                    {
+                        <button type="button" class="btn btn-sm tcode-table-btn tcode-btn-@custom.Style" data-action="@custom.Handler"
+                                title="@custom.Label">
+                            <i class="bi @custom.Icon"></i><span>@custom.Label</span>
+                        </button>
+                    }
+                    @if (Model.Config.TableToolbar.ShowExport)
+                    {
+                        <button type="button" class="btn btn-sm tcode-table-btn" data-action="export" title="Export to CSV">
+                            <i class="bi bi-download"></i><span>Export</span>
+                        </button>
+                    }
+                    @if (Model.Config.TableToolbar.ShowFilter)
+                    {
+                        <button type="button" class="btn btn-sm tcode-table-btn" data-action="toggleFilter" title="Toggle advanced filters">
+                            <i class="bi bi-funnel"></i><span>Filter</span>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="tcode-table-wrapper">
+                <table class="tcode-table" id="tcodeDataTable">
+                    <thead>
+                        <tr>
+                            <th class="tcode-th-check"><input type="checkbox" id="selectAllRows" aria-label="Select all rows" /></th>
+                            @foreach (var col in Model.Config.Columns.Where(c => !c.Fixed))
+                            {
+                                <th class="tcode-th" data-key="@col.Key"
+                                    style="@($"width:{col.Width}px;min-width:{(col.MinWidth > 0 ? col.MinWidth : col.Width)}px;text-align:{col.Align}")">
+                                    <div class="tcode-th-inner">
+                                        <span>@col.Label</span>
+                                        @if (col.Sortable)
+                                        {
+                                            <i class="bi bi-arrow-down-up tcode-sort-icon"></i>
+                                        }
+                                    </div>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody id="tcodeTableBody">
+                        <tr class="tcode-empty-row">
+                            <td colspan="@(Model.Config.Columns.Count(c => !c.Fixed) + 1)" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                No data loaded. Click <strong>Add Row</strong> or execute a query.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tcode-table-footer">
+                <span class="tcode-row-count">0 Rows</span>
+                <div class="tcode-pagination" id="tcodePagination"></div>
+            </div>
+        </div>
+
+        <!-- Tier 5: Action Bar (Footer) -->
+        @if (Model.Config.FooterActions.Any())
+        {
+            <div class="tcode-action-bar">
+                <div class="tcode-action-bar-left">
+                    <span class="tcode-status-indicator" id="tcodeStatus">
+                        <i class="bi bi-check-circle-fill text-success"></i> Ready
+                    </span>
+                </div>
+                <div class="tcode-action-bar-right">
+                    @foreach (var action in Model.Config.FooterActions)
+                    {
+                        <button type="button"
+                                class="btn tcode-action-btn tcode-action-@action.Style"
+                                data-action="@action.Handler"
+                                @(action.Disabled ? "disabled" : "")
+                                @(action.Confirm ? $"data-confirm='{action.ConfirmMessage}'" : "")>
+                            @if (!string.IsNullOrEmpty(action.Icon))
+                            {
+                                <i class="bi @action.Icon"></i>
+                            }
+                            @action.Label
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Hidden config data for JS -->
+        <script type="application/json" id="tcodeLayoutConfig">
+            @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Config, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }))
+        </script>
+    </div>
+
+    <script src="~/js/tcode-engine.js"></script>
+}

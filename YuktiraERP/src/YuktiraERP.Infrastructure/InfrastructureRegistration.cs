@@ -144,6 +144,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IPrPoConversionService, PrPoConversionService>();
         services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();
         services.AddScoped<IThreeWayMatchService, ThreeWayMatchService>();
+        services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<CacheService>();
         services.AddHostedService<IntegrationQueueBackgroundService>();
         services.AddHostedService<MrpSchedulerBackgroundService>();

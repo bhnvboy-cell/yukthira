@@ -14,37 +14,37 @@ public class TransactionCodeService : ITransactionCodeService
     private static readonly Dictionary<string, string> RouteMap = new()
     {
         // MM - Materials Management
-        ["MM01"] = "/MM/Material/Create", ["MM02"] = "/MM/Material/Edit", ["MM03"] = "/MM/Material/Display",
+        ["MM01"] = "/MM/Material/Create", ["MM02"] = "/Transactions/Engine/MM02", ["MM03"] = "/MM/Material/Display",
         ["MMBE"] = "/MM/StockOverview", ["ME11"] = "/MM/Vendor/Create", ["ME12"] = "/MM/Vendor/Edit",
-        ["ME13"] = "/MM/Vendor/Display", ["ME21N"] = "/MM/PO/Create", ["ME22N"] = "/MM/PO/Edit",
-        ["ME23N"] = "/MM/PO/Display",         ["MIGO"] = "/MM/GRN/Create", ["MIRO"] = "/MM/InvoiceVerification/Create",
+        ["ME13"] = "/MM/Vendor/Display", ["ME21N"] = "/Transactions/Engine/ME21N", ["ME22N"] = "/MM/PO/Edit",
+        ["ME23N"] = "/MM/PO/Display",         ["MIGO"] = "/Transactions/Engine/MIGO", ["MIRO"] = "/MM/InvoiceVerification/Create",
         ["MB52"] = "/MM/StockList", ["MB1A"] = "/MM/GoodsIssue", ["MB1C"] = "/MM/GoodsReceiptOther",
         // SD - Sales & Distribution
-        ["VA01"] = "/SD/SalesOrder/Create", ["VA02"] = "/SD/SalesOrder/Edit", ["VA03"] = "/SD/SalesOrder/Display",
+        ["VA01"] = "/Transactions/Engine/VA01", ["VA02"] = "/SD/SalesOrder/Edit", ["VA03"] = "/SD/SalesOrder/Display",
         ["VA05"] = "/SD/SalesOrder/List", ["VLO1N"] = "/SD/Delivery/Create", ["VF01"] = "/SD/Billing/Create",
         ["VD01"] = "/SD/Customer/Create", ["VD02"] = "/SD/Customer/Edit", ["VD03"] = "/SD/Customer/Display",
         ["VKD1"] = "/SD/Customer/List",
         // PP - Production Planning
         ["CS01"] = "/PP/BOM/Create", ["CS02"] = "/PP/BOM/Edit", ["CS03"] = "/PP/BOM/Display",
-        ["CO01"] = "/PP/ProductionOrder/Create", ["CO02"] = "/PP/ProductionOrder/Edit", ["CO03"] = "/PP/ProductionOrder/Display",
+        ["CO01"] = "/Transactions/Engine/CO01", ["CO02"] = "/PP/ProductionOrder/Edit", ["CO03"] = "/PP/ProductionOrder/Display",
         ["MD01"] = "/PP/MrpRun", ["MD04"] = "/PP/MrpStock", ["CR01"] = "/PP/WorkCenter/Create",
         // QM - Quality Management
-        ["QE01"] = "/QM/InspectionLot/Create", ["QE02"] = "/QM/InspectionLot/Edit", ["QE03"] = "/QM/InspectionLot/Display",
-        ["QS01"] = "/QM/InspectionPlan/Create", ["QS02"] = "/QM/InspectionPlan/Edit",
+        ["QE01"] = "/Transactions/Engine/QE01", ["QE02"] = "/QM/InspectionLot/Edit", ["QE03"] = "/QM/InspectionLot/Display",
+        ["QE51N"] = "/Transactions/Engine/QE51N", ["QS01"] = "/QM/InspectionPlan/Create", ["QS02"] = "/QM/InspectionPlan/Edit",
         ["QA01"] = "/QM/InspectionResult/Create", ["QUD"] = "/QM/UsageDecision/Create",
         // WM - Warehouse
         ["LT01"] = "/WM/Transfer/Create", ["LT02"] = "/WM/Transfer/Edit", ["LT03"] = "/WM/Transfer/Display",
         ["LS01"] = "/WM/StorageLocation/Create", ["LS02"] = "/WM/StorageLocation/Edit",
         // FI - Finance
-        ["FB50"] = "/FI/Ledger/Create", ["FB60"] = "/FI/AP/InvoiceCreate", ["FB70"] = "/FI/AR/InvoiceCreate",
-        ["FBL1N"] = "/FI/AP/List", ["FBL5N"] = "/FI/AR/List", ["FS10N"] = "/FI/GL/Display",
+        ["FB50"] = "/Transactions/Engine/FB50", ["FB60"] = "/FI/AP/InvoiceCreate", ["FB70"] = "/FI/AR/InvoiceCreate",
+        ["FBL1N"] = "/Transactions/Engine/FBL1N", ["FBL5N"] = "/FI/AR/List", ["FS10N"] = "/FI/GL/Display",
         ["FAGLL03"] = "/FI/GL/LineItems", ["F.01"] = "/FI/Reports/BalanceSheet",
         ["F.02"] = "/FI/Reports/ProfitLoss", ["F-03"] = "/FI/AP/Payment", ["F-28"] = "/FI/AR/Payment",
         // CO - Controlling
         ["KA01"] = "/CO/CostCenter/Create", ["KA02"] = "/CO/CostCenter/Edit", ["KA03"] = "/CO/CostCenter/Display",
         ["KOB1"] = "/CO/CostCenterReport",
         // HR - Human Resources
-        ["PA30"] = "/HR/Employee/Edit", ["PA20"] = "/HR/Employee/Display",
+        ["PA30"] = "/Transactions/Engine/PA30", ["PA20"] = "/HR/Employee/Display",
         ["PA40"] = "/HR/EmployeeList", ["PT60"] = "/HR/AttendanceReport",
         ["PR01"] = "/HR/PayrollRun", ["PR05"] = "/HR/PayrollHistory",
         // CRM
