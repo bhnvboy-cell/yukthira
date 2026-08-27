@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Infrastructure.Caching;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
 
@@ -8,23 +9,53 @@ namespace YuktiraERP.Infrastructure.Services;
 public class NumberRangeService : INumberRangeService
 {
     private readonly YuktiraDbContext _db;
-    private static readonly Dictionary<string, long> _cache = new();
+    private readonly IDistributedCacheService? _cache;
+    private static readonly Dictionary<string, long> _localCache = new();
     private static readonly object _lock = new();
 
-    public NumberRangeService(YuktiraDbContext db) => _db = db;
+    public NumberRangeService(YuktiraDbContext db, IDistributedCacheService? cache = null)
+    {
+        _db = db;
+        _cache = cache;
+    }
 
     public async Task<string> GetNextNumberAsync(Guid tenantId, string module, string prefix, int? year = null)
     {
         var y = year ?? DateTime.UtcNow.Year;
         var key = $"{tenantId}:{module}:{prefix}:{y}";
 
-        lock (_lock)
+        // Check distributed cache first, then local cache, then DB
+        long? next = null;
+
+        if (_cache != null && _cache.IsAvailable)
         {
-            if (_cache.TryGetValue(key, out var cached))
+            var cachedStr = await _cache.GetStringAsync($"numrange:{key}");
+            if (long.TryParse(cachedStr, out var cached))
             {
-                _cache[key] = cached + 1;
-                return Task.FromResult($"{prefix}{y}{cached:D6}").Result;
+                next = cached;
+                // Sync to local cache
+                lock (_lock) { _localCache[key] = cached + 1; }
             }
+        }
+
+        if (!next.HasValue)
+        {
+            lock (_lock)
+            {
+                if (_localCache.TryGetValue(key, out var cached))
+                {
+                    next = cached;
+                    _localCache[key] = cached + 1;
+                }
+            }
+        }
+
+        if (next.HasValue)
+        {
+            // Sync distributed cache
+            if (_cache != null && _cache.IsAvailable)
+                await _cache.SetStringAsync($"numrange:{key}", (next.Value + 1).ToString());
+            return $"{prefix}{y}{next.Value:D6}";
         }
 
         var def = await _db.NumberRangeDefinitions
@@ -44,16 +75,20 @@ public class NumberRangeService : INumberRangeService
             await _db.SaveChangesAsync();
         }
 
-        long next;
+        long assigned;
         lock (_lock)
         {
-            next = def.NextNumber;
+            assigned = def.NextNumber;
             def.NextNumber++;
-            _cache[key] = next + 1;
+            _localCache[key] = assigned + 1;
         }
         await _db.SaveChangesAsync();
 
-        return $"{prefix}{y}{next:D6}";
+        // Sync distributed cache
+        if (_cache != null && _cache.IsAvailable)
+            await _cache.SetStringAsync($"numrange:{key}", (assigned + 1).ToString());
+
+        return $"{prefix}{y}{assigned:D6}";
     }
 
     public async Task<long> GetCurrentNumberAsync(Guid tenantId, string module, string prefix)
@@ -61,7 +96,7 @@ public class NumberRangeService : INumberRangeService
         var key = $"{tenantId}:{module}:{prefix}:{DateTime.UtcNow.Year}";
         lock (_lock)
         {
-            if (_cache.TryGetValue(key, out var cached))
+            if (_localCache.TryGetValue(key, out var cached))
                 return cached - 1;
         }
         var def = await _db.NumberRangeDefinitions
@@ -80,6 +115,11 @@ public class NumberRangeService : INumberRangeService
             await _db.SaveChangesAsync();
         }
         lock (_lock)
-            _cache[key] = nextNumber;
+            _localCache[key] = nextNumber;
+
+        if (_cache != null && _cache.IsAvailable)
+        {
+            await _cache.SetStringAsync($"numrange:{key}", nextNumber.ToString());
+        }
     }
 }

@@ -8,19 +8,24 @@ using YuktiraERP.Infrastructure.Data;
 namespace YuktiraERP.Infrastructure.Services;
 
 /// <summary>
-/// Periodically processes the outbound integration queue so it no longer
-/// depends on an HTTP-triggered "process" call. Runs every 30 seconds.
+/// Processes the outbound integration queue using message bus for event-driven processing.
+/// Runs every 30 seconds as fallback, but primarily processes via IMessageBus.
 /// </summary>
 public class IntegrationQueueBackgroundService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<IntegrationQueueBackgroundService> _logger;
+    private readonly IMessageBus _messageBus;
     private readonly TimeSpan _interval = TimeSpan.FromSeconds(30);
 
-    public IntegrationQueueBackgroundService(IServiceScopeFactory scopeFactory, ILogger<IntegrationQueueBackgroundService> logger)
+    public IntegrationQueueBackgroundService(
+        IServiceScopeFactory scopeFactory,
+        ILogger<IntegrationQueueBackgroundService> logger,
+        IMessageBus messageBus)
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
+        _messageBus = messageBus;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.CRM;
+[Authorize]
 public class PipelineReportModel : PageModel
 {
     private readonly IRepository<OpportunityEntity, Guid> _repo;

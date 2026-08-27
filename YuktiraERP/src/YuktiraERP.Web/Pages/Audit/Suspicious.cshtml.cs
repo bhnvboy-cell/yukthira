@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.Audit;
+[Authorize(Policy = "AdminOrAbove")]
 public class SuspiciousModel : PageModel
 {
     private readonly IRepository<AuditLogEntity, Guid> _repo;

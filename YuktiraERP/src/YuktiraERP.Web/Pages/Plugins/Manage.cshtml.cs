@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 namespace YuktiraERP.Web.Pages.Plugins;
+[Authorize(Policy = "AdminOrAbove")]
 public class ManageModel : PageModel
 {
     public List<PluginInfo> Plugins { get; set; } = new();

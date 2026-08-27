@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Web.Pages.MM;
 
+[Authorize]
 public class IndexModel : PageModel
 {
     private readonly IRepository<MaterialMasterEntity, Guid> _materialRepo;
@@ -13,6 +15,7 @@ public class IndexModel : PageModel
     private readonly IRepository<GoodsReceiptEntity, Guid> _grnRepo;
     private readonly IRepository<StockItemEntity, Guid> _stockRepo;
     private readonly IRepository<InvoiceVerificationEntity, Guid> _invRepo;
+    private readonly IRepository<BatchEntity, Guid> _batchRepo;
 
     public List<MaterialMasterEntity> Materials { get; set; } = new();
     public List<VendorEntity> Vendors { get; set; } = new();
@@ -21,6 +24,7 @@ public class IndexModel : PageModel
     public List<GoodsReceiptEntity> GoodsReceipts { get; set; } = new();
     public List<StockItemEntity> StockItems { get; set; } = new();
     public List<InvoiceVerificationEntity> InvoiceVerifications { get; set; } = new();
+    public List<BatchEntity> Batches { get; set; } = new();
 
     public IndexModel(
         IRepository<MaterialMasterEntity, Guid> materialRepo,
@@ -29,7 +33,8 @@ public class IndexModel : PageModel
         IRepository<PurchaseOrderEntity, Guid> poRepo,
         IRepository<GoodsReceiptEntity, Guid> grnRepo,
         IRepository<StockItemEntity, Guid> stockRepo,
-        IRepository<InvoiceVerificationEntity, Guid> invRepo)
+        IRepository<InvoiceVerificationEntity, Guid> invRepo,
+        IRepository<BatchEntity, Guid> batchRepo)
     {
         _materialRepo = materialRepo;
         _vendorRepo = vendorRepo;
@@ -38,6 +43,7 @@ public class IndexModel : PageModel
         _grnRepo = grnRepo;
         _stockRepo = stockRepo;
         _invRepo = invRepo;
+        _batchRepo = batchRepo;
     }
 
     public async Task OnGetAsync()
@@ -49,5 +55,6 @@ public class IndexModel : PageModel
         GoodsReceipts = await _grnRepo.GetAllAsync();
         StockItems = await _stockRepo.GetAllAsync();
         InvoiceVerifications = await _invRepo.GetAllAsync();
+        Batches = await _batchRepo.GetAllAsync();
     }
 }

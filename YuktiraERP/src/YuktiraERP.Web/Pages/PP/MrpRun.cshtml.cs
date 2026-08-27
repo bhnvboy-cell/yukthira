@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace YuktiraERP.Web.Pages.PP;
+[Authorize]
 public class MrpRunModel : PageModel
 {
     [BindProperty] public string ProductName { get; set; } = "";

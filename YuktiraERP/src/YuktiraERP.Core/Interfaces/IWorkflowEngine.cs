@@ -17,6 +17,7 @@ public class WorkflowEdgeConfig
     public Guid ToNodeId { get; set; }
     public string? ConditionExpression { get; set; }
     public string? Label { get; set; }
+    public string BranchType { get; set; } = "SEQUENTIAL";
 }
 
 public class WorkflowValidationResult

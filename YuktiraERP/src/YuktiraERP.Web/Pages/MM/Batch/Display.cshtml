@@ -1,0 +1,62 @@
+@page
+@model YuktiraERP.Web.Pages.MM.Batch.DisplayModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Batch Details"; }
+<div class="row justify-content-center"><div class="col-lg-10">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Batch Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-3">Batch Number</dt><dd class="col-sm-9">@Model.Batch.BatchNumber</dd>
+<dt class="col-sm-3">Material</dt><dd class="col-sm-9">@Model.Batch.MaterialName</dd>
+<dt class="col-sm-3">Manufacturing Date</dt><dd class="col-sm-9">@Model.Batch.ManufacturingDate.ToString("d")</dd>
+<dt class="col-sm-3">Expiry Date</dt><dd class="col-sm-9">@(Model.Batch.ExpiryDate?.ToString("d") ?? "N/A")</dd>
+<dt class="col-sm-3">Shelf Life</dt><dd class="col-sm-9">@(Model.Batch.ShelfLifeDays?.ToString() ?? "N/A") days</dd>
+<dt class="col-sm-3">Quantity</dt><dd class="col-sm-9">@Model.Batch.Quantity @Model.Batch.UnitOfMeasure</dd>
+<dt class="col-sm-3">Quantity Consumed</dt><dd class="col-sm-9">@Model.Batch.QuantityConsumed</dd>
+<dt class="col-sm-3">Location</dt><dd class="col-sm-9">@Model.Batch.StorageLocationName</dd>
+<dt class="col-sm-3">Supplier</dt><dd class="col-sm-9">@Model.Batch.SupplierName</dd>
+<dt class="col-sm-3">Status</dt><dd class="col-sm-9"><span class="badge @(Model.Batch.Status=="ACTIVE"?"bg-success":Model.Batch.Status=="EXPIRED"?"bg-danger":"bg-warning")">@Model.Batch.Status</span></dd>
+<dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Batch.Notes</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/MM/Batch/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<a asp-page="/MM/Batch/Edit" asp-route-id="@Model.Batch.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+<a asp-page="/MM/Batch/Traceability" asp-route-id="@Model.Batch.Id" class="btn btn-info"><i class="bi bi-diagram-3 me-1"></i>Trace</a>
+</div>
+</div>
+
+@if (Model.Movements.Any())
+{
+<div class="card shadow-sm mt-3"><div class="card-header"><h6 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Movement History</h6></div>
+<div class="card-body">
+<table class="table table-sm">
+<thead><tr><th>Date</th><th>Type</th><th>Qty</th><th>From</th><th>To</th><th>Doc #</th><th>User</th></tr></thead>
+<tbody>
+@foreach (var m in Model.Movements)
+{
+    <tr><td>@m.MovementDate.ToString("g")</td><td>@m.MovementType</td><td>@m.Quantity</td><td>@m.FromLocation</td><td>@m.ToLocation</td><td>@m.DocumentNumber</td><td>@m.UserName</td></tr>
+}
+</tbody>
+</table>
+</div></div>
+}
+
+@if (Model.SerialNumbers.Any())
+{
+<div class="card shadow-sm mt-3"><div class="card-header"><h6 class="mb-0"><i class="bi bi-upc me-2"></i>Serial Numbers</h6></div>
+<div class="card-body">
+<table class="table table-sm">
+<thead><tr><th>Serial #</th><th>Material</th><th>Mfg Date</th><th>Warranty</th><th>Status</th><th>Owner</th></tr></thead>
+<tbody>
+@foreach (var s in Model.SerialNumbers)
+{
+    <tr><td>@s.SerialNumber</td><td>@s.MaterialName</td><td>@s.ManufacturingDate.ToString("d")</td><td>@(s.WarrantyExpiryDate?.ToString("d") ?? "N/A")</td><td>@s.Status</td><td>@s.CurrentOwnerName</td></tr>
+}
+</tbody>
+</table>
+</div></div>
+}
+
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -11,11 +11,13 @@ public class IntegrationQueueService : IIntegrationQueueService
 {
     private readonly YuktiraDbContext _db;
     private readonly HttpClient _httpClient;
+    private readonly IMessageBus _messageBus;
 
-    public IntegrationQueueService(YuktiraDbContext db, HttpClient httpClient)
+    public IntegrationQueueService(YuktiraDbContext db, HttpClient httpClient, IMessageBus messageBus)
     {
         _db = db;
         _httpClient = httpClient;
+        _messageBus = messageBus;
     }
 
     public async Task EnqueueAsync(Guid tenantId, string messageType, object payload, string targetSystem = "")
@@ -33,6 +35,14 @@ public class IntegrationQueueService : IIntegrationQueueService
             NextRetryAt = DateTime.UtcNow
         });
         await _db.SaveChangesAsync();
+
+        var envelope = new MessageEnvelope<object>
+        {
+            TenantId = tenantId,
+            CorrelationId = Guid.NewGuid().ToString(),
+            Payload = payload
+        };
+        await _messageBus.PublishAsync(envelope);
     }
 
     public async Task<List<IntegrationQueueDto>> GetPendingAsync(Guid tenantId, int limit = 50)

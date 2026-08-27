@@ -4,9 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
+using YuktiraERP.Infrastructure.Messaging;
 using YuktiraERP.Infrastructure.MultiTenant;
+using YuktiraERP.Infrastructure.Security;
 using YuktiraERP.Infrastructure.Services;
 using YuktiraERP.Infrastructure.Services.Connectors;
+using YuktiraERP.Infrastructure.Caching;
 using YuktiraERP.PluginSdk;
 
 namespace YuktiraERP.Infrastructure;
@@ -34,6 +37,51 @@ public static class InfrastructureRegistration
         services.AddMemoryCache();
         services.AddHttpClient();
         services.AddHttpContextAccessor();
+
+        services.AddSingleton<IMessageBus, InMemoryMessageBus>();
+        services.AddHostedService<MessageBusConsumerService>();
+        services.AddHostedService<IntegrationQueueBackgroundService>();
+        services.AddHostedService<MrpSchedulerBackgroundService>();
+
+        var encryptionKey = configuration["Encryption:Key"];
+        if (!string.IsNullOrEmpty(encryptionKey))
+        {
+            services.AddSingleton<IEncryptionService>(sp => new AesEncryptionService(encryptionKey));
+        }
+        else
+        {
+            services.AddSingleton<IEncryptionService>(sp => new AesEncryptionService(Convert.ToBase64String(new byte[32])));
+        }
+
+        // Distributed Caching - Try Redis first, fall back to in-memory
+        services.Configure<RedisCacheOptions>(configuration.GetSection("Redis"));
+        var redisConnection = configuration["Redis:Connection"];
+        if (!string.IsNullOrEmpty(redisConnection))
+        {
+            try
+            {
+                var opts = StackExchange.Redis.ConfigurationOptions.Parse(redisConnection);
+                opts.AbortOnConnectFail = false;
+                var conn = StackExchange.Redis.ConnectionMultiplexer.Connect(opts);
+                if (conn.IsConnected)
+                {
+                    services.AddSingleton<IDistributedCacheService, RedisCacheService>();
+                }
+                else
+                {
+                    services.AddSingleton<IDistributedCacheService, MemoryCacheFallbackService>();
+                }
+                conn.Dispose();
+            }
+            catch
+            {
+                services.AddSingleton<IDistributedCacheService, MemoryCacheFallbackService>();
+            }
+        }
+        else
+        {
+            services.AddSingleton<IDistributedCacheService, MemoryCacheFallbackService>();
+        }
 
         services.AddSingleton<IModuleCatalog, ModuleCatalog>();
 
@@ -84,6 +132,9 @@ public static class InfrastructureRegistration
         services.AddScoped<IThemeService, ThemeService>();
         services.AddScoped<ITCodeGeneratorService, TCodeGeneratorService>();
         services.AddScoped<ITCodeCustomizationService, TCodeCustomizationService>();
+        services.AddScoped<IBatchService, BatchService>();
+        services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IBankService, BankService>();
         services.AddScoped<CacheService>();
         services.AddHostedService<IntegrationQueueBackgroundService>();
         services.AddHostedService<MrpSchedulerBackgroundService>();

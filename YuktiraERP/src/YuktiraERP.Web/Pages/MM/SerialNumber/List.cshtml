@@ -1,0 +1,37 @@
+@page
+@model YuktiraERP.Web.Pages.MM.SerialNumber.ListModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Serial Number Management"; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-upc me-2"></i>Serial Number Management</h2>
+    <a asp-page="/MM/SerialNumber/Create" class="btn btn-primary"><i class="bi bi-plus"></i> New Serial Number</a>
+</div>
+<div class="card shadow-sm"><div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm datatable">
+            <thead><tr><th>Serial #</th><th>Material</th><th>Batch #</th><th>Mfg Date</th><th>Warranty</th><th>Owner</th><th>PO Ref</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+                @foreach (var s in Model.SerialNumbers)
+                {
+                    <tr>
+                        <td><a asp-page="/MM/SerialNumber/Display" asp-route-id="@s.Id">@s.SerialNumber</a></td>
+                        <td>@s.MaterialName</td>
+                        <td>@(string.IsNullOrEmpty(s.BatchNumber) ? "N/A" : s.BatchNumber)</td>
+                        <td>@s.ManufacturingDate.ToString("d")</td>
+                        <td>@(s.WarrantyExpiryDate?.ToString("d") ?? "N/A")</td>
+                        <td>@s.CurrentOwnerName</td>
+                        <td>@s.POReference</td>
+                        <td>
+                            @if (s.Status == "ACTIVE") { <span class="badge bg-success">Active</span> }
+                            else if (s.Status == "SOLD") { <span class="badge bg-info">Sold</span> }
+                            else if (s.Status == "RETURNED") { <span class="badge bg-warning text-dark">Returned</span> }
+                            else if (s.Status == "SCRAPPED") { <span class="badge bg-danger">Scrapped</span> }
+                            else { <span class="badge bg-secondary">@s.Status</span> }
+                        </td>
+                        <td><a asp-page="/MM/SerialNumber/Display" asp-route-id="@s.Id" class="bi bi-eye text-decoration-none"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div></div>

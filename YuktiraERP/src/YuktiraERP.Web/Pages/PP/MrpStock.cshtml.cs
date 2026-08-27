@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.PP;
+[Authorize]
 public class MrpStockModel : PageModel
 {
     private readonly IRepository<ProductionPlanEntity, Guid> _repo;

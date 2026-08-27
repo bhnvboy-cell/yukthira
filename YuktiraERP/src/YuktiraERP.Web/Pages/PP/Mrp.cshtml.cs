@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Core.Interfaces;
@@ -7,6 +8,7 @@ using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Web.Pages.PP;
 
+[Authorize]
 public class MrpModel : PageModel
 {
     private readonly IMrpService _mrpService;

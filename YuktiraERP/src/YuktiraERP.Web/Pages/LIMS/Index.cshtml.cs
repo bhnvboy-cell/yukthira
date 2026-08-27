@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Web.Pages.LIMS;
 
+[Authorize]
 public class IndexModel : PageModel
 {
     private readonly IRepository<SampleEntity, Guid> _sampleRepo;

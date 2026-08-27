@@ -1,0 +1,22 @@
+@page
+@model YuktiraERP.Web.Pages.MM.SerialNumber.DisplayModel
+@{ ViewData["Title"] = "Serial Number Details"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Serial Number Details</h5></div>
+<div class="card-body">
+<dl class="row mb-0">
+<dt class="col-sm-4">Serial Number</dt><dd class="col-sm-8">@Model.Serial.SerialNumber</dd>
+<dt class="col-sm-4">Material</dt><dd class="col-sm-8">@Model.Serial.MaterialName</dd>
+<dt class="col-sm-4">Batch Number</dt><dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Serial.BatchNumber) ? "N/A" : Model.Serial.BatchNumber)</dd>
+<dt class="col-sm-4">Manufacturing Date</dt><dd class="col-sm-8">@Model.Serial.ManufacturingDate.ToString("d")</dd>
+<dt class="col-sm-4">Warranty Expiry</dt><dd class="col-sm-8">@(Model.Serial.WarrantyExpiryDate?.ToString("d") ?? "N/A")</dd>
+<dt class="col-sm-4">Current Owner</dt><dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Serial.CurrentOwnerName) ? "N/A" : Model.Serial.CurrentOwnerName)</dd>
+<dt class="col-sm-4">PO Reference</dt><dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Serial.POReference) ? "N/A" : Model.Serial.POReference)</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8"><span class="badge @(Model.Serial.Status=="ACTIVE"?"bg-success":Model.Serial.Status=="SOLD"?"bg-info":Model.Serial.Status=="RETURNED"?"bg-warning":"bg-danger")">@Model.Serial.Status</span></dd>
+<dt class="col-sm-4">Notes</dt><dd class="col-sm-8">@Model.Serial.Notes</dd>
+</dl>
+</div>
+<div class="card-footer">
+<a asp-page="/MM/SerialNumber/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+</div></div>

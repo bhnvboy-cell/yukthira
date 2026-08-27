@@ -140,17 +140,46 @@ public class PredictionEngine : IAIEngine
         var arCoeffs = new double[p];
         if (p > 0 && n > p)
         {
-            double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-            int m = n - p;
-            for (int i = p; i < n; i++)
+            var r = new double[p + 1];
+            double mean = diffData.Average();
+            for (int lag = 0; lag <= p; lag++)
             {
-                double y = diffData[i];
-                double x = diffData[i - 1];
-                sumX += x; sumY += y; sumXY += x * y; sumX2 += x * x;
+                double sum = 0;
+                for (int t = lag; t < n; t++)
+                    sum += (diffData[t] - mean) * (diffData[t - lag] - mean);
+                r[lag] = sum / n;
             }
-            double denom = m * sumX2 - sumX * sumX;
-            if (Math.Abs(denom) > 1e-12)
-                arCoeffs[0] = (m * sumXY - sumX * sumY) / denom;
+
+            if (Math.Abs(r[0]) > 1e-12)
+            {
+                for (int i = 0; i < p; i++)
+                    r[i + 1] /= r[0];
+
+                if (p == 1)
+                {
+                    arCoeffs[0] = r[1];
+                }
+                else
+                {
+                    var phi = new double[p, p];
+                    phi[0, 0] = r[1];
+                    for (int i = 1; i < p; i++)
+                    {
+                        double num = r[i + 1];
+                        for (int j = 0; j < i; j++)
+                            num -= phi[i - 1, j] * r[i - j];
+                        double denom = 1.0;
+                        for (int j = 0; j < i; j++)
+                            denom -= phi[i - 1, j] * r[j + 1];
+                        if (Math.Abs(denom) < 1e-12) break;
+                        phi[i, i] = num / denom;
+                        for (int j = 0; j < i; j++)
+                            phi[i, j] = phi[i - 1, j] - phi[i, i] * phi[i - 1, i - 1 - j];
+                    }
+                    for (int i = 0; i < p; i++)
+                        arCoeffs[i] = phi[p - 1, i];
+                }
+            }
         }
 
         var arFitted = new double[n];
@@ -164,12 +193,51 @@ public class PredictionEngine : IAIEngine
         }
 
         var maCoeffs = new double[q];
-        if (q > 0)
+        if (q > 0 && n > q)
         {
-            double sumRes = residuals.Skip(n - q).Sum();
-            double avgRes = sumRes / q;
-            for (int j = 0; j < q; j++)
-                maCoeffs[j] = 1.0 / q;
+            double resMean = 0;
+            for (int i = p; i < n; i++) resMean += residuals[i];
+            resMean /= (n - p);
+
+            var rRes = new double[q + 1];
+            double resVar = 0;
+            for (int i = p; i < n; i++)
+                resVar += (residuals[i] - resMean) * (residuals[i] - resMean);
+            resVar /= (n - p);
+            if (Math.Abs(resVar) > 1e-12)
+            {
+                for (int lag = 0; lag <= q; lag++)
+                {
+                    double sum = 0;
+                    for (int t = p + lag; t < n; t++)
+                        sum += (residuals[t] - resMean) * (residuals[t - lag] - resMean);
+                    rRes[lag] = sum / ((n - p) * resVar);
+                }
+
+                if (q == 1)
+                {
+                    maCoeffs[0] = rRes[1];
+                }
+                else
+                {
+                    var psi = new double[q];
+                    psi[0] = rRes[1];
+                    for (int i = 1; i < q; i++)
+                    {
+                        double sum = 0;
+                        for (int j = 0; j < i; j++)
+                            sum += psi[j] * rRes[i - j];
+                        psi[i] = rRes[i + 1] - sum;
+                    }
+                    for (int i = 0; i < q; i++)
+                        maCoeffs[i] = psi[i];
+                }
+            }
+            else
+            {
+                for (int j = 0; j < q; j++)
+                    maCoeffs[j] = 0;
+            }
         }
 
         var forecasted = new List<decimal>();
@@ -193,12 +261,17 @@ public class PredictionEngine : IAIEngine
 
         if (d > 0)
         {
-            var undiffed = new List<decimal>();
-            double lastOrig = (double)data.Last();
-            for (int k = 0; k < forecasted.Count; k++)
+            var undiffed = forecasted.ToList();
+            for (int diffRound = 0; diffRound < d; diffRound++)
             {
-                lastOrig = lastOrig + (double)forecasted[k];
-                undiffed.Add((decimal)lastOrig);
+                var roundResult = new List<decimal>();
+                double lastOrig = (double)data[data.Count - 1 - diffRound];
+                for (int k = 0; k < undiffed.Count; k++)
+                {
+                    lastOrig = lastOrig + (double)undiffed[k];
+                    roundResult.Add((decimal)lastOrig);
+                }
+                undiffed = roundResult;
             }
             forecasted = undiffed;
         }

@@ -93,9 +93,64 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<ModuleAuthorizationMiddleware>();
+
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();
+
+public class ModuleAuthorizationMiddleware
+{
+    private readonly RequestDelegate _next;
+    private static readonly string[] AdminModules = ["Admin", "Audit", "Integration", "Plugins", "TCode", "TCodeGenerator", "Customization"];
+    private static readonly HashSet<string> PowerUserPages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "/BI/Dashboard/Create",
+        "/BI/Report/Create",
+        "/Workflow/Instances",
+        "/Workflow/Designer"
+    };
+
+    public ModuleAuthorizationMiddleware(RequestDelegate next) => _next = next;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var path = context.Request.Path.Value ?? "";
+
+        if (path.StartsWith("/Pages/") || path.StartsWith("/"))
+        {
+            var route = path.TrimStart('/').TrimEnd('/');
+            var topFolder = route.Split('/')[0];
+
+            if (topFolder != "Auth" && topFolder != "health" && context.User?.Identity?.IsAuthenticated != true)
+            {
+                context.Response.StatusCode = 401;
+                return;
+            }
+
+            if (AdminModules.Contains(topFolder, StringComparer.OrdinalIgnoreCase))
+            {
+                if (context.User?.IsInRole("SUPER_USER") != true && context.User?.IsInRole("ADMIN") != true)
+                {
+                    context.Response.StatusCode = 403;
+                    return;
+                }
+            }
+            else if (PowerUserPages.Contains("/" + route))
+            {
+                if (context.User?.IsInRole("SUPER_USER") != true &&
+                    context.User?.IsInRole("ADMIN") != true &&
+                    context.User?.IsInRole("POWER_USER") != true)
+                {
+                    context.Response.StatusCode = 403;
+                    return;
+                }
+            }
+        }
+
+        await _next(context);
+    }
+}

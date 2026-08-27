@@ -14,11 +14,15 @@ public class SOController : ControllerBase
 {
     private readonly YuktiraDbContext _db;
     private readonly ITenantContext _tenant;
+    private readonly IInventoryService _inventoryService;
+    private readonly IMessageBus _messageBus;
 
-    public SOController(YuktiraDbContext db, ITenantContext tenant)
+    public SOController(YuktiraDbContext db, ITenantContext tenant, IInventoryService inventoryService, IMessageBus messageBus)
     {
         _db = db;
         _tenant = tenant;
+        _inventoryService = inventoryService;
+        _messageBus = messageBus;
     }
 
     [HttpGet]
@@ -68,6 +72,15 @@ public class SOController : ControllerBase
         }
 
         await _db.SaveChangesAsync();
+
+        var envelope = new MessageEnvelope<object>
+        {
+            TenantId = _tenant.TenantId,
+            CorrelationId = order.Id.ToString(),
+            Payload = new { eventType = "order.created", orderId = order.Id, orderNumber = order.OrderNumber }
+        };
+        await _messageBus.PublishAsync(envelope);
+
         return Ok(new { success = true, id = order.Id, orderNumber = order.OrderNumber, amount = order.Amount, tenantId = _tenant.TenantId });
     }
 
@@ -77,9 +90,33 @@ public class SOController : ControllerBase
     {
         var order = await _db.SalesOrders.FindAsync(id);
         if (order == null) return NotFound();
+
+        var lines = await _db.SalesOrderLines.Where(l => l.SalesOrderId == id).ToListAsync();
+        foreach (var line in lines)
+        {
+            var material = await _db.MaterialMasters.FirstOrDefaultAsync(m => m.Name == line.MaterialName || m.Code == line.MaterialName);
+            if (material != null)
+            {
+                var atp = await _inventoryService.CheckAvailabilityAsync(material.Id, line.Quantity, DateTime.UtcNow.AddDays(7));
+                if (!atp.IsAvailable)
+                {
+                    return BadRequest(new { error = $"Insufficient stock for {line.MaterialName}. Available: {atp.AvailableQuantity}, Required: {line.Quantity}" });
+                }
+            }
+        }
+
         order.Status = "Confirmed";
         order.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+
+        var envelope = new MessageEnvelope<object>
+        {
+            TenantId = _tenant.TenantId,
+            CorrelationId = order.Id.ToString(),
+            Payload = new { eventType = "order.confirmed", orderId = order.Id, orderNumber = order.OrderNumber }
+        };
+        await _messageBus.PublishAsync(envelope);
+
         return Ok(new { success = true, tenantId = _tenant.TenantId });
     }
 
@@ -127,6 +164,15 @@ public class SOController : ControllerBase
         order.Status = "Delivered";
         order.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+
+        var envelope = new MessageEnvelope<object>
+        {
+            TenantId = _tenant.TenantId,
+            CorrelationId = order.Id.ToString(),
+            Payload = new { eventType = "order.shipped", orderId = order.Id, orderNumber = order.OrderNumber }
+        };
+        await _messageBus.PublishAsync(envelope);
+
         return Ok(new { success = true, orderId = order.Id, status = order.Status, tenantId = _tenant.TenantId });
     }
 }

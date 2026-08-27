@@ -1,0 +1,28 @@
+@page
+@model YuktiraERP.Web.Pages.MM.SerialNumber.CreateModel
+@using YuktiraERP.Infrastructure.Data.Entities
+@{ ViewData["Title"] = "Create Serial Number"; }
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Serial Number</h5></div>
+<div class="card-body">
+<form method="post">
+<div class="row mb-3">
+    <div class="col-md-6"><label asp-for="Serial.SerialNumber" class="form-label">Serial Number</label><input asp-for="Serial.SerialNumber" class="form-control" placeholder="e.g. SN-2026-001" /><span asp-validation-for="Serial.SerialNumber" class="text-danger small"></span></div>
+    <div class="col-md-6"><label class="form-label">Material</label><select asp-for="Serial.MaterialId" class="form-select"><option value="">-- Select Material --</option></select></div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6"><label class="form-label">Batch (Optional)</label><select asp-for="Serial.BatchId" class="form-select"><option value="">-- No Batch --</option></select></div>
+    <div class="col-md-6"><label asp-for="Serial.POReference" class="form-label">PO Reference</label><input asp-for="Serial.POReference" class="form-control" /></div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-6"><label asp-for="Serial.ManufacturingDate" class="form-label">Manufacturing Date</label><input asp-for="Serial.ManufacturingDate" type="date" class="form-control" /><span asp-validation-for="Serial.ManufacturingDate" class="text-danger small"></span></div>
+    <div class="col-md-6"><label asp-for="Serial.WarrantyExpiryDate" class="form-label">Warranty Expiry</label><input asp-for="Serial.WarrantyExpiryDate" type="date" class="form-control" /></div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-12"><label asp-for="Serial.Notes" class="form-label">Notes</label><textarea asp-for="Serial.Notes" class="form-control" rows="2"></textarea></div>
+</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/SerialNumber/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
+</form>
+</div></div>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

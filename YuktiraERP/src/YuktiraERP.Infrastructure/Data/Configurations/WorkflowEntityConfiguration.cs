@@ -25,6 +25,7 @@ public class WorkflowEdgeEntityConfiguration : IEntityTypeConfiguration<Workflow
     public void Configure(EntityTypeBuilder<WorkflowEdgeEntity> builder)
     {
         builder.ToTable("workflow_edges", "yuktira_workflow");
+        builder.Property(e => e.BranchType).HasMaxLength(20).HasDefaultValue("SEQUENTIAL");
     }
 }
 

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Web.Pages.PS.Project;
 
+[Authorize]
 public class DisplayModel : PageModel
 {
     private readonly IRepository<ProjectEntity, Guid> _repo;

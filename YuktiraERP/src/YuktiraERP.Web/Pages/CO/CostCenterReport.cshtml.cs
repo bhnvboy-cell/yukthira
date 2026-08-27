@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.CO;
+[Authorize]
 public class CostCenterReportModel : PageModel
 {
     private readonly IRepository<CostCenterEntity, Guid> _repo;

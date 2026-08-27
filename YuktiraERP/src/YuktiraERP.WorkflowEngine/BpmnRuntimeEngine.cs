@@ -5,6 +5,7 @@ using YuktiraERP.Core.Interfaces;
 
 namespace YuktiraERP.WorkflowEngine;
 
+[Obsolete("Legacy in-memory workflow engine. Use YuktiraERP.Infrastructure.Services.WorkflowService (DB-backed) for production.")]
 public class WorkflowEngineService : IWorkflowEngine
 {
     private static readonly List<WorkflowInstance> _instances = new();
@@ -343,7 +344,9 @@ public class WorkflowEngineService : IWorkflowEngine
                 return context.TryGetValue(key, out var contextValue) && contextValue?.ToString() == value;
             }
         }
-        catch { }
+        catch (Exception)
+        {
+        }
         return true;
     }
 

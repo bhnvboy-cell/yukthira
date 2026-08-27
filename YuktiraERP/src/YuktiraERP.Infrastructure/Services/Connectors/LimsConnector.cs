@@ -64,11 +64,7 @@ public class LimsConnector : IConnector
 
     public async Task<List<Dictionary<string, object>>> PullDataAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType, DateTime? lastSync)
     {
-        ApplyAuth(authType, authConfig);
-        var url = $"{baseUrl.TrimEnd('/')}/api/v1/{entityType.ToLower()}";
-        if (lastSync.HasValue) url += $"?modifiedSince={lastSync:O}";
-        var resp = await _http.GetFromJsonAsync<List<Dictionary<string, object>>>(url);
-        return resp ?? new();
+        return await SyncDataAsync(baseUrl, authType, authConfig, additionalConfig, entityType, lastSync);
     }
 
     public async Task<bool> PushDataAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType, List<Dictionary<string, object>> records)
@@ -80,6 +76,36 @@ public class LimsConnector : IConnector
             if (!resp.IsSuccessStatusCode) return false;
         }
         return true;
+    }
+
+    public async Task<Dictionary<string, object>> GetSchemaAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType)
+    {
+        try
+        {
+            ApplyAuth(authType, authConfig);
+            var url = $"{baseUrl.TrimEnd('/')}/api/v1/{entityType.ToLower()}/schema";
+            var resp = await _http.GetAsync(url);
+            var body = await resp.Content.ReadAsStringAsync();
+            return new Dictionary<string, object>
+            {
+                ["entityType"] = entityType,
+                ["metadata"] = body,
+                ["success"] = resp.IsSuccessStatusCode
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Dictionary<string, object> { ["error"] = ex.Message };
+        }
+    }
+
+    public async Task<List<Dictionary<string, object>>> SyncDataAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType, DateTime? lastSyncTime, int batchSize = 1000)
+    {
+        ApplyAuth(authType, authConfig);
+        var url = $"{baseUrl.TrimEnd('/')}/api/v1/{entityType.ToLower()}";
+        if (lastSyncTime.HasValue) url += $"?modifiedSince={lastSyncTime.Value:O}";
+        var resp = await _http.GetFromJsonAsync<List<Dictionary<string, object>>>(url);
+        return resp ?? new();
     }
 
     private void ApplyAuth(string authType, Dictionary<string, string> cfg)

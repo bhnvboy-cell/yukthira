@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 namespace YuktiraERP.Web.Pages.Workflow;
+[Authorize(Policy = "PowerUserOrAbove")]
 public class InstancesModel : PageModel
 {
     public List<WorkflowInstance> Instances { get; set; } = new();

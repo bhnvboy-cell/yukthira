@@ -73,21 +73,7 @@ public class SapHanaConnector : IConnector
 
     public async Task<List<Dictionary<string, object>>> PullDataAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType, DateTime? lastSync)
     {
-        try
-        {
-            if (authType == "Basic") ApplyBasicAuth(authConfig);
-            else if (authType == "XS_App") ApplyXsAuth(authConfig);
-
-            var url = $"{baseUrl.TrimEnd('/')}/{entityType}";
-            var resp = await _http.GetAsync(url);
-            if (!resp.IsSuccessStatusCode) return new();
-            var json = await resp.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json) ?? new();
-        }
-        catch
-        {
-            return new();
-        }
+        return await SyncDataAsync(baseUrl, authType, authConfig, additionalConfig, entityType, lastSync);
     }
 
     public async Task<bool> PushDataAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType, List<Dictionary<string, object>> records)
@@ -108,8 +94,53 @@ public class SapHanaConnector : IConnector
         }
     }
 
+    public async Task<Dictionary<string, object>> GetSchemaAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType)
+    {
+        try
+        {
+            if (authType == "Basic") ApplyBasicAuth(authConfig);
+            else if (authType == "XS_App") ApplyXsAuth(authConfig);
+
+            var url = $"{baseUrl.TrimEnd('/')}/{entityType}/metadata";
+            var resp = await _http.GetAsync(url);
+            var body = await resp.Content.ReadAsStringAsync();
+            return new Dictionary<string, object>
+            {
+                ["entityType"] = entityType,
+                ["metadata"] = body,
+                ["success"] = resp.IsSuccessStatusCode
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Dictionary<string, object> { ["error"] = ex.Message };
+        }
+    }
+
+    public async Task<List<Dictionary<string, object>>> SyncDataAsync(string baseUrl, string authType, Dictionary<string, string> authConfig, Dictionary<string, string> additionalConfig, string entityType, DateTime? lastSyncTime, int batchSize = 1000)
+    {
+        try
+        {
+            if (authType == "Basic") ApplyBasicAuth(authConfig);
+            else if (authType == "XS_App") ApplyXsAuth(authConfig);
+
+            var url = $"{baseUrl.TrimEnd('/')}/{entityType}";
+            if (lastSyncTime.HasValue) url += $"?updatedSince={lastSyncTime.Value:O}";
+
+            var resp = await _http.GetAsync(url);
+            if (!resp.IsSuccessStatusCode) return new();
+            var json = await resp.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json) ?? new();
+        }
+        catch
+        {
+            return new();
+        }
+    }
+
     private void ApplyBasicAuth(Dictionary<string, string> authConfig)
     {
+        _http.DefaultRequestHeaders.Clear();
         if (authConfig.TryGetValue("Username", out var user) && authConfig.TryGetValue("Password", out var pass))
         {
             var bytes = System.Text.Encoding.UTF8.GetBytes($"{user}:{pass}");
@@ -120,6 +151,7 @@ public class SapHanaConnector : IConnector
 
     private void ApplyXsAuth(Dictionary<string, string> authConfig)
     {
+        _http.DefaultRequestHeaders.Clear();
         if (authConfig.TryGetValue("ApiKey", out var key))
             _http.DefaultRequestHeaders.Add("X-HANA-XS-API-Key", key);
     }

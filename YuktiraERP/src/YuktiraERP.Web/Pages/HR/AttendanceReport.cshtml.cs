@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.HR;
+[Authorize]
 public class AttendanceReportModel : PageModel
 {
     private readonly IRepository<AttendanceEntity, Guid> _repo;

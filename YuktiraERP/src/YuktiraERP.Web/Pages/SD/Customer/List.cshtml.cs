@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.SD.Customer;
+[Authorize]
 public class ListModel : PageModel
 {
     private readonly IRepository<CustomerEntity, Guid> _repo;

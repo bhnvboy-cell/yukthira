@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Web.Pages.CO.ProfitCenter;
 
+[Authorize]
 public class ListModel : PageModel
 {
     private readonly IRepository<ProfitCenterEntity, Guid> _repo;

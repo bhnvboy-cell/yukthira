@@ -52,7 +52,7 @@ public class DataSeeder
             new() { Key = "auth.password_min_length", Value = "8", Description = "Minimum password length", Module = "Auth" },
             new() { Key = "email.smtp_host", Value = "smtp.yuktira.com", Description = "SMTP Server Host", Module = "Email" },
             new() { Key = "email.smtp_port", Value = "587", Description = "SMTP Server Port", Module = "Email" },
-            new() { Key = "features.enable_mfa", Value = "false", Description = "Enable Multi-Factor Authentication", Module = "Features" },
+            new() { Key = "features.enable_mfa", Value = "true", Description = "Enable Multi-Factor Authentication", Module = "Features" },
             new() { Key = "features.enable_audit", Value = "true", Description = "Enable Audit Logging", Module = "Features" },
         };
         await _db.Set<SystemConfigEntity>().AddRangeAsync(configs);

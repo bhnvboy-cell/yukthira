@@ -1,20 +1,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using YuktiraERP.Infrastructure.Caching;
 
 namespace YuktiraERP.Infrastructure.MultiTenant;
 
 public class TenantMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IDistributedCacheService? _cache;
 
-    public TenantMiddleware(RequestDelegate next)
+    public TenantMiddleware(RequestDelegate next, IDistributedCacheService? cache = null)
     {
         _next = next;
+        _cache = cache;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var tenantId = ResolveTenant(context);
+        var tenantId = await ResolveTenantAsync(context);
         if (tenantId.HasValue)
         {
             context.Items["TenantId"] = tenantId.Value;
@@ -22,10 +25,30 @@ public class TenantMiddleware
         await _next(context);
     }
 
-    private static Guid? ResolveTenant(HttpContext context)
+    private async Task<Guid?> ResolveTenantAsync(HttpContext context)
     {
+        // Check cache first
+        if (_cache != null)
+        {
+            var cacheKey = $"tenant:resolve:{context.Request.Host.Host}:{context.Request.Path}";
+            var cachedStr = await _cache.GetStringAsync(cacheKey);
+            if (cachedStr != null && Guid.TryParse(cachedStr, out var cachedTenantId))
+            {
+                return cachedTenantId;
+            }
+        }
+
         var tenantService = context.RequestServices.GetService<ITenantResolver>();
-        return tenantService?.ResolveTenant(context);
+        var tenantId = tenantService?.ResolveTenant(context);
+
+        // Cache the result
+        if (_cache != null && tenantId.HasValue)
+        {
+            var cacheKey = $"tenant:resolve:{context.Request.Host.Host}:{context.Request.Path}";
+            await _cache.SetStringAsync(cacheKey, tenantId.Value.ToString(), TimeSpan.FromMinutes(5));
+        }
+
+        return tenantId;
     }
 }
 

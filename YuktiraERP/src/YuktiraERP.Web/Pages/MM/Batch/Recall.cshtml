@@ -1,0 +1,31 @@
+@page
+@model YuktiraERP.Web.Pages.MM.Batch.RecallModel
+@{ ViewData["Title"] = "Batch Recall Management"; }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Batch Recall Management</h2>
+</div>
+<div class="card shadow-sm"><div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-hover table-sm datatable">
+            <thead><tr><th>Recall #</th><th>Reason</th><th>Affected Batches</th><th>Initiated By</th><th>Date</th><th>Status</th><th>Resolution</th></tr></thead>
+            <tbody>
+                @foreach (var r in Model.Recalls)
+                {
+                    <tr>
+                        <td>@r.RecallNumber</td>
+                        <td>@r.Reason</td>
+                        <td>@r.AffectedBatchNumbers</td>
+                        <td>@r.InitiatedByName</td>
+                        <td>@r.InitiatedDate.ToString("d")</td>
+                        <td>
+                            @if (r.Status == "OPEN") { <span class="badge bg-danger">Open</span> }
+                            else if (r.Status == "IN_PROGRESS") { <span class="badge bg-warning text-dark">In Progress</span> }
+                            else { <span class="badge bg-success">Closed</span> }
+                        </td>
+                        <td>@(r.ResolvedDate?.ToString("d") ?? r.ResolutionNotes)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div></div>

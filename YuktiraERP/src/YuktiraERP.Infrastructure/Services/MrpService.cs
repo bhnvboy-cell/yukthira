@@ -617,8 +617,7 @@ public class MrpService : IMrpService
         decimal total = 0;
         foreach (var po in pos)
         {
-            var parts = po.Quantity?.Split(' ');
-            if (parts != null && parts.Length > 0 && decimal.TryParse(parts[0], out var qty))
+            if (!string.IsNullOrWhiteSpace(po.Quantity) && decimal.TryParse(po.Quantity.Split(' ')[0], out var qty))
                 total += qty;
         }
         return total;

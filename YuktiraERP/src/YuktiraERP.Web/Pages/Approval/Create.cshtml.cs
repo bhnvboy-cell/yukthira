@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 using YuktiraERP.Web.Models;
 namespace YuktiraERP.Web.Pages.Approval;
+[Authorize]
 public class CreateModel : PageModel
 {
     private readonly IRepository<ApprovalRequestEntity, Guid> _repo;

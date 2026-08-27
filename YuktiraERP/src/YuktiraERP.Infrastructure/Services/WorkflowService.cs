@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using YuktiraERP.Core.Domain.Common;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data;
@@ -13,9 +14,15 @@ public class WorkflowService : IWorkflowEngine
 {
     private readonly YuktiraDbContext _db;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<WorkflowService> _logger;
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true };
 
-    public WorkflowService(YuktiraDbContext db, IHttpClientFactory httpClientFactory) { _db = db; _httpClientFactory = httpClientFactory; }
+    public WorkflowService(YuktiraDbContext db, IHttpClientFactory httpClientFactory, ILogger<WorkflowService> logger)
+    {
+        _db = db;
+        _httpClientFactory = httpClientFactory;
+        _logger = logger;
+    }
 
     public async Task<Guid> StartWorkflowAsync(Guid workflowId, Guid tenantId, string entityName, string entityId, Guid startedBy, Dictionary<string, object>? variables = null)
     {
@@ -37,6 +44,7 @@ public class WorkflowService : IWorkflowEngine
             Status = "ACTIVE",
             Variables = JsonSerializer.Serialize(variables ?? new Dictionary<string, object>(), JsonOpts),
             StartedBy = startedBy,
+            ActiveTokens = startNode != null ? JsonSerializer.Serialize(new List<Guid> { startNode.NodeId }, JsonOpts) : "[]",
             CreatedAt = DateTime.UtcNow
         };
         _db.WorkflowInstances.Add(instance);
@@ -50,7 +58,7 @@ public class WorkflowService : IWorkflowEngine
         if (instance == null) throw new InvalidOperationException("Workflow instance not found");
 
         var edges = await _db.WorkflowEdges.Where(e => e.WorkflowId == instance.WorkflowId && e.FromNodeId == nodeId).OrderBy(e => e.SequenceOrder).ToListAsync();
-        var nextEdge = edges.FirstOrDefault();
+        var currentNode = await _db.WorkflowNodes.FirstOrDefaultAsync(n => n.Id == nodeId);
 
         if (data != null)
         {
@@ -59,22 +67,97 @@ public class WorkflowService : IWorkflowEngine
             instance.Variables = JsonSerializer.Serialize(vars, JsonOpts);
         }
 
-        if (nextEdge != null)
+        var activeTokens = JsonSerializer.Deserialize<List<Guid>>(instance.ActiveTokens, JsonOpts) ?? new();
+
+        if (currentNode?.NodeType == "END")
         {
-            var nextNode = await _db.WorkflowNodes.FirstOrDefaultAsync(n => n.Id == nextEdge.ToNodeId);
-            instance.CurrentNodeId = nextNode?.Id;
+            activeTokens.Remove(nodeId);
+            if (activeTokens.Count == 0)
+            {
+                instance.CurrentNodeId = null;
+                instance.Status = "COMPLETED";
+                instance.CompletedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                instance.CurrentNodeId = null;
+            }
+            instance.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+            return;
+        }
+
+        var parallelOutgoing = edges.Where(e => e.BranchType == "PARALLEL").ToList();
+        var isAndSplit = parallelOutgoing.Count > 1;
+
+        if (isAndSplit)
+        {
+            activeTokens.Remove(nodeId);
+            foreach (var edge in parallelOutgoing)
+            {
+                if (!activeTokens.Contains(edge.ToNodeId))
+                    activeTokens.Add(edge.ToNodeId);
+            }
+            instance.CurrentNodeId = null;
         }
         else
         {
-            instance.CurrentNodeId = null;
+            var nextEdge = edges.FirstOrDefault();
+            if (nextEdge != null)
+            {
+                var nextNode = await _db.WorkflowNodes.FirstOrDefaultAsync(n => n.Id == nextEdge.ToNodeId);
+                var incomingParallelEdges = await _db.WorkflowEdges
+                    .Where(e => e.WorkflowId == instance.WorkflowId && e.ToNodeId == nextEdge.ToNodeId && e.BranchType == "PARALLEL")
+                    .ToListAsync();
+
+                if (incomingParallelEdges.Count > 1)
+                {
+                    activeTokens.Remove(nodeId);
+
+                    var arrivalKey = $"__join_arrival:{nextEdge.ToNodeId}";
+                    var currentArrivals = 0;
+                    if (instance.Variables != null)
+                    {
+                        var vars = JsonSerializer.Deserialize<Dictionary<string, object>>(instance.Variables, JsonOpts) ?? new();
+                        if (vars.TryGetValue(arrivalKey, out var existing) && existing is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.Number)
+                            currentArrivals = je.GetInt32();
+                        currentArrivals++;
+                        vars[arrivalKey] = currentArrivals;
+                        instance.Variables = JsonSerializer.Serialize(vars, JsonOpts);
+                    }
+
+                    if (currentArrivals >= incomingParallelEdges.Count)
+                    {
+                        var vars2 = JsonSerializer.Deserialize<Dictionary<string, object>>(instance.Variables ?? "{}", JsonOpts) ?? new();
+                        vars2.Remove(arrivalKey);
+                        instance.Variables = JsonSerializer.Serialize(vars2, JsonOpts);
+                        instance.CurrentNodeId = nextEdge.ToNodeId;
+                    }
+                    else
+                    {
+                        instance.CurrentNodeId = null;
+                    }
+                }
+                else
+                {
+                    activeTokens.Remove(nodeId);
+                    instance.CurrentNodeId = nextNode?.Id;
+                }
+            }
+            else
+            {
+                activeTokens.Remove(nodeId);
+                instance.CurrentNodeId = null;
+            }
         }
 
-        var currentNode = await _db.WorkflowNodes.FirstOrDefaultAsync(n => n.Id == nodeId);
-        if (currentNode?.NodeType == "END" || instance.CurrentNodeId == null)
+        if (instance.CurrentNodeId == null && activeTokens.Count == 0)
         {
             instance.Status = "COMPLETED";
             instance.CompletedAt = DateTime.UtcNow;
         }
+
+        instance.ActiveTokens = JsonSerializer.Serialize(activeTokens, JsonOpts);
         instance.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
     }
@@ -144,25 +227,23 @@ public class WorkflowService : IWorkflowEngine
                 EdgeId = e.Id,
                 ToNodeId = e.ToNodeId,
                 ConditionExpression = e.ConditionExpression,
-                Label = e.Label
+                Label = e.Label,
+                BranchType = e.BranchType
             }).ToList()
         };
     }
 
-    private static bool EvaluateCondition(string expression, Dictionary<string, object> context)
+    private bool EvaluateCondition(string expression, Dictionary<string, object> context)
     {
         try
         {
-            var parts = expression.Split(new[] { "==", "!=", ">", "<", ">=", "<=", " AND ", " OR " }, StringSplitOptions.None);
-            if (parts.Length >= 2)
-            {
-                var key = parts[0].Trim().TrimStart('{').TrimEnd('}').Trim();
-                var value = parts[1].Trim().Trim('\'');
-                return context.TryGetValue(key, out var contextValue) && contextValue?.ToString() == value;
-            }
+            return EvaluateSimpleExpression(expression, context);
         }
-        catch { }
-        return true;
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to evaluate condition expression '{Expression}', defaulting to false", expression);
+            return false;
+        }
     }
 
     public async Task<WorkflowValidationResult> ValidateWorkflowDefinitionAsync(Guid workflowId)
@@ -255,6 +336,44 @@ public class WorkflowService : IWorkflowEngine
                     Field = "ConditionExpression",
                     Message = $"DECISION node '{decNode.Label}' must have exactly one default edge (no condition) and the rest with conditions",
                     Severity = "Warning"
+                });
+            }
+
+            var parallelEdges = outgoing.Where(e => e.BranchType == "PARALLEL").ToList();
+            if (parallelEdges.Count > 0)
+            {
+                result.IsValid = false;
+                result.Errors.Add(new WorkflowValidationError
+                {
+                    NodeId = decNode.Id.ToString(),
+                    Field = "BranchType",
+                    Message = $"DECISION node '{decNode.Label}' must not have PARALLEL branch type edges; use CONDITIONAL instead",
+                    Severity = "Error"
+                });
+            }
+        }
+
+        var parallelSplitNodes = nodes.Where(n => edges.Count(e => e.FromNodeId == n.Id && e.BranchType == "PARALLEL") > 1).ToList();
+        foreach (var splitNode in parallelSplitNodes)
+        {
+            var parallelOutgoing = edges.Where(e => e.FromNodeId == splitNode.Id && e.BranchType == "PARALLEL").ToList();
+            var parallelJoinTargets = new List<Guid>();
+            foreach (var edge in parallelOutgoing)
+            {
+                var incomingParallelCount = edges.Count(e => e.ToNodeId == edge.ToNodeId && e.BranchType == "PARALLEL");
+                if (incomingParallelCount > 1)
+                    parallelJoinTargets.Add(edge.ToNodeId);
+            }
+
+            if (parallelJoinTargets.Count > 0 && parallelJoinTargets.Count != parallelOutgoing.Count)
+            {
+                result.IsValid = false;
+                result.Errors.Add(new WorkflowValidationError
+                {
+                    NodeId = splitNode.Id.ToString(),
+                    Field = "BranchType",
+                    Message = $"AND-split node '{splitNode.Label}' must have all parallel branches converge at an AND-join node",
+                    Severity = "Error"
                 });
             }
         }
@@ -427,7 +546,10 @@ public class WorkflowService : IWorkflowEngine
                 if (parsed != null)
                     result[config.OutputVariable] = parsed;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to parse API call response body as JSON");
+            }
         }
 
         return result;

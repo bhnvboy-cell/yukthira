@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Web.Models;
 namespace YuktiraERP.Web.Pages.Approval;
+[Authorize]
 public class IndexModel : PageModel
 {
     public IActionResult OnGet() => Page();

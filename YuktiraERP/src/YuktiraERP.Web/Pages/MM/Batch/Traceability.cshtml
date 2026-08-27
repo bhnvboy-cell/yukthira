@@ -1,0 +1,52 @@
+@page
+@model YuktiraERP.Web.Pages.MM.Batch.TraceabilityModel
+@{ ViewData["Title"] = "Batch Traceability"; var batch = Model.TraceResult.Batch; }
+<div class="row justify-content-center"><div class="col-lg-10">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Batch Traceability - @batch?.BatchNumber</h5></div>
+<div class="card-body">
+<dl class="row mb-3">
+<dt class="col-sm-3">Batch Number</dt><dd class="col-sm-9">@batch?.BatchNumber</dd>
+<dt class="col-sm-3">Material</dt><dd class="col-sm-9">@batch?.MaterialName</dd>
+<dt class="col-sm-3">Status</dt><dd class="col-sm-9"><span class="badge @(batch?.Status=="ACTIVE"?"bg-success":"bg-warning")">@batch?.Status</span></dd>
+</dl>
+
+<h6><i class="bi bi-arrow-right me-2"></i>Forward Trace (Receipts & Transfers In)</h6>
+@if (Model.TraceResult.ForwardTrace.Any())
+{
+    <table class="table table-sm table-bordered mb-4">
+    <thead><tr><th>Date</th><th>Type</th><th>Qty</th><th>From</th><th>To</th><th>Document</th><th>User</th></tr></thead>
+    <tbody>
+    @foreach (var m in Model.TraceResult.ForwardTrace)
+    { <tr><td>@m.MovementDate.ToString("g")</td><td>@m.MovementType</td><td>@m.Quantity</td><td>@m.FromLocation</td><td>@m.ToLocation</td><td>@m.DocumentNumber</td><td>@m.UserName</td></tr> }
+    </tbody></table>
+}
+else { <p class="text-muted">No forward trace records found.</p> }
+
+<h6><i class="bi bi-arrow-left me-2"></i>Backward Trace (Issues & Transfers Out)</h6>
+@if (Model.TraceResult.BackwardTrace.Any())
+{
+    <table class="table table-sm table-bordered mb-4">
+    <thead><tr><th>Date</th><th>Type</th><th>Qty</th><th>From</th><th>To</th><th>Document</th><th>User</th></tr></thead>
+    <tbody>
+    @foreach (var m in Model.TraceResult.BackwardTrace)
+    { <tr><td>@m.MovementDate.ToString("g")</td><td>@m.MovementType</td><td>@m.Quantity</td><td>@m.FromLocation</td><td>@m.ToLocation</td><td>@m.DocumentNumber</td><td>@m.UserName</td></tr> }
+    </tbody></table>
+}
+else { <p class="text-muted">No backward trace records found.</p> }
+
+<h6><i class="bi bi-upc me-2"></i>Serial Numbers in Batch</h6>
+@if (Model.TraceResult.SerialNumbers.Any())
+{
+    <table class="table table-sm table-bordered">
+    <thead><tr><th>Serial #</th><th>Material</th><th>Mfg Date</th><th>Warranty</th><th>Status</th><th>Owner</th></tr></thead>
+    <tbody>
+    @foreach (var s in Model.TraceResult.SerialNumbers)
+    { <tr><td>@s.SerialNumber</td><td>@s.MaterialName</td><td>@s.ManufacturingDate.ToString("d")</td><td>@(s.WarrantyExpiryDate?.ToString("d") ?? "N/A")</td><td>@s.Status</td><td>@s.CurrentOwnerName</td></tr> }
+    </tbody></table>
+}
+else { <p class="text-muted">No serial numbers found for this batch.</p> }
+</div>
+<div class="card-footer">
+<a asp-page="/MM/Batch/Display" asp-route-id="@batch?.Id" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Batch</a>
+</div>
+</div></div>

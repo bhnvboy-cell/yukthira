@@ -218,6 +218,7 @@ public class TaxService : ITaxService
     {
         var lines = new List<TaxLineResult>();
         decimal totalNet = 0, totalTax = 0, totalGross = 0;
+        decimal priorNonCompoundTax = 0m;
 
         foreach (var line in request.Lines)
         {
@@ -226,8 +227,10 @@ public class TaxService : ITaxService
                 throw new InvalidOperationException("Each line must specify a tax code");
 
             var code = codes[line.TaxCode];
-            var taxableBase = code.IsCompound ? 0m : line.NetAmount;
-            var tax = line.NetAmount * code.Rate / 100m;
+            var taxBase = code.IsCompound ? line.NetAmount + priorNonCompoundTax : line.NetAmount;
+            var tax = taxBase * code.Rate / 100m;
+            if (!code.IsCompound)
+                priorNonCompoundTax += tax;
             totalNet += line.NetAmount;
             totalTax += tax;
             totalGross += line.NetAmount + tax;

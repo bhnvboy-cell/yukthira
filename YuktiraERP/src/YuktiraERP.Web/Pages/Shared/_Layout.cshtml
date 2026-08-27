@@ -14,12 +14,13 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    <a href="#main-content" class="skip-to-content" id="skipToContent">Skip to main content</a>
     <div class="app-layout">
         @if (Context.User?.Identity?.IsAuthenticated == true)
         {
-            <nav class="hybrid-sidebar" id="appSidebar">
+            <nav class="hybrid-sidebar" id="appSidebar" role="navigation" aria-label="Main navigation" tabindex="0">
                 <div class="sidebar-header">
-                    <i class="bi bi-cpu"></i>
+                    <i class="bi bi-cpu" aria-hidden="true"></i>
                     <span class="sidebar-text">Yuktira</span>
                 </div>
 
@@ -30,23 +31,23 @@
                         {
                             if (m.Category != lastCat)
                             {
-                                <div class="nav-category sidebar-text">@m.Category</div>
+                                <div class="nav-category sidebar-text" role="presentation">@m.Category</div>
                                 lastCat = m.Category;
                             }
-                            <a href="@m.BaseRoute" class="nav-item" title="@m.Name"><i class="bi @m.Icon"></i><span class="sidebar-text">@m.Code</span></a>
+                            <a href="@m.BaseRoute" class="nav-item" title="@m.Name" aria-label="@m.Name module"><i class="bi @m.Icon" aria-hidden="true"></i><span class="sidebar-text">@m.Code</span></a>
                         }
                     }
                 </div>
 
                 <div class="sidebar-footer">
-                    <div class="theme-dots" id="sidebarThemeDots">
-                        <button class="theme-btn" data-theme="modern" title="Modern"></button>
-                        <button class="theme-btn" data-theme="classic" title="Classic"></button>
-                        <button class="theme-btn" data-theme="premium" title="Premium"></button>
-                        <button class="theme-btn" data-theme="dark" title="Dark"></button>
+                    <div class="theme-dots" id="sidebarThemeDots" role="radiogroup" aria-label="Theme selection">
+                        <button class="theme-btn" data-theme="modern" title="Modern theme" aria-label="Modern theme" role="radio" aria-checked="false"></button>
+                        <button class="theme-btn" data-theme="classic" title="Classic theme" aria-label="Classic theme" role="radio" aria-checked="false"></button>
+                        <button class="theme-btn" data-theme="premium" title="Premium theme" aria-label="Premium theme" role="radio" aria-checked="false"></button>
+                        <button class="theme-btn" data-theme="dark" title="Dark mode" aria-label="Dark mode" role="radio" aria-checked="false"></button>
                     </div>
                     <div class="sidebar-text" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-                        <div class="avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent-light),var(--accent));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">@(Context.User.Identity.Name?.Substring(0,1).ToUpper()??"U")</div>
+                        <div class="avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent-light),var(--accent));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0" aria-hidden="true">@(Context.User.Identity.Name?.Substring(0,1).ToUpper()??"U")</div>
                         <span style="font-size:12px;color:var(--sidebar-text-hover);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@Context.User.Identity.Name</span>
                     </div>
                 </div>
@@ -55,24 +56,25 @@
             <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
             <div class="app-main-area">
-                <header class="top-bar">
-                    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu"><i class="bi bi-list"></i></button>
+                <header class="top-bar" role="banner">
+                    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation menu"><i class="bi bi-list" aria-hidden="true"></i></button>
                     <div class="top-bar-center">
                         <div class="top-bar-search">
-                            <i class="bi bi-search"></i>
-                            <input type="text" id="globalSearch" placeholder="Transaction search... (Ctrl+K)" autocomplete="off">
-                            <div id="globalSearchResults" class="search-results" style="display:none"></div>
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <input type="text" id="globalSearch" placeholder="Transaction search... (Ctrl+K)" autocomplete="off" aria-label="Search transactions">
+                            <div id="globalSearchResults" class="search-results" style="display:none" role="listbox" aria-label="Search results"></div>
                         </div>
                     </div>
                     <div class="top-bar-right">
-                        <a href="/Notifications" class="top-bar-icon" title="Notifications">
-                            <i class="bi bi-bell"></i>
-                            <span class="badge bg-danger" id="notifCount" style="display:none">0</span>
+                        <button type="button" class="top-bar-icon" id="darkModeToggle" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi bi-moon-stars"></i></button>
+                        <a href="/Notifications" class="top-bar-icon" title="Notifications" aria-label="Notifications">
+                            <i class="bi bi-bell" aria-hidden="true"></i>
+                            <span class="badge bg-danger" id="notifCount" style="display:none" aria-live="polite">0</span>
                         </a>
-                        <a href="/Dashboard" class="top-bar-icon" title="Home"><i class="bi bi-grid-3x3-gap"></i></a>
+                        <a href="/Dashboard" class="top-bar-icon" title="Home" aria-label="Home dashboard"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i></a>
                         <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon" style="margin:0;display:inline-flex">
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                            <select name="culture" onchange="this.form.submit()" style="background:transparent;border:1px solid var(--sidebar-text-hover,#666);border-radius:4px;color:var(--sidebar-text-hover,#ccc);font-size:12px;padding:2px 4px" title="Language">
+                            <select name="culture" onchange="this.form.submit()" style="background:transparent;border:1px solid var(--sidebar-text-hover,#666);border-radius:4px;color:var(--sidebar-text-hover,#ccc);font-size:12px;padding:2px 4px" title="Language" aria-label="Select language">
                                 <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en")">EN</option>
                                 <option value="hi" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hi")">हिन्दी</option>
                                 <option value="ta" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ta")">தமிழ்</option>
@@ -81,18 +83,18 @@
                                 <option value="es" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "es")">ES</option>
                             </select>
                         </form>
-                        <a href="#" class="top-bar-icon" id="printBtn" title="Print / Save as PDF"><i class="bi bi-printer"></i></a>
-                        <a href="/Auth/Logout" class="top-bar-icon text-danger" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+                        <a href="#" class="top-bar-icon" id="printBtn" title="Print / Save as PDF" aria-label="Print page"><i class="bi bi-printer" aria-hidden="true"></i></a>
+                        <a href="/Auth/Logout" class="top-bar-icon text-danger" title="Logout" aria-label="Logout"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </header>
-                <main class="app-main">
+                <main class="app-main" id="main-content" role="main">
                     @RenderBody()
                 </main>
             </div>
         }
         else
         {
-            <main class="app-main" style="padding:0 !important;min-height:100vh">
+            <main class="app-main" style="padding:0 !important;min-height:100vh" id="main-content" role="main">
                 @RenderBody()
             </main>
         }
@@ -108,14 +110,48 @@
             if (!saved) saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'modern';
             document.documentElement.setAttribute('data-theme', saved);
             document.querySelectorAll('.theme-btn').forEach(function(btn) {
-                if (btn.getAttribute('data-theme') === saved) btn.style.borderColor = '#fff';
+                if (btn.getAttribute('data-theme') === saved) {
+                    btn.style.borderColor = '#fff';
+                    btn.setAttribute('aria-checked', 'true');
+                }
                 btn.addEventListener('click', function() {
                     var theme = this.getAttribute('data-theme');
                     document.documentElement.setAttribute('data-theme', theme);
                     localStorage.setItem('yuktira_theme', theme);
-                    document.querySelectorAll('.theme-btn').forEach(function(b) { b.style.borderColor = 'transparent'; });
+                    document.querySelectorAll('.theme-btn').forEach(function(b) {
+                        b.style.borderColor = 'transparent';
+                        b.setAttribute('aria-checked', 'false');
+                    });
                     this.style.borderColor = '#fff';
+                    this.setAttribute('aria-checked', 'true');
+                    document.getElementById('darkModeToggle').setAttribute('aria-label',
+                        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
                 });
+            });
+
+            // Dark mode toggle button
+            var darkToggle = document.getElementById('darkModeToggle');
+            if (darkToggle) {
+                darkToggle.addEventListener('click', function() {
+                    var current = document.documentElement.getAttribute('data-theme');
+                    var next = current === 'dark' ? 'modern' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('yuktira_theme', next);
+                    document.querySelectorAll('.theme-btn').forEach(function(b) {
+                        b.style.borderColor = b.getAttribute('data-theme') === next ? '#fff' : 'transparent';
+                        b.setAttribute('aria-checked', b.getAttribute('data-theme') === next ? 'true' : 'false');
+                    });
+                });
+            }
+        })();
+
+        // ── System preference detection ──
+        (function() {
+            var mq = window.matchMedia('(prefers-color-scheme: dark)');
+            mq.addEventListener('change', function(e) {
+                if (!localStorage.getItem('yuktira_theme')) {
+                    document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'modern');
+                }
             });
         })();
 
@@ -126,6 +162,31 @@
                 var href = el.getAttribute('href');
                 if (href && (path === href || path.startsWith(href + '/'))) {
                     el.classList.add('active');
+                }
+            });
+        })();
+
+        // ── Sidebar keyboard navigation ──
+        (function() {
+            var sidebar = document.getElementById('appSidebar');
+            if (!sidebar) return;
+            sidebar.addEventListener('keydown', function(e) {
+                var items = Array.from(sidebar.querySelectorAll('.nav-item'));
+                var current = document.activeElement;
+                var idx = items.indexOf(current);
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    var next = idx < items.length - 1 ? idx + 1 : 0;
+                    items[next].focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    var prev = idx > 0 ? idx - 1 : items.length - 1;
+                    items[prev].focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (current && current.classList.contains('nav-item')) {
+                        window.location.href = current.getAttribute('href');
+                    }
                 }
             });
         })();
@@ -154,8 +215,8 @@
                 $.get('/api/transaction/search?q=' + encodeURIComponent(val), function(data) {
                     var html = '';
                     data.forEach(function(t) {
-                        html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-2" onclick="window.location.href=\'' + t.route + '\'">';
-                        html += '<i class="bi ' + t.icon + ' text-primary"></i>';
+                        html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-2" role="option" onclick="window.location.href=\'' + t.route + '\'">';
+                        html += '<i class="bi ' + t.icon + ' text-primary" aria-hidden="true"></i>';
                         html += '<div class="small"><strong>' + t.code + '</strong> <span class="text-muted">- ' + t.name + '</span></div>';
                         html += '</button>';
                     });
@@ -173,7 +234,6 @@
         // ── Print / Save as PDF ──
         $('#printBtn').on('click', function(e) {
             e.preventDefault();
-            // Temporarily expand horizontally-scrolled tables so they print fully
             $('.table-responsive, [style*="overflow-x:auto"]').each(function() {
                 $(this).addClass('print-expanded');
             });

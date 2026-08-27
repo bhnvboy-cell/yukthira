@@ -1,0 +1,65 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore YuktiraERP.sln
+
+      - name: Build
+        run: dotnet build YuktiraERP.sln -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish src/YuktiraERP.Web/YuktiraERP.Web.csproj -c Release -o ./publish --no-build
+
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment..."
+          echo "Build artifacts ready at ./publish"
+          # Add your deployment steps here (Azure, AWS, Docker, etc.)
+          # Example: docker build -t yuktira-erp:staging .
+          # Example: docker push registry/yuktira-erp:staging
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: production
+    needs: deploy-staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore YuktiraERP.sln
+
+      - name: Build
+        run: dotnet build YuktiraERP.sln -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish src/YuktiraERP.Web/YuktiraERP.Web.csproj -c Release -o ./publish --no-build
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment..."
+          echo "Build artifacts ready at ./publish"
+          # Add your production deployment steps here

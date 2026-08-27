@@ -1,10 +1,18 @@
 using YuktiraERP.Core.Domain.Modules;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Infrastructure.Caching;
 
 namespace YuktiraERP.Infrastructure.Services;
 
 public class ModuleCatalog : IModuleCatalog
 {
+    private readonly IDistributedCacheService? _cache;
+
+    public ModuleCatalog(IDistributedCacheService? cache = null)
+    {
+        _cache = cache;
+    }
+
     public IReadOnlyList<ModuleDefinition> Modules { get; } = new List<ModuleDefinition>
     {
         // ── Operations ──

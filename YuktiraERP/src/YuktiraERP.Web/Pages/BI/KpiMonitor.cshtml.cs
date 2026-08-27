@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.BI;
+[Authorize]
 public class KpiMonitorModel : PageModel
 {
     public Dictionary<string, object> Kpis { get; set; } = new();

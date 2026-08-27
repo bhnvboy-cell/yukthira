@@ -146,14 +146,24 @@ public class YuktiraDbContext : DbContext
     public DbSet<WorkflowHistoryEntity> WorkflowHistories => Set<WorkflowHistoryEntity>();
     // Stock movements + finance loop
     public DbSet<StockMovementEntity> StockMovements => Set<StockMovementEntity>();
+    // Batch & Serial Lifecycle Management
+    public DbSet<BatchEntity> Batches => Set<BatchEntity>();
+    public DbSet<SerialNumberEntity> SerialNumbers => Set<SerialNumberEntity>();
+    public DbSet<BatchMovementEntity> BatchMovements => Set<BatchMovementEntity>();
+    public DbSet<RecallEntity> Recalls => Set<RecallEntity>();
     public DbSet<FiscalPeriodEntity> FiscalPeriods => Set<FiscalPeriodEntity>();
     public DbSet<BankReconciliationEntity> BankReconciliations => Set<BankReconciliationEntity>();
     public DbSet<PaymentEntity> Payments => Set<PaymentEntity>();
     public DbSet<DepreciationScheduleEntity> DepreciationSchedules => Set<DepreciationScheduleEntity>();
     public DbSet<ApprovalStepEntity> ApprovalSteps => Set<ApprovalStepEntity>();
+    // ATP/CTP - Stock Reservations and Allocations
+    public DbSet<StockReservationEntity> StockReservations => Set<StockReservationEntity>();
+    public DbSet<StockAllocationEntity> StockAllocations => Set<StockAllocationEntity>();
+    // Bank Statement Import
+    public DbSet<BankStatementEntity> BankStatements => Set<BankStatementEntity>();
+    public DbSet<BankStatementLineEntity> BankStatementLines => Set<BankStatementLineEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("yuktira_core");
         ConfigureEntities(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(YuktiraDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
@@ -166,13 +176,7 @@ public class YuktiraDbContext : DbContext
             var entity = mb.Entity(type);
             entity.HasKey(nameof(EntityBase.Id));
             entity.Property(nameof(EntityBase.CreatedAt)).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            if (type.Name.EndsWith("MasterEntity") || type.Name.EndsWith("Entity"))
-                entity.ToTable(type.Name.Replace("Entity", "s"));
         }
-
-        mb.Entity<GeneralLedgerEntryEntity>().Property(g => g.Debit).HasColumnType("decimal(18,2)");
-        mb.Entity<GeneralLedgerEntryEntity>().Property(g => g.Credit).HasColumnType("decimal(18,2)");
-        mb.Entity<AccountEntity>().Property(a => a.Balance).HasColumnType("decimal(18,2)");
     }
 
     public override int SaveChanges() { ApplyAudit(); return base.SaveChanges(); }

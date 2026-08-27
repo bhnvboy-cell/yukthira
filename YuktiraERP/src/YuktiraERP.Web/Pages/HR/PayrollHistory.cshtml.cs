@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 namespace YuktiraERP.Web.Pages.HR;
+[Authorize]
 public class PayrollHistoryModel : PageModel
 {
     private readonly IRepository<PayrollEntryEntity, Guid> _repo;

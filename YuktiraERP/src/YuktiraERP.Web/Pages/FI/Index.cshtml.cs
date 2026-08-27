@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Web.Pages.FI;
 
+[Authorize]
 public class IndexModel : PageModel
 {
     private readonly IRepository<JournalEntryEntity, Guid> _journalRepo;

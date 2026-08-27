@@ -208,28 +208,37 @@ public class AccountingService : IAccountingService
         };
         _db.Payments.Add(payment);
 
-        // Settle the oldest open AP/AR entry for this party (FIFO)
+        // Settle open AP/AR entries for this party (FIFO)
+        decimal remaining = request.Amount;
         if (request.Type == "Payment")
         {
-            var entry = await _db.APEntries
+            var entries = await _db.APEntries
                 .Where(a => a.TenantId == tenantId && a.VendorName == request.PartyName && a.Status == "Open")
                 .OrderBy(a => a.Date)
-                .FirstOrDefaultAsync();
-            if (entry != null)
+                .ToListAsync();
+            foreach (var entry in entries)
             {
-                entry.PaidAmount += request.Amount;
+                if (remaining <= 0) break;
+                var openAmount = entry.Amount - entry.PaidAmount;
+                var applyAmount = Math.Min(remaining, openAmount);
+                entry.PaidAmount += applyAmount;
+                remaining -= applyAmount;
                 if (entry.PaidAmount >= entry.Amount) entry.Status = "Paid";
             }
         }
         else
         {
-            var entry = await _db.AREntries
+            var entries = await _db.AREntries
                 .Where(a => a.TenantId == tenantId && a.CustomerName == request.PartyName && a.Status == "Open")
                 .OrderBy(a => a.Date)
-                .FirstOrDefaultAsync();
-            if (entry != null)
+                .ToListAsync();
+            foreach (var entry in entries)
             {
-                entry.ReceivedAmount += request.Amount;
+                if (remaining <= 0) break;
+                var openAmount = entry.Amount - entry.ReceivedAmount;
+                var applyAmount = Math.Min(remaining, openAmount);
+                entry.ReceivedAmount += applyAmount;
+                remaining -= applyAmount;
                 if (entry.ReceivedAmount >= entry.Amount) entry.Status = "Paid";
             }
         }

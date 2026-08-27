@@ -30,7 +30,7 @@ public class PayrollService : IPayrollService
 
         var basicDa = request.BasicPay;
         var pfWage = Math.Min(basicDa, 15000m);
-        var pfEmployee = Math.Max(Math.Round(pfWage * 0.12m, 0), 1800m);
+        var pfEmployee = Math.Round(pfWage * 0.12m, 0);
         var pfEmployer = pfEmployee;
 
         var esiApplicable = gross <= 21000m;
