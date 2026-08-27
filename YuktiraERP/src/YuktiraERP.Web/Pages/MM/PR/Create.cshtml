@@ -1,21 +1,72 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.MM.PR.CreateModel
 @{ ViewData["Title"] = "Create Purchase Requisition"; }
-<div class="row justify-content-center"><div class="col-lg-8">
+<div class="row justify-content-center"><div class="col-lg-10">
 <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Purchase Requisition</h5></div>
 <div class="card-body">
 <form method="post">
 <div class="row mb-3">
-<div class="col-md-6"><label asp-for="Requisition.Requestor" class="form-label"></label><input asp-for="Requisition.Requestor" class="form-control" /></div>
-<div class="col-md-6"><label asp-for="Requisition.ItemName" class="form-label"></label><input asp-for="Requisition.ItemName" class="form-control" /></div>
+<div class="col-md-4"><label asp-for="Requisition.Requestor" class="form-label"></label><input asp-for="Requisition.Requestor" class="form-control" /></div>
+<div class="col-md-4"><label asp-for="Requisition.DepartmentKey" class="form-label"></label><select asp-for="Requisition.DepartmentKey" class="form-select" asp-items="Model.DepartmentKeyOptions"><option value="">-- Select --</option></select></div>
+<div class="col-md-4"><label asp-for="Requisition.CostCenter" class="form-label"></label><input asp-for="Requisition.CostCenter" class="form-control" /></div>
 </div>
+
+<h6 class="mt-3 mb-2"><i class="bi bi-list-ul me-1"></i>Line Items</h6>
+<div id="lineItems">
+@for (int i = 0; i < Model.LineItems.Count; i++)
+{
+<div class="card mb-2 border">
+<div class="card-body py-2">
+<input type="hidden" asp-for="LineItems[i].Id" />
+<div class="row g-2 align-items-end">
+<div class="col-md-2"><label class="form-label small">Material Code</label><input asp-for="LineItems[i].MaterialCode" class="form-control form-control-sm" /></div>
+<div class="col-md-2"><label class="form-label small">Material Name</label><input asp-for="LineItems[i].MaterialName" class="form-control form-control-sm" /></div>
+<div class="col-md-1"><label class="form-label small">Qty</label><input asp-for="LineItems[i].Quantity" class="form-control form-control-sm" type="number" step="0.01" /></div>
+<div class="col-md-1"><label class="form-label small">UOM</label><input asp-for="LineItems[i].UOM" class="form-control form-control-sm" value="EA" /></div>
+<div class="col-md-1"><label class="form-label small">Unit Price</label><input asp-for="LineItems[i].UnitPrice" class="form-control form-control-sm" type="number" step="0.01" /></div>
+<div class="col-md-1"><label class="form-label small">Plant</label><input asp-for="LineItems[i].Plant" class="form-control form-control-sm" /></div>
+<div class="col-md-1"><label class="form-label small">SLOC</label><input asp-for="LineItems[i].StorageLocation" class="form-control form-control-sm" /></div>
+<div class="col-md-1"><label class="form-label small">Delivery</label><input asp-for="LineItems[i].DeliveryDate" class="form-control form-control-sm" type="date" /></div>
+<div class="col-md-1"><label class="form-label small">Dept</label><select asp-for="LineItems[i].DepartmentKey" class="form-select form-select-sm" asp-items="Model.DepartmentKeyOptions"><option value="">--</option></select></div>
+<div class="col-md-1"><label class="form-label small">Cost Ctr</label><input asp-for="LineItems[i].CostCenter" class="form-control form-control-sm" /></div>
+</div>
+</div>
+</div>
+}
+</div>
+<button type="button" class="btn btn-outline-success btn-sm mb-3" onclick="addLine()"><i class="bi bi-plus"></i> Add Line</button>
+
 <div class="row mb-3">
-<div class="col-md-3"><label asp-for="Requisition.Quantity" class="form-label"></label><input asp-for="Requisition.Quantity" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Requisition.Amount" class="form-label"></label><input asp-for="Requisition.Amount" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Requisition.Status" class="form-label"></label><select asp-for="Requisition.Status" class="form-select"><option>Pending</option><option>Approved</option><option>In Review</option><option>Cancelled</option></select></div>
+<div class="col-md-4"><label asp-for="Requisition.Status" class="form-label"></label><select asp-for="Requisition.Status" class="form-select"><option>Draft</option><option>Pending</option><option>In Review</option></select></div>
 </div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/PR/List" class="btn btn-outline-secondary">Cancel</a></div>
+
+<div class="d-flex gap-2">
+<button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+<a asp-page="/MM/PR/List" class="btn btn-outline-secondary">Cancel</a>
+</div>
 </form>
 </div></div>
 </div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+
+@section Scripts { <partial name="_ValidationScriptsPartial" />
+<script>
+function addLine() {
+    var idx = document.querySelectorAll('#lineItems .card').length;
+    var html = `<div class="card mb-2 border"><div class="card-body py-2">
+    <input type="hidden" name="LineItems[${idx}].Id" value="00000000-0000-0000-0000-000000000000" />
+    <div class="row g-2 align-items-end">
+    <div class="col-md-2"><label class="form-label small">Material Code</label><input name="LineItems[${idx}].MaterialCode" class="form-control form-control-sm" /></div>
+    <div class="col-md-2"><label class="form-label small">Material Name</label><input name="LineItems[${idx}].MaterialName" class="form-control form-control-sm" /></div>
+    <div class="col-md-1"><label class="form-label small">Qty</label><input name="LineItems[${idx}].Quantity" class="form-control form-control-sm" type="number" step="0.01" /></div>
+    <div class="col-md-1"><label class="form-label small">UOM</label><input name="LineItems[${idx}].UOM" class="form-control form-control-sm" value="EA" /></div>
+    <div class="col-md-1"><label class="form-label small">Unit Price</label><input name="LineItems[${idx}].UnitPrice" class="form-control form-control-sm" type="number" step="0.01" /></div>
+    <div class="col-md-1"><label class="form-label small">Plant</label><input name="LineItems[${idx}].Plant" class="form-control form-control-sm" /></div>
+    <div class="col-md-1"><label class="form-label small">SLOC</label><input name="LineItems[${idx}].StorageLocation" class="form-control form-control-sm" /></div>
+    <div class="col-md-1"><label class="form-label small">Delivery</label><input name="LineItems[${idx}].DeliveryDate" class="form-control form-control-sm" type="date" /></div>
+    <div class="col-md-1"><label class="form-label small">Dept</label><select name="LineItems[${idx}].DepartmentKey" class="form-select form-select-sm">${document.querySelector('select[name="Requisition.DepartmentKey"]').innerHTML}</select></div>
+    <div class="col-md-1"><label class="form-label small">Cost Ctr</label><input name="LineItems[${idx}].CostCenter" class="form-control form-control-sm" /></div>
+    </div></div></div>`;
+    document.getElementById('lineItems').insertAdjacentHTML('beforeend', html);
+}
+</script>
+}

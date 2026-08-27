@@ -1,16 +1,46 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.MM.PR.DisplayModel
 @using YuktiraERP.Infrastructure.Data.Entities
-@{ ViewData["Title"] = "PurchaseRequisition Details"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>PurchaseRequisition Details</h5></div>
+@{ ViewData["Title"] = "Purchase Requisition Details"; }
+<div class="row justify-content-center"><div class="col-lg-10">
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Purchase Requisition Details</h5></div>
 <div class="card-body">
-<dl class="row mb-0"><dt class="col-sm-4">PrNumber</dt><dd class="col-sm-8">@(Model.Requisition.PrNumber)</dd><dt class="col-sm-4">Date</dt><dd class="col-sm-8">@(Model.Requisition.Date)</dd><dt class="col-sm-4">Requestor</dt><dd class="col-sm-8">@(Model.Requisition.Requestor)</dd><dt class="col-sm-4">ItemName</dt><dd class="col-sm-8">@(Model.Requisition.ItemName)</dd><dt class="col-sm-4">Quantity</dt><dd class="col-sm-8">@(Model.Requisition.Quantity)</dd><dt class="col-sm-4">Amount</dt><dd class="col-sm-8">@(Model.Requisition.Amount)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Requisition.Status)</dd></dl>
+<dl class="row mb-0">
+<dt class="col-sm-3">PR Number</dt><dd class="col-sm-3">@(Model.Requisition.PrNumber)</dd>
+<dt class="col-sm-3">Date</dt><dd class="col-sm-3">@(Model.Requisition.Date.ToString("yyyy-MM-dd"))</dd>
+<dt class="col-sm-3">Requestor</dt><dd class="col-sm-3">@(Model.Requisition.Requestor)</dd>
+<dt class="col-sm-3">Department</dt><dd class="col-sm-3">@(Model.Requisition.DepartmentKey)</dd>
+<dt class="col-sm-3">Cost Center</dt><dd class="col-sm-3">@(Model.Requisition.CostCenter)</dd>
+<dt class="col-sm-3">Status</dt><dd class="col-sm-3"><span class="badge @(Model.Requisition.Status == "APPROVED" ? "bg-success" : Model.Requisition.Status == "REJECTED" ? "bg-danger" : Model.Requisition.Status == "PENDING_APPROVAL" ? "bg-warning" : "bg-secondary")">@(Model.Requisition.Status)</span></dd>
+<dt class="col-sm-3">Total Amount</dt><dd class="col-sm-3">@Model.Requisition.TotalAmount.ToString("C")</dd>
+<dt class="col-sm-3">Item Count</dt><dd class="col-sm-3">@Model.Requisition.ItemCount</dd>
+<dt class="col-sm-3">Converted PO</dt><dd class="col-sm-3">@(Model.Requisition.ConvertedPoNumber ?? "-")</dd>
+</dl>
+
+@if (Model.Items.Any())
+{
+<h6 class="mt-3">Line Items</h6>
+<table class="table table-sm table-bordered">
+<thead><tr><th>#</th><th>Material</th><th>Code</th><th>Qty</th><th>UOM</th><th>Unit Price</th><th>Total</th><th>Plant</th><th>Status</th></tr></thead>
+<tbody>
+@foreach (var item in Model.Items)
+{
+<tr><td>@item.LineNumber</td><td>@item.MaterialName</td><td>@item.MaterialCode</td><td>@item.Quantity</td><td>@item.UOM</td><td>@item.UnitPrice.ToString("C")</td><td>@item.TotalPrice.ToString("C")</td><td>@item.Plant</td><td><span class="badge bg-secondary">@item.Status</span></td></tr>
+}
+</tbody>
+</table>
+}
 </div>
 <div class="card-footer">
 <a href="/MM/PR/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
 <a href="/MM/PR/Edit?id=@(Model.Requisition.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+@if (Model.Requisition.Status == "DRAFT" || Model.Requisition.Status == "Pending")
+{
+<form method="post" asp-page-handler="SubmitForApproval" style="display:inline">
+<input type="hidden" name="prId" value="@Model.Requisition.Id" />
+<button type="submit" class="btn btn-success"><i class="bi bi-send me-1"></i>Submit for Approval</button>
+</form>
+}
 </div>
 </div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
-
+</div></div>

@@ -134,7 +134,14 @@ public static class InfrastructureRegistration
         services.AddScoped<ITCodeCustomizationService, TCodeCustomizationService>();
         services.AddScoped<IBatchService, BatchService>();
         services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IGoodsMovementService, GoodsMovementService>();
+        services.AddScoped<IProductionOrderService, ProductionOrderService>();
         services.AddScoped<IBankService, BankService>();
+        services.AddScoped<IDepartmentKeyService, DepartmentKeyService>();
+        services.AddScoped<IReleaseStrategyService, ReleaseStrategyService>();
+        services.AddScoped<IPrPoConversionService, PrPoConversionService>();
+        services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();
+        services.AddScoped<IThreeWayMatchService, ThreeWayMatchService>();
         services.AddScoped<CacheService>();
         services.AddHostedService<IntegrationQueueBackgroundService>();
         services.AddHostedService<MrpSchedulerBackgroundService>();

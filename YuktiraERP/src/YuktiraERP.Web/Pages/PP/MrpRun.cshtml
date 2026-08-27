@@ -1,17 +1,75 @@
 @page
 @model YuktiraERP.Web.Pages.PP.MrpRunModel
 @{ ViewData["Title"] = "MRP Run (MD01)"; }
-<div class="row justify-content-center"><div class="col-lg-6">
+<div class="row justify-content-center"><div class="col-lg-8">
 <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-cpu me-2"></i>MRP Run</h5></div>
 <div class="card-body">
 <form method="post">
-<div class="mb-3"><label asp-for="ProductName" class="form-label">Product</label><input asp-for="ProductName" class="form-control" placeholder="Product to plan" /></div>
-<div class="mb-3"><label asp-for="HorizonDays" class="form-label">Planning Horizon (Days)</label><input asp-for="HorizonDays" class="form-control" type="number" min="1" max="365" /></div>
-<button type="submit" class="btn btn-primary"><i class="bi bi-play me-1"></i>Run MRP</button>
+<div class="row mb-3">
+<div class="col-md-4">
+<label asp-for="ProductName" class="form-label">Material Filter (optional)</label>
+<input asp-for="ProductName" class="form-control" placeholder="Filter by material name" />
+</div>
+<div class="col-md-3">
+<label asp-for="HorizonDays" class="form-label">Planning Horizon (Days)</label>
+<input asp-for="HorizonDays" class="form-control" type="number" min="1" max="365" />
+</div>
+<div class="col-md-3">
+<label asp-for="ServiceLevel" class="form-label">Service Level (%)</label>
+<input asp-for="ServiceLevel" class="form-control" type="number" min="0.5" max="1" step="0.01" />
+</div>
+<div class="col-md-2 d-flex align-items-end">
+<button type="submit" class="btn btn-primary w-100"><i class="bi bi-play me-1"></i>Run MRP</button>
+</div>
+</div>
 </form>
+
 @if (!string.IsNullOrEmpty(Model.Result))
 {
-<div class="alert alert-success mt-3">@Model.Result</div>
+<div class="alert @(Model.Result.Contains("failed") ? "alert-danger" : "alert-success") mt-3">@Model.Result</div>
+}
+
+@if (Model.Suggestions.Any())
+{
+<h6 class="mt-4"><i class="bi bi-list-check me-1"></i>MRP Suggestions</h6>
+<div class="table-responsive">
+<table class="table table-sm table-striped">
+<thead class="table-dark"><tr><th>Material</th><th>Type</th><th>Current Stock</th><th>Demand</th><th>Shortage</th><th>Suggested Qty</th></tr></thead>
+<tbody>
+@foreach (var s in Model.Suggestions)
+{
+<tr>
+<td>@s.MaterialName</td>
+<td><span class="badge @(s.SuggestionType == "PURCHASE" ? "bg-info" : "bg-warning")">@s.SuggestionType</span></td>
+<td>@s.CurrentStock</td>
+<td>@s.TotalDemand</td>
+<td>@s.ShortageQty</td>
+<td><strong>@s.SuggestedQty</strong></td>
+</tr>
+}
+</tbody></table>
+</div>
+}
+
+@if (Model.Exceptions.Any())
+{
+<h6 class="mt-4"><i class="bi bi-exclamation-triangle me-1"></i>Exceptions</h6>
+<div class="table-responsive">
+<table class="table table-sm table-hover">
+<thead class="table-warning"><tr><th>Material</th><th>Type</th><th>Severity</th><th>Message</th><th>Suggested Action</th></tr></thead>
+<tbody>
+@foreach (var e in Model.Exceptions)
+{
+<tr>
+<td>@e.MaterialName</td>
+<td>@e.ExceptionType</td>
+<td><span class="badge @(e.Severity == "Error" ? "bg-danger" : "bg-warning")">@e.Severity</span></td>
+<td>@e.Message</td>
+<td>@e.SuggestedAction</td>
+</tr>
+}
+</tbody></table>
+</div>
 }
 </div></div>
 </div></div>

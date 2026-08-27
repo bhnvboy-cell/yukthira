@@ -31,6 +31,8 @@ public class YuktiraDbContext : DbContext
     public DbSet<ProductionRoutingEntity> ProductionRoutings => Set<ProductionRoutingEntity>();
     public DbSet<WorkCenterEntity> WorkCenters => Set<WorkCenterEntity>();
     public DbSet<ProductionOrderEntity> ProductionOrders => Set<ProductionOrderEntity>();
+    public DbSet<ProductionOrderItemEntity> ProductionOrderItems => Set<ProductionOrderItemEntity>();
+    public DbSet<MaterialStagingEntity> MaterialStagings => Set<MaterialStagingEntity>();
     // QM
     public DbSet<InspectionLotEntity> InspectionLots => Set<InspectionLotEntity>();
     public DbSet<InspectionPlanEntity> InspectionPlans => Set<InspectionPlanEntity>();
@@ -156,6 +158,12 @@ public class YuktiraDbContext : DbContext
     public DbSet<PaymentEntity> Payments => Set<PaymentEntity>();
     public DbSet<DepreciationScheduleEntity> DepreciationSchedules => Set<DepreciationScheduleEntity>();
     public DbSet<ApprovalStepEntity> ApprovalSteps => Set<ApprovalStepEntity>();
+    // Procure-to-Pay
+    public DbSet<PurchaseRequisitionItemEntity> PurchaseRequisitionItems => Set<PurchaseRequisitionItemEntity>();
+    public DbSet<PurchaseOrderItemEntity> PurchaseOrderItems => Set<PurchaseOrderItemEntity>();
+    public DbSet<DepartmentKeyEntity> DepartmentKeys => Set<DepartmentKeyEntity>();
+    public DbSet<ReleaseStrategyEntity> ReleaseStrategies => Set<ReleaseStrategyEntity>();
+    public DbSet<ReleaseCodeEntity> ReleaseCodes => Set<ReleaseCodeEntity>();
     // ATP/CTP - Stock Reservations and Allocations
     public DbSet<StockReservationEntity> StockReservations => Set<StockReservationEntity>();
     public DbSet<StockAllocationEntity> StockAllocations => Set<StockAllocationEntity>();

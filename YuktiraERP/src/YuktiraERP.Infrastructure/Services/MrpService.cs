@@ -640,6 +640,50 @@ public class MrpService : IMrpService
         >= 0.85 => 1.04m, >= 0.80 => 0.84m, _ => 0.00m
     };
 
+    public async Task<List<object>> CreateOrdersFromSuggestionsAsync(List<MrpSuggestionDto> suggestions, string userId)
+    {
+        var createdOrders = new List<object>();
+
+        foreach (var suggestion in suggestions.Where(s => s.SuggestedQty > 0))
+        {
+            if (suggestion.SuggestionType == "PURCHASE")
+            {
+                var prNumber = $"PR-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
+                var pr = new PurchaseRequisitionEntity
+                {
+                    PrNumber = prNumber,
+                    Date = DateTime.UtcNow,
+                    Requestor = userId,
+                    ItemName = suggestion.MaterialName,
+                    Quantity = $"{suggestion.SuggestedQty} EA",
+                    Amount = suggestion.SuggestedQty * 10m,
+                    Status = "Pending"
+                };
+                _db.Set<PurchaseRequisitionEntity>().Add(pr);
+                await _db.SaveChangesAsync();
+                createdOrders.Add(new { Type = "PURCHASE_REQUISITION", Id = pr.Id, Number = prNumber, Material = suggestion.MaterialName, Qty = suggestion.SuggestedQty });
+            }
+            else if (suggestion.SuggestionType == "PRODUCE")
+            {
+                var orderNumber = $"PO-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
+                var prodOrder = new ProductionOrderEntity
+                {
+                    OrderNumber = orderNumber,
+                    ProductName = suggestion.MaterialName,
+                    Quantity = suggestion.SuggestedQty,
+                    StartDate = DateTime.Today,
+                    EndDate = DateTime.Today.AddDays(14),
+                    Status = "PLANNED"
+                };
+                _db.Set<ProductionOrderEntity>().Add(prodOrder);
+                await _db.SaveChangesAsync();
+                createdOrders.Add(new { Type = "PRODUCTION_ORDER", Id = prodOrder.Id, Number = orderNumber, Material = suggestion.MaterialName, Qty = suggestion.SuggestedQty });
+            }
+        }
+
+        return createdOrders;
+    }
+
     private async Task<Dictionary<string, List<decimal>>> BuildDemandDictionaryAsync(
         Guid tenantId, List<MaterialMasterEntity> materials, List<SalesOrderEntity> salesOrders)
     {

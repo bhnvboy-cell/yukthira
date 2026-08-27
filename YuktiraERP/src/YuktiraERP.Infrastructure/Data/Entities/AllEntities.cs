@@ -6,8 +6,8 @@ public abstract class EntityBase { [Key] public Guid Id { get; set; } = Guid.New
 // MM
 public class MaterialMasterEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "RAW"; public string UOM { get; set; } = "EA"; public decimal Stock { get; set; } public decimal Price { get; set; } public string Status { get; set; } = "Active"; }
 public class VendorEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string TaxId { get; set; } = ""; public string PaymentTerms { get; set; } = "Net 30"; public string Phone { get; set; } = ""; public string Status { get; set; } = "Active"; }
-public partial class PurchaseOrderEntity : EntityBase { public Guid TenantId { get; set; } public string PoNumber { get; set; } = ""; public DateTime Date { get; set; } public string VendorName { get; set; } = ""; public string ItemName { get; set; } = ""; public string Quantity { get; set; } = ""; public decimal Amount { get; set; } public string Status { get; set; } = "Pending"; }
-public partial class PurchaseRequisitionEntity : EntityBase { public string PrNumber { get; set; } = ""; public DateTime Date { get; set; } public string Requestor { get; set; } = ""; public string ItemName { get; set; } = ""; public string Quantity { get; set; } = ""; public decimal Amount { get; set; } public string Status { get; set; } = "Pending"; }
+public partial class PurchaseOrderEntity : EntityBase { public Guid TenantId { get; set; } public string PoNumber { get; set; } = ""; public DateTime Date { get; set; } public string VendorName { get; set; } = ""; public string VendorCode { get; set; } = ""; public string ItemName { get; set; } = ""; public string Quantity { get; set; } = ""; public decimal Amount { get; set; } public string Status { get; set; } = "Pending"; public string DepartmentKey { get; set; } = ""; public string CostCenter { get; set; } = ""; public decimal TotalAmount { get; set; } public int ItemCount { get; set; } public string PaymentTerms { get; set; } = "Net 30"; public string Incoterms { get; set; } = ""; public string ReleaseStatus { get; set; } = ""; public List<PurchaseOrderItemEntity> Items { get; set; } = new(); }
+public partial class PurchaseRequisitionEntity : EntityBase { public Guid TenantId { get; set; } public string PrNumber { get; set; } = ""; public DateTime Date { get; set; } public string Requestor { get; set; } = ""; public string ItemName { get; set; } = ""; public string Quantity { get; set; } = ""; public decimal Amount { get; set; } public string Status { get; set; } = "Pending"; public string DepartmentKey { get; set; } = ""; public string CostCenter { get; set; } = ""; public decimal TotalAmount { get; set; } public int ItemCount { get; set; } public string ReleaseStatus { get; set; } = ""; public string ConvertedPoNumber { get; set; } = ""; public List<PurchaseRequisitionItemEntity> Items { get; set; } = new(); }
 public class GoodsReceiptEntity : EntityBase { public Guid TenantId { get; set; } public string GrnNumber { get; set; } = ""; public DateTime Date { get; set; } public string PoNumber { get; set; } = ""; public string MaterialName { get; set; } = ""; public string QtyReceived { get; set; } = ""; public string QtyAccepted { get; set; } = ""; public string Status { get; set; } = "Pending"; }
 public class StockItemEntity : EntityBase { public Guid TenantId { get; set; } public string Bin { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Lot { get; set; } = ""; public decimal Quantity { get; set; } public string UOM { get; set; } = "EA"; public decimal Value { get; set; } public decimal MinStock { get; set; } public decimal MaxStock { get; set; } }
 public class InvoiceVerificationEntity : EntityBase { public string InvoiceNumber { get; set; } = ""; public DateTime Date { get; set; } public string PoNumber { get; set; } = ""; public string VendorName { get; set; } = ""; public decimal Amount { get; set; } public decimal MatchedAmount { get; set; } public string Status { get; set; } = "Pending"; public Guid TenantId { get; set; } }
@@ -26,7 +26,74 @@ public class ProductionPlanEntity : EntityBase { public Guid TenantId { get; set
 public class BillOfMaterialEntity : EntityBase { public Guid TenantId { get; set; } public string BomId { get; set; } = ""; public string ProductName { get; set; } = ""; public string ComponentName { get; set; } = ""; public decimal Quantity { get; set; } public string UOM { get; set; } = "EA"; public string Status { get; set; } = "Active"; }
 public class ProductionRoutingEntity : EntityBase { public Guid TenantId { get; set; } public string RoutingId { get; set; } = ""; public string ProductName { get; set; } = ""; public int OperationNo { get; set; } public string WorkCenter { get; set; } = ""; public decimal SetupTimeHrs { get; set; } public decimal RunTimeHrs { get; set; } public string Status { get; set; } = "Active"; }
 public class WorkCenterEntity : EntityBase { public Guid TenantId { get; set; } public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Department { get; set; } = ""; public decimal CapacityPerShift { get; set; } public string Status { get; set; } = "Active"; }
-public class ProductionOrderEntity : EntityBase { public Guid TenantId { get; set; } public string OrderNumber { get; set; } = ""; public string ProductName { get; set; } = ""; public decimal Quantity { get; set; } public DateTime StartDate { get; set; } public DateTime EndDate { get; set; } public string Status { get; set; } = "Planned"; }
+public class ProductionOrderEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string OrderNumber { get; set; } = "";
+    public string ProductName { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+    public string Status { get; set; } = "PLANNED";
+    public Guid? BOMId { get; set; }
+    public Guid? RoutingId { get; set; }
+    public string? BatchNo { get; set; }
+    public decimal ScrapQty { get; set; } = 0;
+    public decimal YieldQty { get; set; } = 0;
+    public decimal ActualCost { get; set; } = 0;
+    public decimal PlannedCost { get; set; } = 0;
+    public DateTime? ReleasedAt { get; set; }
+    public DateTime? ConfirmedAt { get; set; }
+    public DateTime? TecodAt { get; set; }
+    public DateTime? CancelledAt { get; set; }
+    public string? ReleaseBy { get; set; }
+    public string? ConfirmBy { get; set; }
+
+    private static readonly Dictionary<string, HashSet<string>> ValidTransitions = new()
+    {
+        ["PLANNED"] = new() { "RELEASED", "CANCELLED" },
+        ["RELEASED"] = new() { "IN_PROGRESS", "CANCELLED" },
+        ["IN_PROGRESS"] = new() { "COMPLETED", "CANCELLED" },
+        ["COMPLETED"] = new() { "TECO" },
+        ["TECO"] = new(),
+        ["CANCELLED"] = new()
+    };
+
+    public bool CanTransitionTo(string newStatus)
+    {
+        if (!ValidTransitions.TryGetValue(Status, out var allowed))
+            return false;
+        return allowed.Contains(newStatus);
+    }
+
+    public void TransitionTo(string newStatus)
+    {
+        if (!CanTransitionTo(newStatus))
+            throw new InvalidOperationException($"Invalid transition from {Status} to {newStatus}");
+        Status = newStatus;
+    }
+}
+
+public class ProductionOrderItemEntity : EntityBase
+{
+    public Guid ProductionOrderId { get; set; }
+    public string MaterialName { get; set; } = "";
+    public decimal RequiredQty { get; set; }
+    public decimal IssuedQty { get; set; } = 0;
+    public decimal ScrapQty { get; set; } = 0;
+    public string UOM { get; set; } = "EA";
+    public string Status { get; set; } = "PLANNED";
+}
+
+public class MaterialStagingEntity : EntityBase
+{
+    public Guid ProductionOrderId { get; set; }
+    public string MaterialName { get; set; } = "";
+    public decimal RequiredQty { get; set; }
+    public decimal StagedQty { get; set; } = 0;
+    public string Status { get; set; } = "PENDING";
+    public string? Notes { get; set; }
+}
 
 // QM
 public class InspectionLotEntity : EntityBase { public string LotNumber { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Quantity { get; set; } = ""; public int Inspected { get; set; } public int Passed { get; set; } public int Failed { get; set; } public string Status { get; set; } = "Pending"; }
@@ -182,4 +249,15 @@ public class FiscalPeriodEntity : EntityBase { public Guid TenantId { get; set; 
 public class BankReconciliationEntity : EntityBase { public Guid TenantId { get; set; } public string AccountCode { get; set; } = ""; public string AccountName { get; set; } = ""; public DateTime StatementDate { get; set; } public decimal StatementBalance { get; set; } public decimal LedgerBalance { get; set; } public decimal Difference { get; set; } public string Status { get; set; } = "Draft"; public string Notes { get; set; } = ""; }
 public class PaymentEntity : EntityBase { public Guid TenantId { get; set; } public string PaymentNumber { get; set; } = ""; public DateTime Date { get; set; } public string PartyName { get; set; } = ""; public string Type { get; set; } = "Payment"; public string Reference { get; set; } = ""; public decimal Amount { get; set; } public string Method { get; set; } = "Bank Transfer"; public string Status { get; set; } = "Posted"; }
 public class DepreciationScheduleEntity : EntityBase { public Guid TenantId { get; set; } public Guid AssetId { get; set; } public string AssetCode { get; set; } = ""; public string AssetName { get; set; } = ""; public string Period { get; set; } = ""; public decimal DepreciationAmount { get; set; } public decimal AccumulatedDepreciation { get; set; } public decimal BookValue { get; set; } public string Status { get; set; } = "Posted"; }
-public class ApprovalStepEntity : EntityBase { public Guid TenantId { get; set; } public Guid ApprovalRequestId { get; set; } public int Level { get; set; } public string ApproverName { get; set; } = ""; public string Status { get; set; } = "Pending"; public string Comments { get; set; } = ""; public DateTime? ActionedAt { get; set; } }
+public class ApprovalStepEntity : EntityBase { public Guid TenantId { get; set; } public Guid ApprovalRequestId { get; set; } public int Level { get; set; } public string ApproverName { get; set; } = ""; public string ApproverUserId { get; set; } = ""; public string Status { get; set; } = "Pending"; public string Comments { get; set; } = ""; public DateTime? ActionedAt { get; set; } }
+
+// Procure-to-Pay Line Items
+public class PurchaseRequisitionItemEntity : EntityBase { public Guid TenantId { get; set; } public Guid PurchaseRequisitionId { get; set; } public int LineNumber { get; set; } public string MaterialName { get; set; } = string.Empty; public string MaterialCode { get; set; } = string.Empty; public decimal Quantity { get; set; } public string UOM { get; set; } = "EA"; public decimal UnitPrice { get; set; } public decimal TotalPrice { get; set; } public string Plant { get; set; } = string.Empty; public string StorageLocation { get; set; } = string.Empty; public string DeliveryDate { get; set; } = string.Empty; public string Status { get; set; } = "OPEN"; public string DepartmentKey { get; set; } = string.Empty; public string CostCenter { get; set; } = string.Empty; public string Remarks { get; set; } = string.Empty; }
+public class PurchaseOrderItemEntity : EntityBase { public Guid TenantId { get; set; } public Guid PurchaseOrderId { get; set; } public int LineNumber { get; set; } public string MaterialName { get; set; } = string.Empty; public string MaterialCode { get; set; } = string.Empty; public decimal Quantity { get; set; } public string UOM { get; set; } = "EA"; public decimal UnitPrice { get; set; } public decimal TotalPrice { get; set; } public string Plant { get; set; } = string.Empty; public string StorageLocation { get; set; } = string.Empty; public string DeliveryDate { get; set; } = string.Empty; public decimal ReceivedQty { get; set; } public decimal InvoicedQty { get; set; } public string Status { get; set; } = "OPEN"; public string DepartmentKey { get; set; } = string.Empty; public string CostCenter { get; set; } = string.Empty; public string BatchNo { get; set; } = string.Empty; }
+
+// Department Key
+public class DepartmentKeyEntity : EntityBase { public Guid TenantId { get; set; } public string Code { get; set; } = string.Empty; public string Name { get; set; } = string.Empty; public string Description { get; set; } = string.Empty; public string CostCenterDefault { get; set; } = string.Empty; public bool IsActive { get; set; } = true; }
+
+// Release Strategy
+public class ReleaseStrategyEntity : EntityBase { public Guid TenantId { get; set; } public string Code { get; set; } = string.Empty; public string Name { get; set; } = string.Empty; public string Description { get; set; } = string.Empty; public string DocumentType { get; set; } = string.Empty; public decimal MinAmount { get; set; } public decimal MaxAmount { get; set; } public string Plant { get; set; } = string.Empty; public string DepartmentKey { get; set; } = string.Empty; public bool IsActive { get; set; } = true; }
+public class ReleaseCodeEntity : EntityBase { public Guid TenantId { get; set; } public Guid ReleaseStrategyId { get; set; } public int Level { get; set; } public string Code { get; set; } = string.Empty; public string ApproverRole { get; set; } = string.Empty; public string ApproverUserId { get; set; } = string.Empty; public bool IsRequired { get; set; } = true; }
