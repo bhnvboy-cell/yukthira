@@ -1338,28 +1338,27 @@ CREATE TABLE fi_document_lines (
     partner_name VARCHAR(200)
 );
 
-CREATE TABLE ar_ap_aging (
+CREATE TABLE ap_aging (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tenant_id UUID NOT NULL REFERENCES yuktira_core.tenants(id) ON DELETE CASCADE,
-    partner_type VARCHAR(10) NOT NULL CHECK (partner_type IN ('CUSTOMER','VENDOR')),
-    partner_id UUID NOT NULL,
-    partner_code VARCHAR(50),
-    partner_name VARCHAR(200),
     document_number VARCHAR(50),
-    document_date DATE,
-    due_date DATE,
+    date DATE,
+    vendor_name VARCHAR(200),
     amount DECIMAL(18,2),
-    open_amount DECIMAL(18,2),
-    days_overdue INT,
-    aging_bucket VARCHAR(20) GENERATED ALWAYS AS (
-        CASE
-            WHEN days_overdue <= 0 THEN 'CURRENT'
-            WHEN days_overdue <= 30 THEN '1-30'
-            WHEN days_overdue <= 60 THEN '31-60'
-            WHEN days_overdue <= 90 THEN '61-90'
-            ELSE '90+'
-        END
-    ) STORED,
+    paid_amount DECIMAL(18,2),
+    status VARCHAR(20) DEFAULT 'Open',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE ar_aging (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES yuktira_core.tenants(id) ON DELETE CASCADE,
+    document_number VARCHAR(50),
+    date DATE,
+    customer_name VARCHAR(200),
+    amount DECIMAL(18,2),
+    received_amount DECIMAL(18,2),
+    status VARCHAR(20) DEFAULT 'Open',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

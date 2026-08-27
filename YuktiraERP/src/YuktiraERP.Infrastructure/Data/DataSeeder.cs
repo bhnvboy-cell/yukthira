@@ -30,9 +30,9 @@ public class DataSeeder
             await _db.Database.EnsureCreatedAsync();
         }
 
+        await SeedCoreUsersAsync();
         await SeedBetaTestersAsync();
         await SeedChartOfAccountsAsync();
-        await SeedCoreUsersAsync();
         await SeedMasterDataAsync();
         await SeedSalesDataAsync();
         await SeedTaxCodesAsync();

@@ -18,7 +18,7 @@ public class APEntryEntityConfiguration : IEntityTypeConfiguration<APEntryEntity
 {
     public void Configure(EntityTypeBuilder<APEntryEntity> builder)
     {
-        builder.ToTable("ar_ap_aging", "yuktira_fi");
+        builder.ToTable("ap_aging", "yuktira_fi");
         builder.Property(e => e.Amount).HasColumnType("decimal(18,2)");
         builder.Property(e => e.PaidAmount).HasColumnType("decimal(18,2)");
     }
@@ -28,7 +28,7 @@ public class AREntryEntityConfiguration : IEntityTypeConfiguration<AREntryEntity
 {
     public void Configure(EntityTypeBuilder<AREntryEntity> builder)
     {
-        builder.ToTable("ar_ap_aging", "yuktira_fi");
+        builder.ToTable("ar_aging", "yuktira_fi");
         builder.Property(e => e.Amount).HasColumnType("decimal(18,2)");
         builder.Property(e => e.ReceivedAmount).HasColumnType("decimal(18,2)");
     }
