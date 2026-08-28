@@ -179,6 +179,59 @@ public class YuktiraDbContext : DbContext
     public DbSet<DepartmentKeyEntity> DepartmentKeys => Set<DepartmentKeyEntity>();
     public DbSet<ReleaseStrategyEntity> ReleaseStrategies => Set<ReleaseStrategyEntity>();
     public DbSet<ReleaseCodeEntity> ReleaseCodes => Set<ReleaseCodeEntity>();
+    // Customer Complaint & Return with Supplier Pass-Through Claim
+    public DbSet<CustomerComplaintReturnEntity> CustomerComplaintReturns => Set<CustomerComplaintReturnEntity>();
+    public DbSet<ReturnDeliveryEntity> ReturnDeliveries => Set<ReturnDeliveryEntity>();
+    public DbSet<QualityInspectionReturnEntity> QualityInspectionReturns => Set<QualityInspectionReturnEntity>();
+    public DbSet<ComplaintFinancialPostingEntity> ComplaintFinancialPostings => Set<ComplaintFinancialPostingEntity>();
+    public DbSet<SupplierClaimEntity> SupplierClaims => Set<SupplierClaimEntity>();
+    public DbSet<SupplierReturnDeliveryEntity> SupplierReturnDeliveries => Set<SupplierReturnDeliveryEntity>();
+    public DbSet<ComplaintWorkflowStepEntity> ComplaintWorkflowSteps => Set<ComplaintWorkflowStepEntity>();
+    // Phase 1.2: SOX Compliance
+    public DbSet<SoxDutyEntity> SoxDuties => Set<SoxDutyEntity>();
+    public DbSet<SoxAssignmentEntity> SoxAssignments => Set<SoxAssignmentEntity>();
+    public DbSet<SoxViolationEntity> SoxViolations => Set<SoxViolationEntity>();
+    public DbSet<ImmutableAuditTrailEntity> ImmutableAuditTrails => Set<ImmutableAuditTrailEntity>();
+    // Phase 1.1: Universal Journal
+    public DbSet<UniversalJournalEntity> UniversalJournals => Set<UniversalJournalEntity>();
+    // Phase 1.3: RF Framework
+    public DbSet<RFSessionEntity> RFSessions => Set<RFSessionEntity>();
+    public DbSet<RFTransactionEntity> RFTransactions => Set<RFTransactionEntity>();
+    public DbSet<RFMenuItemEntity> RFMenuItems => Set<RFMenuItemEntity>();
+    public DbSet<RFPickTaskEntity> RFPickTasks => Set<RFPickTaskEntity>();
+    public DbSet<RFCountTaskEntity> RFCountTasks => Set<RFCountTaskEntity>();
+    // Phase 2.1: Wave Pick & Slotting
+    public DbSet<WavePickEntity> WavePicks => Set<WavePickEntity>();
+    public DbSet<WavePickLineEntity> WavePickLines => Set<WavePickLineEntity>();
+    public DbSet<VelocitySlottingEntity> VelocitySlottings => Set<VelocitySlottingEntity>();
+    public DbSet<BinMasterEntity> BinMasters => Set<BinMasterEntity>();
+    // Phase 2.2: PP/DS Scheduling
+    public DbSet<FiniteScheduleEntity> FiniteSchedules => Set<FiniteScheduleEntity>();
+    public DbSet<FiniteScheduleOperationEntity> FiniteScheduleOperations => Set<FiniteScheduleOperationEntity>();
+    public DbSet<CapacityLoadEntity> CapacityLoads => Set<CapacityLoadEntity>();
+    public DbSet<MaterialAvailabilityEntity> MaterialAvailabilities => Set<MaterialAvailabilityEntity>();
+    // Phase 2.3: MRP Events
+    public DbSet<MrpEventEntity> MrpEvents => Set<MrpEventEntity>();
+    public DbSet<MrpEventStreamEntity> MrpEventStreams => Set<MrpEventStreamEntity>();
+    public DbSet<MrpPlanningRunEntity> MrpPlanningRuns => Set<MrpPlanningRunEntity>();
+    public DbSet<MrpEventSubscriptionEntity> MrpEventSubscriptions => Set<MrpEventSubscriptionEntity>();
+    // Phase 3.1: Consolidation
+    public DbSet<ConsolidationGroupEntity> ConsolidationGroups => Set<ConsolidationGroupEntity>();
+    public DbSet<ConsolidationEntityEntity> ConsolidationEntities => Set<ConsolidationEntityEntity>();
+    public DbSet<InterCompanyTransactionEntity> InterCompanyTransactions => Set<InterCompanyTransactionEntity>();
+    public DbSet<ConsolidationEliminationEntity> ConsolidationEliminations => Set<ConsolidationEliminationEntity>();
+    public DbSet<CurrencyTranslationEntity> CurrencyTranslations => Set<CurrencyTranslationEntity>();
+    // Phase 3.2: Localization Tax
+    public DbSet<LocalizationCountryEntity> LocalizationCountries => Set<LocalizationCountryEntity>();
+    public DbSet<LocalizationTaxConfigEntity> LocalizationTaxConfigs => Set<LocalizationTaxConfigEntity>();
+    public DbSet<TaxReturnEntity> TaxReturns => Set<TaxReturnEntity>();
+    public DbSet<WithholdingTaxEntity> WithholdingTaxes => Set<WithholdingTaxEntity>();
+    // Phase 3.3: AI Gateway
+    public DbSet<AiDocumentOcrEntity> AiDocumentOcrs => Set<AiDocumentOcrEntity>();
+    public DbSet<AiDocumentTemplateEntity> AiDocumentTemplates => Set<AiDocumentTemplateEntity>();
+    public DbSet<AiPredictiveModelEntity> AiPredictiveModels => Set<AiPredictiveModelEntity>();
+    public DbSet<AiForecastEntity> AiForecasts => Set<AiForecastEntity>();
+    public DbSet<AiAnomalyEntity> AiAnomalies => Set<AiAnomalyEntity>();
     // ATP/CTP - Stock Reservations and Allocations
     public DbSet<StockReservationEntity> StockReservations => Set<StockReservationEntity>();
     public DbSet<StockAllocationEntity> StockAllocations => Set<StockAllocationEntity>();

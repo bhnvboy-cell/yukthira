@@ -75,6 +75,25 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Register(CS01());
         Register(CR01());
         Register(IL01());
+        // Customer Complaint & Return with Supplier Pass-Through Claim
+        Register(CRRETURN());
+        Register(CRINSPECT());
+        Register(CRUDPOST());
+        Register(CRCREDIT());
+        Register(CRSUPPLY());
+        Register(CRSRET());
+        Register(CRDEBIT());
+        Register(SOXADM());
+        Register(UNIJRN());
+        Register(RFSCAN());
+        Register(RFPICK());
+        Register(WAVEPK());
+        Register(VSLOTT());
+        Register(PPDS());
+        Register(MRPEVT());
+        Register(CONSOL());
+        Register(TAXRET());
+        Register(AIOCR());
     }
 
     private static TCodeLayoutConfig QE51N() => new()
@@ -2957,5 +2976,957 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // Customer Complaint & Return with Supplier Pass-Through Claim
+    // ══════════════════════════════════════════════════════════════════════════
+
+    private static TCodeLayoutConfig CRRETURN() => new()
+    {
+        TCode = "CRRETURN", Title = "Customer Complaint & Return Order", Module = "SD", Icon = "bi-arrow-return-left",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Complaint", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "workflow", Label = "Start Workflow", Icon = "bi-play-circle", Style = "info", Handler = "startWorkflow" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Complaint Number", Value = "", Key = "complaintNumber" },
+            new() { Label = "Complaint Type", Value = "Q1", Key = "complaintType", Editable = true },
+            new() { Label = "Return Order Type", Value = "RE", Key = "returnType", Editable = true },
+            new() { Label = "Customer Code", Value = "", Key = "customerCode", Editable = true },
+            new() { Label = "Customer Name", Value = "", Key = "customerName", Editable = true },
+            new() { Label = "Material Code", Value = "", Key = "materialCode", Editable = true },
+            new() { Label = "Material Name", Value = "", Key = "materialName", Editable = true },
+            new() { Label = "Return Quantity", Value = "0", Key = "returnQuantity", Editable = true },
+            new() { Label = "Unit Price", Value = "0", Key = "unitPrice", Editable = true },
+            new() { Label = "Batch Number", Value = "", Key = "batchNumber", Editable = true },
+            new() { Label = "Defect Code", Value = "", Key = "defectCode", Editable = true },
+            new() { Label = "Defect Description", Value = "", Key = "defectDescription", Editable = true },
+            new() { Label = "Supplier Vendor Code", Value = "", Key = "supplierVendorCode", Editable = true },
+            new() { Label = "Supplier Batch Number", Value = "", Key = "supplierBatchNumber", Editable = true },
+            new() { Label = "Plant", Value = "PLT-01", Key = "plant", Editable = true },
+            new() { Label = "Status", Value = "CREATED", Key = "status" },
+            new() { Label = "Current Step", Value = "", Key = "currentStep" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "complaint", Label = "Complaint Details", Icon = "bi-exclamation-circle", Active = true },
+            new() { Id = "return", Label = "Return Order", Icon = "bi-arrow-return-left" },
+            new() { Id = "quality", Label = "Quality", Icon = "bi-clipboard-check" },
+            new() { Id = "financials", Label = "Financials", Icon = "bi-calculator" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "complaintNumber", Label = "Complaint #", Type = "text", Width = 160, Required = true },
+            new() { Key = "customerName", Label = "Customer", Type = "text", Width = 200, Editable = true },
+            new() { Key = "materialName", Label = "Material", Type = "text", Width = 200, Editable = true },
+            new() { Key = "returnQuantity", Label = "Qty", Type = "number", Width = 100, Editable = true },
+            new() { Key = "unitPrice", Label = "Unit Price", Type = "currency", Width = 120, Editable = true },
+            new() { Key = "returnAmount", Label = "Amount", Type = "currency", Width = 120 },
+            new() { Key = "defectCode", Label = "Defect", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "SURFACE", Label = "Surface Defect" },
+                new() { Value = "DIMENSION", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+                new() { Value = "MATERIAL", Label = "Material Defect" },
+                new() { Value = "PACKAGING", Label = "Packaging" },
+                new() { Value = "CONTAMINATION", Label = "Contamination" },
+            }},
+            new() { Key = "supplierVendorCode", Label = "Supplier", Type = "text", Width = 150, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 130, Options = new() {
+                new() { Value = "CREATED", Label = "Created" },
+                new() { Value = "RETURN_RECEIVED", Label = "Return Received" },
+                new() { Value = "INSPECTION_COMPLETED", Label = "Inspection Done" },
+                new() { Value = "USAGE_DECIDED", Label = "UD Posted" },
+                new() { Value = "CREDIT_MEMO_ISSUED", Label = "Credit Memo" },
+                new() { Value = "SUPPLIER_CLAIM_CREATED", Label = "Supplier Claim" },
+                new() { Value = "SUPPLIER_RETURN_POSTED", Label = "Supplier Return" },
+                new() { Value = "RECOVERY_COMPLETED", Label = "Recovery Done" },
+                new() { Value = "CLOSED", Label = "Closed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Complaint", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save complaint?" },
+            new() { Id = "startWorkflow", Label = "Start Full Workflow", Icon = "bi-play-circle", Style = "info", Handler = "startWorkflow", Confirm = true, ConfirmMessage = "Execute full complaint workflow?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig CRINSPECT() => new()
+    {
+        TCode = "CRINSPECT", Title = "Quality Inspection - Return Analysis", Module = "QM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Result", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "ud", Label = "Usage Decision", Icon = "bi-check-circle", Style = "info", Handler = "usageDecision" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Inspection Lot", Value = "", Key = "inspectionLot", Editable = true },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "Batch", Value = "", Key = "batch" },
+            new() { Label = "Supplier Batch", Value = "", Key = "supplierBatch" },
+            new() { Label = "Quantity", Value = "", Key = "quantity" },
+            new() { Label = "Plant", Value = "PLT-01", Key = "plant" },
+            new() { Label = "Status", Value = "OPEN", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "results", Label = "Inspection Results", Icon = "bi-clipboard-data", Active = true },
+            new() { Id = "defects", Label = "Defect Analysis", Icon = "bi-exclamation-triangle" },
+            new() { Id = "rootCause", Label = "Root Cause", Icon = "bi-search" },
+            new() { Id = "ud", Label = "Usage Decision", Icon = "bi-check-circle" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "characteristic", Label = "Characteristic", Type = "text", Width = 200, Required = true, Editable = true },
+            new() { Key = "specification", Label = "Specification", Type = "text", Width = 180, Editable = true },
+            new() { Key = "resultValue", Label = "Result", Type = "number", Editable = true, Width = 120, Validation = new() { Min = 0, Max = 99999, Required = true } },
+            new() { Key = "resultValuation", Label = "Valuation", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "OK", Label = "OK" },
+                new() { Value = "NOK", Label = "Not OK" },
+                new() { Value = "REVIEW", Label = "Review" },
+            }},
+            new() { Key = "defectCode", Label = "Defect Code", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+                new() { Value = "SURFACE", Label = "Surface Defect" },
+                new() { Value = "DIMENSION", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+                new() { Value = "MATERIAL", Label = "Material Defect" },
+                new() { Value = "CONTAMINATION", Label = "Contamination" },
+            }},
+            new() { Key = "rootCause", Label = "Root Cause", Type = "dropdown", Width = 180, Editable = true, Options = new() {
+                new() { Value = "SUPPLIER-RAW", Label = "Supplier Raw Material" },
+                new() { Value = "SUPPLIER-PROCESS", Label = "Supplier Process" },
+                new() { Value = "SUPPLIER-STORAGE", Label = "Supplier Storage" },
+                new() { Value = "INTERNAL-PROCESS", Label = "Internal Process" },
+                new() { Value = "TRANSPORT", Label = "Transport Damage" },
+                new() { Value = "CUSTOMER-MISHANDLING", Label = "Customer Mishandling" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Results", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save inspection results?" },
+            new() { Id = "usageDecision", Label = "Post Usage Decision", Icon = "bi-check-circle", Style = "info", Handler = "usageDecision", Confirm = true, ConfirmMessage = "Post usage decision?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig CRUDPOST() => new()
+    {
+        TCode = "CRUDPOST", Title = "Post Usage Decision - Return", Module = "QM", Icon = "bi-check-circle",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Post Decision", Icon = "bi-send", Style = "primary", Handler = "post" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Inspection Lot", Value = "", Key = "inspectionLot" },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "Usage Decision", Value = "", Key = "usageDecision", Editable = true },
+            new() { Label = "UD Code", Value = "", Key = "udCode", Editable = true },
+            new() { Label = "Stock Proposal", Value = "", Key = "stockProposal", Editable = true },
+            new() { Label = "Target Stock Type", Value = "BLOCKED", Key = "targetStockType", Editable = true },
+            new() { Label = "Decided By", Value = "", Key = "decidedBy", Editable = true },
+            new() { Label = "Status", Value = "OPEN", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "decision", Label = "Usage Decision", Icon = "bi-check-circle", Active = true },
+            new() { Id = "stock", Label = "Stock Transfer", Icon = "bi-box-arrow-right" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "post", Label = "Post Usage Decision", Icon = "bi-send", Style = "primary", Handler = "post", Confirm = true, ConfirmMessage = "Post usage decision and move stock?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig CRCREDIT() => new()
+    {
+        TCode = "CRCREDIT", Title = "Customer Credit Memo - Return", Module = "SD", Icon = "bi-credit-card",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "default", Handler = "simulate" },
+            new() { Id = "post", Label = "Post", Icon = "bi-send", Style = "primary", Handler = "post" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Billing Type", Value = "RE", Key = "billingType" },
+            new() { Label = "Complaint Number", Value = "", Key = "complaintNumber" },
+            new() { Label = "Customer Code", Value = "", Key = "customerCode" },
+            new() { Label = "Customer Name", Value = "", Key = "customerName" },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "Return Quantity", Value = "", Key = "returnQuantity" },
+            new() { Label = "Credit Amount", Value = "", Key = "creditAmount", Editable = true },
+            new() { Label = "Currency", Value = "INR", Key = "currency" },
+            new() { Label = "Cost Center", Value = "", Key = "costCenter", Editable = true },
+            new() { Label = "GL Account", Value = "", Key = "glAccount", Editable = true },
+            new() { Label = "Status", Value = "PENDING", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Credit Memo Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "lineItems", Label = "Line Items", Icon = "bi-list-ol" },
+            new() { Id = "accounting", Label = "Accounting", Icon = "bi-calculator" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "post", Label = "Post Credit Memo", Icon = "bi-send", Style = "primary", Handler = "post", Confirm = true, ConfirmMessage = "Issue credit memo to customer?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig CRSUPPLY() => new()
+    {
+        TCode = "CRSUPPLY", Title = "Supplier Complaint & Claim", Module = "QM", Icon = "bi-person-exclamation",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Claim", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "notify", Label = "Notify Supplier", Icon = "bi-envelope", Style = "info", Handler = "notifySupplier" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Supplier Claim Number", Value = "", Key = "supplierClaimNumber" },
+            new() { Label = "Complaint Type", Value = "Q2", Key = "complaintType" },
+            new() { Label = "Vendor Code", Value = "", Key = "vendorCode", Editable = true },
+            new() { Label = "Vendor Name", Value = "", Key = "vendorName", Editable = true },
+            new() { Label = "Material Code", Value = "", Key = "materialCode", Editable = true },
+            new() { Label = "Material Name", Value = "", Key = "materialName", Editable = true },
+            new() { Label = "Supplier Batch", Value = "", Key = "supplierBatch", Editable = true },
+            new() { Label = "Claim Quantity", Value = "0", Key = "claimQuantity", Editable = true },
+            new() { Label = "Claim Amount", Value = "0", Key = "claimAmount", Editable = true },
+            new() { Label = "Defect Code", Value = "", Key = "defectCode", Editable = true },
+            new() { Label = "Root Cause", Value = "", Key = "rootCause", Editable = true },
+            new() { Label = "Plant", Value = "PLT-01", Key = "plant", Editable = true },
+            new() { Label = "Status", Value = "CREATED", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "claim", Label = "Claim Details", Icon = "bi-exclamation-circle", Active = true },
+            new() { Id = "defect", Label = "Defect Analysis", Icon = "bi-search" },
+            new() { Id = "recovery", Label = "Recovery", Icon = "bi-cash" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "supplierClaimNumber", Label = "Claim #", Type = "text", Width = 160 },
+            new() { Key = "vendorName", Label = "Vendor", Type = "text", Width = 200, Editable = true },
+            new() { Key = "materialName", Label = "Material", Type = "text", Width = 200, Editable = true },
+            new() { Key = "claimQuantity", Label = "Qty", Type = "number", Width = 100, Editable = true },
+            new() { Key = "claimAmount", Label = "Amount", Type = "currency", Width = 120, Editable = true },
+            new() { Key = "defectCode", Label = "Defect", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "RAW-IMPURITY", Label = "Raw Material Impurity" },
+                new() { Value = "RAW-SPEC", Label = "Out of Specification" },
+                new() { Value = "RAW-CONTAMINATION", Label = "Contamination" },
+                new() { Value = "PROCESS", Label = "Supplier Process Defect" },
+                new() { Value = "PACKAGING", Label = "Packaging Defect" },
+            }},
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 130, Options = new() {
+                new() { Value = "CREATED", Label = "Created" },
+                new() { Value = "SUPPLIER_NOTIFIED", Label = "Supplier Notified" },
+                new() { Value = "SUPPLIER_RETURN_POSTED", Label = "Return Posted" },
+                new() { Value = "RECOVERY_COMPLETED", Label = "Recovery Done" },
+                new() { Value = "CLOSED", Label = "Closed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Claim", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save supplier claim?" },
+            new() { Id = "notifySupplier", Label = "Notify Supplier", Icon = "bi-envelope", Style = "info", Handler = "notifySupplier", Confirm = true, ConfirmMessage = "Send notification to supplier?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig CRSRET() => new()
+    {
+        TCode = "CRSRET", Title = "Supplier Return Delivery (Mvt 122)", Module = "MM", Icon = "bi-box-arrow-right",
+        ToolbarActions = new()
+        {
+            new() { Id = "check", Label = "Check", Icon = "bi-check-circle", Style = "primary", Handler = "validate" },
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "default", Handler = "simulate" },
+            new() { Id = "post", Label = "Post", Icon = "bi-send", Style = "success", Handler = "post" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Movement Type", Value = "122", Key = "movementType" },
+            new() { Label = "Supplier Claim Number", Value = "", Key = "supplierClaimNumber" },
+            new() { Label = "Vendor Code", Value = "", Key = "vendorCode" },
+            new() { Label = "Vendor Name", Value = "", Key = "vendorName" },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "Quantity", Value = "0", Key = "quantity", Editable = true },
+            new() { Label = "Batch", Value = "", Key = "batch", Editable = true },
+            new() { Label = "Plant", Value = "PLT-01", Key = "plant", Editable = true },
+            new() { Label = "Storage Location", Value = "", Key = "storageLocation", Editable = true },
+            new() { Label = "PO Reference", Value = "", Key = "poReference" },
+            new() { Label = "Posting Date", Value = "", Key = "postingDate", Type = "date", Editable = true },
+            new() { Label = "Status", Value = "PENDING", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "items", Label = "Item Overview", Icon = "bi-list-ol", Active = true },
+            new() { Id = "vendor", Label = "Vendor", Icon = "bi-person" },
+            new() { Id = "accounting", Label = "Accounting", Icon = "bi-calculator" },
+        },
+        Columns = new()
+        {
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 200, Editable = true },
+            new() { Key = "quantity", Label = "Qty", Type = "number", Editable = true, Width = 90, Validation = new() { Min = 0.001m, Required = true } },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 70, Editable = true },
+            new() { Key = "unitPrice", Label = "Unit Price", Type = "currency", Width = 110, Editable = true },
+            new() { Key = "totalValue", Label = "Total Value", Type = "currency", Width = 120 },
+            new() { Key = "batch", Label = "Batch", Type = "text", Width = 120, Editable = true },
+            new() { Key = "poReference", Label = "PO Reference", Type = "text", Width = 130 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "post", Label = "Post Supplier Return", Icon = "bi-send", Style = "primary", Handler = "post", Confirm = true, ConfirmMessage = "Post supplier return delivery (Mvt 122)?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig CRDEBIT() => new()
+    {
+        TCode = "CRDEBIT", Title = "Supplier Debit Memo (Credit Recovery)", Module = "FI", Icon = "bi-cash-stack",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "default", Handler = "simulate" },
+            new() { Id = "post", Label = "Post", Icon = "bi-send", Style = "primary", Handler = "post" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Document Type", Value = "Credit Memo", Key = "documentType" },
+            new() { Label = "Supplier Claim Number", Value = "", Key = "supplierClaimNumber" },
+            new() { Label = "Vendor Code", Value = "", Key = "vendorCode" },
+            new() { Label = "Vendor Name", Value = "", Key = "vendorName" },
+            new() { Label = "Debit Amount", Value = "0", Key = "debitAmount", Editable = true },
+            new() { Label = "Currency", Value = "INR", Key = "currency" },
+            new() { Label = "PO Reference", Value = "", Key = "poReference" },
+            new() { Label = "Cost Center", Value = "", Key = "costCenter", Editable = true },
+            new() { Label = "GL Account", Value = "", Key = "glAccount", Editable = true },
+            new() { Label = "Status", Value = "PENDING", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Debit Memo Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "accounting", Label = "Accounting", Icon = "bi-calculator" },
+            new() { Id = "recovery", Label = "Recovery Details", Icon = "bi-cash" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "post", Label = "Post Debit Memo", Icon = "bi-send", Style = "primary", Handler = "post", Confirm = true, ConfirmMessage = "Issue debit memo and recover from supplier?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig SOXADM() => new()
+    {
+        TCode = "SOXADM", Title = "SOX Compliance Administration", Module = "GRC", Icon = "bi-shield-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Duty", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "violations", Label = "Violations", Icon = "bi-exclamation-triangle", Style = "warning", Handler = "violations" },
+            new() { Id = "audittrail", Label = "Audit Trail", Icon = "bi-clock-history", Style = "default", Handler = "audittrail" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Compliance Status", Value = "", Key = "complianceStatus" },
+            new() { Label = "Total Duties", Value = "0", Key = "totalDuties" },
+            new() { Label = "Active Assignments", Value = "0", Key = "activeAssignments" },
+            new() { Label = "Violations Count", Value = "0", Key = "violationsCount" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "duties", Label = "SoD Duties", Icon = "bi-list-check", Active = true },
+            new() { Id = "assignments", Label = "Assignments", Icon = "bi-people" },
+            new() { Id = "violations", Label = "Violations", Icon = "bi-exclamation-octagon" },
+            new() { Id = "audittrail", Label = "Audit Trail", Icon = "bi-clock-history" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "dutyCode", Label = "Duty Code", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "dutyName", Label = "Duty Name", Type = "text", Width = 200, Editable = true },
+            new() { Key = "module", Label = "Module", Type = "text", Width = 100, Editable = true },
+            new() { Key = "conflictDuties", Label = "Conflict Duties", Type = "text", Width = 200, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "ACTIVE", Label = "Active", Color = "success" },
+                new() { Value = "INACTIVE", Label = "Inactive", Color = "secondary" },
+                new() { Value = "VIOLATED", Label = "Violated", Color = "danger" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save SOX compliance duties?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig UNIJRN() => new()
+    {
+        TCode = "UNIJRN", Title = "Universal Journal Entry", Module = "FI", Icon = "bi-journal-text",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Entry", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "default", Handler = "simulate" },
+            new() { Id = "post", Label = "Post", Icon = "bi-send", Style = "success", Handler = "post" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Document Number", Value = "", Key = "documentNumber" },
+            new() { Label = "Fiscal Year", Value = "", Key = "fiscalYear" },
+            new() { Label = "Period", Value = "", Key = "period", Editable = true },
+            new() { Label = "Posting Date", Value = "", Key = "postingDate", Type = "date", Editable = true },
+            new() { Label = "Document Type", Value = "", Key = "documentType", Editable = true },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "lineitems", Label = "Line Items", Icon = "bi-list-ol" },
+            new() { Id = "costcenter", Label = "Cost Center", Icon = "bi-diagram-3" },
+            new() { Id = "profitcenter", Label = "Profit Center", Icon = "bi-graph-up" },
+            new() { Id = "accounting", Label = "Accounting", Icon = "bi-calculator" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lineNum", Label = "Line", Type = "number", Width = 50 },
+            new() { Key = "accountCode", Label = "Account Code", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "accountName", Label = "Account Name", Type = "text", Width = 200, Editable = true },
+            new() { Key = "debit", Label = "Debit", Type = "currency", Width = 120, Editable = true, Validation = new() { Min = 0 } },
+            new() { Key = "credit", Label = "Credit", Type = "currency", Width = 120, Editable = true, Validation = new() { Min = 0 } },
+            new() { Key = "costCenter", Label = "Cost Center", Type = "text", Width = 120, Editable = true },
+            new() { Key = "profitCenter", Label = "Profit Center", Type = "text", Width = 120, Editable = true },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 130, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "default", Handler = "simulate" },
+            new() { Id = "post", Label = "Post Journal", Icon = "bi-send", Style = "primary", Handler = "post", Confirm = true, ConfirmMessage = "Post universal journal entry?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig RFSCAN() => new()
+    {
+        TCode = "RFSCAN", Title = "RF Scanner Menu", Module = "WM", Icon = "bi-upc-scan",
+        ToolbarActions = new()
+        {
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Session ID", Value = "", Key = "sessionId" },
+            new() { Label = "User ID", Value = "", Key = "userId" },
+            new() { Label = "Plant", Value = "", Key = "plant" },
+            new() { Label = "Warehouse", Value = "", Key = "warehouse" },
+            new() { Label = "Current Bin", Value = "", Key = "currentBin" },
+            new() { Label = "Device Type", Value = "", Key = "deviceType" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "menu", Label = "Menu", Icon = "bi-list-ul", Active = true },
+            new() { Id = "scan", Label = "Scan", Icon = "bi-upc-scan" },
+            new() { Id = "tasks", Label = "Tasks", Icon = "bi-list-check" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "menuCode", Label = "Menu Code", Type = "text", Width = 120, Required = true },
+            new() { Key = "menuName", Label = "Menu Name", Type = "text", Width = 220 },
+            new() { Key = "transactionType", Label = "Transaction Type", Type = "text", Width = 160 },
+            new() { Key = "requiredPermission", Label = "Required Permission", Type = "text", Width = 160 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig RFPICK() => new()
+    {
+        TCode = "RFPICK", Title = "RF Pick Task", Module = "WM", Icon = "bi-box-seam",
+        ToolbarActions = new()
+        {
+            new() { Id = "scan", Label = "Scan", Icon = "bi-upc-scan", Style = "primary", Handler = "scan" },
+            new() { Id = "pick", Label = "Pick", Icon = "bi-box-arrow-right", Style = "success", Handler = "pick" },
+            new() { Id = "shortPick", Label = "Short Pick", Icon = "bi-dash-circle", Style = "warning", Handler = "shortPick" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Wave Number", Value = "", Key = "waveNumber" },
+            new() { Label = "Task ID", Value = "", Key = "taskId" },
+            new() { Label = "Material Code", Value = "", Key = "materialCode" },
+            new() { Label = "Source Bin", Value = "", Key = "sourceBin" },
+            new() { Label = "Destination Bin", Value = "", Key = "destinationBin" },
+            new() { Label = "Required Qty", Value = "0", Key = "requiredQty" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "task", Label = "Task", Icon = "bi-clipboard-check", Active = true },
+            new() { Id = "scan", Label = "Scan", Icon = "bi-upc-scan" },
+            new() { Id = "confirm", Label = "Confirm", Icon = "bi-check2-square" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "taskLine", Label = "Task Line", Type = "number", Width = 80 },
+            new() { Key = "materialName", Label = "Material Name", Type = "text", Width = 200 },
+            new() { Key = "sourceBin", Label = "Source Bin", Type = "text", Width = 120 },
+            new() { Key = "requiredQty", Label = "Required Qty", Type = "number", Width = 110 },
+            new() { Key = "pickedQty", Label = "Picked Qty", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0 } },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "OPEN", Label = "Open", Color = "warning" },
+                new() { Value = "IN_PROGRESS", Label = "In Progress", Color = "info" },
+                new() { Value = "COMPLETED", Label = "Completed", Color = "success" },
+                new() { Value = "SHORT", Label = "Short", Color = "danger" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "confirmPick", Label = "Confirm Pick", Icon = "bi-check-lg", Style = "primary", Handler = "confirmPick", Confirm = true, ConfirmMessage = "Confirm pick completion?" },
+            new() { Id = "shortPick", Label = "Short Pick", Icon = "bi-dash-circle", Style = "warning", Handler = "shortPick", Confirm = true, ConfirmMessage = "Report short pick?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig WAVEPK() => new()
+    {
+        TCode = "WAVEPK", Title = "Wave Pick Management", Module = "WM", Icon = "bi-layers",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Wave", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "release", Label = "Release", Icon = "bi-send", Style = "primary", Handler = "release" },
+            new() { Id = "assign", Label = "Assign", Icon = "bi-people", Style = "default", Handler = "assign" },
+            new() { Id = "optimize", Label = "Optimize", Icon = "bi-speedometer", Style = "default", Handler = "optimize" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Wave Number", Value = "", Key = "waveNumber" },
+            new() { Label = "Wave Name", Value = "", Key = "waveName", Editable = true },
+            new() { Label = "Wave Type", Value = "", Key = "waveType", Editable = true },
+            new() { Label = "Warehouse", Value = "", Key = "warehouse" },
+            new() { Label = "Total Lines", Value = "0", Key = "totalLines" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "lines", Label = "Wave Lines", Icon = "bi-list-ol" },
+            new() { Id = "progress", Label = "Progress", Icon = "bi-graph-up" },
+            new() { Id = "assignment", Label = "Assignment", Icon = "bi-people" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lineNum", Label = "Line", Type = "number", Width = 50 },
+            new() { Key = "deliveryNumber", Label = "Delivery Number", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "customerName", Label = "Customer Name", Type = "text", Width = 180 },
+            new() { Key = "materialName", Label = "Material Name", Type = "text", Width = 180 },
+            new() { Key = "sourceBin", Label = "Source Bin", Type = "text", Width = 110 },
+            new() { Key = "requiredQty", Label = "Required Qty", Type = "number", Width = 100 },
+            new() { Key = "pickedQty", Label = "Picked Qty", Type = "number", Width = 100 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "OPEN", Label = "Open", Color = "warning" },
+                new() { Value = "IN_PROGRESS", Label = "In Progress", Color = "info" },
+                new() { Value = "COMPLETED", Label = "Completed", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "release", Label = "Release Wave", Icon = "bi-send", Style = "primary", Handler = "release", Confirm = true, ConfirmMessage = "Release this wave for picking?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig VSLOTT() => new()
+    {
+        TCode = "VSLOTT", Title = "Velocity Slotting", Module = "WM", Icon = "bi-speedometer",
+        ToolbarActions = new()
+        {
+            new() { Id = "calculate", Label = "Calculate", Icon = "bi-calculator", Style = "primary", Handler = "calculate" },
+            new() { Id = "apply", Label = "Apply", Icon = "bi-check-lg", Style = "success", Handler = "apply" },
+            new() { Id = "batchApply", Label = "Batch Apply", Icon = "bi-layers", Style = "default", Handler = "batchApply" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Plant", Value = "", Key = "plant" },
+            new() { Label = "Warehouse", Value = "", Key = "warehouse" },
+            new() { Label = "Total Materials", Value = "0", Key = "totalMaterials" },
+            new() { Label = "Class A", Value = "0", Key = "classA" },
+            new() { Label = "Class B", Value = "0", Key = "classB" },
+            new() { Label = "Class C", Value = "0", Key = "classC" },
+            new() { Label = "Class D", Value = "0", Key = "classD" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "velocity", Label = "Velocity Classes", Icon = "bi-speedometer2", Active = true },
+            new() { Id = "recommendations", Label = "Recommendations", Icon = "bi-lightbulb" },
+            new() { Id = "bins", Label = "Bin Assignment", Icon = "bi-grid-3x3-gap" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "materialCode", Label = "Material Code", Type = "text", Width = 130, Required = true },
+            new() { Key = "materialName", Label = "Material Name", Type = "text", Width = 200 },
+            new() { Key = "velocityClass", Label = "Velocity Class", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "A", Label = "Class A - Fast" },
+                new() { Value = "B", Label = "Class B - Medium" },
+                new() { Value = "C", Label = "Class C - Slow" },
+                new() { Value = "D", Label = "Class D - Dead" },
+            }},
+            new() { Key = "consumption30", Label = "30-Day Consumption", Type = "number", Width = 150 },
+            new() { Key = "currentBin", Label = "Current Bin", Type = "text", Width = 110 },
+            new() { Key = "recommendedBin", Label = "Recommended Bin", Type = "text", Width = 140, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "CALCULATED", Label = "Calculated", Color = "info" },
+                new() { Value = "APPLIED", Label = "Applied", Color = "success" },
+                new() { Value = "PENDING", Label = "Pending", Color = "warning" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "apply", Label = "Apply Slotting", Icon = "bi-check-lg", Style = "primary", Handler = "apply", Confirm = true, ConfirmMessage = "Apply velocity slotting recommendations?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig PPDS() => new()
+    {
+        TCode = "PPDS", Title = "PP/DS Finite Scheduling", Module = "PP", Icon = "bi-calendar-range",
+        ToolbarActions = new()
+        {
+            new() { Id = "create", Label = "Create Schedule", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "calculate", Label = "Calculate", Icon = "bi-calculator", Style = "primary", Handler = "calculate" },
+            new() { Id = "optimize", Label = "Optimize", Icon = "bi-speedometer", Style = "default", Handler = "optimize" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Schedule ID", Value = "", Key = "scheduleId" },
+            new() { Label = "Schedule Name", Value = "", Key = "scheduleName", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Horizon Start", Value = "", Key = "horizonStart", Type = "date", Editable = true },
+            new() { Label = "Horizon End", Value = "", Key = "horizonEnd", Type = "date", Editable = true },
+            new() { Label = "Strategy", Value = "", Key = "strategy", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "operations", Label = "Operations", Icon = "bi-diagram-3" },
+            new() { Id = "capacity", Label = "Capacity", Icon = "bi-bar-chart-steps" },
+            new() { Id = "gantt", Label = "Gantt Chart", Icon = "bi-calendar-range" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "productionOrder", Label = "Production Order", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "materialName", Label = "Material Name", Type = "text", Width = 180 },
+            new() { Key = "workCenter", Label = "Work Center", Type = "text", Width = 120, Editable = true },
+            new() { Key = "plannedStart", Label = "Planned Start", Type = "date", Width = 130, Editable = true },
+            new() { Key = "plannedEnd", Label = "Planned End", Type = "date", Width = 130, Editable = true },
+            new() { Key = "duration", Label = "Duration (hrs)", Type = "number", Width = 120 },
+            new() { Key = "capacityLoad", Label = "Capacity Load %", Type = "number", Width = 120 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "PLANNED", Label = "Planned", Color = "info" },
+                new() { Value = "OPTIMIZED", Label = "Optimized", Color = "success" },
+                new() { Value = "OVERLOADED", Label = "Overloaded", Color = "danger" },
+                new() { Value = "CONFIRMED", Label = "Confirmed", Color = "secondary" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "calculate", Label = "Calculate Schedule", Icon = "bi-calculator", Style = "primary", Handler = "calculate", Confirm = true, ConfirmMessage = "Recalculate finite schedule?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig MRPEVT() => new()
+    {
+        TCode = "MRPEVT", Title = "MRP Event Monitor", Module = "MM", Icon = "bi-lightning",
+        ToolbarActions = new()
+        {
+            new() { Id = "publish", Label = "Publish Event", Icon = "bi-send", Style = "primary", Handler = "publish" },
+            new() { Id = "runMrp", Label = "Run MRP", Icon = "bi-play-circle", Style = "success", Handler = "runMrp" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Event Type", Value = "", Key = "eventType" },
+            new() { Label = "Material Code", Value = "", Key = "materialCode" },
+            new() { Label = "Plant", Value = "", Key = "plant" },
+            new() { Label = "Status", Value = "", Key = "status" },
+            new() { Label = "Pending Events", Value = "0", Key = "pendingEvents" },
+            new() { Label = "Processed Events", Value = "0", Key = "processedEvents" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "events", Label = "Events", Icon = "bi-lightning", Active = true },
+            new() { Id = "stream", Label = "Event Stream", Icon = "bi-activity" },
+            new() { Id = "runs", Label = "MRP Runs", Icon = "bi-play-circle" },
+            new() { Id = "subscriptions", Label = "Subscriptions", Icon = "bi-bell" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "eventType", Label = "Event Type", Type = "text", Width = 140, Required = true },
+            new() { Key = "materialCode", Label = "Material Code", Type = "text", Width = 130 },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80 },
+            new() { Key = "priority", Label = "Priority", Type = "dropdown", Width = 100, Editable = true, Options = new() {
+                new() { Value = "HIGH", Label = "High" },
+                new() { Value = "MEDIUM", Label = "Medium" },
+                new() { Value = "LOW", Label = "Low" },
+            }},
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "PENDING", Label = "Pending", Color = "warning" },
+                new() { Value = "PROCESSED", Label = "Processed", Color = "success" },
+                new() { Value = "FAILED", Label = "Failed", Color = "danger" },
+            }},
+            new() { Key = "processedAt", Label = "Processed At", Type = "date", Width = 130 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "runMrp", Label = "Run MRP Now", Icon = "bi-play-circle", Style = "primary", Handler = "runMrp", Confirm = true, ConfirmMessage = "Execute MRP with pending events?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig CONSOL() => new()
+    {
+        TCode = "CONSOL", Title = "Consolidation Workbench", Module = "FI", Icon = "bi-diagram-3",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Group", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "addEntity", Label = "Add Entity", Icon = "bi-building", Style = "default", Handler = "addEntity" },
+            new() { Id = "translate", Label = "Translate", Icon = "bi-translate", Style = "default", Handler = "translate" },
+            new() { Id = "eliminate", Label = "Eliminate", Icon = "bi-x-octagon", Style = "default", Handler = "eliminate" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Group Code", Value = "", Key = "groupCode" },
+            new() { Label = "Group Name", Value = "", Key = "groupName", Editable = true },
+            new() { Label = "Fiscal Year", Value = "", Key = "fiscalYear", Editable = true },
+            new() { Label = "Consolidation Currency", Value = "", Key = "consolidationCurrency", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "group", Label = "Group", Icon = "bi-diagram-3", Active = true },
+            new() { Id = "entities", Label = "Entities", Icon = "bi-building" },
+            new() { Id = "eliminations", Label = "Eliminations", Icon = "bi-x-octagon" },
+            new() { Id = "translation", Label = "Translation", Icon = "bi-translate" },
+            new() { Id = "report", Label = "Report", Icon = "bi-file-earmark-bar-graph" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "entityCode", Label = "Entity Code", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "entityName", Label = "Entity Name", Type = "text", Width = 200, Editable = true },
+            new() { Key = "currency", Label = "Currency", Type = "text", Width = 80, Editable = true },
+            new() { Key = "ownership", Label = "Ownership %", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0, Max = 100 } },
+            new() { Key = "revenue", Label = "Revenue", Type = "currency", Width = 130 },
+            new() { Key = "cost", Label = "Cost", Type = "currency", Width = 130 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "DRAFT", Label = "Draft", Color = "secondary" },
+                new() { Value = "TRANSLATED", Label = "Translated", Color = "info" },
+                new() { Value = "ELIMINATED", Label = "Eliminated", Color = "success" },
+                new() { Value = "CONSOLIDATED", Label = "Consolidated", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "translate", Label = "Translate Currencies", Icon = "bi-translate", Style = "primary", Handler = "translate", Confirm = true, ConfirmMessage = "Translate entity currencies?" },
+            new() { Id = "eliminate", Label = "Eliminate Intercompany", Icon = "bi-x-octagon", Style = "default", Handler = "eliminate", Confirm = true, ConfirmMessage = "Eliminate intercompany balances?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig TAXRET() => new()
+    {
+        TCode = "TAXRET", Title = "Tax Return Filing", Module = "FI", Icon = "bi-file-earmark-text",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Return", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "calculate", Label = "Calculate", Icon = "bi-calculator", Style = "primary", Handler = "calculate" },
+            new() { Id = "validate", Label = "Validate", Icon = "bi-check-circle", Style = "default", Handler = "validate" },
+            new() { Id = "file", Label = "File Return", Icon = "bi-send", Style = "success", Handler = "file" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Country Code", Value = "", Key = "countryCode", Editable = true },
+            new() { Label = "Tax Type", Value = "", Key = "taxType", Editable = true },
+            new() { Label = "Period", Value = "", Key = "period", Editable = true },
+            new() { Label = "Return Number", Value = "", Key = "returnNumber" },
+            new() { Label = "Total Output Tax", Value = "0", Key = "totalOutputTax" },
+            new() { Label = "Total Input Tax", Value = "0", Key = "totalInputTax" },
+            new() { Label = "Net Tax Payable", Value = "0", Key = "netTaxPayable" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "transactions", Label = "Transactions", Icon = "bi-list-ol" },
+            new() { Id = "filing", Label = "Filing", Icon = "bi-file-earmark-check" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "countryCode", Label = "Country", Type = "text", Width = 80, Required = true, Editable = true },
+            new() { Key = "taxType", Label = "Tax Type", Type = "text", Width = 100, Editable = true },
+            new() { Key = "period", Label = "Period", Type = "text", Width = 100, Editable = true },
+            new() { Key = "taxableSales", Label = "Taxable Sales", Type = "currency", Width = 130 },
+            new() { Key = "outputTax", Label = "Output Tax", Type = "currency", Width = 110 },
+            new() { Key = "inputTax", Label = "Input Tax", Type = "currency", Width = 110 },
+            new() { Key = "netPayable", Label = "Net Payable", Type = "currency", Width = 120 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "DRAFT", Label = "Draft", Color = "secondary" },
+                new() { Value = "CALCULATED", Label = "Calculated", Color = "info" },
+                new() { Value = "FILED", Label = "Filed", Color = "success" },
+                new() { Value = "REJECTED", Label = "Rejected", Color = "danger" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "calculate", Label = "Calculate Tax", Icon = "bi-calculator", Style = "primary", Handler = "calculate", Confirm = true, ConfirmMessage = "Calculate tax return amounts?" },
+            new() { Id = "file", Label = "File Return", Icon = "bi-send", Style = "success", Handler = "file", Confirm = true, ConfirmMessage = "File this tax return?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig AIOCR() => new()
+    {
+        TCode = "AIOCR", Title = "Document OCR Processing", Module = "AI", Icon = "bi-eye",
+        ToolbarActions = new()
+        {
+            new() { Id = "upload", Label = "Upload", Icon = "bi-cloud-upload", Style = "primary", Handler = "upload" },
+            new() { Id = "process", Label = "Process", Icon = "bi-cpu", Style = "success", Handler = "process" },
+            new() { Id = "validate", Label = "Validate", Icon = "bi-check-circle", Style = "default", Handler = "validate" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Document Type", Value = "", Key = "documentType" },
+            new() { Label = "File Name", Value = "", Key = "fileName" },
+            new() { Label = "File Size", Value = "", Key = "fileSize" },
+            new() { Label = "Status", Value = "", Key = "status" },
+            new() { Label = "Confidence Score", Value = "0", Key = "confidenceScore" },
+            new() { Label = "OCR Provider", Value = "", Key = "ocrProvider" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "upload", Label = "Upload", Icon = "bi-cloud-upload", Active = true },
+            new() { Id = "extracted", Label = "Extracted Data", Icon = "bi-file-earmark-text" },
+            new() { Id = "mapping", Label = "Field Mapping", Icon = "bi-arrow-left-right" },
+            new() { Id = "review", Label = "Review", Icon = "bi-eye" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "documentType", Label = "Document Type", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "fileName", Label = "File Name", Type = "text", Width = 220 },
+            new() { Key = "confidenceScore", Label = "Confidence %", Type = "number", Width = 110 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "UPLOADED", Label = "Uploaded", Color = "info" },
+                new() { Value = "PROCESSING", Label = "Processing", Color = "warning" },
+                new() { Value = "EXTRACTED", Label = "Extracted", Color = "success" },
+                new() { Value = "REVIEWED", Label = "Reviewed", Color = "success" },
+                new() { Value = "FAILED", Label = "Failed", Color = "danger" },
+            }},
+            new() { Key = "extractedAt", Label = "Extracted At", Type = "date", Width = 130 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "process", Label = "Process OCR", Icon = "bi-cpu", Style = "primary", Handler = "process", Confirm = true, ConfirmMessage = "Process document with OCR?" },
+            new() { Id = "validate", Label = "Validate Data", Icon = "bi-check-circle", Style = "success", Handler = "validate" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
     };
 }

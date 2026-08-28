@@ -6,6 +6,8 @@
     <RootNamespace>YuktiraERP.Api</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.0" />

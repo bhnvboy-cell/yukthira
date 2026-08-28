@@ -148,6 +148,18 @@ public static class InfrastructureRegistration
         services.AddScoped<YuktiraERP.Infrastructure.Services.IInspectionResultService, InspectionResultService>();
         services.AddScoped<IQMMasterDataService, QMMasterDataService>();
         services.AddScoped<IQMInspectionConfigService, QMInspectionConfigService>();
+        services.AddScoped<ICustomerComplaintReturnService, CustomerComplaintReturnService>();
+        services.AddScoped<ISoxComplianceService, SoxComplianceService>();
+        services.AddScoped<IUniversalJournalService, UniversalJournalService>();
+        services.AddScoped<IRFWarehouseService, RFWarehouseService>();
+        services.AddScoped<IWavePickService, WavePickService>();
+        services.AddScoped<IVelocitySlottingService, VelocitySlottingService>();
+        services.AddScoped<IFiniteCapacityScheduler, FiniteCapacityScheduler>();
+        services.AddScoped<IMrpEventScheduler, MrpEventScheduler>();
+        services.AddScoped<IConsolidationService, ConsolidationService>();
+        services.AddScoped<ILocalizationTaxService, LocalizationTaxService>();
+        services.AddScoped<IAiDocumentOcrService, AiDocumentOcrService>();
+        services.AddScoped<IAiPredictiveService, AiPredictiveService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<ITransactionSequenceService, TransactionSequenceService>();
         services.AddScoped<CacheService>();

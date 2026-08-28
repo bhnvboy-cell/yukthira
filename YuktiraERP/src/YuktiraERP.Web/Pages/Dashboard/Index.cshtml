@@ -9,6 +9,9 @@
         <h1>Welcome back, @(User.Identity?.Name ?? "User")</h1>
         <p>Select a module to get started</p>
     </div>
+    <div class="live-indicator" id="liveIndicator" title="Real-time dashboard">
+        <span class="live-dot"></span> Live
+    </div>
 </div>
 
 <div class="kpi-grid" id="kpiGrid">
@@ -51,6 +54,16 @@
         </div>
         <div class="kpi-value">--</div>
         <div class="kpi-label">Loading...</div>
+    </div>
+</div>
+
+<div class="realtime-panel" id="realtimePanel" style="display:none">
+    <div class="realtime-header">
+        <i class="bi bi-broadcast"></i> Real-Time Activity
+        <button class="realtime-close" onclick="document.getElementById('realtimePanel').style.display='none'">&times;</button>
+    </div>
+    <div class="realtime-body" id="realtimeBody">
+        <div class="realtime-empty">Waiting for live updates...</div>
     </div>
 </div>
 
@@ -397,5 +410,90 @@
     renderFavorites();
     renderRecent();
     renderFavButtons();
+
+    // ── SignalR Real-Time Dashboard ──
+    (function() {
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl('/hubs/dashboard')
+            .withAutomaticRetry([0, 2000, 5000, 10000])
+            .build();
+
+        var panel = document.getElementById('realtimePanel');
+        var body = document.getElementById('realtimeBody');
+        var indicator = document.getElementById('liveIndicator');
+        var eventCount = 0;
+
+        connection.on('DashboardUpdate', function(data) {
+            if (!panel) return;
+            panel.style.display = '';
+            if (indicator) indicator.classList.add('connected');
+            var empty = body.querySelector('.realtime-empty');
+            if (empty) empty.remove();
+
+            var item = document.createElement('div');
+            item.className = 'realtime-item';
+            var time = new Date(data.timestamp).toLocaleTimeString();
+            item.innerHTML = '<span class="rt-time">' + time + '</span>' +
+                '<span class="rt-msg">Materials: ' + data.materials +
+                ' | Stock: ₹' + (data.stockValue || 0).toLocaleString() +
+                ' | Revenue: ₹' + (data.totalRevenue || 0).toLocaleString() +
+                ' | Open Orders: ' + data.openOrders +
+                ' | QM Pass: ' + data.qmPassRate + '%</span>';
+            body.insertBefore(item, body.firstChild);
+            eventCount++;
+            if (eventCount > 50) { body.removeChild(body.lastChild); }
+        });
+
+        connection.on('StockChange', function(data) {
+            addRealtimeEvent('📦 Stock: ' + data.materialName + ' changed from ' + data.oldQuantity + ' to ' + data.newQuantity, 'warning');
+        });
+
+        connection.on('OrderUpdate', function(data) {
+            addRealtimeEvent('📋 ' + data.orderType + ' ' + data.orderNumber + ' → ' + data.status, 'info');
+        });
+
+        connection.on('ProductionUpdate', function(data) {
+            addRealtimeEvent('🏭 Production ' + data.orderNumber + ': ' + data.status + ' (' + data.progress + '%)', 'info');
+        });
+
+        connection.on('QualityAlert', function(data) {
+            addRealtimeEvent('✅ Quality Lot ' + data.lotNumber + ': ' + data.result, 'success');
+        });
+
+        connection.on('SoxViolation', function(data) {
+            addRealtimeEvent('🚨 SOX Violation: ' + data.violationType + ' by ' + data.userId + ' [' + data.severity + ']', 'danger');
+        });
+
+        connection.on('AnomalyDetected', function(data) {
+            addRealtimeEvent('⚠️ Anomaly: ' + data.anomalyType + ' in ' + data.entityName, 'warning');
+        });
+
+        function addRealtimeEvent(msg, type) {
+            if (!panel) return;
+            panel.style.display = '';
+            if (indicator) indicator.classList.add('connected');
+            var empty = body.querySelector('.realtime-empty');
+            if (empty) empty.remove();
+
+            var item = document.createElement('div');
+            item.className = 'realtime-item rt-' + type;
+            var time = new Date().toLocaleTimeString();
+            item.innerHTML = '<span class="rt-time">' + time + '</span><span class="rt-msg">' + msg + '</span>';
+            body.insertBefore(item, body.firstChild);
+            eventCount++;
+            if (eventCount > 50) { body.removeChild(body.lastChild); }
+        }
+
+        connection.start().catch(function() {
+            if (indicator) indicator.classList.remove('connected');
+        });
+
+        // Periodic dashboard refresh via SignalR
+        setInterval(function() {
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke('RequestDashboardUpdate').catch(function() {});
+            }
+        }, 30000);
+    })();
 </script>
 }

@@ -386,3 +386,1120 @@ public class DepartmentKeyEntity : EntityBase { public Guid TenantId { get; set;
 // Release Strategy
 public class ReleaseStrategyEntity : EntityBase { public Guid TenantId { get; set; } public string Code { get; set; } = string.Empty; public string Name { get; set; } = string.Empty; public string Description { get; set; } = string.Empty; public string DocumentType { get; set; } = string.Empty; public decimal MinAmount { get; set; } public decimal MaxAmount { get; set; } public string Plant { get; set; } = string.Empty; public string DepartmentKey { get; set; } = string.Empty; public bool IsActive { get; set; } = true; }
 public class ReleaseCodeEntity : EntityBase { public Guid TenantId { get; set; } public Guid ReleaseStrategyId { get; set; } public int Level { get; set; } public string Code { get; set; } = string.Empty; public string ApproverRole { get; set; } = string.Empty; public string ApproverUserId { get; set; } = string.Empty; public bool IsRequired { get; set; } = true; }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Customer Complaint & Return with Supplier Pass-Through Claim (SD-QM-MM-FI)
+// ══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>
+/// CR-01/CR-06: Master entity for end-to-end customer complaint lifecycle.
+/// Bridges SD (Return Order), QM (Complaint Notification), MM (Supplier Claim), FI (Credit/Debit Memo).
+/// </summary>
+public class CustomerComplaintReturnEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string ComplaintNumber { get; set; } = "";
+    public string ComplaintType { get; set; } = "Q1";
+    public string ReturnType { get; set; } = "RE";
+    public string SalesOrderNumber { get; set; } = "";
+    public string ReturnOrderNumber { get; set; } = "";
+    public string DeliveryNumber { get; set; } = "";
+    public string CreditMemoNumber { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public decimal ReturnQuantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal UnitPrice { get; set; }
+    public decimal ReturnAmount { get; set; }
+    public string BatchNumber { get; set; } = "";
+    public string DefectCode { get; set; } = "";
+    public string DefectDescription { get; set; } = "";
+    public string DefectCategory { get; set; } = "";
+    public string RootCause { get; set; } = "";
+    public string RootCauseCode { get; set; } = "";
+    public string SupplierBatchNumber { get; set; } = "";
+    public string SupplierVendorCode { get; set; } = "";
+    public string SupplierVendorName { get; set; } = "";
+    public string PurchaseOrderReference { get; set; } = "";
+    public string InspectionLotNumber { get; set; } = "";
+    public string UsageDecision { get; set; } = "";
+    public string StockProposal { get; set; } = "";
+    public string QualityNotificationNumber { get; set; } = "";
+    public string SupplierClaimNumber { get; set; } = "";
+    public string SupplierReturnDeliveryNumber { get; set; } = "";
+    public string SupplierDebitMemoNumber { get; set; } = "";
+    public decimal CreditMemoAmount { get; set; }
+    public decimal SupplierClaimAmount { get; set; }
+    public decimal RecoveryAmount { get; set; }
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string CostCenter { get; set; } = "";
+    public string ProfitCenter { get; set; } = "";
+    public string Priority { get; set; } = "Medium";
+    public string Status { get; set; } = "CREATED";
+    public string CurrentStep { get; set; } = "";
+    public string AssignedTo { get; set; } = "";
+    public DateTime? ComplaintDate { get; set; }
+    public DateTime? ReturnReceivedDate { get; set; }
+    public DateTime? InspectionCompletedDate { get; set; }
+    public DateTime? CreditMemoIssuedDate { get; set; }
+    public DateTime? SupplierClaimCreatedDate { get; set; }
+    public DateTime? SupplierReturnDate { get; set; }
+    public DateTime? RecoveryCompletedDate { get; set; }
+    public DateTime? ClosedDate { get; set; }
+    public string Notes { get; set; } = "";
+    public string ResolutionNotes { get; set; } = "";
+}
+
+/// <summary>
+/// CR-02: Return delivery and goods receipt tracking with movement types.
+/// </summary>
+public class ReturnDeliveryEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ComplaintReturnId { get; set; }
+    public string ReturnOrderNumber { get; set; } = "";
+    public string DeliveryNumber { get; set; } = "";
+    public string MaterialDocumentNumber { get; set; } = "";
+    public int MovementType { get; set; }
+    public string MovementTypeDescription { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal UnitPrice { get; set; }
+    public string BatchNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string StockType { get; set; } = "QI";
+    public string StockTypeDescription { get; set; } = "Quality Inspection";
+    public string CustomerCode { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public string PostingDate { get; set; } = "";
+    public string DocumentDate { get; set; } = "";
+    public string Reference { get; set; } = "";
+    public string HeaderText { get; set; } = "";
+    public string Status { get; set; } = "CREATED";
+    public string PostedBy { get; set; } = "";
+    public DateTime? PostedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+/// <summary>
+/// CR-03/CR-04: Quality inspection tracking for returned goods.
+/// </summary>
+public class QualityInspectionReturnEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ComplaintReturnId { get; set; }
+    public string InspectionLotNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string SupplierBatchNumber { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public string Plant { get; set; } = "";
+    public string InspectionType { get; set; } = "RETURN";
+    public string InspectionLotOrigin { get; set; } = "08";
+    public string Characteristic { get; set; } = "";
+    public string Specification { get; set; } = "";
+    public string ResultValue { get; set; } = "";
+    public string ResultValuation { get; set; } = "";
+    public string DefectCodeGroup { get; set; } = "";
+    public string DefectCode { get; set; } = "";
+    public string DefectDescription { get; set; } = "";
+    public string DefectCategory { get; set; } = "";
+    public string RootCause { get; set; } = "";
+    public string RootCauseCode { get; set; } = "";
+    public string UsageDecision { get; set; } = "";
+    public string UsageDecisionCode { get; set; } = "";
+    public string StockProposal { get; set; } = "";
+    public string TargetStockType { get; set; } = "";
+    public string Status { get; set; } = "OPEN";
+    public string RecordedBy { get; set; } = "";
+    public DateTime? RecordedAt { get; set; }
+    public string DecidedBy { get; set; } = "";
+    public DateTime? DecisionDate { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+/// <summary>
+/// CR-05/CR-08: Financial postings for customer credit and supplier debit memos.
+/// </summary>
+public class ComplaintFinancialPostingEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ComplaintReturnId { get; set; }
+    public string DocumentNumber { get; set; } = "";
+    public string DocumentType { get; set; } = "";
+    public string PostingType { get; set; } = "";
+    public string AccountCode { get; set; } = "";
+    public string AccountName { get; set; } = "";
+    public string PartyCode { get; set; } = "";
+    public string PartyName { get; set; } = "";
+    public decimal DebitAmount { get; set; }
+    public decimal CreditAmount { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = "INR";
+    public string Reference { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string CostCenter { get; set; } = "";
+    public string ProfitCenter { get; set; } = "";
+    public string GLAccount { get; set; } = "";
+    public string PostingDate { get; set; } = "";
+    public string DocumentDate { get; set; } = "";
+    public string Period { get; set; } = "";
+    public string FiscalYear { get; set; } = "";
+    public string Status { get; set; } = "POSTED";
+    public string PostedBy { get; set; } = "";
+    public DateTime? PostedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+/// <summary>
+/// CR-06: Supplier complaint and claim tracking.
+/// </summary>
+public class SupplierClaimEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ComplaintReturnId { get; set; }
+    public string SupplierClaimNumber { get; set; } = "";
+    public string SupplierComplaintType { get; set; } = "Q2";
+    public string VendorCode { get; set; } = "";
+    public string VendorName { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string SupplierBatchNumber { get; set; } = "";
+    public string PurchaseOrderNumber { get; set; } = "";
+    public string GoodsReceiptNumber { get; set; } = "";
+    public decimal ClaimQuantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal ClaimAmount { get; set; }
+    public decimal UnitPrice { get; set; } = 0;
+    public string DefectCode { get; set; } = "";
+    public string DefectDescription { get; set; } = "";
+    public string DefectCategory { get; set; } = "";
+    public string RootCause { get; set; } = "";
+    public string RootCauseCode { get; set; } = "";
+    public string CustomerComplaintReference { get; set; } = "";
+    public string CustomerComplaintNumber { get; set; } = "";
+    public string CustomerReturnNumber { get; set; } = "";
+    public string QualityNotificationNumber { get; set; } = "";
+    public string SupplierReturnDeliveryNumber { get; set; } = "";
+    public string SupplierReturnMaterialDocument { get; set; } = "";
+    public string DebitMemoNumber { get; set; } = "";
+    public int SupplierReturnMovementType { get; set; }
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string CostCenter { get; set; } = "";
+    public string ProfitCenter { get; set; } = "";
+    public string Priority { get; set; } = "Medium";
+    public string Status { get; set; } = "CREATED";
+    public string CurrentStep { get; set; } = "";
+    public string AssignedTo { get; set; } = "";
+    public DateTime? ClaimCreatedDate { get; set; }
+    public DateTime? SupplierNotifiedDate { get; set; }
+    public DateTime? SupplierReturnDate { get; set; }
+    public DateTime? RecoveryCompletedDate { get; set; }
+    public DateTime? ClosedDate { get; set; }
+    public string Notes { get; set; } = "";
+    public string ResolutionNotes { get; set; } = "";
+}
+
+/// <summary>
+/// CR-07: Supplier return delivery tracking with movement type 122/161.
+/// </summary>
+public class SupplierReturnDeliveryEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid SupplierClaimId { get; set; }
+    public string SupplierReturnNumber { get; set; } = "";
+    public string DeliveryNumber { get; set; } = "";
+    public string MaterialDocumentNumber { get; set; } = "";
+    public int MovementType { get; set; }
+    public string MovementTypeDescription { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal UnitPrice { get; set; }
+    public decimal TotalValue { get; set; }
+    public string BatchNumber { get; set; } = "";
+    public string VendorCode { get; set; } = "";
+    public string VendorName { get; set; } = "";
+    public string PurchaseOrderNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string StockType { get; set; } = "BLOCKED";
+    public string PostingDate { get; set; } = "";
+    public string DocumentDate { get; set; } = "";
+    public string Reference { get; set; } = "";
+    public string HeaderText { get; set; } = "";
+    public string Status { get; set; } = "CREATED";
+    public string PostedBy { get; set; } = "";
+    public DateTime? PostedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 1.2: Segregation of Duties (SOX) & Immutable Audit Trails
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class SoxDutyEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string DutyCode { get; set; } = "";
+    public string DutyName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Module { get; set; } = "";
+    public string TransactionCode { get; set; } = "";
+    public string ActionType { get; set; } = "";
+    public int MinApprovers { get; set; } = 1;
+    public string RequiredRoles { get; set; } = "[]";
+    public string ConflictDuties { get; set; } = "[]";
+    public bool IsActive { get; set; } = true;
+    public DateTime? EffectiveFrom { get; set; }
+    public DateTime? EffectiveTo { get; set; }
+}
+
+public class SoxAssignmentEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string UserId { get; set; } = "";
+    public string UserName { get; set; } = "";
+    public string Role { get; set; } = "";
+    public string DutyCode { get; set; } = "";
+    public string DutyName { get; set; } = "";
+    public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+    public string AssignedBy { get; set; } = "";
+    public DateTime? ExpiresAt { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string Notes { get; set; } = "";
+}
+
+public class SoxViolationEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string UserId { get; set; } = "";
+    public string UserName { get; set; } = "";
+    public string ViolationType { get; set; } = "";
+    public string DutyCode1 { get; set; } = "";
+    public string DutyCode2 { get; set; } = "";
+    public string TransactionCode { get; set; } = "";
+    public string DocumentNumber { get; set; } = "";
+    public DateTime DetectedAt { get; set; } = DateTime.UtcNow;
+    public string DetectedBy { get; set; } = "";
+    public string Severity { get; set; } = "Medium";
+    public string Status { get; set; } = "Open";
+    public string ResolutionNotes { get; set; } = "";
+    public string ResolvedBy { get; set; } = "";
+    public DateTime? ResolvedAt { get; set; }
+    public string Description { get; set; } = "";
+}
+
+public class ImmutableAuditTrailEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public long SequenceNumber { get; set; }
+    public string TableName { get; set; } = "";
+    public string RecordId { get; set; } = "";
+    public string ActionType { get; set; } = "";
+    public string OldValues { get; set; } = "{}";
+    public string NewValues { get; set; } = "{}";
+    public string UserId { get; set; } = "";
+    public string UserName { get; set; } = "";
+    public string UserIp { get; set; } = "";
+    public string UserAgent { get; set; } = "";
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public string PreviousHash { get; set; } = "";
+    public string CurrentHash { get; set; } = "";
+    public string TransactionCode { get; set; } = "";
+    public string DocumentNumber { get; set; } = "";
+    public string Module { get; set; } = "";
+    public string SubModule { get; set; } = "";
+    public bool IsImmutable { get; set; } = true;
+    public string WitnessSignature { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 1.1: Universal Journal Table (FI + CO Merge - like SAP ACDOCA)
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class UniversalJournalEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public int FiscalYear { get; set; }
+    public int Period { get; set; }
+    public string DocumentNumber { get; set; } = "";
+    public string DocumentType { get; set; } = "";
+    public DateTime DocumentDate { get; set; }
+    public DateTime PostingDate { get; set; }
+    public int LineNumber { get; set; }
+    public string AccountCode { get; set; } = "";
+    public string AccountName { get; set; } = "";
+    public string AccountType { get; set; } = "";
+    public decimal DebitAmount { get; set; }
+    public decimal CreditAmount { get; set; }
+    public string Currency { get; set; } = "INR";
+    public decimal ExchangeRate { get; set; } = 1.0m;
+    public decimal AmountLC { get; set; }
+    public string CostCenter { get; set; } = "";
+    public string CostElement { get; set; } = "";
+    public string ProfitCenter { get; set; } = "";
+    public string InternalOrder { get; set; } = "";
+    public string BusinessArea { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string VendorCode { get; set; } = "";
+    public string ProjectCode { get; set; } = "";
+    public string TaskCode { get; set; } = "";
+    public string TaxCode { get; set; } = "";
+    public decimal TaxAmount { get; set; }
+    public bool IntercompanyIndicator { get; set; }
+    public string TradingPartner { get; set; } = "";
+    public string ReversalDocument { get; set; } = "";
+    public bool IsReversal { get; set; }
+    public string CreatedBy { get; set; } = "";
+    public DateTime PostedAt { get; set; }
+    public string Hash { get; set; } = "";
+    public string Status { get; set; } = "Posted";
+    public string Reference { get; set; } = "";
+    public string Description { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 1.3: Mobile RF Framework for Warehouse Execution
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class RFSessionEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string SessionId { get; set; } = "";
+    public string UserId { get; set; } = "";
+    public string UserName { get; set; } = "";
+    public string TerminalId { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string Warehouse { get; set; } = "";
+    public string CurrentBin { get; set; } = "";
+    public DateTime StartedAt { get; set; } = DateTime.UtcNow;
+    public DateTime LastActivityAt { get; set; } = DateTime.UtcNow;
+    public DateTime? EndedAt { get; set; }
+    public string Status { get; set; } = "Active";
+    public string DeviceType { get; set; } = "Mobile";
+    public string IpAddress { get; set; } = "";
+    public string FirmwareVersion { get; set; } = "";
+    public int TransactionCount { get; set; }
+}
+
+public class RFTransactionEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid SessionId { get; set; }
+    public int TransactionId { get; set; }
+    public string TransactionType { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public string FromBin { get; set; } = "";
+    public string ToBin { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string SerialNumber { get; set; } = "";
+    public string DocumentReference { get; set; } = "";
+    public DateTime ScanTimestamp { get; set; } = DateTime.UtcNow;
+    public bool Success { get; set; }
+    public string ErrorMessage { get; set; } = "";
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
+    public long DurationMs { get; set; }
+}
+
+public class RFMenuItemEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string MenuCode { get; set; } = "";
+    public string MenuName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string IconClass { get; set; } = "";
+    public string TransactionType { get; set; } = "";
+    public string RequiredPermission { get; set; } = "";
+    public int SequenceOrder { get; set; }
+    public bool IsActive { get; set; } = true;
+    public Guid? ParentMenuId { get; set; }
+    public string Parameters { get; set; } = "{}";
+    public string ValidationRules { get; set; } = "{}";
+}
+
+public class RFPickTaskEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string WaveNumber { get; set; } = "";
+    public string TaskId { get; set; } = "";
+    public int TaskLine { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string SourceBin { get; set; } = "";
+    public string DestinationBin { get; set; } = "";
+    public decimal RequiredQty { get; set; }
+    public decimal PickedQty { get; set; }
+    public string BatchNumber { get; set; } = "";
+    public string SerialNumber { get; set; } = "";
+    public string UnitOfMeasure { get; set; } = "EA";
+    public int Priority { get; set; } = 5;
+    public int SequenceOrder { get; set; }
+    public string AssignedTo { get; set; } = "";
+    public DateTime? AssignedAt { get; set; }
+    public DateTime? StartedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public string Status { get; set; } = "Open";
+    public string PickMethod { get; set; } = "Single";
+    public bool ScanRequired { get; set; } = true;
+    public int ScanCount { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class RFCountTaskEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CycleCountId { get; set; } = "";
+    public string TaskId { get; set; } = "";
+    public string Bin { get; set; } = "";
+    public string StorageType { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public decimal SystemQuantity { get; set; }
+    public decimal CountedQuantity { get; set; }
+    public decimal Variance { get; set; }
+    public decimal VariancePercent { get; set; }
+    public string CountedBy { get; set; } = "";
+    public DateTime? CountedAt { get; set; }
+    public string Status { get; set; } = "Pending";
+    public bool RequiresRecount { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 2.1: Wave Pick & Velocity-Based Bin Slotting
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class WavePickEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string WaveNumber { get; set; } = "";
+    public string WaveName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string WaveType { get; set; } = "Standard";
+    public DateTime? PlannedPickDate { get; set; }
+    public DateTime? ActualPickDate { get; set; }
+    public string Warehouse { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public int TotalLines { get; set; }
+    public decimal TotalQuantity { get; set; }
+    public int AssignedPickers { get; set; }
+    public int ActivePickers { get; set; }
+    public string Status { get; set; } = "Planned";
+    public int Priority { get; set; } = 5;
+    public DateTime? ReleaseTime { get; set; }
+    public DateTime? CompleteTime { get; set; }
+    public string Strategy { get; set; } = "Zone";
+    public string Notes { get; set; } = "";
+}
+
+public class WavePickLineEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid WaveId { get; set; }
+    public int LineNumber { get; set; }
+    public string SalesOrderNumber { get; set; } = "";
+    public string DeliveryNumber { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string SourceBin { get; set; } = "";
+    public string DestinationBin { get; set; } = "";
+    public decimal RequiredQty { get; set; }
+    public decimal PickedQty { get; set; }
+    public decimal ShortQty { get; set; }
+    public string BatchNumber { get; set; } = "";
+    public string SerialNumber { get; set; } = "";
+    public string UOM { get; set; } = "EA";
+    public decimal Weight { get; set; }
+    public decimal Volume { get; set; }
+    public string Zone { get; set; } = "";
+    public string Aisle { get; set; } = "";
+    public string Rack { get; set; } = "";
+    public int PickSequence { get; set; }
+    public string Status { get; set; } = "Pending";
+    public string PickedBy { get; set; } = "";
+    public DateTime? PickedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class VelocitySlottingEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string Warehouse { get; set; } = "";
+    public string VelocityClass { get; set; } = "C";
+    public decimal ConsumptionQty30Day { get; set; }
+    public decimal ConsumptionQty90Day { get; set; }
+    public decimal ConsumptionQty365Day { get; set; }
+    public decimal ConsumptionValue30Day { get; set; }
+    public decimal ConsumptionValue90Day { get; set; }
+    public string CurrentBin { get; set; } = "";
+    public string CurrentZone { get; set; } = "";
+    public string RecommendedBin { get; set; } = "";
+    public string RecommendedZone { get; set; } = "";
+    public string SlottingRule { get; set; } = "";
+    public int PickFrequency { get; set; }
+    public decimal PickDensity { get; set; }
+    public DateTime? LastPickedAt { get; set; }
+    public DateTime? LastReceivedAt { get; set; }
+    public string OptimalSlots { get; set; } = "[]";
+    public string Status { get; set; } = "Active";
+    public DateTime? CalculatedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class BinMasterEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string BinCode { get; set; } = "";
+    public string Warehouse { get; set; } = "";
+    public string Zone { get; set; } = "";
+    public string Aisle { get; set; } = "";
+    public string Rack { get; set; } = "";
+    public string Level { get; set; } = "";
+    public string Position { get; set; } = "";
+    public string BinType { get; set; } = "Storage";
+    public string StorageType { get; set; } = "Bulk";
+    public decimal Capacity { get; set; }
+    public decimal CurrentOccupancy { get; set; }
+    public decimal WeightCapacity { get; set; }
+    public decimal VolumeCapacity { get; set; }
+    public string AssignedMaterial { get; set; } = "";
+    public string AssignedVelocityClass { get; set; } = "";
+    public bool IsPickable { get; set; } = true;
+    public bool IsReceivable { get; set; } = true;
+    public string Status { get; set; } = "Active";
+    public DateTime? LastCycleCountAt { get; set; }
+    public string Coordinates { get; set; } = "{}";
+    public string Notes { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 2.2: Finite Capacity Production Scheduling (PP/DS)
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class FiniteScheduleEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string ScheduleId { get; set; } = "";
+    public string ScheduleName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public DateTime PlanningHorizonStart { get; set; }
+    public DateTime PlanningHorizonEnd { get; set; }
+    public string Status { get; set; } = "Draft";
+    public string Strategy { get; set; } = "Finite";
+    public decimal CapacityUtilizationTarget { get; set; } = 85.0m;
+    public int TotalOperations { get; set; }
+    public int ScheduledOperations { get; set; }
+    public int ConflictsResolved { get; set; }
+    public DateTime? CalculatedAt { get; set; }
+    public long DurationMs { get; set; }
+    public string CreatedBy { get; set; } = "";
+    public string Notes { get; set; } = "";
+}
+
+public class FiniteScheduleOperationEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ScheduleId { get; set; }
+    public string ProductionOrderNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public int OperationNumber { get; set; }
+    public string OperationDescription { get; set; } = "";
+    public string WorkCenterCode { get; set; } = "";
+    public string WorkCenterName { get; set; } = "";
+    public DateTime? PlannedStart { get; set; }
+    public DateTime? PlannedEnd { get; set; }
+    public DateTime? ActualStart { get; set; }
+    public DateTime? ActualEnd { get; set; }
+    public decimal SetupTimeHrs { get; set; }
+    public decimal RunTimeHrs { get; set; }
+    public decimal QueueTimeHrs { get; set; }
+    public decimal WaitTimeHrs { get; set; }
+    public decimal TotalDurationHrs { get; set; }
+    public decimal CapacityLoad { get; set; }
+    public string SetupGroup { get; set; } = "";
+    public string SetupFamily { get; set; } = "";
+    public string Dependencies { get; set; } = "[]";
+    public bool IsCriticalPath { get; set; }
+    public int SequenceNumber { get; set; }
+    public string Status { get; set; } = "Scheduled";
+    public DateTime? RescheduledFrom { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class CapacityLoadEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string WorkCenterCode { get; set; } = "";
+    public DateTime Date { get; set; }
+    public decimal AvailableHours { get; set; }
+    public decimal PlannedHours { get; set; }
+    public decimal ActualHours { get; set; }
+    public decimal LoadPercent { get; set; }
+    public decimal OverloadHours { get; set; }
+    public decimal UtilizationRate { get; set; }
+    public string Operations { get; set; } = "[]";
+    public decimal Shift1Hours { get; set; }
+    public decimal Shift2Hours { get; set; }
+    public decimal Shift3Hours { get; set; }
+    public decimal MaintenanceHours { get; set; }
+    public decimal DowntimeHours { get; set; }
+    public string Status { get; set; } = "Normal";
+}
+
+public class MaterialAvailabilityEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public DateTime Date { get; set; }
+    public decimal RequiredQty { get; set; }
+    public decimal AvailableQty { get; set; }
+    public decimal ShortageQty { get; set; }
+    public decimal ReservedQty { get; set; }
+    public decimal InTransitQty { get; set; }
+    public string ProductionOrderNumber { get; set; } = "";
+    public string OperationNumber { get; set; } = "";
+    public bool IsCriticalMaterial { get; set; }
+    public DateTime? EarliestAvailDate { get; set; }
+    public string Status { get; set; } = "Available";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 2.3: In-Memory Event-Driven MRP Scheduler
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class MrpEventEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string EventId { get; set; } = "";
+    public string EventType { get; set; } = "";
+    public string EventSource { get; set; } = "";
+    public string SourceDocumentNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string EventPayload { get; set; } = "{}";
+    public int Priority { get; set; } = 5;
+    public DateTime? ProcessedAt { get; set; }
+    public long ProcessingDurationMs { get; set; }
+    public string Status { get; set; } = "Pending";
+    public int RetryCount { get; set; }
+    public int MaxRetries { get; set; } = 3;
+    public string ErrorMessage { get; set; } = "";
+    public string CorrelationId { get; set; } = "";
+}
+
+public class MrpEventStreamEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string StreamId { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public long EventSequence { get; set; }
+    public string EventId { get; set; } = "";
+    public string EventType { get; set; } = "";
+    public decimal RunningDemand { get; set; }
+    public decimal RunningSupply { get; set; }
+    public decimal RunningProjectedBalance { get; set; }
+    public DateTime SnapshotDate { get; set; }
+    public bool IsSnapshot { get; set; }
+}
+
+public class MrpPlanningRunEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string RunId { get; set; } = "";
+    public string RunType { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string MaterialsScope { get; set; } = "All";
+    public string SelectedMaterials { get; set; } = "[]";
+    public string TriggerEvent { get; set; } = "";
+    public string TriggerEventId { get; set; } = "";
+    public DateTime? StartedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public long DurationMs { get; set; }
+    public int MaterialsProcessed { get; set; }
+    public int MaterialsPlanned { get; set; }
+    public int OrdersCreated { get; set; }
+    public int OrdersChanged { get; set; }
+    public int OrdersCancelled { get; set; }
+    public decimal TotalPlannedOrders { get; set; }
+    public decimal TotalPlannedReceipts { get; set; }
+    public string Status { get; set; } = "Queued";
+    public int ExceptionCount { get; set; }
+    public string CreatedBy { get; set; } = "";
+    public string Notes { get; set; } = "";
+}
+
+public class MrpEventSubscriptionEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string EventType { get; set; } = "";
+    public string MaterialCode { get; set; } = "*";
+    public string Plant { get; set; } = "*";
+    public string SubscriberService { get; set; } = "";
+    public string WebhookUrl { get; set; } = "";
+    public bool IsActive { get; set; } = true;
+    public int DebounceMs { get; set; } = 1000;
+    public DateTime? LastTriggeredAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 3.1: Dynamic Multi-Entity Consolidation
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class ConsolidationGroupEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string GroupCode { get; set; } = "";
+    public string GroupName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string FiscalYear { get; set; } = "";
+    public string ConsolidationCurrency { get; set; } = "USD";
+    public string ExchangeRateMethod { get; set; } = "Closing";
+    public string EliminationRules { get; set; } = "{}";
+    public string MinorityInterestPolicy { get; set; } = "";
+    public string Status { get; set; } = "Draft";
+    public string CreatedBy { get; set; } = "";
+    public DateTime? CompletedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class ConsolidationEntityEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid GroupId { get; set; }
+    public string EntityCode { get; set; } = "";
+    public string EntityName { get; set; } = "";
+    public string EntityCurrency { get; set; } = "";
+    public decimal OwnershipPercent { get; set; }
+    public bool IsEliminationEntity { get; set; }
+    public string ParentEntityCode { get; set; } = "";
+    public string Country { get; set; } = "";
+    public string AccountingStandard { get; set; } = "IFRS";
+    public string ExchangeRateType { get; set; } = "Closing";
+    public string Period { get; set; } = "";
+    public string FiscalYear { get; set; } = "";
+    public decimal LocalCurrencyRevenue { get; set; }
+    public decimal LocalCurrencyCost { get; set; }
+    public decimal TranslatedRevenue { get; set; }
+    public decimal TranslatedCost { get; set; }
+    public decimal TranslationDifference { get; set; }
+    public string Status { get; set; } = "Submitted";
+    public string Notes { get; set; } = "";
+}
+
+public class InterCompanyTransactionEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string FromEntityCode { get; set; } = "";
+    public string FromEntityName { get; set; } = "";
+    public string ToEntityCode { get; set; } = "";
+    public string ToEntityName { get; set; } = "";
+    public string TransactionType { get; set; } = "";
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = "";
+    public decimal AmountGroupCurrency { get; set; }
+    public decimal ExchangeRate { get; set; }
+    public DateTime ExchangeRateDate { get; set; }
+    public string DocumentNumber { get; set; } = "";
+    public DateTime PostingDate { get; set; }
+    public string Description { get; set; } = "";
+    public bool IsEliminated { get; set; }
+    public string EliminationDocument { get; set; } = "";
+    public string Status { get; set; } = "Open";
+    public decimal DiscrepancyAmount { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class ConsolidationEliminationEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid GroupId { get; set; }
+    public string EliminationType { get; set; } = "";
+    public string FromEntityCode { get; set; } = "";
+    public string ToEntityCode { get; set; } = "";
+    public string FromDocumentNumber { get; set; } = "";
+    public string ToDocumentNumber { get; set; } = "";
+    public decimal OriginalAmount { get; set; }
+    public decimal EliminationAmount { get; set; }
+    public string Currency { get; set; } = "";
+    public string EliminationDocumentNumber { get; set; } = "";
+    public DateTime PostingDate { get; set; }
+    public string Notes { get; set; } = "";
+    public string Status { get; set; } = "Proposed";
+    public string PostedBy { get; set; } = "";
+    public DateTime? PostedAt { get; set; }
+}
+
+public class CurrencyTranslationEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid GroupId { get; set; }
+    public string EntityCode { get; set; } = "";
+    public string EntityCurrency { get; set; } = "";
+    public string GroupCurrency { get; set; } = "";
+    public DateTime TranslationDate { get; set; }
+    public string AccountType { get; set; } = "";
+    public decimal ClosingRate { get; set; }
+    public decimal AverageRate { get; set; }
+    public decimal HistoricalRate { get; set; }
+    public decimal LocalAmount { get; set; }
+    public decimal TranslatedAmount { get; set; }
+    public decimal TranslationGainLoss { get; set; }
+    public string Period { get; set; } = "";
+    public string FiscalYear { get; set; } = "";
+    public string Status { get; set; } = "Calculated";
+    public string Notes { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 3.2: Dynamic Localization Tax Microservice
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class LocalizationCountryEntity : EntityBase
+{
+    public string CountryCode { get; set; } = "";
+    public string CountryName { get; set; } = "";
+    public string TaxSystem { get; set; } = "";
+    public string Currency { get; set; } = "";
+    public int CurrencyDecimals { get; set; } = 2;
+    public string DateFormat { get; set; } = "yyyy-MM-dd";
+    public string NumberFormat { get; set; } = "";
+    public string FiscalYearStart { get; set; } = "";
+    public string TaxRegistrationLabel { get; set; } = "";
+    public bool IsSupported { get; set; } = true;
+    public string SupportedVersion { get; set; } = "1.0";
+    public string LocalizationConfig { get; set; } = "{}";
+    public string Notes { get; set; } = "";
+}
+
+public class LocalizationTaxConfigEntity : EntityBase
+{
+    public string CountryCode { get; set; } = "";
+    public string TaxType { get; set; } = "";
+    public string TaxCode { get; set; } = "";
+    public string TaxName { get; set; } = "";
+    public string TaxDescription { get; set; } = "";
+    public decimal Rate { get; set; }
+    public bool IsCompound { get; set; }
+    public string CalculationMethod { get; set; } = "Percentage";
+    public bool InclusiveOfTax { get; set; }
+    public string RoundingRule { get; set; } = "Standard";
+    public string AccountCode { get; set; } = "";
+    public string AccountName { get; set; } = "";
+    public DateTime EffectiveFrom { get; set; }
+    public DateTime? EffectiveTo { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string Conditions { get; set; } = "{}";
+    public string Notes { get; set; } = "";
+}
+
+public class TaxReturnEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CountryCode { get; set; } = "";
+    public string TaxType { get; set; } = "";
+    public string Period { get; set; } = "";
+    public string FiscalYear { get; set; } = "";
+    public string ReturnPeriod { get; set; } = "";
+    public string ReturnNumber { get; set; } = "";
+    public decimal TotalTaxableSales { get; set; }
+    public decimal TotalOutputTax { get; set; }
+    public decimal TotalTaxablePurchases { get; set; }
+    public decimal TotalInputTax { get; set; }
+    public decimal NetTaxPayable { get; set; }
+    public decimal NetTaxRefund { get; set; }
+    public DateTime FilingDueDate { get; set; }
+    public DateTime? FilingDate { get; set; }
+    public DateTime? PaymentDueDate { get; set; }
+    public DateTime? PaymentDate { get; set; }
+    public string Status { get; set; } = "Draft";
+    public string FilingReference { get; set; } = "";
+    public DateTime CalculatedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class WithholdingTaxEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CountryCode { get; set; } = "";
+    public string VendorCode { get; set; } = "";
+    public string VendorName { get; set; } = "";
+    public string WHTType { get; set; } = "";
+    public string SectionCode { get; set; } = "";
+    public string SectionDescription { get; set; } = "";
+    public decimal PaymentAmount { get; set; }
+    public decimal WHTRate { get; set; }
+    public decimal WHTAmount { get; set; }
+    public DateTime PaymentDate { get; set; }
+    public DateTime DeductionDate { get; set; }
+    public string PaymentVoucherNumber { get; set; } = "";
+    public string ChallanNumber { get; set; } = "";
+    public DateTime? ChallanDate { get; set; }
+    public string Status { get; set; } = "Deducted";
+    public string FinancialYear { get; set; } = "";
+    public string Quarter { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 3.3: Embedded AI API Gateway (Document OCR & Predictive Analytics)
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class AiDocumentOcrEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string DocumentId { get; set; } = "";
+    public string DocumentType { get; set; } = "";
+    public string SourceType { get; set; } = "";
+    public string FileName { get; set; } = "";
+    public long FileSize { get; set; }
+    public string FileHash { get; set; } = "";
+    public string ExtractedData { get; set; } = "{}";
+    public decimal ConfidenceScore { get; set; }
+    public string OcrProvider { get; set; } = "";
+    public long ProcessingTimeMs { get; set; }
+    public string Status { get; set; } = "Uploaded";
+    public DateTime? ExtractedAt { get; set; }
+    public string ReviewedBy { get; set; } = "";
+    public DateTime? ReviewedAt { get; set; }
+    public bool IsVerified { get; set; }
+    public string ExtractionErrors { get; set; } = "[]";
+    public string Notes { get; set; } = "";
+}
+
+public class AiDocumentTemplateEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string TemplateCode { get; set; } = "";
+    public string TemplateName { get; set; } = "";
+    public string DocumentType { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Fields { get; set; } = "[]";
+    public string ValidationRules { get; set; } = "{}";
+    public string MappingRules { get; set; } = "{}";
+    public decimal ConfidenceThreshold { get; set; } = 0.85m;
+    public bool IsActive { get; set; } = true;
+    public int Version { get; set; } = 1;
+    public string SampleDocumentUrl { get; set; } = "";
+}
+
+public class AiPredictiveModelEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string ModelCode { get; set; } = "";
+    public string ModelName { get; set; } = "";
+    public string ModelType { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string TrainingDataRange { get; set; } = "";
+    public string Features { get; set; } = "[]";
+    public decimal Accuracy { get; set; }
+    public decimal Precision { get; set; }
+    public decimal Recall { get; set; }
+    public decimal F1Score { get; set; }
+    public string TrainingStatus { get; set; } = "NotStarted";
+    public DateTime? LastTrainedAt { get; set; }
+    public DateTime? NextRetrainAt { get; set; }
+    public bool IsActive { get; set; } = true;
+    public bool IsProduction { get; set; }
+    public string ModelParameters { get; set; } = "{}";
+    public string ModelBinaryPath { get; set; } = "";
+    public int Version { get; set; } = 1;
+}
+
+public class AiForecastEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ModelId { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string Warehouse { get; set; } = "";
+    public DateTime ForecastDate { get; set; }
+    public int ForecastHorizonDays { get; set; }
+    public string DailyForecasts { get; set; } = "[]";
+    public decimal TotalForecastQty { get; set; }
+    public decimal ForecastAccuracy { get; set; }
+    public decimal ActualQty { get; set; }
+    public decimal Bias { get; set; }
+    public string Method { get; set; } = "";
+    public string Status { get; set; } = "Generated";
+    public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
+    public string ReviewedBy { get; set; } = "";
+    public DateTime? ReviewedAt { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public class AiAnomalyEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string AnomalyId { get; set; } = "";
+    public string AnomalyType { get; set; } = "";
+    public string EntityType { get; set; } = "";
+    public string EntityId { get; set; } = "";
+    public string EntityName { get; set; } = "";
+    public decimal DetectedValue { get; set; }
+    public decimal ExpectedValue { get; set; }
+    public decimal DeviationPercent { get; set; }
+    public string Severity { get; set; } = "Medium";
+    public decimal ConfidenceScore { get; set; }
+    public string DetectionMethod { get; set; } = "";
+    public string ModelId { get; set; } = "";
+    public DateTime DetectionDate { get; set; } = DateTime.UtcNow;
+    public string Status { get; set; } = "Detected";
+    public string InvestigatedBy { get; set; } = "";
+    public DateTime? InvestigatedAt { get; set; }
+    public string ResolutionNotes { get; set; } = "";
+    public string RootCause { get; set; } = "";
+    public string RecommendedAction { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Workflow step tracking for complaint/return lifecycle.
+// ══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>
+/// Workflow step tracking for complaint/return lifecycle.
+/// </summary>
+public class ComplaintWorkflowStepEntity : EntityBase
+{
+    public Guid ComplaintReturnId { get; set; }
+    public string StepName { get; set; } = "";
+    public string StepCode { get; set; } = "";
+    public int StepOrder { get; set; }
+    public string Module { get; set; } = "";
+    public string TransactionCode { get; set; } = "";
+    public string DocumentNumber { get; set; } = "";
+    public string Status { get; set; } = "PENDING";
+    public string AssignedTo { get; set; } = "";
+    public string CompletedBy { get; set; } = "";
+    public DateTime? StartedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public string Notes { get; set; } = "";
+    public bool IsRequired { get; set; } = true;
+    public bool IsAutomated { get; set; } = false;
+}

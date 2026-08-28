@@ -90,7 +90,19 @@ public class TransactionCodeService : ITransactionCodeService
         // CO - Controlling (additional)
         ["KO88"] = "/Transactions/Engine/KO88", ["KS01"] = "/Transactions/Engine/KS01",
         // MM - BP (Business Partner)
-        ["BP"] = "/Transactions/Engine/BP"
+        ["BP"] = "/Transactions/Engine/BP",
+        // Enterprise Phase 1-3
+        ["UNIJRN"] = "/Transactions/Engine/UNIJRN", ["SOXADM"] = "/Transactions/Engine/SOXADM",
+        ["RFSCAN"] = "/Transactions/Engine/RFSCAN", ["RFPICK"] = "/Transactions/Engine/RFPICK",
+        ["WAVEPK"] = "/Transactions/Engine/WAVEPK", ["VSLOTT"] = "/Transactions/Engine/VSLOTT",
+        ["PPDS"] = "/Transactions/Engine/PPDS", ["MRPEVT"] = "/Transactions/Engine/MRPEVT",
+        ["CONSOL"] = "/Transactions/Engine/CONSOL", ["TAXRET"] = "/Transactions/Engine/TAXRET",
+        ["AIOCR"] = "/Transactions/Engine/AIOCR",
+        // Customer Complaint & Return
+        ["CRRETURN"] = "/Transactions/Engine/CRRETURN", ["CRINSPECT"] = "/Transactions/Engine/CRINSPECT",
+        ["CRUDPOST"] = "/Transactions/Engine/CRUDPOST", ["CRCREDIT"] = "/Transactions/Engine/CRCREDIT",
+        ["CRSUPPLY"] = "/Transactions/Engine/CRSUPPLY", ["CRSRET"] = "/Transactions/Engine/CRSRET",
+        ["CRDEBIT"] = "/Transactions/Engine/CRDEBIT"
     };
 
     public TransactionCodeService(YuktiraDbContext db, IModuleCatalog catalog)
@@ -485,6 +497,18 @@ public class TransactionCodeService : ITransactionCodeService
                     "KO88" => "Settle Production / PM Order", "KS01" => "Create Cost Center",
                     "BP" => "Create Business Partner",
                     "IL01" => "Create Functional Location",
+                    // Enterprise Phase 1-3
+                    "UNIJRN" => "Universal Journal Entry", "SOXADM" => "SOX Compliance Admin",
+                    "RFSCAN" => "RF Scanner Menu", "RFPICK" => "RF Pick Task",
+                    "WAVEPK" => "Wave Pick Management", "VSLOTT" => "Velocity Slotting",
+                    "PPDS" => "PP/DS Finite Scheduling", "MRPEVT" => "MRP Event Monitor",
+                    "CONSOL" => "Consolidation Workbench", "TAXRET" => "Tax Return Filing",
+                    "AIOCR" => "Document OCR Processing",
+                    // Customer Complaint & Return
+                    "CRRETURN" => "Customer Complaint & Return", "CRINSPECT" => "QM Return Inspection",
+                    "CRUDPOST" => "Post Usage Decision - Return", "CRCREDIT" => "Customer Credit Memo",
+                    "CRSUPPLY" => "Supplier Complaint & Claim", "CRSRET" => "Supplier Return Delivery",
+                    "CRDEBIT" => "Supplier Debit Memo",
                     _ => kvp.Key
                 };
                 codes.Add(new TransactionCodeEntity
@@ -541,7 +565,21 @@ public class TransactionCodeService : ITransactionCodeService
     private static string GetModuleForRoute(string route, IModuleCatalog catalog)
     {
         var def = catalog.ResolveByRoute(route);
-        return def?.Code ?? route.TrimStart('/').Split('/')[0];
+        if (def != null) return def.Code;
+        // Module override for TransactionEngine routes
+        var code = route.Split('/').LastOrDefault() ?? "";
+        return code switch
+        {
+            "UNIJRN" or "TAXRET" or "CONSOL" or "CRUDPOST" or "CRDEBIT" => "FI",
+            "SOXADM" => "GRC",
+            "RFSCAN" or "RFPICK" or "WAVEPK" or "VSLOTT" => "WM",
+            "PPDS" => "PP",
+            "MRPEVT" => "MM",
+            "AIOCR" => "AI",
+            "CRRETURN" or "CRCREDIT" => "SD",
+            "CRINSPECT" or "CRSUPPLY" or "CRSRET" => "QM",
+            _ => route.TrimStart('/').Split('/')[0]
+        };
     }
 
     private static string GetGroupForCode(string code) => code switch
@@ -576,7 +614,12 @@ public class TransactionCodeService : ITransactionCodeService
         "1MP" or "BKR" or "2FA" or "CALIB" or
         "ME51N" or "ME28" or "MD61" or
         "ABZN" or "KB11N" or "QP01" or "QN01" or "QA11" or "QC21" or
-        "KO88"
+        "KO88" or
+        // Enterprise Phase 1-3
+        "UNIJRN" or "SOXADM" or "RFSCAN" or "RFPICK" or "WAVEPK" or "VSLOTT" or
+        "PPDS" or "MRPEVT" or "CONSOL" or "TAXRET" or "AIOCR" or
+        // Customer Complaint & Return
+        "CRRETURN" or "CRINSPECT" or "CRUDPOST" or "CRCREDIT" or "CRSUPPLY" or "CRSRET" or "CRDEBIT"
             => "Transactions",
         // Process (MRP run, payroll run, workflow-driven)
         "MD01" or "MD02" => "Process",

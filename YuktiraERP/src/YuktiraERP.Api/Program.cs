@@ -5,6 +5,7 @@ using System.Text;
 using Prometheus;
 using Serilog;
 using YuktiraERP.Api.Controllers;
+using YuktiraERP.Api.GraphQL;
 using YuktiraERP.Api.Middleware;
 using YuktiraERP.Infrastructure;
 using YuktiraERP.Infrastructure.Data;
@@ -23,7 +24,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
     .WriteTo.File(
-        path: Path.Combine(AppContext.BaseDirectory, "logs", "api-.log"),
+        path: System.IO.Path.Combine(AppContext.BaseDirectory, "logs", "api-.log"),
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 14,
         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
@@ -92,6 +93,32 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddYuktiraInfrastructure(builder.Configuration);
 builder.Services.AddYuktiraAIEngine();
 builder.Services.AddYuktiraExportEngine();
+
+// GraphQL
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddType<MaterialMasterType>()
+    .AddType<CustomerType>()
+    .AddType<VendorType>()
+    .AddType<SalesOrderType>()
+    .AddType<SalesOrderLineType>()
+    .AddType<PurchaseOrderType>()
+    .AddType<PurchaseOrderItemType>()
+    .AddType<ProductionOrderType>()
+    .AddType<StockItemType>()
+    .AddType<BatchType>()
+    .AddType<QualityNotificationType>()
+    .AddType<UniversalJournalType>()
+    .AddType<StockMovementType>()
+    .AddType<InspectionLotType>()
+    .AddType<MaintenanceOrderType>()
+    .AddFiltering()
+    .AddSorting()
+    .AddProjections();
+
+// Dashboard Hub
+builder.Services.AddScoped<IDashboardNotificationService, DashboardNotificationService>();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? new[] { "http://localhost:5001", "http://127.0.0.1:5001" };
@@ -162,5 +189,7 @@ app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks
 app.MapMetrics();
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<DashboardHub>("/hubs/dashboard");
+app.MapGraphQL("/api/graphql");
 
 app.Run();

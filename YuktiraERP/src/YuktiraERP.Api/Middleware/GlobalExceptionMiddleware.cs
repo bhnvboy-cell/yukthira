@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ public class GlobalExceptionMiddleware
 
             var status = ex switch
             {
-                KeyNotFoundException => StatusCodes.Status404NotFound,
+                System.Collections.Generic.KeyNotFoundException => StatusCodes.Status404NotFound,
                 UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
             };
