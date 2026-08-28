@@ -48,14 +48,14 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Metadata = new()
         {
-            new() { Label = "Material", Value = "1110100002", Key = "material" },
-            new() { Label = "Batch", Value = "0000006276", Key = "batch" },
-            new() { Label = "Insp. Lot", Value = "10000000528", Key = "inspectionLot" },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
-            new() { Label = "Operation", Value = "0010", Key = "operation" },
-            new() { Label = "Work Center", Value = "QC-LAB-01", Key = "workCenter" },
-            new() { Label = "Status", Value = "REL", Key = "status" },
-            new() { Label = "Created By", Value = "SUPERADMIN", Key = "createdBy" },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "Batch", Value = "", Key = "batch" },
+            new() { Label = "Insp. Lot", Value = "", Key = "inspectionLot" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Operation", Value = "", Key = "operation" },
+            new() { Label = "Work Center", Value = "", Key = "workCenter" },
+            new() { Label = "Status", Value = "", Key = "status" },
+            new() { Label = "Created By", Value = "", Key = "createdBy" },
         },
         Tabs = new()
         {
@@ -65,8 +65,8 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Columns = new()
         {
-            new() { Key = "shortText", Label = "Short Text for Characteristic", Type = "text", Width = 260, Required = true },
-            new() { Key = "spec", Label = "Specifications", Type = "text", Width = 180 },
+            new() { Key = "shortText", Label = "Short Text for Characteristic", Type = "text", Width = 260, Required = true, Editable = true },
+            new() { Key = "spec", Label = "Specifications", Type = "text", Width = 180, Editable = true },
             new() { Key = "result", Label = "Result", Type = "number", Editable = true, Width = 120, Validation = new() { Min = 0, Max = 99999, Required = true } },
             new() { Key = "valuation", Label = "Valuation", Type = "status_icon", Width = 100, Options = new() {
                 new() { Value = "OK", Label = "OK", Color = "success" },
@@ -80,7 +80,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             }},
             new() { Key = "measuredValue", Label = "Measured Value", Type = "number", Editable = true, Width = 130 },
             new() { Key = "targetValue", Label = "Target Value", Type = "number", Width = 120 },
-            new() { Key = "tolerance", Label = "Tolerance", Type = "text", Width = 100 },
+            new() { Key = "tolerance", Label = "Tolerance", Type = "text", Width = 100, Editable = true },
         },
         FooterActions = new()
         {
@@ -103,11 +103,11 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Metadata = new()
         {
-            new() { Label = "Movement Type", Value = "101", Key = "movementType" },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
-            new() { Label = "Storage Location", Value = "0001", Key = "storageLocation" },
-            new() { Label = "Posting Date", Value = "2026-08-27", Key = "postingDate", Type = "date" },
-            new() { Label = "Document Date", Value = "2026-08-27", Key = "documentDate", Type = "date" },
+            new() { Label = "Movement Type", Value = "", Key = "movementType" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Storage Location", Value = "", Key = "storageLocation" },
+            new() { Label = "Posting Date", Value = "", Key = "postingDate", Type = "date" },
+            new() { Label = "Document Date", Value = "", Key = "documentDate", Type = "date" },
             new() { Label = "Reference", Value = "", Key = "reference" },
             new() { Label = "Header Text", Value = "", Key = "headerText" },
         },
@@ -121,12 +121,12 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Columns = new()
         {
             new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
-            new() { Key = "description", Label = "Description", Type = "text", Width = 200 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 200, Editable = true },
             new() { Key = "quantity", Label = "Qty", Type = "number", Editable = true, Width = 90, Validation = new() { Min = 0.001m, Required = true } },
-            new() { Key = "uom", Label = "UoM", Type = "text", Width = 70, DefaultValue = "EA" },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 70, Editable = true },
             new() { Key = "amount", Label = "Amount", Type = "currency", Width = 110, Editable = true },
-            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, DefaultValue = "7001", Editable = true },
-            new() { Key = "sloc", Label = "SLoc", Type = "text", Width = 80, DefaultValue = "0001", Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, DefaultValue = "", Editable = true },
+            new() { Key = "sloc", Label = "SLoc", Type = "text", Width = 80, Editable = true },
             new() { Key = "batch", Label = "Batch", Type = "text", Width = 120, Editable = true },
             new() { Key = "stockType", Label = "Stock Type", Type = "dropdown", Width = 120, Options = new() {
                 new() { Value = "FREE", Label = "Unrestricted" },
@@ -166,9 +166,9 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Metadata = new()
         {
             new() { Label = "Material", Value = "", Key = "material", Editable = true },
-            new() { Label = "Material Type", Value = "ROH", Key = "materialType" },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
-            new() { Label = "Last Changed", Value = "2026-08-20", Key = "lastChanged" },
+            new() { Label = "Material Type", Value = "", Key = "materialType" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Last Changed", Value = "", Key = "lastChanged" },
             new() { Label = "Status", Value = "Active", Key = "status" },
         },
         Tabs = new()
@@ -185,7 +185,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
             new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
-            new() { Key = "description", Label = "Description", Type = "text", Width = 250 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
             new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
             new() { Key = "changed", Label = "", Type = "changed_icon", Width = 30, Fixed = true },
         },
@@ -209,15 +209,15 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Metadata = new()
         {
-            new() { Label = "Order Type", Value = "OR", Key = "orderType" },
-            new() { Label = "Sales Org", Value = "1000", Key = "salesOrg" },
-            new() { Label = "Dist. Channel", Value = "10", Key = "distChannel" },
-            new() { Label = "Division", Value = "00", Key = "division" },
+            new() { Label = "Order Type", Value = "", Key = "orderType" },
+            new() { Label = "Sales Org", Value = "", Key = "salesOrg" },
+            new() { Label = "Dist. Channel", Value = "", Key = "distChannel" },
+            new() { Label = "Division", Value = "", Key = "division" },
             new() { Label = "Sold-To Party", Value = "", Key = "soldToParty", Editable = true },
             new() { Label = "Ship-To Party", Value = "", Key = "shipToParty" },
             new() { Label = "PO Number", Value = "", Key = "poNumber", Editable = true },
-            new() { Label = "Net Value", Value = "0.00", Key = "netValue" },
-            new() { Label = "Currency", Value = "USD", Key = "currency" },
+            new() { Label = "Net Value", Value = "", Key = "netValue" },
+            new() { Label = "Currency", Value = "", Key = "currency" },
         },
         Tabs = new()
         {
@@ -232,9 +232,9 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Key = "item", Label = "Item", Type = "number", Width = 60 },
             new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
-            new() { Key = "description", Label = "Description", Type = "text", Width = 220 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220, Editable = true },
             new() { Key = "quantity", Label = "Order Qty", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 1, Required = true } },
-            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, DefaultValue = "EA" },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, Editable = true },
             new() { Key = "unitPrice", Label = "Unit Price", Type = "currency", Width = 110, Editable = true },
             new() { Key = "netValue", Label = "Net Value", Type = "currency", Width = 120 },
             new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Editable = true },
@@ -267,11 +267,11 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Metadata = new()
         {
-            new() { Label = "Document Date", Value = "2026-08-27", Key = "documentDate", Type = "date" },
-            new() { Label = "Posting Date", Value = "2026-08-27", Key = "postingDate", Type = "date" },
-            new() { Label = "Document Type", Value = "SA", Key = "documentType" },
-            new() { Label = "Company Code", Value = "1000", Key = "companyCode" },
-            new() { Label = "Currency", Value = "USD", Key = "currency" },
+            new() { Label = "Document Date", Value = "", Key = "documentDate", Type = "date" },
+            new() { Label = "Posting Date", Value = "", Key = "postingDate", Type = "date" },
+            new() { Label = "Document Type", Value = "", Key = "documentType" },
+            new() { Label = "Company Code", Value = "", Key = "companyCode" },
+            new() { Label = "Currency", Value = "", Key = "currency" },
             new() { Label = "Reference", Value = "", Key = "reference", Editable = true },
             new() { Label = "Doc. Header Text", Value = "", Key = "headerText", Editable = true },
         },
@@ -322,14 +322,14 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Metadata = new()
         {
-            new() { Label = "Order Type", Value = "PP01", Key = "orderType" },
+            new() { Label = "Order Type", Value = "", Key = "orderType" },
             new() { Label = "Material", Value = "", Key = "material", Editable = true },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
             new() { Label = "Production Qty", Value = "0", Key = "prodQty", Editable = true },
-            new() { Label = "UoM", Value = "EA", Key = "uom" },
+            new() { Label = "UoM", Value = "", Key = "uom" },
             new() { Label = "BOM", Value = "", Key = "bom" },
             new() { Label = "Routing", Value = "", Key = "routing" },
-            new() { Label = "Status", Value = "CRTD", Key = "status" },
+            new() { Label = "Status", Value = "", Key = "status" },
         },
         Tabs = new()
         {
@@ -343,12 +343,12 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Key = "operation", Label = "Operation", Type = "number", Width = 80 },
             new() { Key = "workCenter", Label = "Work Center", Type = "text", Width = 120, Editable = true },
-            new() { Key = "description", Label = "Description", Type = "text", Width = 220 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220, Editable = true },
             new() { Key = "setupTime", Label = "Setup Time", Type = "number", Width = 100, Editable = true },
             new() { Key = "machineTime", Label = "Machine Time", Type = "number", Width = 110, Editable = true },
             new() { Key = "laborTime", Label = "Labor Time", Type = "number", Width = 100, Editable = true },
             new() { Key = "quantity", Label = "Qty", Type = "number", Width = 80 },
-            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60 },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, Editable = true },
             new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
         },
         FooterActions = new()
@@ -371,12 +371,12 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Metadata = new()
         {
-            new() { Label = "PO Type", Value = "Standard PO", Key = "poType" },
-            new() { Label = "Purch. Org", Value = "1000", Key = "purchOrg" },
-            new() { Label = "Purch. Group", Value = "001", Key = "purchGroup" },
-            new() { Label = "Company Code", Value = "1000", Key = "companyCode" },
+            new() { Label = "PO Type", Value = "", Key = "poType" },
+            new() { Label = "Purch. Org", Value = "", Key = "purchOrg" },
+            new() { Label = "Purch. Group", Value = "", Key = "purchGroup" },
+            new() { Label = "Company Code", Value = "", Key = "companyCode" },
             new() { Label = "Vendor", Value = "", Key = "vendor", Editable = true },
-            new() { Label = "PO Date", Value = "2026-08-27", Key = "poDate", Type = "date" },
+            new() { Label = "PO Date", Value = "", Key = "poDate", Type = "date" },
         },
         Tabs = new()
         {
@@ -389,11 +389,11 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Key = "item", Label = "Item", Type = "number", Width = 50 },
             new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
-            new() { Key = "description", Label = "Short Text", Type = "text", Width = 200 },
+            new() { Key = "description", Label = "Short Text", Type = "text", Width = 200, Editable = true },
             new() { Key = "quantity", Label = "PO Quantity", Type = "number", Width = 110, Editable = true, Validation = new() { Min = 1, Required = true } },
-            new() { Key = "uom", Label = "Order Unit", Type = "text", Width = 80, DefaultValue = "EA" },
+            new() { Key = "uom", Label = "Order Unit", Type = "text", Width = 80, Editable = true },
             new() { Key = "netPrice", Label = "Net Price", Type = "currency", Width = 110, Editable = true, Required = true },
-            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, DefaultValue = "7001", Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, DefaultValue = "", Editable = true },
             new() { Key = "deliveryDate", Label = "Delivery Date", Type = "date", Width = 130, Editable = true },
             new() { Key = "taxCode", Label = "Tax Code", Type = "text", Width = 80, Editable = true },
             new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
@@ -419,10 +419,10 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Label = "Inspection Lot", Value = "", Key = "inspectionLot", Editable = true },
             new() { Label = "Material", Value = "", Key = "material" },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
-            new() { Label = "Inspection Type", Value = "01", Key = "inspType" },
-            new() { Label = "Status", Value = "REL", Key = "status" },
-            new() { Label = "Lots Status", Value = "INSP", Key = "lotStatus" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Inspection Type", Value = "", Key = "inspType" },
+            new() { Label = "Status", Value = "", Key = "status" },
+            new() { Label = "Lots Status", Value = "", Key = "lotStatus" },
         },
         Tabs = new()
         {
@@ -433,8 +433,8 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Columns = new()
         {
             new() { Key = "char", Label = "Char.", Type = "number", Width = 60 },
-            new() { Key = "shortText", Label = "Short Text", Type = "text", Width = 220, Required = true },
-            new() { Key = "spec", Label = "Specs", Type = "text", Width = 140 },
+            new() { Key = "shortText", Label = "Short Text", Type = "text", Width = 220, Required = true, Editable = true },
+            new() { Key = "spec", Label = "Specs", Type = "text", Width = 140, Editable = true },
             new() { Key = "result", Label = "Result", Type = "number", Width = 110, Editable = true, Validation = new() { Required = true } },
             new() { Key = "valuation", Label = "Valuation", Type = "status_icon", Width = 100, Options = new() {
                 new() { Value = "OK", Label = "OK", Color = "success" },
@@ -468,10 +468,10 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Metadata = new()
         {
             new() { Label = "Vendor", Value = "", Key = "vendor", Editable = true },
-            new() { Label = "Company Code", Value = "1000", Key = "companyCode" },
-            new() { Label = "Item Type", Value = "All Items", Key = "itemType" },
-            new() { Label = "Posting Date From", Value = "2026-01-01", Key = "dateFrom", Type = "date" },
-            new() { Label = "Posting Date To", Value = "2026-08-27", Key = "dateTo", Type = "date" },
+            new() { Label = "Company Code", Value = "", Key = "companyCode" },
+            new() { Label = "Item Type", Value = "", Key = "itemType" },
+            new() { Label = "Posting Date From", Value = "", Key = "dateFrom", Type = "date" },
+            new() { Label = "Posting Date To", Value = "", Key = "dateTo", Type = "date" },
         },
         Tabs = new()
         {
@@ -520,7 +520,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             new() { Label = "Position", Value = "", Key = "position" },
             new() { Label = "Department", Value = "", Key = "department" },
             new() { Label = "Hire Date", Value = "", Key = "hireDate", Type = "date" },
-            new() { Label = "Status", Value = "Active", Key = "status" },
+            new() { Label = "Status", Value = "", Key = "status" },
         },
         Tabs = new()
         {
@@ -532,7 +532,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Columns = new()
         {
-            new() { Key = "infotype", Label = "Infotype", Type = "text", Width = 100 },
+            new() { Key = "infotype", Label = "Infotype", Type = "text", Width = 100, Editable = true },
             new() { Key = "name", Label = "Name", Type = "text", Width = 200, Editable = true },
             new() { Key = "validFrom", Label = "Valid From", Type = "date", Width = 120, Editable = true },
             new() { Key = "validTo", Label = "Valid To", Type = "date", Width = 120, Editable = true },
@@ -562,7 +562,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Label = "Notification Type", Value = "Q1", Key = "notificationType", Editable = true },
             new() { Label = "Reference Doc (PO)", Value = "", Key = "referenceDocument", Editable = true },
-            new() { Label = "Plant", Value = "7001", Key = "plant", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
             new() { Label = "Partner (Coordinator)", Value = "", Key = "partnerName", Editable = true },
             new() { Label = "Subject Coding", Value = "", Key = "subjectCoding", Editable = true },
         },
@@ -597,8 +597,8 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Label = "Notification No.", Value = "", Key = "notificationNumber", Editable = true },
             new() { Label = "Description", Value = "", Key = "description" },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
-            new() { Label = "Status", Value = "NEW", Key = "status" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Status", Value = "", Key = "status" },
         },
         Tabs = new()
         {
@@ -631,7 +631,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         {
             new() { Label = "Notification No.", Value = "", Key = "notificationNumber", Editable = true },
             new() { Label = "Description", Value = "", Key = "description" },
-            new() { Label = "Status", Value = "NEW", Key = "status" },
+            new() { Label = "Status", Value = "", Key = "status" },
         },
         Tabs = new()
         {
@@ -678,11 +678,11 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Metadata = new()
         {
             new() { Label = "Inspection Lot", Value = "", Key = "lotNumber", Editable = true },
-            new() { Label = "Plant", Value = "7001", Key = "plant", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
             new() { Label = "Material Code", Value = "", Key = "materialCode" },
             new() { Label = "Material Name", Value = "", Key = "materialName" },
             new() { Label = "Inspection Lot Origin", Value = "", Key = "inspectionLotOrigin", Editable = true },
-            new() { Label = "Result Status", Value = "PENDING", Key = "resultStatus" },
+            new() { Label = "Result Status", Value = "", Key = "resultStatus" },
         },
         Tabs = new()
         {
@@ -692,7 +692,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Columns = new()
         {
             new() { Key = "characteristic", Label = "Characteristic", Type = "text", Width = 200, Required = true, Editable = true },
-            new() { Key = "specification", Label = "Specification", Type = "text", Width = 160 },
+            new() { Key = "specification", Label = "Specification", Type = "text", Width = 160, Editable = true },
             new() { Key = "result", Label = "Result", Type = "number", Width = 110, Editable = true, Validation = new() { Required = true } },
             new() { Key = "uom", Label = "UoM", Type = "text", Width = 70 },
             new() { Key = "valuation", Label = "Valuation", Type = "status_icon", Width = 110, Options = new() {
@@ -735,13 +735,13 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Metadata = new()
         {
             new() { Label = "Inspection Lot", Value = "", Key = "lotNumber", Editable = true },
-            new() { Label = "Plant", Value = "7001", Key = "plant" },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
             new() { Label = "Insp. Lot Origin", Value = "", Key = "inspectionLotOrigin" },
-            new() { Label = "Result Recording Status", Value = "RECORDED", Key = "resultRecordingStatus" },
+            new() { Label = "Result Recording Status", Value = "", Key = "resultRecordingStatus" },
             new() { Label = "UD Code", Value = "", Key = "udCode", Editable = true },
             new() { Label = "Stock Proposal", Value = "", Key = "stockProposal", Editable = true },
-            new() { Label = "Certificate Received", Value = "No", Key = "certificateReceived" },
-            new() { Label = "Status", Value = "OPEN", Key = "status" },
+            new() { Label = "Certificate Received", Value = "", Key = "certificateReceived" },
+            new() { Label = "Status", Value = "", Key = "status" },
         },
         Tabs = new()
         {
