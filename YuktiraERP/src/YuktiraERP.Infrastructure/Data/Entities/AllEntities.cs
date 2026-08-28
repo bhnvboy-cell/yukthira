@@ -173,6 +173,49 @@ public class UsageDecisionDetailEntity : EntityBase
     public DateTime? DecisionDate { get; set; }
 }
 
+public class QMMasterDataEntity : EntityBase
+{
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string InspectionType { get; set; } = "";
+    public string InspectionLotOrigin { get; set; } = "";
+    public string InspectionScope { get; set; } = "";
+    public string InspectionProcedure { get; set; } = "";
+    public string SampleProcedure { get; set; } = "";
+    public string DynModificationKey { get; set; } = "";
+    public string QMControlKey { get; set; } = "";
+    public string CatalogType { get; set; } = "";
+    public string DefectCatalog { get; set; } = "";
+    public string DefectCodeGroup { get; set; } = "";
+    public string UDCatalog { get; set; } = "";
+    public string UDCodeGroup { get; set; } = "";
+    public int Frequency { get; set; }
+    public string FrequencyUnit { get; set; } = "Days";
+    public bool IsActive { get; set; } = true;
+    public string CreatedBy { get; set; } = "";
+}
+
+public class QMInspectionConfigEntity : EntityBase
+{
+    public string ConfigName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string InspectionType { get; set; } = "";
+    public string MaterialGroup { get; set; } = "";
+    public string VendorCode { get; set; } = "";
+    public string VendorName { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string POReference { get; set; } = "";
+    public string DeliveryReference { get; set; } = "";
+    public string ProductionOrderReference { get; set; } = "";
+    public string SampleSize { get; set; } = "";
+    public string InspectionLevel { get; set; } = "";
+    public string Status { get; set; } = "ACTIVE";
+    public string CreatedBy { get; set; } = "";
+}
+
 // WM
 public class WarehouseTransferEntity : EntityBase { public string TransferId { get; set; } = ""; public DateTime Date { get; set; } public string MaterialName { get; set; } = ""; public string FromBin { get; set; } = ""; public string ToBin { get; set; } = ""; public decimal Quantity { get; set; } public string Status { get; set; } = "Pending"; }
 public class StorageLocationEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "General"; public decimal Capacity { get; set; } public string Status { get; set; } = "Active"; }

@@ -71,3 +71,20 @@ public class UsageDecisionDetailEntityConfiguration : IEntityTypeConfiguration<U
         builder.ToTable("usage_decision_details", "yuktira_qm");
     }
 }
+
+public class QMMasterDataEntityConfiguration : IEntityTypeConfiguration<QMMasterDataEntity>
+{
+    public void Configure(EntityTypeBuilder<QMMasterDataEntity> builder)
+    {
+        builder.ToTable("qm_master_data", "yuktira_qm");
+        builder.HasIndex(e => new { e.MaterialCode, e.Plant }).IsUnique();
+    }
+}
+
+public class QMInspectionConfigEntityConfiguration : IEntityTypeConfiguration<QMInspectionConfigEntity>
+{
+    public void Configure(EntityTypeBuilder<QMInspectionConfigEntity> builder)
+    {
+        builder.ToTable("qm_inspection_configs", "yuktira_qm");
+    }
+}

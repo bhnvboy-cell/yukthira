@@ -34,6 +34,12 @@ public class TransactionCodeService : ITransactionCodeService
         ["QA01"] = "/QM/InspectionResult/Create", ["QUD"] = "/QM/UsageDecision/Create",
         ["QM01"] = "/Transactions/Engine/QM01", ["QM02"] = "/Transactions/Engine/QM02", ["QM03"] = "/Transactions/Engine/QM03",
         ["QM11"] = "/Transactions/Engine/QM11", ["QM12"] = "/Transactions/Engine/QM12",
+        ["ZQM1"] = "/Transactions/Engine/ZQM1", ["1FM"] = "/Transactions/Engine/1FM",
+        ["2F9"] = "/Transactions/Engine/2F9", ["1E1"] = "/Transactions/Engine/1E1",
+        ["2QP"] = "/Transactions/Engine/2QP", ["2QN"] = "/Transactions/Engine/2QN",
+        ["QMM"] = "/Transactions/Engine/QMM", ["1MP"] = "/Transactions/Engine/1MP",
+        ["BKR"] = "/Transactions/Engine/BKR", ["2FA"] = "/Transactions/Engine/2FA",
+        ["CALIB"] = "/Transactions/Engine/CALIB",
         // WM - Warehouse
         ["LT01"] = "/WM/Transfer/Create", ["LT02"] = "/WM/Transfer/Edit", ["LT03"] = "/WM/Transfer/Display",
         ["LS01"] = "/WM/StorageLocation/Create", ["LS02"] = "/WM/StorageLocation/Edit",

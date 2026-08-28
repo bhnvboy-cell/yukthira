@@ -24,6 +24,8 @@ public class ToolbarAction
     public string Handler { get; set; } = "";
     public bool Disabled { get; set; }
     public string Tooltip { get; set; } = "";
+    public bool Confirm { get; set; }
+    public string ConfirmMessage { get; set; } = "";
 }
 
 public class MetadataField
