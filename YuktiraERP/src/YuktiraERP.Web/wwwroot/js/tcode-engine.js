@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   TCode Engine – Config→DOM renderer (5-tier Fiori layout)
+   TCode Engine – Config→DOM renderer with real API CRUD
    ══════════════════════════════════════════════════════════════ */
 (function () {
     'use strict';
@@ -13,10 +13,12 @@
     var tcode = config.tCode;
     var rows = [];
     var selectedRows = new Set();
+    var deletedRecordIds = [];
     var sortKey = null;
     var sortDir = 'asc';
     var currentPage = 1;
     var pageSize = 50;
+    var isLoading = false;
 
     /* ── Helpers ── */
     function $(sel, ctx) { return (ctx || document).querySelector(sel); }
@@ -31,6 +33,102 @@
         });
         if (text !== undefined) e.textContent = text;
         return e;
+    }
+
+    function setStatus(msg, type) {
+        var s = $('#tcodeStatus');
+        if (!s) return;
+        var icon = type === 'success' ? 'bi-check-circle-fill text-success' :
+                   type === 'error' ? 'bi-x-circle-fill text-danger' :
+                   type === 'loading' ? 'bi-hourglass-split text-warning' :
+                   'bi-check-circle-fill text-success';
+        s.innerHTML = '<i class="bi ' + icon + '"></i> ' + msg;
+    }
+
+    /* ── API calls ── */
+    function apiGet(url) {
+        var token = document.querySelector('input[name="__RequestVerificationToken"]');
+        var headers = { 'Accept': 'application/json' };
+        if (token) headers['X-CSRF-TOKEN'] = token.value;
+        return fetch(url, { headers: headers, credentials: 'same-origin' })
+            .then(function (r) {
+                if (!r.ok) throw new Error('API error: ' + r.status);
+                return r.json();
+            });
+    }
+
+    function apiPost(url, data) {
+        var token = document.querySelector('input[name="__RequestVerificationToken"]');
+        var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        if (token) headers['X-CSRF-TOKEN'] = token.value;
+        return fetch(url, {
+            method: 'POST',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        }).then(function (r) {
+            if (!r.ok) throw new Error('API error: ' + r.status);
+            return r.json();
+        });
+    }
+
+    function loadRecords() {
+        isLoading = true;
+        setStatus('Loading...', 'loading');
+        apiGet('/api/v1/TCodeEngine/layout/' + tcode + '/records')
+            .then(function (data) {
+                rows = [];
+                selectedRows.clear();
+                deletedRecordIds = [];
+                (data || []).forEach(function (r, i) {
+                    r.__idx = i;
+                    r.__dirty = {};
+                    rows.push(r);
+                });
+                if (rows.length === 0) {
+                    for (var j = 0; j < 5; j++) addRow();
+                }
+                isLoading = false;
+                setStatus('Loaded ' + rows.length + ' record(s)', 'success');
+                renderTable();
+            })
+            .catch(function (err) {
+                isLoading = false;
+                setStatus('Load failed: ' + err.message, 'error');
+                showToast('Failed to load data: ' + err.message, 'danger');
+                for (var j = 0; j < 5; j++) addRow();
+                renderTable();
+            });
+    }
+
+    function saveRecords(callback) {
+        var dirtyRows = rows.filter(function (r) { return r.__dirty && Object.keys(r.__dirty).length > 0; });
+        var newRows = rows.filter(function (r) { return !r.__recordId; });
+        var updateRows = rows.filter(function (r) { return r.__recordId && r.__dirty && Object.keys(r.__dirty).length > 0; });
+        var toSave = newRows.concat(updateRows).map(function (r) {
+            var clean = {};
+            Object.keys(r).forEach(function (k) {
+                if (!k.startsWith('__')) clean[k] = r[k];
+            });
+            if (r.__recordId) clean.__recordId = r.__recordId;
+            return clean;
+        });
+
+        setStatus('Saving...', 'loading');
+        apiPost('/api/v1/TCodeEngine/layout/' + tcode + '/records', {
+            records: toSave,
+            deleteIds: deletedRecordIds
+        }).then(function (res) {
+            deletedRecordIds = [];
+            rows.forEach(function (r) { r.__dirty = {}; });
+            setStatus('Saved ' + (res.saved || 0) + ' record(s)', 'success');
+            showToast('Saved successfully', 'success');
+            if (callback) callback();
+            loadRecords();
+        }).catch(function (err) {
+            setStatus('Save failed', 'error');
+            showToast('Save failed: ' + err.message, 'danger');
+        });
     }
 
     /* ── Render table body ── */
@@ -65,7 +163,6 @@
                 }
             });
 
-            // Checkbox cell
             var tdCheck = el('td', { className: 'tcode-check-cell' });
             var cb = el('input', {
                 type: 'checkbox',
@@ -110,6 +207,8 @@
                     });
                     inp.addEventListener('change', function () {
                         row[col.key] = col.type === 'currency' ? parseFloat(this.value) || 0 : parseInt(this.value) || 0;
+                        row.__dirty = row.__dirty || {};
+                        row.__dirty[col.key] = true;
                         updateRowValidation(row, col);
                     });
                     td.appendChild(inp);
@@ -132,7 +231,11 @@
                         'data-key': col.key,
                         'data-row-index': String(row.__idx)
                     });
-                    dInp.addEventListener('change', function () { row[col.key] = this.value; });
+                    dInp.addEventListener('change', function () {
+                        row[col.key] = this.value;
+                        row.__dirty = row.__dirty || {};
+                        row.__dirty[col.key] = true;
+                    });
                     td.appendChild(dInp);
                 } else {
                     td.textContent = val;
@@ -148,7 +251,11 @@
                         if (String(val) === opt.value) o.selected = true;
                         sel.appendChild(o);
                     });
-                    sel.addEventListener('change', function () { row[col.key] = this.value; });
+                    sel.addEventListener('change', function () {
+                        row[col.key] = this.value;
+                        row.__dirty = row.__dirty || {};
+                        row.__dirty[col.key] = true;
+                    });
                     td.appendChild(sel);
                 } else {
                     var optMatch = (col.options || []).find(function (o) { return o.value === String(val); });
@@ -198,7 +305,7 @@
                 }
                 break;
 
-            default: // text
+            default:
                 if (col.editable) {
                     var tInp = el('input', {
                         type: 'text',
@@ -301,8 +408,8 @@
     }
 
     function updateRowCount(total) {
-        var el = $('.tcode-row-count');
-        if (el) el.textContent = total + ' Row' + (total !== 1 ? 's' : '');
+        var e = $('.tcode-row-count');
+        if (e) e.textContent = total + ' Row' + (total !== 1 ? 's' : '');
         renderPagination(total);
     }
 
@@ -314,7 +421,7 @@
         if (totalPages <= 1) return;
 
         if (currentPage > 1) {
-            var prev = el('button', { className: 'tcode-pagination-btn', onClick: function () { currentPage--; renderTable(); } }, '‹');
+            var prev = el('button', { className: 'tcode-pagination-btn', onClick: function () { currentPage--; renderTable(); } }, '\u2039');
             container.appendChild(prev);
         }
 
@@ -329,7 +436,7 @@
         }
 
         if (currentPage < totalPages) {
-            var next = el('button', { className: 'tcode-pagination-btn', onClick: function () { currentPage++; renderTable(); } }, '›');
+            var next = el('button', { className: 'tcode-pagination-btn', onClick: function () { currentPage++; renderTable(); } }, '\u203A');
             container.appendChild(next);
         }
     }
@@ -342,16 +449,19 @@
         });
         rows.push(newRow);
         renderTable();
-        showToast('Row added', 'success');
     }
 
     function deleteRows() {
         if (selectedRows.size === 0) return;
         if (!confirm('Delete ' + selectedRows.size + ' selected row(s)?')) return;
+        selectedRows.forEach(function (idx) {
+            var row = rows.find(function (r) { return r.__idx === idx; });
+            if (row && row.__recordId) deletedRecordIds.push(row.__recordId);
+        });
         rows = rows.filter(function (r) { return !selectedRows.has(r.__idx); });
         selectedRows.clear();
         renderTable();
-        showToast('Rows deleted', 'success');
+        showToast('Row(s) marked for deletion. Save to confirm.', 'warning');
     }
 
     /* ── Toast ── */
@@ -390,13 +500,35 @@
         showToast('Exported ' + rows.length + ' rows', 'success');
     }
 
+    /* ── Collect metadata from panel ── */
+    function collectMetadata() {
+        var meta = {};
+        $$('.tcode-meta-input').forEach(function (inp) {
+            var key = inp.getAttribute('data-key');
+            if (key) meta[key] = inp.value;
+        });
+        $$('.tcode-meta-value').forEach(function (span) {
+            var key = span.getAttribute('data-key');
+            if (key) meta[key] = span.textContent;
+        });
+        return meta;
+    }
+
+    /* ── Merge metadata into all rows ── */
+    function mergeMetadataIntoRows(meta) {
+        rows.forEach(function (row) {
+            Object.keys(meta).forEach(function (k) {
+                if (!row[k] || row[k] === '') row[k] = meta[k];
+            });
+        });
+    }
+
     /* ── Tab switching ── */
     function initTabs() {
         $$('.tcode-tab').forEach(function (tab) {
             tab.addEventListener('click', function () {
                 $$('.tcode-tab').forEach(function (t) { t.classList.remove('active'); });
                 this.classList.add('active');
-                // Tab content switching handled via visual state only (single table for now)
             });
         });
     }
@@ -465,10 +597,10 @@
 
                 switch (action) {
                     case 'save':
-                        showToast('Saved successfully', 'success');
+                        saveRecords();
                         break;
                     case 'post':
-                        showToast('Posted successfully', 'success');
+                        saveRecords(function () { showToast('Posted successfully', 'success'); });
                         break;
                     case 'simulate':
                         showToast('Simulation complete (no errors)', 'success');
@@ -483,14 +615,13 @@
                         }
                         break;
                     case 'refresh':
-                        renderTable();
-                        showToast('Refreshed', 'info');
+                        loadRecords();
                         break;
                     case 'print':
                         window.print();
                         break;
                     case 'back':
-                        if (confirm('Leave this transaction?')) window.history.back();
+                        window.history.back();
                         break;
                     case 'addRow':
                         addRow();
@@ -505,32 +636,47 @@
                         var wrapper = $('.tcode-table-toolbar-left');
                         if (wrapper) wrapper.classList.toggle('show-filter');
                         break;
-                    case 'execute':
-                        showToast('Query executed', 'success');
+                    case 'activate':
+                        setStatus('Activating...', 'loading');
+                        rows.forEach(function (r) { r.status = 'ACTIVE'; r.__dirty = r.__dirty || {}; r.__dirty.status = true; });
+                        saveRecords(function () { showToast('Activated', 'success'); });
+                        break;
+                    case 'deactivate':
+                        setStatus('Deactivating...', 'loading');
+                        rows.forEach(function (r) { r.status = 'INACTIVE'; r.__dirty = r.__dirty || {}; r.__dirty.status = true; });
+                        saveRecords(function () { showToast('Deactivated', 'warning'); });
+                        break;
+                    case 'complete':
+                        setStatus('Completing...', 'loading');
+                        rows.forEach(function (r) { r.status = 'COMPLETED'; r.__dirty = r.__dirty || {}; r.__dirty.status = true; });
+                        saveRecords(function () { showToast('Marked complete', 'success'); });
                         break;
                     case 'release':
-                        showToast('Order released', 'success');
+                        setStatus('Releasing...', 'loading');
+                        rows.forEach(function (r) { r.status = 'RELEASED'; r.__dirty = r.__dirty || {}; r.__dirty.status = true; });
+                        saveRecords(function () { showToast('Released', 'success'); });
+                        break;
+                    case 'execute':
+                        setStatus('Executing...', 'loading');
+                        saveRecords(function () { showToast('Executed', 'success'); });
+                        break;
+                    case 'dispose':
+                        setStatus('Disposing...', 'loading');
+                        rows.forEach(function (r) { r.status = 'DISPOSED'; r.__dirty = r.__dirty || {}; r.__dirty.status = true; });
+                        saveRecords(function () { showToast('Disposed', 'warning'); });
                         break;
                     case 'usageDecision':
-                        showToast('Usage decision recorded', 'success');
+                        setStatus('Recording UD...', 'loading');
+                        rows.forEach(function (r) { r.status = 'UD_RECORDED'; r.__dirty = r.__dirty || {}; r.__dirty.status = true; });
+                        saveRecords(function () { showToast('Usage decision recorded', 'success'); });
                         break;
-                    case 'extensions':
-                        showToast('Extensions view opened', 'info');
+                    case 'confirmCertificate':
+                        setStatus('Confirming...', 'loading');
+                        rows.forEach(function (r) { r.certificateReceived = 'Yes'; r.__dirty = r.__dirty || {}; r.__dirty.certificateReceived = true; });
+                        saveRecords(function () { showToast('Certificate confirmed', 'success'); });
                         break;
-                    case 'copyFrom':
-                        showToast('Copy from dialog opened', 'info');
-                        break;
-                    case 'showDetails':
-                        showToast('Details panel toggled', 'info');
-                        break;
-                    case 'force':
-                        showToast('Force mode activated', 'warning');
-                        break;
-                    case 'balanceCheck':
-                        showToast('Balance check: documents balanced', 'success');
-                        break;
-                    case 'simulate':
-                        showToast('Simulated: no errors found', 'success');
+                    case 'generateCertificate':
+                        showToast('Certificate generated', 'success');
                         break;
                     default:
                         showToast('Action: ' + action, 'info');
@@ -544,10 +690,7 @@
         document.addEventListener('keydown', function (e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
-                var saveBtn = $$('.tcode-toolbar-btn, .tcode-action-btn').find(function (b) {
-                    return b.getAttribute('data-action') === 'save';
-                });
-                if (saveBtn) saveBtn.click();
+                saveRecords();
             }
             if (e.key === 'F8') {
                 e.preventDefault();
@@ -567,10 +710,7 @@
         initFilter();
         initToolbarActions();
         initKeyboard();
-        if (rows.length === 0) {
-            for (var i = 0; i < 5; i++) addRow();
-        }
-        renderTable();
+        loadRecords();
     }
 
     if (document.readyState === 'loading') {
