@@ -49,54 +49,64 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
 
     private static TCodeLayoutConfig QE51N() => new()
     {
-        TCode = "QE51N", Title = "Record Results: Characteristic Overview", Module = "QM", Icon = "bi-clipboard-check",
+        TCode = "QE51N", Title = "Record Inspection Results", Module = "QM", Icon = "bi-clipboard-check",
         ToolbarActions = new()
         {
+            new() { Id = "new", Label = "New Result", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
             new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
-            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
             new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
-            new() { Id = "print", Label = "Print", Icon = "bi-printer", Style = "default", Handler = "print" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
         },
         Metadata = new()
         {
+            new() { Label = "Lot Created", Value = "", Key = "lotCreated", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Inspection Lot Origin", Value = "", Key = "inspectionLotOrigin", Editable = true },
+            new() { Label = "Inspection Lot", Value = "", Key = "inspectionLot", Editable = true },
             new() { Label = "Material", Value = "", Key = "material" },
             new() { Label = "Batch", Value = "", Key = "batch" },
-            new() { Label = "Insp. Lot", Value = "", Key = "inspectionLot" },
-            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
-            new() { Label = "Operation", Value = "", Key = "operation" },
-            new() { Label = "Work Center", Value = "", Key = "workCenter" },
             new() { Label = "Status", Value = "", Key = "status" },
-            new() { Label = "Created By", Value = "", Key = "createdBy" },
         },
         Tabs = new()
         {
-            new() { Id = "general", Label = "General", Icon = "bi-list-ul", Active = true },
-            new() { Id = "summarized", Label = "Summarized", Icon = "bi-bar-chart" },
-            new() { Id = "indicators", Label = "Indicators", Icon = "bi-speedometer" },
+            new() { Id = "general", Label = "Results", Icon = "bi-clipboard-data", Active = true },
+            new() { Id = "defects", Label = "Defects", Icon = "bi-exclamation-triangle" },
         },
         Columns = new()
         {
-            new() { Key = "shortText", Label = "Short Text for Characteristic", Type = "text", Width = 260, Required = true, Editable = true },
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "shortText", Label = "Characteristic", Type = "text", Width = 220, Required = true, Editable = true },
             new() { Key = "spec", Label = "Specifications", Type = "text", Width = 180, Editable = true },
             new() { Key = "result", Label = "Result", Type = "number", Editable = true, Width = 120, Validation = new() { Min = 0, Max = 99999, Required = true } },
-            new() { Key = "valuation", Label = "Valuation", Type = "status_icon", Width = 100, Options = new() {
-                new() { Value = "OK", Label = "OK", Color = "success" },
-                new() { Value = "NOK", Label = "Not OK", Color = "danger" },
-                new() { Value = "REVIEW", Label = "Review", Color = "warning" },
+            new() { Key = "valuation", Label = "Valuation", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "OK", Label = "OK" },
+                new() { Value = "NOK", Label = "Not OK" },
+                new() { Value = "REVIEW", Label = "Review" },
             }},
-            new() { Key = "defectClass", Label = "Defect Class", Type = "dropdown", Width = 160, Options = new() {
+            new() { Key = "defectClass", Label = "Defect Class", Type = "dropdown", Width = 150, Editable = true, Options = new() {
                 new() { Value = "MAJOR", Label = "Major defect" },
                 new() { Value = "MINOR", Label = "Minor defect" },
                 new() { Value = "VALID", Label = "Valid" },
             }},
-            new() { Key = "measuredValue", Label = "Measured Value", Type = "number", Editable = true, Width = 130 },
-            new() { Key = "targetValue", Label = "Target Value", Type = "number", Width = 120 },
-            new() { Key = "tolerance", Label = "Tolerance", Type = "text", Width = 100, Editable = true },
+            new() { Key = "reportType", Label = "Report Type", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "CHAR", Label = "Characteristic" },
+                new() { Value = "LOT", Label = "Lot" },
+                new() { Value = "DEFECT", Label = "Defect" },
+            }},
+            new() { Key = "defectCodeGroup", Label = "Defect Code Group", Type = "dropdown", Width = 160, Editable = true, Options = new() {
+                new() { Value = "VISUAL", Label = "Visual Defect" },
+                new() { Value = "DIMENSIONAL", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+                new() { Value = "MATERIAL", Label = "Material Defect" },
+                new() { Value = "PACKAGING", Label = "Packaging" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
         },
         FooterActions = new()
         {
-            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save inspection results?" },
-            new() { Id = "post", Label = "Post Results", Icon = "bi-send", Style = "success", Handler = "post" },
+            new() { Id = "save", Label = "Save Results", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save inspection results?" },
+            new() { Id = "printCOA", Label = "Print COA", Icon = "bi-printer", Style = "info", Handler = "printCOA" },
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
@@ -566,34 +576,62 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         TCode = "QM01", Title = "Create Quality Notification", Module = "QM", Icon = "bi-clipboard-plus",
         ToolbarActions = new()
         {
+            new() { Id = "new", Label = "New Notification", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
             new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
             new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
         },
         Metadata = new()
         {
             new() { Label = "Notification Type", Value = "Q1", Key = "notificationType", Editable = true },
-            new() { Label = "Reference Doc (PO)", Value = "", Key = "referenceDocument", Editable = true },
+            new() { Label = "Reference Doc (Process Order)", Value = "", Key = "referenceDocument", Editable = true },
             new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
             new() { Label = "Partner (Coordinator)", Value = "", Key = "partnerName", Editable = true },
             new() { Label = "Subject Coding", Value = "", Key = "subjectCoding", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
         },
         Tabs = new()
         {
             new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
-            new() { Id = "text", Label = "Description / Long Text", Icon = "bi-file-text" },
+            new() { Id = "text", Label = "Long Text", Icon = "bi-file-text" },
         },
         Columns = new()
         {
-            new() { Key = "field", Label = "Field", Type = "text", Width = 220 },
-            new() { Key = "value", Label = "Value", Type = "text", Width = 400, Editable = true },
-            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "notificationNumber", Label = "Notification No.", Type = "text", Width = 150, Required = true, Editable = true },
+            new() { Key = "notificationType", Label = "Type", Type = "dropdown", Width = 100, Editable = true, Options = new() {
+                new() { Value = "Q1", Label = "Q1 - Quality" },
+                new() { Value = "Q2", Label = "Q2 - Customer" },
+                new() { Value = "Q3", Label = "Q3 - Supplier" },
+                new() { Value = "Q5", Label = "Q5 - Internal" },
+            }},
+            new() { Key = "referenceDocument", Label = "Process Order Ref", Type = "text", Width = 160, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 100, Editable = true },
+            new() { Key = "partnerName", Label = "Coordinator", Type = "text", Width = 160, Editable = true },
+            new() { Key = "subjectCoding", Label = "Subject Code", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+                new() { Value = "QUALITY", Label = "Quality Issue" },
+                new() { Value = "DELIVERY", Label = "Delivery Problem" },
+                new() { Value = "PACKAGING", Label = "Packaging" },
+                new() { Value = "DOCUMENTATION", Label = "Documentation" },
+            }},
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "longText", Label = "Long Text", Type = "text", Width = 250, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "NEW", Label = "New" },
+                new() { Value = "IN_PROCESS", Label = "In Process" },
+                new() { Value = "COMPLETED", Label = "Completed" },
+                new() { Value = "CLOSED", Label = "Closed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
         },
         FooterActions = new()
         {
             new() { Id = "save", Label = "Create Notification", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this quality notification?" },
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
-        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
     };
 
     private static TCodeLayoutConfig QM02() => new()
@@ -602,32 +640,66 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         ToolbarActions = new()
         {
             new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
             new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
         },
         Metadata = new()
         {
             new() { Label = "Notification No.", Value = "", Key = "notificationNumber", Editable = true },
-            new() { Label = "Description", Value = "", Key = "description" },
             new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description" },
             new() { Label = "Status", Value = "", Key = "status" },
         },
         Tabs = new()
         {
             new() { Id = "defect", Label = "Defect Assignment", Icon = "bi-exclamation-triangle", Active = true },
+            new() { Id = "cause", Label = "Cause Code", Icon = "bi-search" },
             new() { Id = "tasks", Label = "Tasks", Icon = "bi-list-check" },
         },
         Columns = new()
         {
-            new() { Key = "field", Label = "Field", Type = "text", Width = 220 },
-            new() { Key = "value", Label = "Value", Type = "text", Width = 400, Editable = true },
-            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "defectLocation", Label = "Defect Location", Type = "dropdown", Width = 160, Editable = true, Options = new() {
+                new() { Value = "SURFACE", Label = "Surface" },
+                new() { Value = "INTERNAL", Label = "Internal" },
+                new() { Value = "EDGE", Label = "Edge" },
+                new() { Value = "COATING", Label = "Coating" },
+                new() { Value = "ASSEMBLY", Label = "Assembly" },
+            }},
+            new() { Key = "defectType", Label = "Defect Type", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+                new() { Value = "VISUAL", Label = "Visual" },
+                new() { Value = "DIMENSIONAL", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+                new() { Value = "MATERIAL", Label = "Material" },
+                new() { Value = "PACKAGING", Label = "Packaging" },
+            }},
+            new() { Key = "causeCode", Label = "Cause Code", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+                new() { Value = "MACHINE", Label = "Machine" },
+                new() { Value = "MATERIAL", Label = "Material" },
+                new() { Value = "METHOD", Label = "Method" },
+                new() { Value = "MANPOWER", Label = "Manpower" },
+                new() { Value = "ENVIRONMENT", Label = "Environment" },
+            }},
+            new() { Key = "defectCodeGroup", Label = "Defect Code Group", Type = "dropdown", Width = 160, Editable = true, Options = new() {
+                new() { Value = "VISUAL", Label = "Visual Defect" },
+                new() { Value = "DIMENSIONAL", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+            }},
+            new() { Key = "defectDescription", Label = "Defect Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "tasks", Label = "Tasks", Type = "text", Width = 200, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "OPEN", Label = "Open" },
+                new() { Value = "IN_PROCESS", Label = "In Process" },
+                new() { Value = "COMPLETED", Label = "Completed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
         },
         FooterActions = new()
         {
             new() { Id = "save", Label = "Save Changes", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save notification changes?" },
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
-        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = true, ShowDeleteRow = true }
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
     };
 
     private static TCodeLayoutConfig QM03() => new()
@@ -635,7 +707,10 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         TCode = "QM03", Title = "Quality Notification Tasks", Module = "QM", Icon = "bi-clipboard-check",
         ToolbarActions = new()
         {
+            new() { Id = "new", Label = "New Task", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
             new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
             new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
         },
         Metadata = new()
@@ -650,30 +725,34 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Columns = new()
         {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
             new() { Key = "taskNumber", Label = "Task No.", Type = "text", Width = 90 },
-            new() { Key = "description", Label = "Description", Type = "text", Width = 280, Editable = true, Required = true },
-            new() { Key = "userResponsible", Label = "User Responsible", Type = "text", Width = 160, Editable = true },
-            new() { Key = "completionText", Label = "Completion Text", Type = "text", Width = 250, Editable = true },
-            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
-                new() { Value = "OPEN", Label = "Open", Color = "warning" },
-                new() { Value = "COMPLETED", Label = "Completed", Color = "success" },
-                new() { Value = "IN_PROCESS", Label = "In Process", Color = "info" },
+            new() { Key = "chooseTask", Label = "Choose Task", Type = "dropdown", Width = 180, Editable = true, Required = true, Options = new() {
+                new() { Value = "INVESTIGATE", Label = "Investigate Root Cause" },
+                new() { Value = "CORRECT", Label = "Corrective Action" },
+                new() { Value = "PREVENT", Label = "Preventive Action" },
+                new() { Value = "VERIFY", Label = "Verify Effectiveness" },
+                new() { Value = "DOCUMENT", Label = "Document Findings" },
             }},
-            new() { Key = "completedAt", Label = "Completed At", Type = "date", Width = 130 },
+            new() { Key = "userResponsible", Label = "User Responsible", Type = "text", Width = 160, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true, Required = true },
+            new() { Key = "completionText", Label = "Completion Text", Type = "text", Width = 250, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "OPEN", Label = "Open" },
+                new() { Value = "IN_PROCESS", Label = "In Process" },
+                new() { Value = "COMPLETED", Label = "Completed" },
+            }},
+            new() { Key = "completedAt", Label = "Completed At", Type = "date", Width = 130, Editable = true },
             new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
         },
         FooterActions = new()
         {
-            new() { Id = "complete", Label = "Complete Selected Tasks", Icon = "bi-check2-all", Style = "success", Handler = "completeTasks", Confirm = true, ConfirmMessage = "Mark selected tasks as completed?" },
+            new() { Id = "complete", Label = "Complete Selected Tasks", Icon = "bi-check2-all", Style = "success", Handler = "complete", Confirm = true, ConfirmMessage = "Mark selected tasks as completed?" },
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new()
         {
-            ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true,
-            CustomActions = new()
-            {
-                new() { Id = "complete", Label = "Complete", Icon = "bi-check2-all", Style = "success", Handler = "completeTasks" },
-            }
+            ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true
         }
     };
 
@@ -739,9 +818,11 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         TCode = "QM12", Title = "Manage Usage Decisions", Module = "QM", Icon = "bi-clipboard-check",
         ToolbarActions = new()
         {
+            new() { Id = "new", Label = "New Decision", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
             new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
             new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
-            new() { Id = "confirm", Label = "Confirm Certificate", Icon = "bi-patch-check", Style = "success", Handler = "confirmCertificate" },
         },
         Metadata = new()
         {
@@ -761,22 +842,23 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         Columns = new()
         {
-            new() { Key = "lotNumber", Label = "Inspection Lot", Type = "text", Width = 140 },
-            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80 },
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Inspection Lot", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Editable = true },
             new() { Key = "origin", Label = "Origin", Type = "text", Width = 110 },
             new() { Key = "resultStatus", Label = "Result Status", Type = "status_badge", Width = 120, Options = new() {
                 new() { Value = "RECORDED", Label = "Recorded", Color = "info" },
                 new() { Value = "CERT_CONFIRMED", Label = "Cert. Confirmed", Color = "success" },
                 new() { Value = "UD_RECORDED", Label = "UD Recorded", Color = "success" },
             }},
-            new() { Key = "udCode", Label = "UD Code", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+            new() { Key = "udCode", Label = "UD Code", Type = "dropdown", Width = 150, Editable = true, Required = true, Options = new() {
                 new() { Value = "A", Label = "A - Accept" },
                 new() { Value = "R", Label = "R - Reject" },
                 new() { Value = "R1", Label = "R1 - Rework" },
                 new() { Value = "N", Label = "N - Return to Vendor" },
                 new() { Value = "S", Label = "S - Scrap" },
             }},
-            new() { Key = "stockProposal", Label = "Stock Proposal", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+            new() { Key = "stockProposal", Label = "Stock Proposal", Type = "dropdown", Width = 150, Editable = true, Required = true, Options = new() {
                 new() { Value = "FREE", Label = "Unrestricted Use" },
                 new() { Value = "QI", Label = "Quality Inspection" },
                 new() { Value = "BLOCKED", Label = "Blocked Stock" },
@@ -790,11 +872,12 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         },
         FooterActions = new()
         {
-            new() { Id = "confirm", Label = "Confirm Certificate", Icon = "bi-patch-check", Style = "success", Handler = "confirmCertificate", Confirm = true, ConfirmMessage = "Confirm certificate receipt?" },
-            new() { Id = "save", Label = "Record Usage Decision", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Record usage decision and post stock?" },
+            new() { Id = "save", Label = "Save & Post Stock", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save usage decision and post stock?" },
+            new() { Id = "confirm", Label = "Confirm Certificate", Icon = "bi-patch-check", Style = "success", Handler = "confirmCertificate" },
+            new() { Id = "printCOA", Label = "Print COA", Icon = "bi-printer", Style = "info", Handler = "printCOA" },
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
-        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
     };
 
     private static TCodeLayoutConfig ZQM1() => new()
