@@ -43,6 +43,7 @@
                     <div class="theme-dots" id="sidebarThemeDots" role="radiogroup" aria-label="Theme selection">
                         <button class="theme-btn" data-theme="modern" title="Modern theme" aria-label="Modern theme" role="radio" aria-checked="false"><span class="theme-label">Modern</span></button>
                         <button class="theme-btn" data-theme="classic" title="Classical theme" aria-label="Classical theme" role="radio" aria-checked="false"><span class="theme-label">Classical</span></button>
+                        <button class="theme-btn" data-theme="minimal" title="Minimal theme" aria-label="Minimal theme" role="radio" aria-checked="false"><span class="theme-label">Minimal</span></button>
                         <button class="theme-btn" data-theme="futuristic" title="Futuristic theme" aria-label="Futuristic theme" role="radio" aria-checked="false"><span class="theme-label">Futuristic</span></button>
                     </div>
                     <div class="sidebar-text" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
@@ -73,13 +74,13 @@
                         </a>
                         <a href="/Dashboard" class="top-bar-icon" title="Home" aria-label="Home dashboard"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i></a>
                         <a href="/Settings" class="top-bar-icon" title="Settings" aria-label="Settings"><i class="bi bi-gear" aria-hidden="true"></i></a>
-                        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon" style="margin:0;display:inline-flex">
+                        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon lang-form" style="margin:0;display:inline-flex">
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                            <select name="culture" onchange="this.form.submit()" style="background:transparent;border:1px solid var(--sidebar-text-hover,#666);border-radius:4px;color:var(--sidebar-text-hover,#ccc);font-size:12px;padding:2px 4px" title="Language" aria-label="Select language">
+                            <select name="culture" onchange="this.form.submit()" class="lang-select" title="Language" aria-label="Select language">
                                 <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en")">EN</option>
-                                <option value="hi" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hi")">हिन्दी</option>
-                                <option value="ta" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ta")">தமிழ்</option>
-                                <option value="te" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "te")">తెలుగు</option>
+                                <option value="hi" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hi")">HI</option>
+                                <option value="ta" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ta")">TA</option>
+                                <option value="te" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "te")">TE</option>
                                 <option value="fr" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "fr")">FR</option>
                                 <option value="es" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "es")">ES</option>
                             </select>

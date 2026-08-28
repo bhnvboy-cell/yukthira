@@ -103,6 +103,78 @@
 [data-theme="classic"] .app-main { padding: 16px 20px !important; }
 [data-theme="classic"] .top-bar { border-bottom: 1px solid var(--border-color); }
 
+/* ── Minimal theme ── */
+[data-theme="minimal"] {
+  --primary: #374151;
+  --primary-dark: #1f2937;
+  --primary-light: #6b7280;
+  --bg-main: #fafafa;
+  --card-bg: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --shadow-sm: none;
+  --shadow-md: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg: 0 2px 8px rgba(0,0,0,0.08);
+  --radius: 4px;
+  --radius-sm: 2px;
+  --accent: #374151;
+  --accent-light: #6b7280;
+  --gradient-brand: none;
+  --topbar-bg: #ffffff;
+  --topbar-border: #e5e7eb;
+  --topbar-shadow: none;
+  --tile-shadow: none;
+  --tile-shadow-hover: 0 1px 4px rgba(0,0,0,0.08);
+  --tile-radius: 4px;
+  --sidebar-bg: #111827;
+  --sidebar-hover: #1f2937;
+  --sidebar-active: rgba(55,65,81,0.25);
+  --sidebar-text: rgba(255,255,255,0.6);
+  --sidebar-text-hover: #ffffff;
+  --sidebar-divider: rgba(255,255,255,0.08);
+}
+[data-theme="minimal"] body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-main); color: var(--text-primary); font-size: 13px; }
+[data-theme="minimal"] .card { border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: none; border-radius: var(--radius); transition: none; }
+[data-theme="minimal"] .card:hover { box-shadow: none; transform: none; }
+[data-theme="minimal"] .card-header { background: #f9fafb; border-bottom: 1px solid var(--border-color); padding: 10px 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+[data-theme="minimal"] .card-body { padding: 14px; }
+[data-theme="minimal"] .table { font-size: 12.5px; }
+[data-theme="minimal"] .table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 8px 10px 6px; border-bottom: 1px solid var(--border-color); font-weight: 600; }
+[data-theme="minimal"] .table td { padding: 7px 10px; border-bottom: 1px solid #f3f4f6; }
+[data-theme="minimal"] .table-hover tbody tr:hover { background: #f9fafb; }
+[data-theme="minimal"] .nav-tabs .nav-link { font-size: 12px; padding: 6px 14px; color: var(--text-muted); }
+[data-theme="minimal"] .nav-tabs .nav-link.active { color: var(--text-primary); font-weight: 600; border-bottom: 2px solid var(--text-primary); }
+[data-theme="minimal"] .btn { font-weight: 500; font-size: 12px; padding: 6px 14px; border-radius: var(--radius-sm); }
+[data-theme="minimal"] .btn-primary { background: var(--text-primary); border-color: var(--text-primary); color: #fff; }
+[data-theme="minimal"] .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+[data-theme="minimal"] .btn-outline-primary { color: var(--text-primary); border-color: var(--border-color); }
+[data-theme="minimal"] .btn-outline-primary:hover { background: var(--text-primary); color: #fff; }
+[data-theme="minimal"] .form-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+[data-theme="minimal"] .form-control, [data-theme="minimal"] .form-select { border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; padding: 6px 10px; }
+[data-theme="minimal"] .form-control:focus, [data-theme="minimal"] .form-select:focus { border-color: var(--text-primary); box-shadow: none; }
+[data-theme="minimal"] .badge { font-weight: 500; font-size: 10px; padding: 2px 8px; border-radius: 2px; }
+[data-theme="minimal"] h2 { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+[data-theme="minimal"] h2 i, [data-theme="minimal"] h2 .bi { color: var(--text-primary); }
+[data-theme="minimal"] .app-main { padding: 16px 20px !important; }
+[data-theme="minimal"] .top-bar { border-bottom: 1px solid var(--border-color); box-shadow: none; }
+[data-theme="minimal"] .tile-group-header { border-left: 3px solid var(--text-primary); background: #f9fafb; }
+[data-theme="minimal"] .tile-card { border: 1px solid var(--border-color); box-shadow: none; }
+[data-theme="minimal"] .tile-card:hover { box-shadow: var(--tile-shadow-hover); border-color: var(--text-muted); }
+[data-theme="minimal"] .mini-tile-card { border: 1px solid var(--border-color); box-shadow: none; }
+[data-theme="minimal"] .mini-tile-card:hover { border-color: var(--text-muted); }
+[data-theme="minimal"] .hybrid-sidebar { border-right: 1px solid rgba(255,255,255,0.06); }
+[data-theme="minimal"] .hybrid-sidebar .nav-item:hover { background: var(--sidebar-hover); }
+[data-theme="minimal"] .hybrid-sidebar .nav-item.active { background: var(--sidebar-active); color: #fff !important; }
+[data-theme="minimal"] .progress-bar { background: var(--text-primary); }
+[data-theme="minimal"] .kpi-card { border: 1px solid var(--border-color); box-shadow: none; }
+[data-theme="minimal"] .kpi-card:hover { box-shadow: var(--tile-shadow-hover); }
+[data-theme="minimal"] .quick-action { border: 1px solid var(--border-color); box-shadow: none; }
+[data-theme="minimal"] .quick-action:hover { border-color: var(--text-muted); }
+[data-theme="minimal"] .category-filter { border-radius: 2px; }
+[data-theme="minimal"] .category-filter.active { background: var(--text-primary); color: #fff; }
+
 /* ── Futuristic theme ── */
 [data-theme="futuristic"] {
   --primary: #c9952c;
@@ -416,6 +488,7 @@ body {
 .sidebar-footer .theme-btn:hover { transform: scale(1.15); }
 .sidebar-footer .theme-btn[data-theme="modern"] { background: #2563eb; }
 .sidebar-footer .theme-btn[data-theme="classic"] { background: #1a56db; }
+.sidebar-footer .theme-btn[data-theme="minimal"] { background: #374151; }
 .sidebar-footer .theme-btn[data-theme="futuristic"] { background: linear-gradient(135deg, #c9952c, #0b0f1a); }
 
 /* ── Main area (top bar + content) ── */
@@ -1680,6 +1753,7 @@ tr.editing td input:focus {
 }
 .theme-btn[data-theme="modern"] { background: #2563eb; }
 .theme-btn[data-theme="classic"] { background: #1a56db; }
+.theme-btn[data-theme="minimal"] { background: #374151; }
 .theme-btn[data-theme="futuristic"] { background: linear-gradient(135deg, #c9952c, #0b0f1a); }
 .theme-label {
   display: none;
@@ -1697,7 +1771,7 @@ tr.editing td input:focus {
 /* ── Settings page theme cards ── */
 .settings-theme-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -1723,6 +1797,7 @@ tr.editing td input:focus {
 }
 .settings-theme-card[data-theme="modern"] .settings-theme-preview { background: linear-gradient(135deg, #2563eb, #0d9488); }
 .settings-theme-card[data-theme="classic"] .settings-theme-preview { background: linear-gradient(135deg, #1a56db, #1e3a5f); }
+.settings-theme-card[data-theme="minimal"] .settings-theme-preview { background: linear-gradient(135deg, #374151, #111827); }
 .settings-theme-card[data-theme="futuristic"] .settings-theme-preview { background: linear-gradient(135deg, #c9952c, #0b0f1a); }
 .settings-theme-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
 .settings-theme-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
@@ -1784,6 +1859,31 @@ tr.editing td input:focus {
   gap: 8px;
   transition: all 0.2s ease;
 }
+
+/* ── Language selector in top bar ── */
+.lang-form { display: inline-flex !important; align-items: center; }
+.lang-select {
+  background: transparent;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 4px;
+  color: var(--text-primary, #0f172a);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 6px;
+  cursor: pointer;
+  outline: none;
+  appearance: auto;
+}
+.lang-select option {
+  background: var(--card-bg, #ffffff);
+  color: var(--text-primary, #0f172a);
+}
+[data-theme="futuristic"] .lang-select { border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
+[data-theme="futuristic"] .lang-select option { background: #1a1f2e; color: var(--text-primary); }
+[data-theme="minimal"] .lang-select { border-color: #e5e7eb; color: var(--text-primary); }
+[data-theme="minimal"] .lang-select option { background: #ffffff; color: #111827; }
+[data-theme="dark"] .lang-select { border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
+[data-theme="dark"] .lang-select option { background: #121a2b; color: var(--text-primary); }
 .btn-timeout-continue {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;

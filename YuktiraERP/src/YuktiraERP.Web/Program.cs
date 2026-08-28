@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using YuktiraERP.AIEngine;
 using YuktiraERP.Infrastructure;
@@ -76,6 +77,16 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAsync();
+
+    // Auto-unlock any locked accounts on startup
+    var db = scope.ServiceProvider.GetRequiredService<YuktiraERP.Infrastructure.Data.YuktiraDbContext>();
+    var lockedUsers = await db.AdminUsers.Where(u => u.LockedUntil != null && u.LockedUntil > DateTime.UtcNow).ToListAsync();
+    foreach (var u in lockedUsers)
+    {
+        u.LockedUntil = null;
+        u.FailedLoginAttempts = 0;
+    }
+    if (lockedUsers.Count > 0) await db.SaveChangesAsync();
 
     // Load plugins from the plugins/ folder (logs & activates IYuktiraPlugin assemblies)
     var loader = scope.ServiceProvider.GetRequiredService<YuktiraERP.PluginSdk.PluginLoader>();
