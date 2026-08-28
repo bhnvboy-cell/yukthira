@@ -415,9 +415,8 @@ body {
 }
 .sidebar-footer .theme-btn:hover { transform: scale(1.15); }
 .sidebar-footer .theme-btn[data-theme="modern"] { background: #2563eb; }
-.sidebar-footer .theme-btn[data-theme="classic"] { background: #1e3a5f; }
-.sidebar-footer .theme-btn[data-theme="premium"] { background: #c9952c; }
-.sidebar-footer .theme-btn[data-theme="dark"] { background: #475569; }
+.sidebar-footer .theme-btn[data-theme="classic"] { background: #1a56db; }
+.sidebar-footer .theme-btn[data-theme="futuristic"] { background: linear-gradient(135deg, #c9952c, #0b0f1a); }
 
 /* ── Main area (top bar + content) ── */
 .app-main-area {
@@ -1155,7 +1154,7 @@ h2 i, h2 .bi {
 
 [data-theme="classic"] .category-filter { border-radius: 2px; font-size: 11px; padding: 4px 12px; }
 [data-theme="classic"] .category-filter.active { background: var(--primary); color: #fff; }
-[data-theme="premium"] .category-filter.active { background: var(--accent); border-color: var(--accent); color: #0b0f1a; font-weight: 600; }
+[data-theme="futuristic"] .category-filter.active { background: var(--accent); border-color: var(--accent); color: #0b0f1a; font-weight: 600; }
 
 /* ── Search highlight ── */
 mark.highlight {
@@ -1165,7 +1164,7 @@ mark.highlight {
   border-radius: 2px;
 }
 [data-theme="classic"] mark.highlight { background: rgba(26,86,219,0.15); }
-[data-theme="premium"] mark.highlight { background: rgba(201,149,44,0.2); color: var(--accent-light); }
+[data-theme="futuristic"] mark.highlight { background: rgba(201,149,44,0.2); color: var(--accent-light); }
 
 /* ── KPI Cards (Fiori-style) ── */
 .kpi-grid {
@@ -1266,14 +1265,14 @@ mark.highlight {
 [data-theme="classic"] .kpi-value { font-size: 20px; }
 [data-theme="classic"] .kpi-label { font-size: 10px; }
 
-[data-theme="premium"] .kpi-card { border: 1px solid rgba(255,255,255,0.06); background: rgba(26,31,46,0.9); }
-[data-theme="premium"] .kpi-card:hover { border-color: var(--accent); }
-[data-theme="premium"] .kpi-card.color-green { border-left: 3px solid #059669; }
-[data-theme="premium"] .kpi-card.color-yellow { border-left: 3px solid #d97706; }
-[data-theme="premium"] .kpi-card.color-red { border-left: 3px solid #dc2626; }
-[data-theme="premium"] .kpi-card .kpi-trend.up { color: #34d399; }
-[data-theme="premium"] .kpi-card .kpi-trend.down { color: #f87171; }
-[data-theme="premium"] .kpi-card .kpi-icon { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+[data-theme="futuristic"] .kpi-card { border: 1px solid rgba(255,255,255,0.06); background: rgba(26,31,46,0.9); }
+[data-theme="futuristic"] .kpi-card:hover { border-color: var(--accent); }
+[data-theme="futuristic"] .kpi-card.color-green { border-left: 3px solid #059669; }
+[data-theme="futuristic"] .kpi-card.color-yellow { border-left: 3px solid #d97706; }
+[data-theme="futuristic"] .kpi-card.color-red { border-left: 3px solid #dc2626; }
+[data-theme="futuristic"] .kpi-card .kpi-trend.up { color: #34d399; }
+[data-theme="futuristic"] .kpi-card .kpi-trend.down { color: #f87171; }
+[data-theme="futuristic"] .kpi-card .kpi-icon { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
 /* ── KPI Badges on tiles ── */
 .tile-card .kpi-badge {
@@ -1326,10 +1325,10 @@ mark.highlight {
 [data-theme="classic"] .kpi-ai-section { border-left: 3px solid var(--primary); }
 [data-theme="classic"] .kpi-ai-section h3 { color: var(--primary); }
 [data-theme="classic"] .kpi-stat-card { border: 1px solid var(--border-color); }
-[data-theme="premium"] .kpi-ai-section { border-left: 3px solid var(--accent); }
-[data-theme="premium"] .kpi-ai-section h3 { color: var(--accent-light); }
-[data-theme="premium"] .kpi-stat-card { border: 1px solid rgba(255,255,255,0.06); }
-[data-theme="premium"] .kpi-drill-chart { border: 1px solid rgba(255,255,255,0.06); }
+[data-theme="futuristic"] .kpi-ai-section { border-left: 3px solid var(--accent); }
+[data-theme="futuristic"] .kpi-ai-section h3 { color: var(--accent-light); }
+[data-theme="futuristic"] .kpi-stat-card { border: 1px solid rgba(255,255,255,0.06); }
+[data-theme="futuristic"] .kpi-drill-chart { border: 1px solid rgba(255,255,255,0.06); }
 
 /* ── Responsive KPI grid ── */
 @media (max-width: 1200px) {
@@ -1398,8 +1397,8 @@ mark.highlight {
 
 [data-theme="classic"] .quick-action { border: 1px solid var(--border-color); }
 [data-theme="classic"] .quick-action:hover { border-color: var(--primary-light); }
-[data-theme="premium"] .quick-action { border: 1px solid rgba(255,255,255,0.06); }
-[data-theme="premium"] .quick-action:hover { border-color: var(--accent); color: var(--accent-light); }
+[data-theme="futuristic"] .quick-action { border: 1px solid rgba(255,255,255,0.06); }
+[data-theme="futuristic"] .quick-action:hover { border-color: var(--accent); color: var(--accent-light); }
 
 /* ── Responsive (hybrid layout) ── */
 @media (max-width: 1200px) {
