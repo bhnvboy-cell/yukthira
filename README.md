@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.0.5** | **August 2026**
+**Version 1.0.0** | **August 2026**
 
 ---
 
@@ -73,7 +73,7 @@ Plugin registry with per-tenant enable/disable. Currently ships with AdvancedQC 
 107 SAP-style codes (MM01, VA01, FB50, MIRO, PS01, PM01, etc.) organized by module with search, favorites, and role-based visibility. Enter-key triggers direct API execution fallback when debounced search results aren't ready. Includes the PS/PM module codes (PS01–PS04, PM01–PM04).
 
 ### Module Registry & Sidebar
-The dashboard and sidebar are driven by a central **module catalog** (`ModuleCatalog`, registered as a singleton in `Infrastructure`): 24 modules (MM, SD, WM, PP, QM, PM, FI, CO, HR, CRM, PS, LIMS, BI, AI, WF, APP, NOT, TCD, TCG, AUD, ADM, CST, INT, PLG) grouped into Operations / Finance / People / Projects & Labs / Analytics / System with per-module icons and category colors. Modules resolve from routes and transaction codes derive module + SAP-style group (MasterData / Transactions / Process / Reports / Configuration / Administration / Analytics / Utilities) from the catalog — e.g. MM01=MasterData, MIGO=Transactions, MD01=Process, MB52=Reports, BI01=Configuration, SU01=Administration.
+The dashboard and sidebar are driven by a central **module catalog** (`ModuleCatalog`, registered as a singleton in `Infrastructure`): 28 modules (MM, SD, WM, PP, QM, PM, FI, CO, HR, CRM, PS, LIMS, BI, AI, CR, RF, WV, VS, UJ, TX, CN, SX, PD, ME, WF, APP, NOT, TCD, TCG, AUD, ADM, CST, INT, PLG) grouped into Operations / Finance / People / Projects & Labs / Analytics / Compliance / System with per-module icons and category colors. Modules resolve from routes and transaction codes derive module + SAP-style group (MasterData / Transactions / Process / Reports / Configuration / Administration / Analytics / Utilities) from the catalog — e.g. MM01=MasterData, MIGO=Transactions, MD01=Process, MB52=Reports, BI01=Configuration, SU01=Administration.
 
 ### Full CRUD Pages
 Every entity has a full Web UI CRUD set — **List** (searchable table with View/Edit/Delete), **Display** (read-only detail), **Edit** (pre-filled form), and **Create** — wired together with redirects after save. 32 entity types previously limited to Create-only now have complete List/Edit/Display pages (GRN, Invoice Verification, PR, SD Billing/Delivery/Inquiry/Quotation, PP Plan/Routing/WorkCenter, QM InspectionResult/UsageDecision, WM Bin, FI FixedAsset/Ledger, CO CostElement/ProfitCenter/InternalOrder, HR Appraisal/Attendance/Leave/Payroll, CRM Campaign/Contact/ServiceTicket, LIMS Instrument/Specification/TestResult, PS ProjTask/Timesheet, PM Order/Plan).
@@ -289,6 +289,32 @@ Entities: WorkflowDefinition, WorkflowNode, WorkflowEdge, WorkflowInstance, Work
 
 ### MRP Engine
 Multi-level BOM explosion, gross/net requirement calculation, shortage detection, planned order generation, capacity load calculation, safety stock monitoring. **Extensions:** multi-plant planning scoped to PlantEntity, vendor lead-time integration adjusting order dates from VendorLeadTimeEntity, production capacity leveling with overtime/shift suggestions, MRP run history recording (run_type, materials_processed, duration_ms), SAP-style exception messages (STOCK_SHORTAGE, NO_VENDOR, LONG_LEAD_TIME).
+
+### Enterprise Features (v1.0.0)
+
+**Customer Complaint & Return (SD-QM-MM-FI):** 8-step cross-functional workflow: CR-01 (Complaint Order) → CR-02 (QM Notification) → CR-03 (Return Delivery) → CR-04 (QM Inspection) → CR-05 (Usage Decision) → CR-06 (Credit Memo) → CR-07 (Supplier Claim) → CR-08 (Debit Memo). 7 entities, 7 TCode layouts (CRRETURN, CRINSPECT, CRUDPOST, CRCREDIT, CRSUPPLY, CRSRET, CRDEBIT).
+
+**Universal Journal (FI+CO):** SAP ACDOCA equivalent — merged FI and CO into single ledger. Single journal entry with both debit/credit and cost allocation.
+
+**SOX Compliance:** Immutable audit trail with SHA-256 hash chain (PreviousHash/CurrentHash). Duty assignments, violation tracking, segregation of duties enforcement.
+
+**RF Warehouse Framework:** Mobile RF scanner menu (RFSCAN), pick tasks (RFPICK), count tasks. Real-time SignalR updates for warehouse operations.
+
+**Wave Pick & Velocity Slotting:** Wave creation with line allocation (WAVEPK). ABCD velocity classification with automatic bin assignment (VSLOTT). Bin master with capacity tracking.
+
+**PP/DS Finite Scheduling:** Capacity-constrained scheduling with load leveling (PPDS). FiniteSchedule, CapacityLoad, MaterialAvailability entities.
+
+**Event-Driven MRP:** Real-time material requirement triggers (MRPEVT). MrpEvent, MrpEventStream, MrpPlanningRun, MrpEventSubscription entities.
+
+**Multi-Entity Consolidation:** Consolidation groups, inter-company transactions, elimination entries, currency translation (CONSOL).
+
+**Localization Tax Engine:** Country-specific tax configs, withholding tax, tax return filing (TAXRET).
+
+**AI Document OCR:** Base64 document processing with confidence scoring (AIOCR).
+
+**Real-Time Dashboard:** SignalR hub at `/hubs/dashboard` with live KPI push, stock change alerts, order updates, production status, quality alerts, SOX violation notifications, anomaly detection. Auto-refresh every 30 seconds.
+
+**GraphQL API:** HotChocolate 15 endpoint at `/api/graphql` with 16 entity types, filtering, sorting, projections. Dashboard aggregation query with KPIs across all modules.
 
 ---
 
@@ -1177,7 +1203,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - Schema: `database/scripts/007_new_entities.sql` (StockMovements, FiscalPeriods, BankReconciliations, Payments, DepreciationSchedules, ApprovalSteps) and `008_tenantid_columns.sql` (TenantId on APEntrys/AREntrys/PayrollEntrys/goods_receipts/invoice_verifications/AdminUsers.MfaSecret)
 - Backup/restore scripts fixed and verified end-to-end: `backup.ps1` / `restore.ps1` now auto-locate PostgreSQL client tools (`C:\Program Files\PostgreSQL\13-18\bin`), default to the app's `postgres` user on `127.0.0.1:5432`, accept an optional `-Password`, and rename the reserved `$Host` param to `$Server` — tested with a real dump (custom format, 30-backup rotation) and a full restore into a scratch database (99 tables verified)
 - Print / Save-as-PDF: global Print button in the top bar (and `Ctrl+P`) on every page with a print stylesheet that hides chrome (sidebar/top bar/action buttons), expands scrolled tables, and produces clean paper-friendly output in the browser print dialog (incl. "Save as PDF")
-- Module registry: new `ModuleCatalog` (24 modules in 6 categories with icons/colors) drives the Dashboard tiles, sidebar navigation, and transaction-code module/group classification; exposed via `IModuleCatalog` (Core) implemented in Infrastructure as a singleton
+- Module registry: new `ModuleCatalog` (28 modules in 7 categories with icons/colors) drives the Dashboard tiles, sidebar navigation, and transaction-code module/group classification; exposed via `IModuleCatalog` (Core) implemented in Infrastructure as a singleton
 - Legacy flat pages: 13 duplicated flat page routes (MM/Create, MM/CreateGRN, MM/CreatePO, MM/CreatePR, MM/CreateVendor, MM/GoodsReceipt, SD/CreateCustomer, PP/Create, QM/Create, FI/Create, HR/Create, CRM/Create, LIMS/Create) converted to server-side redirects to their canonical sub-folder pages; `MIGO` t-code route fixed to `/MM/GRN/Create`
 - T-code reclassification: `TransactionCodeService` now derives module from the catalog (`GetModuleForRoute`) and classifies codes into SAP-style groups (MasterData / Transactions / Process / Reports / Configuration / Administration / Analytics / Utilities); seed reconciliation back-fills missing codes
 - Full CRUD pages: generated List + Edit + Display pages for 32 entity types that previously had Create-only pages (see "Full CRUD Pages" above), with Create pages now redirecting/Cancelling to their List pages
