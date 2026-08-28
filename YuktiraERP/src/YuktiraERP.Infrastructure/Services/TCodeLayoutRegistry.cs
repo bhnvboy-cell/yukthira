@@ -29,6 +29,9 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Register(QE01());
         Register(FBL1N());
         Register(PA30());
+        Register(QM01());
+        Register(QM02());
+        Register(QM03());
     }
 
     private static TCodeLayoutConfig QE51N() => new()
@@ -543,5 +546,121 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QM01() => new()
+    {
+        TCode = "QM01", Title = "Create Quality Notification", Module = "QM", Icon = "bi-clipboard-plus",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Notification Type", Value = "Q1", Key = "notificationType", Editable = true },
+            new() { Label = "Reference Doc (PO)", Value = "", Key = "referenceDocument", Editable = true },
+            new() { Label = "Plant", Value = "7001", Key = "plant", Editable = true },
+            new() { Label = "Partner (Coordinator)", Value = "", Key = "partnerName", Editable = true },
+            new() { Label = "Subject Coding", Value = "", Key = "subjectCoding", Editable = true },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "text", Label = "Description / Long Text", Icon = "bi-file-text" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 220 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 400, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Notification", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this quality notification?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig QM02() => new()
+    {
+        TCode = "QM02", Title = "Change Quality Notification", Module = "QM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Notification No.", Value = "", Key = "notificationNumber", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description" },
+            new() { Label = "Plant", Value = "7001", Key = "plant" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "defect", Label = "Defect Assignment", Icon = "bi-exclamation-triangle", Active = true },
+            new() { Id = "tasks", Label = "Tasks", Icon = "bi-list-check" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 220 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 400, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Changes", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save notification changes?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QM03() => new()
+    {
+        TCode = "QM03", Title = "Quality Notification Tasks", Module = "QM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Notification No.", Value = "", Key = "notificationNumber", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "tasks", Label = "Tasks", Icon = "bi-list-check", Active = true },
+        },
+        Columns = new()
+        {
+            new() { Key = "taskNumber", Label = "Task No.", Type = "text", Width = 90 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 280, Editable = true, Required = true },
+            new() { Key = "userResponsible", Label = "User Responsible", Type = "text", Width = 160, Editable = true },
+            new() { Key = "completionText", Label = "Completion Text", Type = "text", Width = 250, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "OPEN", Label = "Open", Color = "warning" },
+                new() { Value = "COMPLETED", Label = "Completed", Color = "success" },
+                new() { Value = "IN_PROCESS", Label = "In Process", Color = "info" },
+            }},
+            new() { Key = "completedAt", Label = "Completed At", Type = "date", Width = 130 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "complete", Label = "Complete Selected Tasks", Icon = "bi-check2-all", Style = "success", Handler = "completeTasks", Confirm = true, ConfirmMessage = "Mark selected tasks as completed?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new()
+        {
+            ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true,
+            CustomActions = new()
+            {
+                new() { Id = "complete", Label = "Complete", Icon = "bi-check2-all", Style = "success", Handler = "completeTasks" },
+            }
+        }
     };
 }

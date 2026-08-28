@@ -35,3 +35,23 @@ public class UsageDecisionEntityConfiguration : IEntityTypeConfiguration<UsageDe
         builder.ToTable("usage_decisions", "yuktira_qm");
     }
 }
+
+public class QualityNotificationEntityConfiguration : IEntityTypeConfiguration<QualityNotificationEntity>
+{
+    public void Configure(EntityTypeBuilder<QualityNotificationEntity> builder)
+    {
+        builder.ToTable("quality_notifications", "yuktira_qm");
+        builder.HasIndex(e => e.NotificationNumber).IsUnique();
+    }
+}
+
+public class QualityNotificationTaskEntityConfiguration : IEntityTypeConfiguration<QualityNotificationTaskEntity>
+{
+    public void Configure(EntityTypeBuilder<QualityNotificationTaskEntity> builder)
+    {
+        builder.ToTable("quality_notification_tasks", "yuktira_qm");
+        builder.HasOne<QualityNotificationEntity>()
+            .WithMany()
+            .HasForeignKey(e => e.NotificationId);
+    }
+}

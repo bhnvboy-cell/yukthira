@@ -101,6 +101,42 @@ public class InspectionPlanEntity : EntityBase { public string PlanId { get; set
 public class InspectionResultEntity : EntityBase { public string ResultId { get; set; } = ""; public string LotNumber { get; set; } = ""; public string Characteristic { get; set; } = ""; public string Result { get; set; } = ""; public string Specification { get; set; } = ""; public string Status { get; set; } = "Passed"; }
 public class UsageDecisionEntity : EntityBase { public string DecisionId { get; set; } = ""; public string LotNumber { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Decision { get; set; } = "Accept"; public string Notes { get; set; } = ""; public DateTime DecisionDate { get; set; } }
 
+public class QualityNotificationEntity : EntityBase
+{
+    public string NotificationNumber { get; set; } = "";
+    public string NotificationType { get; set; } = "Q1";
+    public string Description { get; set; } = "";
+    public string LongText { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string ReferenceDocument { get; set; } = "";
+    public string ReferenceDocType { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Batch { get; set; } = "";
+    public string PartnerId { get; set; } = "";
+    public string PartnerName { get; set; } = "";
+    public string SubjectCoding { get; set; } = "";
+    public string DefectLocation { get; set; } = "";
+    public string DefectCode { get; set; } = "";
+    public string DefectType { get; set; } = "";
+    public string CauseCode { get; set; } = "";
+    public string Priority { get; set; } = "Medium";
+    public string Status { get; set; } = "NEW";
+    public string CreatedBy { get; set; } = "";
+    public DateTime? CompletedAt { get; set; }
+}
+
+public class QualityNotificationTaskEntity : EntityBase
+{
+    public Guid NotificationId { get; set; }
+    public string TaskNumber { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string UserResponsible { get; set; } = "";
+    public string CompletionText { get; set; } = "";
+    public string Status { get; set; } = "OPEN";
+    public DateTime? CompletedAt { get; set; }
+}
+
 // WM
 public class WarehouseTransferEntity : EntityBase { public string TransferId { get; set; } = ""; public DateTime Date { get; set; } public string MaterialName { get; set; } = ""; public string FromBin { get; set; } = ""; public string ToBin { get; set; } = ""; public decimal Quantity { get; set; } public string Status { get; set; } = "Pending"; }
 public class StorageLocationEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "General"; public decimal Capacity { get; set; } public string Status { get; set; } = "Active"; }

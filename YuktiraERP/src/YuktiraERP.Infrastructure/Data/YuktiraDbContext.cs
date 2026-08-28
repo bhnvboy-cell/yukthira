@@ -38,6 +38,8 @@ public class YuktiraDbContext : DbContext
     public DbSet<InspectionPlanEntity> InspectionPlans => Set<InspectionPlanEntity>();
     public DbSet<InspectionResultEntity> InspectionResults => Set<InspectionResultEntity>();
     public DbSet<UsageDecisionEntity> UsageDecisions => Set<UsageDecisionEntity>();
+    public DbSet<QualityNotificationEntity> QualityNotifications => Set<QualityNotificationEntity>();
+    public DbSet<QualityNotificationTaskEntity> QualityNotificationTasks => Set<QualityNotificationTaskEntity>();
     // WM
     public DbSet<WarehouseTransferEntity> WarehouseTransfers => Set<WarehouseTransferEntity>();
     public DbSet<StorageLocationEntity> StorageLocations => Set<StorageLocationEntity>();
