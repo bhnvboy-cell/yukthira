@@ -31,7 +31,7 @@
 
     async function loadWfDef() {
         if (!wfDef) {
-            var r = await fetch('/api/tcode-generator/workflow-definition');
+            var r = await fetch('/api/v1/tcode-generator/workflow-definition');
             wfDef = await r.json();
         }
     }
@@ -47,7 +47,7 @@
     async function loadData() {
         await loadWfDef();
         var search = document.getElementById('searchInput').value;
-        var url = '/api/tcode-generator/data/' + tcodeId + '?search=' + encodeURIComponent(search);
+        var url = '/api/v1/tcode-generator/data/' + tcodeId + '?search=' + encodeURIComponent(search);
         var res = await fetch(url);
         var data = await res.json();
         var html = '';
@@ -68,7 +68,7 @@
 
     async function deleteRec(id) {
         if (!confirm('Delete this record?')) return;
-        await fetch('/api/tcode-generator/data/' + id, { method: 'DELETE' });
+        await fetch('/api/v1/tcode-generator/data/' + id, { method: 'DELETE' });
         loadData();
     }
 

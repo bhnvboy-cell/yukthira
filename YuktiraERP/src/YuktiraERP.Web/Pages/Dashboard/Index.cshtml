@@ -115,7 +115,7 @@
     (function() {
         var kpiGrid = document.getElementById('kpiGrid');
         if (!kpiGrid) return;
-        fetch('/api/kpi/dashboard')
+        fetch('/api/v1/kpi/dashboard')
             .then(function(r) { return r.json(); })
             .then(function(kpis) {
                 if (!kpis || !kpis.length) return;
@@ -139,7 +139,7 @@
 
     // ── KPI Badges on tiles ──
     (function() {
-        fetch('/api/kpi/module-badges')
+        fetch('/api/v1/kpi/module-badges')
             .then(function(r) { return r.json(); })
             .then(function(badges) {
                 if (!badges || !badges.length) return;

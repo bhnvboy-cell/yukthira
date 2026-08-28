@@ -32,7 +32,7 @@
     var code = params.get('code');
 
     async function loadWorkflow() {
-        var res = await fetch('/api/tcode-generator/data/' + recordId + '/workflow');
+        var res = await fetch('/api/v1/tcode-generator/data/' + recordId + '/workflow');
         var wf = await res.json();
         var bar = document.getElementById('workflowBar');
         bar.innerHTML = '';
@@ -51,7 +51,7 @@
     }
 
     async function advance(target) {
-        var res = await fetch('/api/tcode-generator/data/' + recordId + '/workflow/advance', {
+        var res = await fetch('/api/v1/tcode-generator/data/' + recordId + '/workflow/advance', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ targetNode: target })
@@ -67,8 +67,8 @@
 
     async function loadForm() {
         var [fieldsRes, recRes] = await Promise.all([
-            fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields'),
-            fetch('/api/tcode-generator/data/record/' + recordId)
+            fetch('/api/v1/tcode-generator/definitions/' + tcodeId + '/fields'),
+            fetch('/api/v1/tcode-generator/data/record/' + recordId)
         ]);
         var fields = await fieldsRes.json();
         var rec = await recRes.json();
@@ -90,7 +90,7 @@
     }
 
     async function submitForm() {
-        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields');
+        var res = await fetch('/api/v1/tcode-generator/definitions/' + tcodeId + '/fields');
         var fields = await res.json();
         var data = {};
         fields.forEach(function(f) {
@@ -101,7 +101,7 @@
                 else data[f.fieldName] = el.value;
             }
         });
-        var saveRes = await fetch('/api/tcode-generator/data/' + recordId, {
+        var saveRes = await fetch('/api/v1/tcode-generator/data/' + recordId, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)

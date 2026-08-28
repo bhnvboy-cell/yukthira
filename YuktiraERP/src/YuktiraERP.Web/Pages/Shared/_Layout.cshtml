@@ -62,6 +62,7 @@
                         <div class="top-bar-search">
                             <i class="bi bi-search" aria-hidden="true"></i>
                             <input type="text" id="globalSearch" placeholder="Transaction search... (Ctrl+K)" autocomplete="off" aria-label="Search transactions">
+                            <button type="button" class="top-bar-search-btn" id="globalSearchBtn" title="Search" aria-label="Search"><i class="bi bi-arrow-right"></i></button>
                             <div id="globalSearchResults" class="search-results" style="display:none" role="listbox" aria-label="Search results"></div>
                         </div>
                     </div>
@@ -196,7 +197,7 @@
         (function() {
             var badge = document.getElementById('notifCount');
             if (badge) {
-                fetch('/api/notifications/unread-count').then(function(r) { return r.json(); }).then(function(d) {
+                fetch('/api/v1/notifications/unread-count').then(function(r) { return r.json(); }).then(function(d) {
                     if (d.count > 0) {
                         badge.textContent = d.count > 99 ? '99+' : d.count;
                         badge.style.display = '';
@@ -207,25 +208,39 @@
 
         // ── Global search (Ctrl+K) ──
         var searchTimeout;
-        $('#globalSearch').on('input', function() {
-            clearTimeout(searchTimeout);
-            var val = $(this).val().trim().toUpperCase();
+        function doGlobalSearch() {
+            var val = $('#globalSearch').val().trim().toUpperCase();
             var results = $('#globalSearchResults');
             if (val.length < 2) { results.hide(); return; }
-            searchTimeout = setTimeout(function() {
-                $.get('/api/transaction/search?q=' + encodeURIComponent(val), function(data) {
-                    var html = '';
-                    data.forEach(function(t) {
-                        var route = t.route && t.route !== '#' ? t.route : '/Transactions/Engine/' + encodeURIComponent(t.code);
-                        html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-2" role="option" onclick="window.location.href=\'' + route + '\'">';
-                        html += '<i class="bi ' + t.icon + ' text-primary" aria-hidden="true"></i>';
-                        html += '<div class="small"><strong>' + t.code + '</strong> <span class="text-muted">- ' + t.name + '</span></div>';
-                        html += '</button>';
-                    });
-                    if (!data.length) html = '<div class="list-group-item text-muted small">No matches found</div>';
-                    results.html(html).show();
+            $.get('/Transactions/Search?q=' + encodeURIComponent(val), function(data) {
+                var html = '';
+                data.forEach(function(t) {
+                    var route = t.route && t.route !== '#' ? t.route : '/Transactions/Engine/' + encodeURIComponent(t.code);
+                    html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-2" role="option" onclick="window.location.href=\'' + route + '\'">';
+                    html += '<i class="bi ' + t.icon + ' text-primary" aria-hidden="true"></i>';
+                    html += '<div class="small"><strong>' + t.code + '</strong> <span class="text-muted">- ' + t.name + '</span></div>';
+                    html += '</button>';
                 });
-            }, 150);
+                if (!data.length) html = '<div class="list-group-item text-muted small">No matches found</div>';
+                results.html(html).show();
+            });
+        }
+        $('#globalSearch').on('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(doGlobalSearch, 150);
+        });
+        $('#globalSearchBtn').on('click', function() { doGlobalSearch(); $('#globalSearch').focus(); });
+        $('#globalSearch').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                var first = $('#globalSearchResults button:first');
+                if (first.length) {
+                    var m = first.attr('onclick').match(/'([^']+)'/);
+                    if (m) window.location.href = m[1];
+                } else {
+                    doGlobalSearch();
+                }
+            }
         });
 
         $(document).on('keydown', function(e) {
@@ -267,16 +282,6 @@
 
         $(document).on('click', function(e) {
             if (!$(e.target).closest('.top-bar-search').length) $('#globalSearchResults').hide();
-        });
-
-        $('#globalSearch').on('keydown', function(e) {
-            if (e.key === 'Enter') {
-                var first = $('#globalSearchResults button:first');
-                if (first.length) {
-                    var m = first.attr('onclick').match(/'([^']+)'/);
-                    if (m) window.location.href = m[1];
-                }
-            }
         });
     </script>
 

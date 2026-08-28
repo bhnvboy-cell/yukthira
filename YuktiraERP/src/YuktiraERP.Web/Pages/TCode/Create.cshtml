@@ -23,7 +23,7 @@
     var code = params.get('code');
 
     async function loadForm() {
-        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields');
+        var res = await fetch('/api/v1/tcode-generator/definitions/' + tcodeId + '/fields');
         var fields = await res.json();
         var html = '<div class="row">';
         fields.forEach(function(f) {
@@ -42,7 +42,7 @@
     }
 
     async function submitForm() {
-        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields');
+        var res = await fetch('/api/v1/tcode-generator/definitions/' + tcodeId + '/fields');
         var fields = await res.json();
         var data = {};
         fields.forEach(function(f) {
@@ -53,7 +53,7 @@
                 else data[f.fieldName] = el.value;
             }
         });
-        var createRes = await fetch('/api/tcode-generator/data/' + tcodeId, {
+        var createRes = await fetch('/api/v1/tcode-generator/data/' + tcodeId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)

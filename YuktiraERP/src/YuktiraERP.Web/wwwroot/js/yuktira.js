@@ -16,7 +16,7 @@ $(function() {
     });
 
     function loadNotificationCount() {
-        $.get('/api/notifications/unread-count', function(data) {
+        $.get('/api/v1/notifications/unread-count', function(data) {
             if (data.count > 0) {
                 $('#notificationBell').show();
                 $('#notifCount').text(data.count);

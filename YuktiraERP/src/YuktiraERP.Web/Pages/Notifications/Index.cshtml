@@ -37,10 +37,10 @@
 @section Scripts {
 <script>
     function markRead(id) {
-        fetch('/api/notifications/' + id + '/read', { method: 'PUT' }).then(function() { location.reload(); });
+        fetch('/api/v1/notifications/' + id + '/read', { method: 'PUT' }).then(function() { location.reload(); });
     }
     function markAllRead() {
-        fetch('/api/notifications/read-all', { method: 'PUT' }).then(function() { location.reload(); });
+        fetch('/api/v1/notifications/read-all', { method: 'PUT' }).then(function() { location.reload(); });
     }
 </script>
 }

@@ -100,7 +100,7 @@
         if (val.length < 2) { $('#txSuggestions').hide(); $('#txGoBtn').prop('disabled', true); return; }
         $('#txGoBtn').prop('disabled', false);
         searchTimeout = setTimeout(function() {
-            $.get('/api/transaction/search?q=' + encodeURIComponent(val), function(data) {
+            $.get('/Transactions/Search?q=' + encodeURIComponent(val), function(data) {
                 var html = '';
                 data.forEach(function(t) {
                     html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-code="' + t.code + '" data-route="' + t.route + '">';
@@ -134,7 +134,7 @@
 
     function executeTransaction(code) {
         $.ajax({
-            url: '/api/transaction/' + code + '/execute',
+            url: '/api/v1/transaction/' + code + '/execute',
             method: 'POST',
             contentType: 'application/json',
             data: '{}',
@@ -154,7 +154,7 @@
         e.stopPropagation();
         var btn = $(this);
         var codeId = btn.data('code-id');
-        $.post('/api/transaction/favorites/' + codeId, function() {
+        $.post('/api/v1/transaction/favorites/' + codeId, function() {
             btn.find('i').toggleClass('bi-star bi-star-fill');
         });
     });

@@ -70,7 +70,7 @@
     var tcodeId = params.get('id');
 
     async function loadFields() {
-        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields');
+        var res = await fetch('/api/v1/tcode-generator/definitions/' + tcodeId + '/fields');
         var fields = await res.json();
         var html = '', preview = '';
         fields.forEach(function(f, i) {
@@ -95,7 +95,7 @@
     }
 
     async function addField() {
-        var res = await fetch('/api/tcode-generator/definitions/' + tcodeId + '/fields', {
+        var res = await fetch('/api/v1/tcode-generator/definitions/' + tcodeId + '/fields', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -116,7 +116,7 @@
 
     async function removeField(id) {
         if (!confirm('Remove this field?')) return;
-        await fetch('/api/tcode-generator/fields/' + id, { method: 'DELETE' });
+        await fetch('/api/v1/tcode-generator/fields/' + id, { method: 'DELETE' });
         loadFields();
     }
 

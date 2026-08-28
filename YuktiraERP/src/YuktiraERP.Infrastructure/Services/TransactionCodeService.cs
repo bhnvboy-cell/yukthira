@@ -459,7 +459,7 @@ public class TransactionCodeService : ITransactionCodeService
                 });
             }
             var existing = await _db.TransactionCodes.ToListAsync();
-            var existingByCode = existing.ToDictionary(t => t.Code);
+            var existingByCode = existing.GroupBy(t => t.Code).ToDictionary(g => g.Key, g => g.First());
             var missing = new List<TransactionCodeEntity>();
             foreach (var c in codes)
             {

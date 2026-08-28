@@ -161,7 +161,7 @@
 <script>
     // ── Load Connectors ──
     async function loadConnectors() {
-        var r = await fetch('/api/integration/connectors');
+        var r = await fetch('/api/v1/integration/connectors');
         var list = await r.json();
         var html = '';
         list.forEach(function(c) {
@@ -186,7 +186,7 @@
 
     // ── Connections ──
     async function loadConnections() {
-        var r = await fetch('/api/integration/connections');
+        var r = await fetch('/api/v1/integration/connections');
         var list = await r.json();
         var html = '';
         list.forEach(function(c) {
@@ -203,7 +203,7 @@
 
     async function saveConnection() {
         var dto = { name: get('cName'), connectorType: get('cType'), baseUrl: get('cUrl'), authType: get('cAuth'), timeoutSeconds: parseInt(get('cTimeout')) || 30, isActive: true };
-        await fetch('/api/integration/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        await fetch('/api/v1/integration/connections', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
         hideModal('connModal'); loadConnections();
     }
 
@@ -216,12 +216,12 @@
 
     async function deleteConnection(id) {
         if (!confirm('Delete this connection?')) return;
-        await fetch('/api/integration/connections/' + id, { method:'DELETE' }); loadConnections();
+        await fetch('/api/v1/integration/connections/' + id, { method:'DELETE' }); loadConnections();
     }
 
     // ── Webhooks ──
     async function loadWebhooks() {
-        var r = await fetch('/api/integration/webhooks');
+        var r = await fetch('/api/v1/integration/webhooks');
         var list = await r.json();
         var html = '';
         list.forEach(function(w) {
@@ -231,7 +231,7 @@
     }
 
     async function loadEventTypes() {
-        var r = await fetch('/api/integration/webhooks/event-types');
+        var r = await fetch('/api/v1/integration/webhooks/event-types');
         var list = await r.json();
         var opts = '<option value="">-- Select --</option>';
         list.forEach(function(e) { opts += '<option value="' + e + '">' + e + '</option>'; });
@@ -242,18 +242,18 @@
 
     async function saveWebhook() {
         var dto = { name: get('wName'), eventType: get('wEvent'), targetUrl: get('wUrl'), secretKey: get('wSecret') || null };
-        await fetch('/api/integration/webhooks', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        await fetch('/api/v1/integration/webhooks', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
         hideModal('webhookModal'); loadWebhooks();
     }
 
     async function deleteWebhook(id) {
         if (!confirm('Delete this webhook?')) return;
-        await fetch('/api/integration/webhooks/' + id, { method:'DELETE' }); loadWebhooks();
+        await fetch('/api/v1/integration/webhooks/' + id, { method:'DELETE' }); loadWebhooks();
     }
 
     // ── Sync Jobs ──
     async function loadSyncJobs() {
-        var r = await fetch('/api/integration/sync-jobs');
+        var r = await fetch('/api/v1/integration/sync-jobs');
         var list = await r.json();
         var html = '';
         list.forEach(function(j) {
@@ -274,23 +274,23 @@
             direction: get('sDir'), entityType: get('sEntity'), scheduleType: get('sSchedule'),
             conflictResolution: get('sConflict'), isActive: true
         };
-        await fetch('/api/integration/sync-jobs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        await fetch('/api/v1/integration/sync-jobs', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
         hideModal('syncModal'); loadSyncJobs();
     }
 
     async function runSyncJob(id) {
-        var r = await fetch('/api/integration/sync-jobs/' + id + '/run', { method:'POST' });
+        var r = await fetch('/api/v1/integration/sync-jobs/' + id + '/run', { method:'POST' });
         if (r.ok) { loadSyncJobs(); } else { var err = await r.text(); alert(err); }
     }
 
     async function deleteSyncJob(id) {
         if (!confirm('Delete this sync job?')) return;
-        await fetch('/api/integration/sync-jobs/' + id, { method:'DELETE' }); loadSyncJobs();
+        await fetch('/api/v1/integration/sync-jobs/' + id, { method:'DELETE' }); loadSyncJobs();
     }
 
     // ── Mapping Rules ──
     async function loadMappings() {
-        var r = await fetch('/api/integration/mappings');
+        var r = await fetch('/api/v1/integration/mappings');
         var list = await r.json();
         var html = '';
         list.forEach(function(m) {
@@ -322,18 +322,18 @@
             name: get('mName'), sourceSystem: get('mSrcSys'), targetSystem: get('mTgtSys'),
             sourceEntity: get('mSrcEnt'), targetEntity: get('mTgtEnt'), fieldMappings: fields, isActive: true
         };
-        await fetch('/api/integration/mappings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+        await fetch('/api/v1/integration/mappings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dto) });
         hideModal('mapModal'); loadMappings();
     }
 
     async function deleteMapping(id) {
         if (!confirm('Delete this mapping?')) return;
-        await fetch('/api/integration/mappings/' + id, { method:'DELETE' }); loadMappings();
+        await fetch('/api/v1/integration/mappings/' + id, { method:'DELETE' }); loadMappings();
     }
 
     // ── API Clients ──
     async function loadApiClients() {
-        var r = await fetch('/api/integration/api-clients');
+        var r = await fetch('/api/v1/integration/api-clients');
         var list = await r.json();
         var html = '';
         list.forEach(function(c) {
@@ -346,7 +346,7 @@
 
     async function saveApiClient() {
         var ips = get('aIps').split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
-        var r = await fetch('/api/integration/api-clients', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: get('aName'), allowedIpAddresses: ips }) });
+        var r = await fetch('/api/v1/integration/api-clients', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: get('aName'), allowedIpAddresses: ips }) });
         var creds = await r.json();
         hideModal('apiClientModal'); loadApiClients();
         document.getElementById('credId').value = creds.clientId;
@@ -356,12 +356,12 @@
 
     async function deleteApiClient(id) {
         if (!confirm('Delete this API client?')) return;
-        await fetch('/api/integration/api-clients/' + id, { method:'DELETE' }); loadApiClients();
+        await fetch('/api/v1/integration/api-clients/' + id, { method:'DELETE' }); loadApiClients();
     }
 
     // ── Queue ──
     async function loadQueue() {
-        var r = await fetch('/api/integration/queue/pending');
+        var r = await fetch('/api/v1/integration/queue/pending');
         var list = await r.json();
         var html = '';
         list.forEach(function(q) {
@@ -369,7 +369,7 @@
         });
         document.getElementById('queueBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">Queue empty</td></tr>';
 
-        var d = await fetch('/api/integration/queue/dead-letter');
+        var d = await fetch('/api/v1/integration/queue/dead-letter');
         var dead = await d.json();
         var dh = '';
         dead.forEach(function(q) {
@@ -379,7 +379,7 @@
     }
 
     async function processQueue() {
-        await fetch('/api/integration/queue/process', { method:'POST' }); loadQueue();
+        await fetch('/api/v1/integration/queue/process', { method:'POST' }); loadQueue();
     }
 
     // ── Utilities ──

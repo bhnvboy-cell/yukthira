@@ -507,7 +507,7 @@ body.sidebar-lock { overflow: hidden; }
 .top-bar-search input {
   width: 100%;
   height: 32px;
-  padding: 0 10px 0 32px;
+  padding: 0 36px 0 32px;
   border: 1.5px solid var(--border-color);
   border-radius: 6px;
   background: var(--bg-main);
@@ -515,6 +515,27 @@ body.sidebar-lock { overflow: hidden; }
   font-size: 12.5px;
   transition: all 0.2s ease;
   outline: none;
+}
+.top-bar-search-btn {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  background: var(--primary-light, #4f46e5);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.15s;
+}
+.top-bar-search-btn:hover {
+  background: var(--primary, #4338ca);
 }
 .top-bar-search input:focus {
   border-color: var(--primary-light);

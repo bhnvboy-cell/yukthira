@@ -105,7 +105,7 @@
 
 <script>
     async function loadTCDefs() {
-        var res = await fetch('/api/tcode-generator/definitions');
+        var res = await fetch('/api/v1/tcode-generator/definitions');
         var data = await res.json();
         var opts = '<option value="">-- Select --</option>';
         data.forEach(function(d) { opts += '<option value="' + d.code + '">' + d.code + ' - ' + d.name + '</option>'; });
@@ -119,7 +119,7 @@
         var tc = document.getElementById('tcSelect').value;
         selectedTCode = tc;
         if (!tc) { document.getElementById('tcFieldsBody').innerHTML = '<tr><td colspan="7" class="text-muted text-center">Select a T-Code</td></tr>'; return; }
-        var res = await fetch('/api/tcode-customize/' + tc + '/fields');
+        var res = await fetch('/api/v1/tcode-customize/' + tc + '/fields');
         var fields = await res.json();
         var html = '';
         fields.forEach(function(f) {
@@ -143,7 +143,7 @@
     }
 
     async function addTCustomField() {
-        var res = await fetch('/api/tcode-customize/' + selectedTCode + '/fields', {
+        var res = await fetch('/api/v1/tcode-customize/' + selectedTCode + '/fields', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -165,7 +165,7 @@
 
     async function delTCustomField(id) {
         if (!confirm('Delete this custom field?')) return;
-        await fetch('/api/tcode-customize/fields/' + id, { method: 'DELETE' });
+        await fetch('/api/v1/tcode-customize/fields/' + id, { method: 'DELETE' });
         loadTCustomFields();
     }
 
@@ -173,8 +173,8 @@
         var tc = document.getElementById('tcLayoutSelect').value;
         if (!tc) { document.getElementById('layoutContainer').innerHTML = '<p class="text-muted">Select a T-Code</p>'; return; }
         var [fieldsRes, layoutRes] = await Promise.all([
-            fetch('/api/tcode-customize/' + tc + '/fields'),
-            fetch('/api/tcode-customize/' + tc + '/layout')
+            fetch('/api/v1/tcode-customize/' + tc + '/fields'),
+            fetch('/api/v1/tcode-customize/' + tc + '/layout')
         ]);
         var fields = await fieldsRes.json();
         var layout = await layoutRes.json();
@@ -212,7 +212,7 @@
     async function saveTLayout() {
         var tc = document.getElementById('tcLayoutSelect').value;
         if (!tc) return;
-        await fetch('/api/tcode-customize/' + tc + '/layout', {
+        await fetch('/api/v1/tcode-customize/' + tc + '/layout', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(_currentLayout.map(function(f, i) { return { ...f, orderIndex: i + 1 }; }))

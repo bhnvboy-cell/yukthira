@@ -50,7 +50,7 @@
 
 <script>
     async function loadTCodes() {
-        var res = await fetch('/api/tcode-generator/definitions');
+        var res = await fetch('/api/v1/tcode-generator/definitions');
         var data = await res.json();
         var html = '';
         data.forEach(function(d) {
@@ -74,7 +74,7 @@
     function showCreateModal() { new bootstrap.Modal(document.getElementById('createModal')).show(); }
 
     async function createTCode() {
-        var res = await fetch('/api/tcode-generator/definitions', {
+        var res = await fetch('/api/v1/tcode-generator/definitions', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -94,7 +94,7 @@
 
     async function deleteTCode(id) {
         if (!confirm('Delete this T-Code definition?')) return;
-        var res = await fetch('/api/tcode-generator/definitions/' + id, { method: 'DELETE' });
+        var res = await fetch('/api/v1/tcode-generator/definitions/' + id, { method: 'DELETE' });
         if (res.ok) loadTCodes();
     }
 
