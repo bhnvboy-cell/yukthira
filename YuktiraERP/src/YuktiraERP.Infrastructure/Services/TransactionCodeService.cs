@@ -17,21 +17,23 @@ public class TransactionCodeService : ITransactionCodeService
         ["MM01"] = "/MM/Material/Create", ["MM02"] = "/Transactions/Engine/MM02", ["MM03"] = "/MM/Material/Display",
         ["MMBE"] = "/MM/StockOverview", ["ME11"] = "/MM/Vendor/Create", ["ME12"] = "/MM/Vendor/Edit",
         ["ME13"] = "/MM/Vendor/Display", ["ME21N"] = "/Transactions/Engine/ME21N", ["ME22N"] = "/MM/PO/Edit",
-        ["ME23N"] = "/MM/PO/Display",         ["MIGO"] = "/Transactions/Engine/MIGO", ["MIRO"] = "/MM/InvoiceVerification/Create",
+        ["ME23N"] = "/MM/PO/Display",         ["MIGO"] = "/Transactions/Engine/MIGO", ["ME51N"] = "/Transactions/Engine/ME51N",
+        ["ME28"] = "/Transactions/Engine/ME28", ["MIRO"] = "/Transactions/Engine/MIRO",
         ["MB52"] = "/MM/StockList", ["MB1A"] = "/MM/GoodsIssue", ["MB1C"] = "/MM/GoodsReceiptOther",
         // SD - Sales & Distribution
         ["VA01"] = "/Transactions/Engine/VA01", ["VA02"] = "/SD/SalesOrder/Edit", ["VA03"] = "/SD/SalesOrder/Display",
-        ["VA05"] = "/SD/SalesOrder/List", ["VLO1N"] = "/SD/Delivery/Create", ["VF01"] = "/SD/Billing/Create",
-        ["VD01"] = "/SD/Customer/Create", ["VD02"] = "/SD/Customer/Edit", ["VD03"] = "/SD/Customer/Display",
+        ["VA05"] = "/SD/SalesOrder/List", ["VL01N"] = "/Transactions/Engine/VL01N", ["VL02N"] = "/Transactions/Engine/VL02N",
+        ["VF01"] = "/Transactions/Engine/VF01", ["VD01"] = "/SD/Customer/Create", ["VD02"] = "/SD/Customer/Edit", ["VD03"] = "/SD/Customer/Display",
         ["VKD1"] = "/SD/Customer/List",
         // PP - Production Planning
         ["CS01"] = "/PP/BOM/Create", ["CS02"] = "/PP/BOM/Edit", ["CS03"] = "/PP/BOM/Display",
         ["CO01"] = "/Transactions/Engine/CO01", ["CO02"] = "/PP/ProductionOrder/Edit", ["CO03"] = "/PP/ProductionOrder/Display",
-        ["MD01"] = "/PP/MrpRun", ["MD04"] = "/PP/MrpStock", ["CR01"] = "/PP/WorkCenter/Create",
+        ["CO11N"] = "/Transactions/Engine/CO11N", ["MD61"] = "/Transactions/Engine/MD61",
+        ["MD02"] = "/Transactions/Engine/MD02", ["MD01"] = "/PP/MrpRun", ["MD04"] = "/PP/MrpStock", ["CR01"] = "/PP/WorkCenter/Create",
         // QM - Quality Management
         ["QE01"] = "/Transactions/Engine/QE01", ["QE02"] = "/QM/InspectionLot/Edit", ["QE03"] = "/QM/InspectionLot/Display",
         ["QE51N"] = "/Transactions/Engine/QE51N", ["QS01"] = "/QM/InspectionPlan/Create", ["QS02"] = "/QM/InspectionPlan/Edit",
-        ["QA01"] = "/QM/InspectionResult/Create", ["QUD"] = "/QM/UsageDecision/Create",
+        ["QA01"] = "/Transactions/Engine/QA01", ["QUD"] = "/QM/UsageDecision/Create",
         ["QM01"] = "/Transactions/Engine/QM01", ["QM02"] = "/Transactions/Engine/QM02", ["QM03"] = "/Transactions/Engine/QM03",
         ["QM11"] = "/Transactions/Engine/QM11", ["QM12"] = "/Transactions/Engine/QM12",
         ["ZQM1"] = "/Transactions/Engine/ZQM1", ["1FM"] = "/Transactions/Engine/1FM",
@@ -39,18 +41,21 @@ public class TransactionCodeService : ITransactionCodeService
         ["2QP"] = "/Transactions/Engine/2QP", ["2QN"] = "/Transactions/Engine/2QN",
         ["QMM"] = "/Transactions/Engine/QMM", ["1MP"] = "/Transactions/Engine/1MP",
         ["BKR"] = "/Transactions/Engine/BKR", ["2FA"] = "/Transactions/Engine/2FA",
-        ["CALIB"] = "/Transactions/Engine/CALIB",
+        ["CALIB"] = "/Transactions/Engine/CALIB", ["QP01"] = "/Transactions/Engine/QP01",
+        ["QN01"] = "/Transactions/Engine/QN01", ["QA11"] = "/Transactions/Engine/QA11",
+        ["QC21"] = "/Transactions/Engine/QC21",
         // WM - Warehouse
         ["LT01"] = "/WM/Transfer/Create", ["LT02"] = "/WM/Transfer/Edit", ["LT03"] = "/WM/Transfer/Display",
         ["LS01"] = "/WM/StorageLocation/Create", ["LS02"] = "/WM/StorageLocation/Edit",
         // FI - Finance
-        ["FB50"] = "/Transactions/Engine/FB50", ["FB60"] = "/FI/AP/InvoiceCreate", ["FB70"] = "/FI/AR/InvoiceCreate",
+        ["FB50"] = "/Transactions/Engine/FB50", ["FB60"] = "/Transactions/Engine/FB60", ["FB70"] = "/FI/AR/InvoiceCreate",
         ["FBL1N"] = "/Transactions/Engine/FBL1N", ["FBL5N"] = "/FI/AR/List", ["FS10N"] = "/FI/GL/Display",
         ["FAGLL03"] = "/FI/GL/LineItems", ["F.01"] = "/FI/Reports/BalanceSheet",
-        ["F.02"] = "/FI/Reports/ProfitLoss", ["F-03"] = "/FI/AP/Payment", ["F-28"] = "/FI/AR/Payment",
+        ["F.02"] = "/FI/Reports/ProfitLoss", ["F-03"] = "/FI/AP/Payment", ["F-28"] = "/Transactions/Engine/F-28",
+        ["F-53"] = "/Transactions/Engine/F-53", ["ABZN"] = "/Transactions/Engine/ABZN",
         // CO - Controlling
         ["KA01"] = "/CO/CostCenter/Create", ["KA02"] = "/CO/CostCenter/Edit", ["KA03"] = "/CO/CostCenter/Display",
-        ["KOB1"] = "/CO/CostCenterReport",
+        ["KOB1"] = "/CO/CostCenterReport", ["KB11N"] = "/Transactions/Engine/KB11N",
         // HR - Human Resources
         ["PA30"] = "/Transactions/Engine/PA30", ["PA20"] = "/HR/Employee/Display",
         ["PA40"] = "/HR/EmployeeList", ["PT60"] = "/HR/AttendanceReport",
@@ -78,7 +83,10 @@ public class TransactionCodeService : ITransactionCodeService
         ["PS03"] = "/PS/ProjTask/Create", ["PS04"] = "/PS/Timesheet/Create",
         // PM - Plant Maintenance
         ["PM01"] = "/PM/Equipment/Create", ["PM02"] = "/PM/Equipment/Display",
-        ["PM03"] = "/PM/Plan/Create", ["PM04"] = "/PM/Order/Create"
+        ["PM03"] = "/PM/Plan/Create", ["PM04"] = "/PM/Order/Create",
+        ["IE01"] = "/Transactions/Engine/IE01", ["IW21"] = "/Transactions/Engine/IW21",
+        ["IW31"] = "/Transactions/Engine/IW31", ["IW41"] = "/Transactions/Engine/IW41",
+        ["IW32"] = "/Transactions/Engine/IW32"
     };
 
     public TransactionCodeService(YuktiraDbContext db, IModuleCatalog catalog)
@@ -409,27 +417,29 @@ public class TransactionCodeService : ITransactionCodeService
                     "MMBE" => "Stock Overview", "ME11" => "Create Vendor", "ME12" => "Change Vendor",
                     "ME13" => "Display Vendor", "ME21N" => "Create Purchase Order",
                     "ME22N" => "Change Purchase Order", "ME23N" => "Display Purchase Order",
-                    "MIGO" => "Goods Receipt", "MIRO" => "Invoice Verification",
+                    "MIGO" => "Goods Receipt",                     "MIRO" => "Invoice Verification (LIV)",
                     "MB52" => "Stock List", "MB1A" => "Goods Issue", "MB1C" => "Goods Receipt (Other)",
                     "VA01" => "Create Sales Order", "VA02" => "Change Sales Order", "VA03" => "Display Sales Order",
-                    "VA05" => "Sales Order List", "VLO1N" => "Create Delivery",
+                    "VA05" => "Sales Order List", "VL01N" => "Create Outbound Delivery",
+                    "VL02N" => "Change Outbound Delivery",
                     "VF01" => "Create Billing Document", "VD01" => "Create Customer",
                     "VD02" => "Change Customer", "VD03" => "Display Customer", "VKD1" => "Customer List",
                     "CS01" => "Create BOM", "CS02" => "Change BOM", "CS03" => "Display BOM",
                     "CO01" => "Create Production Order", "CO02" => "Change Production Order",
-                    "CO03" => "Display Production Order", "MD01" => "MRP Run",
+                    "CO03" => "Display Production Order", "CO11N" => "Production Order Confirmation",
+                    "MD01" => "MRP Run", "MD02" => "MRP Run (Single-Item)", "MD61" => "Planned Independent Requirements",
                     "MD04" => "Stock Requirements List", "CR01" => "Create Work Center",
                     "QE01" => "Create Inspection Lot", "QE02" => "Change Inspection Lot",
                     "QE03" => "Display Inspection Lot", "QS01" => "Create Inspection Plan",
-                    "QS02" => "Change Inspection Plan", "QA01" => "Record Inspection Result",
+                    "QS02" => "Change Inspection Plan",                     "QA01" => "Create Inspection Lot",
                     "QUD" => "Usage Decision", "LT01" => "Create Transfer", "LT02" => "Change Transfer",
                     "LT03" => "Display Transfer", "LS01" => "Create Storage Location",
                     "LS02" => "Change Storage Location",
-                    "FB50" => "Journal Entry", "FB60" => "AP Invoice", "FB70" => "AR Invoice",
+                    "FB50" => "Journal Entry", "FB60" => "Vendor Invoice Entry", "FB70" => "AR Invoice",
                     "FBL1N" => "Vendor Line Items", "FBL5N" => "Customer Line Items",
                     "FS10N" => "G/L Account Balance", "FAGLL03" => "G/L Line Items",
                     "F.01" => "Balance Sheet", "F.02" => "Profit & Loss", "F-03" => "AP Payment",
-                    "F-28" => "AR Payment", "KA01" => "Create Cost Center", "KA02" => "Change Cost Center",
+                    "F-28" => "Customer Incoming Payment", "KA01" => "Create Cost Center", "KA02" => "Change Cost Center",
                     "KA03" => "Display Cost Center", "KOB1" => "Cost Center Report",
                     "PA30" => "Maintain Employee", "PA20" => "Display Employee", "PA40" => "Employee List",
                     "PT60" => "Attendance Report", "PR01" => "Run Payroll", "PR05" => "Payroll History",
@@ -459,6 +469,15 @@ public class TransactionCodeService : ITransactionCodeService
                     "QMM" => "Recurring Batch Inspection", "1MP" => "Outbound Delivery Inspection",
                     "BKR" => "Customer Return Inspection", "2FA" => "Customer Complaints",
                     "CALIB" => "Calibration Inspection",
+                    "ME51N" => "Create Purchase Requisition",
+                    "ME28" => "PO Release / Approval",
+                    "F-53" => "Vendor Outgoing Payment",
+                    "ABZN" => "Asset Acquisition", "KB11N" => "Cost Center Allocation",
+                    "IE01" => "Equipment Master Creation", "IW21" => "Create Maintenance Notification",
+                    "IW31" => "Create Maintenance Order", "IW41" => "PM Order Confirmation",
+                    "IW32" => "Change Maintenance Order", "QP01" => "Create Inspection Plan",
+                    "QN01" => "Create Quality Notification (Defect)", "QA11" => "Usage Decision & Stock Posting",
+                    "QC21" => "Quality Certificate (COA)",
                     _ => kvp.Key
                 };
                 codes.Add(new TransactionCodeEntity
@@ -531,26 +550,28 @@ public class TransactionCodeService : ITransactionCodeService
         "CRM01" or "CRM02" or "CRM03" or
         "LM01" or "LM02" or "LM03" or "LM05" or
         "PS01" or "PS02" or
-        "PM01" or "PM02" or "PM03"
+        "PM01" or "PM02" or "PM03" or "IE01"
             => "MasterData",
         // Transactions
         "ME21N" or "ME22N" or "ME23N" or "MIGO" or "MIRO" or "MB1A" or "MB1C" or
-        "VA01" or "VA02" or "VA03" or "VLO1N" or "VF01" or
-        "CO01" or "CO02" or "CO03" or
+        "VA01" or "VA02" or "VA03" or "VL01N" or "VL02N" or "VF01" or
+        "CO01" or "CO02" or "CO03" or "CO11N" or
         "QE01" or "QE02" or "QE03" or "QA01" or "QUD" or
         "LT01" or "LT02" or "LT03" or
-        "FB50" or "FB60" or "FB70" or "F-03" or "F-28" or
+        "FB50" or "FB60" or "FB70" or "F-03" or "F-28" or "F-53" or
         "PR01" or
         "CRM04" or "CRM05" or
         "LM04" or
         "PS03" or "PS04" or
-        "PM04" or
+        "PM04" or "IW21" or "IW31" or "IW41" or "IW32" or
         "QM01" or "QM02" or "QM03" or "QM11" or "QM12" or "QE51N" or
         "ZQM1" or "1FM" or "2F9" or "1E1" or "2QP" or "2QN" or "QMM" or
-        "1MP" or "BKR" or "2FA" or "CALIB"
+        "1MP" or "BKR" or "2FA" or "CALIB" or
+        "ME51N" or "ME28" or "MD61" or
+        "ABZN" or "KB11N" or "QP01" or "QN01" or "QA11" or "QC21"
             => "Transactions",
         // Process (MRP run, payroll run, workflow-driven)
-        "MD01" => "Process",
+        "MD01" or "MD02" => "Process",
         // Reports
         "MMBE" or "MB52" or
         "VA05" or

@@ -45,6 +45,30 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Register(QMBKR());
         Register(QM2FA());
         Register(QMCALIB());
+        Register(VL01N());
+        Register(VL02N());
+        Register(VF01());
+        Register(ME51N());
+        Register(ME28());
+        Register(MIRO());
+        Register(MD61());
+        Register(MD02());
+        Register(CO11N());
+        Register(FB60());
+        Register(F53());
+        Register(F28());
+        Register(ABZN());
+        Register(KB11N());
+        Register(IE01());
+        Register(IW21());
+        Register(IW31());
+        Register(IW41());
+        Register(IW32());
+        Register(QP01());
+        Register(QA01());
+        Register(QN01());
+        Register(QA11());
+        Register(QC21());
     }
 
     private static TCodeLayoutConfig QE51N() => new()
@@ -1601,6 +1625,1085 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save calibration result?" },
             new() { Id = "complete", Label = "Complete Calibration", Icon = "bi-check-circle", Style = "success", Handler = "complete", Confirm = true, ConfirmMessage = "Mark calibration complete?" },
             new() { Id = "certificate", Label = "Generate Certificate", Icon = "bi-file-earmark-pdf", Style = "warning", Handler = "generateCertificate" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig VL01N() => new()
+    {
+        TCode = "VL01N", Title = "Create Outbound Delivery", Module = "SD", Icon = "bi-truck",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Delivery", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Shipping Point", Value = "", Key = "shippingPoint", Editable = true },
+            new() { Label = "Order Number", Value = "", Key = "orderNumber", Editable = true },
+            new() { Label = "Delivery Date", Value = "", Key = "deliveryDate", Editable = true },
+            new() { Label = "Ship-To Party", Value = "", Key = "shipToParty" },
+            new() { Label = "Route", Value = "", Key = "route", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "items", Label = "Delivery Items", Icon = "bi-box", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "item", Label = "Item", Type = "number", Width = 60 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220, Editable = true },
+            new() { Key = "quantity", Label = "Delivery Qty", Type = "number", Width = 110, Editable = true, Validation = new() { Min = 1, Required = true } },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Editable = true },
+            new() { Key = "storageLocation", Label = "Storage Loc", Type = "text", Width = 100, Editable = true },
+            new() { Key = "weight", Label = "Gross Weight", Type = "number", Width = 110, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "PICKED", Label = "Picked", Color = "warning" },
+                new() { Value = "SHIPPED", Label = "Shipped", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Delivery", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this outbound delivery?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig VL02N() => new()
+    {
+        TCode = "VL02N", Title = "Change Outbound Delivery / PGI", Module = "SD", Icon = "bi-truck",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Delivery", Value = "", Key = "deliveryNumber", Editable = true },
+            new() { Label = "Shipping Point", Value = "", Key = "shippingPoint" },
+            new() { Label = "Delivery Date", Value = "", Key = "deliveryDate" },
+            new() { Label = "Ship-To Party", Value = "", Key = "shipToParty" },
+            new() { Label = "Picking Status", Value = "", Key = "pickingStatus" },
+            new() { Label = "PGI Status", Value = "", Key = "pgiStatus" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "picking", Label = "Picking", Icon = "bi-box-arrow-right", Active = true },
+            new() { Id = "packing", Label = "Packing", Icon = "bi-box" },
+            new() { Id = "pgi", Label = "Post Goods Issue", Icon = "bi-send" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "item", Label = "Item", Type = "number", Width = 60 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 200 },
+            new() { Key = "deliveryQty", Label = "Delivery Qty", Type = "number", Width = 110 },
+            new() { Key = "pickedQty", Label = "Picked Qty", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0 } },
+            new() { Key = "storageLocation", Label = "Storage Loc", Type = "text", Width = 100, Editable = true },
+            new() { Key = "handlingUnit", Label = "Handling Unit", Type = "text", Width = 140, Editable = true },
+            new() { Key = "batch", Label = "Batch", Type = "text", Width = 120, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Changes", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save delivery changes?" },
+            new() { Id = "pgi", Label = "Post Goods Issue", Icon = "bi-send", Style = "success", Handler = "pgi", Confirm = true, ConfirmMessage = "Post goods issue? Physical inventory will be reduced." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig VF01() => new()
+    {
+        TCode = "VF01", Title = "Create Billing Document", Module = "SD", Icon = "bi-receipt",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Invoice", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Outbound Delivery", Value = "", Key = "deliveryNumber", Editable = true },
+            new() { Label = "Billing Type", Value = "F2", Key = "billingType", Editable = true },
+            new() { Label = "Billing Date", Value = "", Key = "billingDate", Editable = true },
+            new() { Label = "Payer", Value = "", Key = "payer" },
+            new() { Label = "Net Value", Value = "", Key = "netValue" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "items", Label = "Billing Items", Icon = "bi-receipt-cutoff", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "item", Label = "Item", Type = "number", Width = 60 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220 },
+            new() { Key = "quantity", Label = "Quantity", Type = "number", Width = 100 },
+            new() { Key = "unitPrice", Label = "Unit Price", Type = "currency", Width = 110, Editable = true },
+            new() { Key = "netValue", Label = "Net Value", Type = "currency", Width = 120 },
+            new() { Key = "taxAmount", Label = "Tax", Type = "currency", Width = 100 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Invoice", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create billing document? Accounting entry will be posted to AR." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig ME51N() => new()
+    {
+        TCode = "ME51N", Title = "Create Purchase Requisition", Module = "MM", Icon = "bi-cart-plus",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New PR", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "PR Type", Value = "NB", Key = "prType", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Purch. Org", Value = "", Key = "purchasingOrg", Editable = true },
+            new() { Label = "Purch. Group", Value = "", Key = "purchasingGroup", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "items", Label = "PR Items", Icon = "bi-list-ol", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "item", Label = "Item", Type = "number", Width = 60 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220, Editable = true },
+            new() { Key = "quantity", Label = "Quantity", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 1, Required = true } },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Editable = true },
+            new() { Key = "storageLocation", Label = "Storage Loc", Type = "text", Width = 100, Editable = true },
+            new() { Key = "deliveryDate", Label = "Delivery Date", Type = "date", Width = 130, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "OPEN", Label = "Open", Color = "warning" },
+                new() { Value = "PO_CREATED", Label = "PO Created", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create PR", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this purchase requisition?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig ME28() => new()
+    {
+        TCode = "ME28", Title = "PO Release / Approval", Module = "MM", Icon = "bi-shield-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "PO Number", Value = "", Key = "poNumber", Editable = true },
+            new() { Label = "Vendor", Value = "", Key = "vendor" },
+            new() { Label = "Net Value", Value = "", Key = "netValue" },
+            new() { Label = "Release Strategy", Value = "", Key = "releaseStrategy" },
+            new() { Label = "Status", Value = "IN_APPROVAL", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "release", Label = "Release", Icon = "bi-shield-check", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "poNumber", Label = "PO Number", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "vendor", Label = "Vendor", Type = "text", Width = 140 },
+            new() { Key = "netValue", Label = "Net Value", Type = "currency", Width = 120 },
+            new() { Key = "releaseStrategy", Label = "Release Strategy", Type = "dropdown", Width = 160, Editable = true, Options = new() {
+                new() { Value = "RF1", Label = "RF1 - Level 1" },
+                new() { Value = "RF2", Label = "RF2 - Level 2" },
+                new() { Value = "RF3", Label = "RF3 - Level 3" },
+            }},
+            new() { Key = "releaseCode", Label = "Release Code", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "R1", Label = "R1 - Approve" },
+                new() { Value = "R2", Label = "R2 - Final Approve" },
+                new() { Value = "X", Label = "X - Reject" },
+            }},
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 120, Options = new() {
+                new() { Value = "IN_APPROVAL", Label = "In Approval", Color = "warning" },
+                new() { Value = "RELEASED", Label = "Released", Color = "success" },
+                new() { Value = "REJECTED", Label = "Rejected", Color = "danger" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Release PO", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Release this purchase order?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig MIRO() => new()
+    {
+        TCode = "MIRO", Title = "Invoice Verification (LIV)", Module = "MM", Icon = "bi-file-earmark-text",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "primary", Handler = "simulate" },
+            new() { Id = "save", Label = "Post", Icon = "bi-send", Style = "success", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "PO Number", Value = "", Key = "poNumber", Editable = true },
+            new() { Label = "Invoice Date", Value = "", Key = "invoiceDate", Editable = true },
+            new() { Label = "Invoice Amount", Value = "", Key = "invoiceAmount", Editable = true },
+            new() { Label = "Tax Code", Value = "", Key = "taxCode", Editable = true },
+            new() { Label = "Vendor", Value = "", Key = "vendor" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "lineItems", Label = "Line Items", Icon = "bi-list-ol", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "poItem", Label = "PO Item", Type = "number", Width = 80 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 200 },
+            new() { Key = "poQty", Label = "PO Qty", Type = "number", Width = 90 },
+            new() { Key = "invoiceQty", Label = "Invoice Qty", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0 } },
+            new() { Key = "poPrice", Label = "PO Price", Type = "currency", Width = 110 },
+            new() { Key = "invoicedAmount", Label = "Invoiced Amt", Type = "currency", Width = 120, Editable = true },
+            new() { Key = "taxAmount", Label = "Tax", Type = "currency", Width = 100 },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Post Invoice", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Post vendor invoice? AP line item will be created in FI." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig MD61() => new()
+    {
+        TCode = "MD61", Title = "Planned Independent Requirements", Module = "PP", Icon = "bi-calendar-range",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New PIR", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Material", Value = "", Key = "material", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Planning Horizon", Value = "", Key = "horizon", Editable = true },
+            new() { Label = "Version", Value = "00", Key = "version" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "schedule", Label = "Forecast Schedule", Icon = "bi-bar-chart", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "period", Label = "Period", Type = "text", Width = 100, Required = true, Editable = true },
+            new() { Key = "year", Label = "Year", Type = "text", Width = 80, Editable = true },
+            new() { Key = "forecastQty", Label = "Forecast Qty", Type = "number", Width = 120, Editable = true, Validation = new() { Min = 0, Required = true } },
+            new() { Key = "actualQty", Label = "Actual Qty", Type = "number", Width = 110 },
+            new() { Key = "deviation", Label = "Deviation %", Type = "number", Width = 100 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "ACTIVE", Label = "Active", Color = "success" },
+                new() { Value = "INACTIVE", Label = "Inactive", Color = "secondary" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save PIR", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save planned independent requirements?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig MD02() => new()
+    {
+        TCode = "MD02", Title = "Material Requirements Planning (MRP)", Module = "PP", Icon = "bi-gear-wide-connected",
+        ToolbarActions = new()
+        {
+            new() { Id = "execute", Label = "Execute MRP", Icon = "bi-play-circle", Style = "success", Handler = "execute" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Material", Value = "", Key = "material", Editable = true },
+            new() { Label = "MRP Type", Value = "PD", Key = "mrpType", Editable = true },
+            new() { Label = "Planning Horizon", Value = "90", Key = "horizon", Editable = true },
+            new() { Label = "Status", Value = "READY", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "results", Label = "Planning Results", Icon = "bi-list-check", Active = true },
+            new() { Id = "exceptions", Label = "Exceptions", Icon = "bi-exclamation-triangle" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140 },
+            new() { Key = "plannedOrder", Label = "Planned Order", Type = "text", Width = 140 },
+            new() { Key = "purchaseReq", Label = "Purchase Req", Type = "text", Width = 130 },
+            new() { Key = "quantity", Label = "Quantity", Type = "number", Width = 100 },
+            new() { Key = "startDate", Label = "Start Date", Type = "date", Width = 120 },
+            new() { Key = "endDate", Label = "End Date", Type = "date", Width = 120 },
+            new() { Key = "type", Label = "Type", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "PLANNED_ORDER", Label = "Planned Order" },
+                new() { Value = "PR", Label = "Purchase Requisition" },
+                new() { Value = "RESCHEDULE", Label = "Reschedule" },
+            }},
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "CONVERTED", Label = "Converted", Color = "success" },
+                new() { Value = "OPEN", Label = "Open", Color = "warning" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "execute", Label = "Run MRP", Icon = "bi-play-circle", Style = "success", Handler = "execute", Confirm = true, ConfirmMessage = "Execute MRP? Planned orders and PRs will be generated." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig CO11N() => new()
+    {
+        TCode = "CO11N", Title = "Production Order Confirmation", Module = "PP", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Confirmation", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Order Number", Value = "", Key = "orderNumber", Editable = true },
+            new() { Label = "Operation", Value = "", Key = "operation", Editable = true },
+            new() { Label = "Work Center", Value = "", Key = "workCenter" },
+            new() { Label = "Yield Qty", Value = "", Key = "yieldQty", Editable = true },
+            new() { Label = "Scrap Qty", Value = "", Key = "scrapQty", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "confirmation", Label = "Confirmation", Icon = "bi-check2-square", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "orderNumber", Label = "Order", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "operation", Label = "Operation", Type = "text", Width = 100, Editable = true },
+            new() { Key = "workCenter", Label = "Work Center", Type = "text", Width = 120 },
+            new() { Key = "yieldQty", Label = "Yield Qty", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0, Required = true } },
+            new() { Key = "scrapQty", Label = "Scrap Qty", Type = "number", Width = 90, Editable = true },
+            new() { Key = "laborHours", Label = "Labor Hours", Type = "number", Width = 100, Editable = true },
+            new() { Key = "machineHours", Label = "Machine Hours", Type = "number", Width = 110, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "NEW", Label = "New" },
+                new() { Value = "CONFIRMED", Label = "Confirmed" },
+                new() { Value = "REVERSED", Label = "Reversed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Confirm Order", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Confirm this production order? Labor will be posted." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig FB60() => new()
+    {
+        TCode = "FB60", Title = "Vendor Invoice Entry", Module = "FI", Icon = "bi-file-earmark-text",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "primary", Handler = "simulate" },
+            new() { Id = "save", Label = "Post", Icon = "bi-send", Style = "success", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Vendor ID", Value = "", Key = "vendorId", Editable = true },
+            new() { Label = "Invoice Date", Value = "", Key = "invoiceDate", Editable = true },
+            new() { Label = "Amount", Value = "", Key = "amount", Editable = true },
+            new() { Label = "Tax Code", Value = "", Key = "taxCode", Editable = true },
+            new() { Label = "Expense G/L", Value = "", Key = "expenseGl", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "lineItems", Label = "Line Items", Icon = "bi-list-ol", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "glAccount", Label = "G/L Account", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "amount", Label = "Amount", Type = "currency", Width = 120, Editable = true, Validation = new() { Required = true } },
+            new() { Key = "taxCode", Label = "Tax Code", Type = "text", Width = 90, Editable = true },
+            new() { Key = "costCenter", Label = "Cost Center", Type = "text", Width = 120, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Post Invoice", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Post vendor invoice? AP open item will be created." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig F53() => new()
+    {
+        TCode = "F-53", Title = "Vendor Outgoing Payment", Module = "FI", Icon = "bi-cash-stack",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "primary", Handler = "simulate" },
+            new() { Id = "save", Label = "Post", Icon = "bi-send", Style = "success", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Vendor ID", Value = "", Key = "vendorId", Editable = true },
+            new() { Label = "Bank Account", Value = "", Key = "bankAccount", Editable = true },
+            new() { Label = "Amount", Value = "", Key = "amount", Editable = true },
+            new() { Label = "Payment Date", Value = "", Key = "paymentDate", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "items", Label = "Open Items", Icon = "bi-list-check", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "docNumber", Label = "Document", Type = "text", Width = 130 },
+            new() { Key = "invoiceDate", Label = "Invoice Date", Type = "date", Width = 120 },
+            new() { Key = "amount", Label = "Amount", Type = "currency", Width = 120 },
+            new() { Key = "openAmount", Label = "Open Amount", Type = "currency", Width = 120 },
+            new() { Key = "paymentAmount", Label = "Payment Amt", Type = "currency", Width = 120, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Post Payment", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Post vendor payment? Vendor balance will be cleared." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig F28() => new()
+    {
+        TCode = "F-28", Title = "Customer Incoming Payment", Module = "FI", Icon = "bi-bank",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "primary", Handler = "simulate" },
+            new() { Id = "save", Label = "Post", Icon = "bi-send", Style = "success", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Customer ID", Value = "", Key = "customerId", Editable = true },
+            new() { Label = "Bank Account", Value = "", Key = "bankAccount", Editable = true },
+            new() { Label = "Amount", Value = "", Key = "amount", Editable = true },
+            new() { Label = "Payment Date", Value = "", Key = "paymentDate", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "items", Label = "Open Items", Icon = "bi-list-check", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "docNumber", Label = "Document", Type = "text", Width = 130 },
+            new() { Key = "invoiceDate", Label = "Invoice Date", Type = "date", Width = 120 },
+            new() { Key = "amount", Label = "Amount", Type = "currency", Width = 120 },
+            new() { Key = "openAmount", Label = "Open Amount", Type = "currency", Width = 120 },
+            new() { Key = "paymentAmount", Label = "Payment Amt", Type = "currency", Width = 120, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Post Payment", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Post customer payment? A/R open item will be cleared." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ABZN() => new()
+    {
+        TCode = "ABZN", Title = "Asset Acquisition", Module = "FI", Icon = "bi-building",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Asset", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Asset Class", Value = "", Key = "assetClass", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description", Editable = true },
+            new() { Label = "Amount", Value = "", Key = "amount", Editable = true },
+            new() { Label = "G/L Account", Value = "", Key = "glAccount", Editable = true },
+            new() { Label = "Capitalization Date", Value = "", Key = "capDate", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "assets", Label = "Asset Details", Icon = "bi-building", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "assetNumber", Label = "Asset No.", Type = "text", Width = 120 },
+            new() { Key = "assetClass", Label = "Asset Class", Type = "text", Width = 120, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "amount", Label = "Acquisition Value", Type = "currency", Width = 140, Editable = true, Validation = new() { Min = 0, Required = true } },
+            new() { Key = "glAccount", Label = "G/L Account", Type = "text", Width = 110, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "CAPITALIZED", Label = "Capitalized", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Acquire Asset", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Acquire this asset? G/L will be updated." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig KB11N() => new()
+    {
+        TCode = "KB11N", Title = "Cost Center Allocation", Module = "CO", Icon = "bi-arrow-left-right",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Allocation", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Sender Cost Center", Value = "", Key = "senderCC", Editable = true },
+            new() { Label = "Receiver Cost Center", Value = "", Key = "receiverCC", Editable = true },
+            new() { Label = "Amount", Value = "", Key = "amount", Editable = true },
+            new() { Label = "Period", Value = "", Key = "period", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "allocations", Label = "Allocations", Icon = "bi-arrow-left-right", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "senderCC", Label = "Sender CC", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "receiverCC", Label = "Receiver CC", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "amount", Label = "Amount", Type = "currency", Width = 120, Editable = true, Validation = new() { Min = 0, Required = true } },
+            new() { Key = "costElement", Label = "Cost Element", Type = "text", Width = 120, Editable = true },
+            new() { Key = "period", Label = "Period", Type = "text", Width = 80, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Post Allocation", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Post cost center allocation?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig IE01() => new()
+    {
+        TCode = "IE01", Title = "Equipment Master Creation", Module = "PM", Icon = "bi-tools",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Equipment", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Equipment Category", Value = "", Key = "category", Editable = true },
+            new() { Label = "Functional Location", Value = "", Key = "funcLocation", Editable = true },
+            new() { Label = "Work Center", Value = "", Key = "workCenter", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "details", Label = "Equipment Details", Icon = "bi-tools", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "equipmentNumber", Label = "Equipment No.", Type = "text", Width = 130 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Required = true, Editable = true },
+            new() { Key = "category", Label = "Category", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "M", Label = "M - Machine" },
+                new() { Value = "T", Label = "T - Tool" },
+                new() { Value = "V", Label = "V - Vehicle" },
+                new() { Value = "B", Label = "B - Building" },
+            }},
+            new() { Key = "funcLocation", Label = "Func. Location", Type = "text", Width = 140, Editable = true },
+            new() { Key = "workCenter", Label = "Work Center", Type = "text", Width = 120, Editable = true },
+            new() { Key = "manufacturer", Label = "Manufacturer", Type = "text", Width = 140, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "ACTIVE", Label = "Active", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Equipment", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this equipment master?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig IW21() => new()
+    {
+        TCode = "IW21", Title = "Create Maintenance Notification", Module = "PM", Icon = "bi-clipboard-plus",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Notification", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Notification Type", Value = "M1", Key = "notificationType", Editable = true },
+            new() { Label = "Equipment ID", Value = "", Key = "equipmentId", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description", Editable = true },
+            new() { Label = "Status", Value = "NOPR", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "details", Label = "Notification Details", Icon = "bi-clipboard", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "notificationNumber", Label = "Notification No.", Type = "text", Width = 150 },
+            new() { Key = "notificationType", Label = "Type", Type = "dropdown", Width = 100, Editable = true, Options = new() {
+                new() { Value = "M1", Label = "M1 - Malfunction" },
+                new() { Value = "M2", Label = "M2 - Maintenance" },
+                new() { Value = "M3", Label = "M3 - Improvement" },
+            }},
+            new() { Key = "equipmentId", Label = "Equipment", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "damage", Label = "Damage", Type = "text", Width = 150, Editable = true },
+            new() { Key = "cause", Label = "Cause", Type = "text", Width = 150, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NOPR", Label = "Not Processed", Color = "warning" },
+                new() { Value = "IN_PROCESS", Label = "In Process", Color = "info" },
+                new() { Value = "COMPLETE", Label = "Complete", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Notification", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create maintenance notification?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig IW31() => new()
+    {
+        TCode = "IW31", Title = "Create Maintenance Order", Module = "PM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Order", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Order Type", Value = "PM01", Key = "orderType", Editable = true },
+            new() { Label = "Equipment", Value = "", Key = "equipment", Editable = true },
+            new() { Label = "Functional Location", Value = "", Key = "funcLocation", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "operations", Label = "Operations", Icon = "bi-list-check", Active = true },
+            new() { Id = "spareParts", Label = "Spare Parts", Icon = "bi-box" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "orderNumber", Label = "Order No.", Type = "text", Width = 130 },
+            new() { Key = "orderType", Label = "Type", Type = "dropdown", Width = 100, Editable = true, Options = new() {
+                new() { Value = "PM01", Label = "PM01 - Maintenance" },
+                new() { Value = "PM02", Label = "PM02 - Capital" },
+            }},
+            new() { Key = "equipment", Label = "Equipment", Type = "text", Width = 120, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "plannerGroup", Label = "Planner Group", Type = "text", Width = 120, Editable = true },
+            new() { Key = "workCenter", Label = "Work Center", Type = "text", Width = 120, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "REL", Label = "Released", Color = "success" },
+                new() { Value = "TECO", Label = "TECO", Color = "secondary" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Order", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this maintenance order?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig IW41() => new()
+    {
+        TCode = "IW41", Title = "PM Order Confirmation", Module = "PM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Confirmation", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "PM Order", Value = "", Key = "orderNumber", Editable = true },
+            new() { Label = "Operation", Value = "", Key = "operation", Editable = true },
+            new() { Label = "Actual Hours", Value = "", Key = "actualHours", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "confirmation", Label = "Confirmation", Icon = "bi-check2-square", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "orderNumber", Label = "PM Order", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "operation", Label = "Operation", Type = "text", Width = 100, Editable = true },
+            new() { Key = "actualHours", Label = "Actual Hours", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0 } },
+            new() { Key = "workCenter", Label = "Work Center", Type = "text", Width = 120 },
+            new() { Key = "notes", Label = "Notes", Type = "text", Width = 250, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 110, Editable = true, Options = new() {
+                new() { Value = "NEW", Label = "New" },
+                new() { Value = "CONF", Label = "Confirmed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Confirm", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Confirm PM order? Labor will be posted." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig IW32() => new()
+    {
+        TCode = "IW32", Title = "Change Maintenance Order / TECO", Module = "PM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "PM Order", Value = "", Key = "orderNumber", Editable = true },
+            new() { Label = "Equipment", Value = "", Key = "equipment" },
+            new() { Label = "Description", Value = "", Key = "description" },
+            new() { Label = "Status", Value = "", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "header", Label = "Header", Icon = "bi-card-heading", Active = true },
+            new() { Id = "operations", Label = "Operations", Icon = "bi-list-check" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "orderNumber", Label = "Order No.", Type = "text", Width = 120 },
+            new() { Key = "operation", Label = "Operation", Type = "text", Width = 100 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250 },
+            new() { Key = "actualHours", Label = "Actual Hours", Type = "number", Width = 100 },
+            new() { Key = "status", Label = "Status", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "REL", Label = "Released" },
+                new() { Value = "CONF", Label = "Confirmed" },
+                new() { Value = "TECO", Label = "TECO" },
+                new() { Value = "CLSD", Label = "Closed" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "teco", Label = "Technical Completion", Icon = "bi-check-circle", Style = "success", Handler = "complete", Confirm = true, ConfirmMessage = "Technically complete this PM order?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig QP01() => new()
+    {
+        TCode = "QP01", Title = "Create Inspection Plan", Module = "QM", Icon = "bi-clipboard-data",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Plan", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Material ID", Value = "", Key = "material", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Usage", Value = "", Key = "usage", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "characteristics", Label = "Characteristics", Icon = "bi-list-check", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "planNumber", Label = "Plan No.", Type = "text", Width = 120 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Editable = true },
+            new() { Key = "usage", Label = "Usage", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "PURCHASE", Label = "Purchase" },
+                new() { Value = "PRODUCTION", Label = "Production" },
+                new() { Value = "STOCK_TRANSFER", Label = "Stock Transfer" },
+            }},
+            new() { Key = "characteristic", Label = "Characteristic", Type = "text", Width = 200, Editable = true },
+            new() { Key = "specification", Label = "Specification", Type = "text", Width = 160, Editable = true },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "ACTIVE", Label = "Active", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Plan", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save inspection plan?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QA01() => new()
+    {
+        TCode = "QA01", Title = "Create Inspection Lot", Module = "QM", Icon = "bi-clipboard-plus",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Lot", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Material", Value = "", Key = "material", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Inspection Type", Value = "01", Key = "inspectionType", Editable = true },
+            new() { Label = "Lot Origin", Value = "", Key = "lotOrigin", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "lots", Label = "Inspection Lots", Icon = "bi-clipboard", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Lot Number", Type = "text", Width = 130 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Editable = true },
+            new() { Key = "inspectionType", Label = "Insp. Type", Type = "dropdown", Width = 120, Editable = true, Options = new() {
+                new() { Value = "01", Label = "Goods Receipt" },
+                new() { Value = "02", Label = "Production" },
+                new() { Value = "03", Label = "Stock Transfer" },
+                new() { Value = "04", Label = "Manual" },
+            }},
+            new() { Key = "lotOrigin", Label = "Lot Origin", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "PO", Label = "Purchase Order" },
+                new() { Value = "PROD", Label = "Production" },
+                new() { Value = "MANUAL", Label = "Manual" },
+            }},
+            new() { Key = "quantity", Label = "Lot Qty", Type = "number", Width = 100, Editable = true },
+            new() { Key = "stockStatus", Label = "Stock Status", Type = "status_badge", Width = 120, Options = new() {
+                new() { Value = "QI", Label = "In QI", Color = "warning" },
+                new() { Value = "FREE", Label = "Unrestricted", Color = "success" },
+            }},
+            new() { Key = "status", Label = "Lot Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "RREC", Label = "Results Rec.", Color = "warning" },
+                new() { Value = "UD", Label = "UD Posted", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Lot", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create inspection lot? Stock will be in QI status." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QN01() => new()
+    {
+        TCode = "QN01", Title = "Create Quality Notification (Defect)", Module = "QM", Icon = "bi-exclamation-triangle",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Notification", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Notification Type", Value = "Q1", Key = "notificationType", Editable = true },
+            new() { Label = "Defect Type", Value = "", Key = "defectType", Editable = true },
+            new() { Label = "Code Group", Value = "", Key = "codeGroup", Editable = true },
+            new() { Label = "Fault Description", Value = "", Key = "faultDescription", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "details", Label = "Defect Details", Icon = "bi-exclamation-triangle", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "notificationNumber", Label = "Notification No.", Type = "text", Width = 150 },
+            new() { Key = "notificationType", Label = "Type", Type = "dropdown", Width = 100, Editable = true, Options = new() {
+                new() { Value = "Q1", Label = "Q1 - Quality" },
+                new() { Value = "Q2", Label = "Q2 - Customer" },
+                new() { Value = "Q5", Label = "Q5 - Internal" },
+            }},
+            new() { Key = "defectType", Label = "Defect Type", Type = "dropdown", Width = 140, Editable = true, Options = new() {
+                new() { Value = "VISUAL", Label = "Visual" },
+                new() { Value = "DIMENSIONAL", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+                new() { Value = "MATERIAL", Label = "Material" },
+            }},
+            new() { Key = "codeGroup", Label = "Code Group", Type = "text", Width = 140, Editable = true },
+            new() { Key = "faultDescription", Label = "Fault Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "IN_PROCESS", Label = "In Process", Color = "warning" },
+                new() { Value = "COMPLETE", Label = "Complete", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Notification", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create quality notification for non-conformance?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QA11() => new()
+    {
+        TCode = "QA11", Title = "Usage Decision & Stock Posting", Module = "QM", Icon = "bi-check2-square",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Decision", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Lot ID", Value = "", Key = "lotNumber", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant" },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "UD Code", Value = "", Key = "udCode", Editable = true },
+            new() { Label = "Stock Proposal", Value = "", Key = "stockProposal", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "usageDecision", Label = "Usage Decision", Icon = "bi-check2-square", Active = true },
+            new() { Id = "stockPosting", Label = "Stock Posting", Icon = "bi-box" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Lot ID", Type = "text", Width = 130, Required = true, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80 },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140 },
+            new() { Key = "udCode", Label = "UD Code", Type = "dropdown", Width = 150, Editable = true, Required = true, Options = new() {
+                new() { Value = "A", Label = "A - Accept" },
+                new() { Value = "R", Label = "R - Reject" },
+                new() { Value = "R1", Label = "R1 - Rework" },
+                new() { Value = "N", Label = "N - Return to Vendor" },
+                new() { Value = "S", Label = "S - Scrap" },
+            }},
+            new() { Key = "stockProposal", Label = "Stock Proposal", Type = "dropdown", Width = 150, Editable = true, Required = true, Options = new() {
+                new() { Value = "FREE", Label = "Unrestricted Use" },
+                new() { Value = "QI", Label = "Quality Inspection" },
+                new() { Value = "BLOCKED", Label = "Blocked Stock" },
+                new() { Value = "SAMPLE", Label = "Sample" },
+            }},
+            new() { Key = "fromStock", Label = "From Stock", Type = "text", Width = 110 },
+            new() { Key = "toStock", Label = "To Stock", Type = "text", Width = 110 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "UD_POSTED", Label = "UD Posted", Color = "success" },
+                new() { Value = "STOCK_POSTED", Label = "Stock Posted", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Post UD & Stock", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Post usage decision and stock posting?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QC21() => new()
+    {
+        TCode = "QC21", Title = "Quality Certificate (COA)", Module = "QM", Icon = "bi-file-earmark-medical",
+        ToolbarActions = new()
+        {
+            new() { Id = "new", Label = "New Certificate", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "delete", Label = "Delete", Icon = "bi-trash", Style = "danger", Handler = "deleteRow", Confirm = true, ConfirmMessage = "Delete selected?" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Delivery Number", Value = "", Key = "deliveryNumber", Editable = true },
+            new() { Label = "Lot Number", Value = "", Key = "lotNumber", Editable = true },
+            new() { Label = "Material", Value = "", Key = "material" },
+            new() { Label = "Customer", Value = "", Key = "customer" },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new() { new() { Id = "certificate", Label = "Certificate Details", Icon = "bi-file-earmark-medical", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "certificateNumber", Label = "Cert. No.", Type = "text", Width = 130 },
+            new() { Key = "deliveryNumber", Label = "Delivery", Type = "text", Width = 130, Editable = true },
+            new() { Key = "lotNumber", Label = "Lot No.", Type = "text", Width = 120, Editable = true },
+            new() { Key = "material", Label = "Material", Type = "text", Width = 140 },
+            new() { Key = "customer", Label = "Customer", Type = "text", Width = 140 },
+            new() { Key = "certificateDate", Label = "Cert. Date", Type = "date", Width = 120, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 110, Options = new() {
+                new() { Value = "NEW", Label = "New", Color = "info" },
+                new() { Value = "GENERATED", Label = "Generated", Color = "success" },
+                new() { Value = "SENT", Label = "Sent", Color = "success" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Generate COA", Icon = "bi-file-earmark-pdf", Style = "primary", Handler = "printCOA", Confirm = true, ConfirmMessage = "Generate Certificate of Analysis PDF?" },
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
