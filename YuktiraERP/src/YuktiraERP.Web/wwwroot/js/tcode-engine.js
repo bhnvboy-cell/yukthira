@@ -20,6 +20,13 @@
     var pageSize = 50;
     var isLoading = false;
 
+    /* ── Workflow state ── */
+    var workflowChains = [];
+    var currentChainId = null;
+    var currentChain = null;
+    var workflowSteps = [];
+    var activeInstances = [];
+
     /* ── Helpers ── */
     function $(sel, ctx) { return (ctx || document).querySelector(sel); }
     function $$(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
@@ -114,24 +121,210 @@
             return clean;
         });
 
-        setStatus('Saving...', 'loading');
-        apiPost('/api/v1/TCodeEngine/layout/' + tcode + '/records', {
-            records: toSave,
-            deleteIds: deletedRecordIds
-        }).then(function (res) {
-            deletedRecordIds = [];
-            rows.forEach(function (r) { r.__dirty = {}; });
-            setStatus('Saved ' + (res.saved || 0) + ' record(s)', 'success');
-            showToast('Saved successfully', 'success');
-            if (callback) callback();
-            loadRecords();
-        }).catch(function (err) {
-            setStatus('Save failed', 'error');
-            showToast('Save failed: ' + err.message, 'danger');
+        validateWorkflowPrereqs(function (valid) {
+            if (!valid) return;
+            setStatus('Saving...', 'loading');
+            apiPost('/api/v1/TCodeEngine/layout/' + tcode + '/records', {
+                records: toSave,
+                deleteIds: deletedRecordIds
+            }).then(function (res) {
+                deletedRecordIds = [];
+                rows.forEach(function (r) { r.__dirty = {}; });
+                setStatus('Saved ' + (res.saved || 0) + ' record(s)', 'success');
+                showToast('Saved successfully', 'success');
+                executeWorkflowStep();
+                if (callback) callback();
+                loadRecords();
+            }).catch(function (err) {
+                setStatus('Save failed', 'error');
+                showToast('Save failed: ' + err.message, 'danger');
+            });
         });
     }
 
     /* ── Render table body ── */
+    /* ── Workflow API ── */
+    function loadWorkflowChains() {
+        apiGet('/api/v1/Workflow/chains')
+            .then(function (chains) {
+                workflowChains = chains || [];
+                findChainForTCode();
+            })
+            .catch(function () {
+                workflowChains = [];
+            });
+    }
+
+    function findChainForTCode() {
+        currentChain = null;
+        currentChainId = null;
+        workflowSteps = [];
+        for (var i = 0; i < workflowChains.length; i++) {
+            var chain = workflowChains[i];
+            var found = chain.steps.some(function (s) {
+                return s.tCode.toUpperCase() === tcode.toUpperCase();
+            });
+            if (found) {
+                currentChain = chain;
+                currentChainId = chain.id;
+                workflowSteps = chain.steps.slice().sort(function (a, b) { return a.order - b.order; });
+                break;
+            }
+        }
+        if (currentChain) {
+            renderWorkflowBar();
+            loadActiveInstances();
+        }
+    }
+
+    function loadActiveInstances() {
+        apiGet('/api/v1/Workflow/instances?chainId=' + currentChainId)
+            .then(function (instances) {
+                activeInstances = instances || [];
+                if (activeInstances.length > 0) {
+                    loadWorkflowProgress(activeInstances[0].id);
+                } else {
+                    renderWorkflowProgress([]);
+                }
+            })
+            .catch(function () {
+                renderWorkflowProgress([]);
+            });
+    }
+
+    function loadWorkflowProgress(instanceId) {
+        apiGet('/api/v1/Workflow/chains/' + currentChainId + '/progress?instanceId=' + instanceId)
+            .then(function (steps) {
+                renderWorkflowProgress(steps || []);
+            })
+            .catch(function () {
+                renderWorkflowProgress([]);
+            });
+    }
+
+    function renderWorkflowBar() {
+        var bar = $('#tcodeWorkflowBar');
+        if (!bar || !currentChain) {
+            if (bar) bar.style.display = 'none';
+            return;
+        }
+        bar.style.display = 'flex';
+        var nameEl = $('#wfChainName');
+        if (nameEl) nameEl.textContent = currentChain.name;
+        renderWorkflowProgress([]);
+    }
+
+    function renderWorkflowProgress(stepsData) {
+        var container = $('#wfSteps');
+        var infoEl = $('#wfInfo');
+        if (!container || !currentChain) return;
+        container.innerHTML = '';
+
+        var currentIndex = -1;
+        for (var i = 0; i < workflowSteps.length; i++) {
+            var step = workflowSteps[i];
+            var stepData = stepsData.find(function (s) { return s.tCode === step.tCode; });
+            var status = stepData ? stepData.status : 'PENDING';
+            var isCurrentTCode = step.tCode.toUpperCase() === tcode.toUpperCase();
+
+            if (status === 'COMPLETED') {
+                currentIndex = i;
+            } else if (status !== 'COMPLETED' && currentIndex === -1) {
+                currentIndex = i;
+            }
+        }
+
+        var completedCount = 0;
+        workflowSteps.forEach(function (step, idx) {
+            var stepData = stepsData.find(function (s) { return s.tCode === step.tCode; });
+            var status = stepData ? stepData.status : 'PENDING';
+            var isCurrentTCode = step.tCode.toUpperCase() === tcode.toUpperCase();
+
+            var stepEl = document.createElement('div');
+            stepEl.className = 'tcode-wf-step ' + (isCurrentTCode ? 'current' : '');
+
+            var nodeEl = document.createElement('span');
+            nodeEl.className = 'tcode-wf-step-node';
+
+            if (status === 'COMPLETED') {
+                nodeEl.className += ' completed';
+                nodeEl.innerHTML = '<i class="bi bi-check-lg"></i>';
+                completedCount++;
+            } else if (isCurrentTCode) {
+                nodeEl.className += ' current';
+                nodeEl.textContent = String(idx + 1);
+            } else {
+                nodeEl.className += ' pending';
+                nodeEl.textContent = String(idx + 1);
+            }
+            stepEl.appendChild(nodeEl);
+
+            var labelEl = document.createElement('span');
+            labelEl.className = 'tcode-wf-step-label';
+            labelEl.textContent = step.name.length > 14 ? step.name.substring(0, 12) + '..' : step.name;
+            labelEl.title = step.name + ' (' + step.tCode + ')';
+            stepEl.appendChild(labelEl);
+            container.appendChild(stepEl);
+
+            if (idx < workflowSteps.length - 1) {
+                var connector = document.createElement('div');
+                connector.className = 'tcode-wf-connector';
+                if (status === 'COMPLETED') {
+                    connector.className += ' completed';
+                } else if (isCurrentTCode) {
+                    connector.className += ' active';
+                }
+                container.appendChild(connector);
+            }
+        });
+
+        if (infoEl) {
+            var pct = workflowSteps.length > 0 ? Math.round((completedCount / workflowSteps.length) * 100) : 0;
+            infoEl.textContent = completedCount + '/' + workflowSteps.length + ' steps (' + pct + '%)';
+        }
+    }
+
+    function validateWorkflowPrereqs(callback) {
+        if (!currentChain) { callback(true); return; }
+        apiPost('/api/v1/Workflow/chains/' + currentChainId + '/validate', {
+            tCode: tcode,
+            context: collectMetadata()
+        }).then(function (result) {
+            if (result.isValid) {
+                callback(true);
+            } else {
+                showToast('Workflow prerequisite check failed: ' + result.message, 'danger');
+                callback(false);
+            }
+        }).catch(function () {
+            callback(true);
+        });
+    }
+
+    function executeWorkflowStep() {
+        if (!currentChain) return;
+        var params = collectMetadata();
+        rows.forEach(function (row) {
+            Object.keys(row).forEach(function (k) {
+                if (!k.startsWith('__')) params[k] = row[k];
+            });
+        });
+        apiPost('/api/v1/Workflow/chains/' + currentChainId + '/execute', {
+            tCode: tcode,
+            parameters: params
+        }).then(function (result) {
+            if (result.success) {
+                showToast('Workflow step executed: ' + result.message, 'success');
+                if (result.nextStep) {
+                    showToast('Next step: ' + (result.data ? result.data.nextName : result.nextStep), 'info');
+                } else {
+                    showToast('Workflow chain complete!', 'success');
+                }
+                loadWorkflowProgress(activeInstances.length > 0 ? activeInstances[0].id : null);
+            }
+        }).catch(function () { });
+    }
+
     function renderTable() {
         var tbody = $('#tcodeTableBody');
         if (!tbody) return;
@@ -757,6 +950,7 @@
         initFilter();
         initToolbarActions();
         initKeyboard();
+        loadWorkflowChains();
         loadRecords();
     }
 

@@ -37,7 +37,14 @@ else
             </div>
         </div>
 
-        <!-- Tier 2: Metadata Panel -->
+        <!-- Tier 2: Workflow Progress Bar -->
+        <div class="tcode-workflow-bar" id="tcodeWorkflowBar" style="display:none">
+            <span class="tcode-workflow-chain-name" id="wfChainName"></span>
+            <div class="tcode-workflow-steps" id="wfSteps"></div>
+            <span class="tcode-workflow-info" id="wfInfo"></span>
+        </div>
+
+        <!-- Tier 3: Metadata Panel -->
         @if (Model.Config.Metadata.Any())
         {
             <div class="tcode-metadata">

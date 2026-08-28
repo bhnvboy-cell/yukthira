@@ -805,10 +805,160 @@
 [data-theme="dark"] .tcode-tab:hover { background: rgba(10,110,209,0.1); }
 [data-theme="dark"] .tcode-tab.active { background: rgba(10,110,209,0.15); }
 
+/* ── Workflow Progress ── */
+.tcode-workflow-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0.5rem 1.25rem;
+    background: var(--tcode-surface);
+    border-bottom: 1px solid var(--tcode-border);
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.tcode-workflow-chain-name {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--tcode-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.tcode-workflow-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    overflow-x: auto;
+}
+
+.tcode-wf-step {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+}
+
+.tcode-wf-step-node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border: 2px solid var(--tcode-border);
+    background: var(--tcode-surface);
+    color: var(--tcode-text-muted);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tcode-wf-step-node.completed {
+    background: var(--tcode-success);
+    border-color: var(--tcode-success);
+    color: #fff;
+}
+
+.tcode-wf-step-node.current {
+    background: var(--tcode-primary);
+    border-color: var(--tcode-primary);
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--tcode-primary-light);
+    animation: tcode-step-pulse 1.5s infinite;
+}
+
+.tcode-wf-step-node.pending {
+    background: var(--tcode-surface);
+    border-color: var(--tcode-border);
+    color: var(--tcode-text-muted);
+}
+
+.tcode-wf-step-label {
+    font-size: 0.65rem;
+    color: var(--tcode-text-muted);
+    white-space: nowrap;
+    margin-left: 0.4rem;
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: max-content;
+    text-align: center;
+    font-weight: 500;
+}
+
+.tcode-wf-step.current .tcode-wf-step-label {
+    color: var(--tcode-primary);
+    font-weight: 600;
+}
+
+.tcode-wf-step.completed .tcode-wf-step-label {
+    color: var(--tcode-success);
+}
+
+.tcode-wf-connector {
+    width: 36px;
+    height: 2px;
+    background: var(--tcode-border);
+    flex-shrink: 0;
+    margin-top: -12px;
+}
+
+.tcode-wf-connector.completed {
+    background: var(--tcode-success);
+}
+
+.tcode-wf-connector.active {
+    background: linear-gradient(90deg, var(--tcode-success), var(--tcode-primary));
+}
+
+.tcode-workflow-no-chain {
+    font-size: 0.72rem;
+    color: var(--tcode-text-muted);
+    font-style: italic;
+}
+
+.tcode-workflow-chain-select {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--tcode-border);
+    border-radius: var(--tcode-radius-sm);
+    background: #fff;
+    color: var(--tcode-text);
+    cursor: pointer;
+}
+
+@keyframes tcode-step-pulse {
+    0%, 100% { box-shadow: 0 0 0 4px var(--tcode-primary-light); }
+    50% { box-shadow: 0 0 0 8px rgba(10,110,209,0.05); }
+}
+
+.tcode-workflow-info {
+    font-size: 0.68rem;
+    color: var(--tcode-text-muted);
+    padding: 0.3rem 0.5rem;
+    background: var(--tcode-primary-light);
+    border-radius: var(--tcode-radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 0.75rem;
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
     .tcode-metadata-grid { flex-direction: column; }
     .tcode-meta-field { min-width: unset; }
     .tcode-action-bar { flex-direction: column; gap: 0.5rem; }
     .tcode-toolbar { flex-direction: column; align-items: flex-start; }
+    .tcode-workflow-bar { padding: 0.5rem 0.75rem; }
+    .tcode-wf-step-label { font-size: 0.6rem; }
+    .tcode-wf-connector { width: 20px; }
 }
