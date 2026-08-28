@@ -388,8 +388,8 @@ public class TransactionCodeService : ITransactionCodeService
 
     private static readonly Func<TransactionCodeEntity, TransactionCodeDto> ToDtoFunc = ToDto;
 
-    private bool _seeded;
-    private readonly SemaphoreSlim _seedLock = new(1, 1);
+    private static bool _seeded;
+    private static readonly SemaphoreSlim _seedLock = new(1, 1);
 
     private async Task EnsureSeedAsync()
     {
@@ -449,6 +449,16 @@ public class TransactionCodeService : ITransactionCodeService
                     "PS03" => "Create Project Task", "PS04" => "Create Timesheet",
                     "PM01" => "Create Equipment", "PM02" => "Display Equipment",
                     "PM03" => "Create Maintenance Plan", "PM04" => "Create Maintenance Order",
+                    "QE51N" => "Record Results: Overview",
+                    "QM01" => "Create Quality Notification", "QM02" => "Change Quality Notification",
+                    "QM03" => "Quality Notification Tasks", "QM11" => "Record Results: Overview",
+                    "QM12" => "Usage Decision",
+                    "ZQM1" => "QM Master Data Setup", "1FM" => "QM in Procurement",
+                    "2F9" => "Supplier Complaints", "1E1" => "QM in Production",
+                    "2QP" => "Internal Problem Notification", "2QN" => "Manual Inspection",
+                    "QMM" => "Recurring Batch Inspection", "1MP" => "Outbound Delivery Inspection",
+                    "BKR" => "Customer Return Inspection", "2FA" => "Customer Complaints",
+                    "CALIB" => "Calibration Inspection",
                     _ => kvp.Key
                 };
                 codes.Add(new TransactionCodeEntity
@@ -534,7 +544,10 @@ public class TransactionCodeService : ITransactionCodeService
         "CRM04" or "CRM05" or
         "LM04" or
         "PS03" or "PS04" or
-        "PM04"
+        "PM04" or
+        "QM01" or "QM02" or "QM03" or "QM11" or "QM12" or "QE51N" or
+        "ZQM1" or "1FM" or "2F9" or "1E1" or "2QP" or "2QN" or "QMM" or
+        "1MP" or "BKR" or "2FA" or "CALIB"
             => "Transactions",
         // Process (MRP run, payroll run, workflow-driven)
         "MD01" => "Process",
