@@ -32,6 +32,8 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Register(QM01());
         Register(QM02());
         Register(QM03());
+        Register(QM11());
+        Register(QM12());
     }
 
     private static TCodeLayoutConfig QE51N() => new()
@@ -662,5 +664,125 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
                 new() { Id = "complete", Label = "Complete", Icon = "bi-check2-all", Style = "success", Handler = "completeTasks" },
             }
         }
+    };
+
+    private static TCodeLayoutConfig QM11() => new()
+    {
+        TCode = "QM11", Title = "Record Inspection Results", Module = "QM", Icon = "bi-clipboard-data",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+            new() { Id = "defect", Label = "Record Defect", Icon = "bi-exclamation-triangle", Style = "warning", Handler = "recordDefect" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Inspection Lot", Value = "", Key = "lotNumber", Editable = true },
+            new() { Label = "Plant", Value = "7001", Key = "plant", Editable = true },
+            new() { Label = "Material Code", Value = "", Key = "materialCode" },
+            new() { Label = "Material Name", Value = "", Key = "materialName" },
+            new() { Label = "Inspection Lot Origin", Value = "", Key = "inspectionLotOrigin", Editable = true },
+            new() { Label = "Result Status", Value = "PENDING", Key = "resultStatus" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "results", Label = "Results", Icon = "bi-clipboard-data", Active = true },
+            new() { Id = "defects", Label = "Defects", Icon = "bi-exclamation-triangle" },
+        },
+        Columns = new()
+        {
+            new() { Key = "characteristic", Label = "Characteristic", Type = "text", Width = 200, Required = true, Editable = true },
+            new() { Key = "specification", Label = "Specification", Type = "text", Width = 160 },
+            new() { Key = "result", Label = "Result", Type = "number", Width = 110, Editable = true, Validation = new() { Required = true } },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 70 },
+            new() { Key = "valuation", Label = "Valuation", Type = "status_icon", Width = 110, Options = new() {
+                new() { Value = "OK", Label = "OK", Color = "success" },
+                new() { Value = "NOK", Label = "Not OK", Color = "danger" },
+                new() { Value = "REVIEW", Label = "Review", Color = "warning" },
+            }},
+            new() { Key = "defectCodeGroup", Label = "Defect Code Group", Type = "dropdown", Width = 160, Editable = true, Options = new() {
+                new() { Value = "VISUAL", Label = "Visual Defect" },
+                new() { Value = "DIMENSIONAL", Label = "Dimensional" },
+                new() { Value = "FUNCTIONAL", Label = "Functional" },
+                new() { Value = "MATERIAL", Label = "Material Defect" },
+                new() { Value = "PACKAGING", Label = "Packaging" },
+            }},
+            new() { Key = "reportType", Label = "Report Type", Type = "dropdown", Width = 130, Editable = true, Options = new() {
+                new() { Value = "CHAR", Label = "Characteristic" },
+                new() { Value = "LOT", Label = "Lot" },
+                new() { Value = "DEFECT", Label = "Defect" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Save Results", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Save inspection results?" },
+            new() { Id = "defect", Label = "Record Defect", Icon = "bi-exclamation-triangle", Style = "warning", Handler = "recordDefect" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig QM12() => new()
+    {
+        TCode = "QM12", Title = "Manage Usage Decisions", Module = "QM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+            new() { Id = "confirm", Label = "Confirm Certificate", Icon = "bi-patch-check", Style = "success", Handler = "confirmCertificate" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Inspection Lot", Value = "", Key = "lotNumber", Editable = true },
+            new() { Label = "Plant", Value = "7001", Key = "plant" },
+            new() { Label = "Insp. Lot Origin", Value = "", Key = "inspectionLotOrigin" },
+            new() { Label = "Result Recording Status", Value = "RECORDED", Key = "resultRecordingStatus" },
+            new() { Label = "UD Code", Value = "", Key = "udCode", Editable = true },
+            new() { Label = "Stock Proposal", Value = "", Key = "stockProposal", Editable = true },
+            new() { Label = "Certificate Received", Value = "No", Key = "certificateReceived" },
+            new() { Label = "Status", Value = "OPEN", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "usageDecision", Label = "Usage Decision", Icon = "bi-check2-square", Active = true },
+            new() { Id = "stockPosting", Label = "Stock Posting", Icon = "bi-box" },
+        },
+        Columns = new()
+        {
+            new() { Key = "lotNumber", Label = "Inspection Lot", Type = "text", Width = 140 },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80 },
+            new() { Key = "origin", Label = "Origin", Type = "text", Width = 110 },
+            new() { Key = "resultStatus", Label = "Result Status", Type = "status_badge", Width = 120, Options = new() {
+                new() { Value = "RECORDED", Label = "Recorded", Color = "info" },
+                new() { Value = "CERT_CONFIRMED", Label = "Cert. Confirmed", Color = "success" },
+                new() { Value = "UD_RECORDED", Label = "UD Recorded", Color = "success" },
+            }},
+            new() { Key = "udCode", Label = "UD Code", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+                new() { Value = "A", Label = "A - Accept" },
+                new() { Value = "R", Label = "R - Reject" },
+                new() { Value = "R1", Label = "R1 - Rework" },
+                new() { Value = "N", Label = "N - Return to Vendor" },
+                new() { Value = "S", Label = "S - Scrap" },
+            }},
+            new() { Key = "stockProposal", Label = "Stock Proposal", Type = "dropdown", Width = 150, Editable = true, Options = new() {
+                new() { Value = "FREE", Label = "Unrestricted Use" },
+                new() { Value = "QI", Label = "Quality Inspection" },
+                new() { Value = "BLOCKED", Label = "Blocked Stock" },
+                new() { Value = "SAMPLE", Label = "Sample" },
+            }},
+            new() { Key = "certificateReceived", Label = "Cert. Received", Type = "status_icon", Width = 100, Options = new() {
+                new() { Value = "Yes", Label = "Yes", Color = "success" },
+                new() { Value = "No", Label = "No", Color = "warning" },
+            }},
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "confirm", Label = "Confirm Certificate", Icon = "bi-patch-check", Style = "success", Handler = "confirmCertificate", Confirm = true, ConfirmMessage = "Confirm certificate receipt?" },
+            new() { Id = "save", Label = "Record Usage Decision", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Record usage decision and post stock?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
     };
 }

@@ -137,6 +137,42 @@ public class QualityNotificationTaskEntity : EntityBase
     public DateTime? CompletedAt { get; set; }
 }
 
+public class InspectionResultDetailEntity : EntityBase
+{
+    public string LotNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string InspectionLotOrigin { get; set; } = "";
+    public string ReportType { get; set; } = "";
+    public string DefectCodeGroup { get; set; } = "";
+    public string DefectCode { get; set; } = "";
+    public string DefectDescription { get; set; } = "";
+    public string DefectCategory { get; set; } = "";
+    public int Quantity { get; set; }
+    public int DefectiveQuantity { get; set; }
+    public string ResultStatus { get; set; } = "RECORDED";
+    public string RecordedBy { get; set; } = "";
+    public DateTime RecordedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class UsageDecisionDetailEntity : EntityBase
+{
+    public string LotNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string InspectionLotOrigin { get; set; } = "";
+    public string ResultRecordingStatus { get; set; } = "";
+    public string UDCode { get; set; } = "";
+    public string UDDescription { get; set; } = "";
+    public string StockProposal { get; set; } = "";
+    public string CertificateReceived { get; set; } = "No";
+    public string CertificateNumber { get; set; } = "";
+    public DateTime? CertificateDate { get; set; }
+    public string Status { get; set; } = "OPEN";
+    public string DecidedBy { get; set; } = "";
+    public DateTime? DecisionDate { get; set; }
+}
+
 // WM
 public class WarehouseTransferEntity : EntityBase { public string TransferId { get; set; } = ""; public DateTime Date { get; set; } public string MaterialName { get; set; } = ""; public string FromBin { get; set; } = ""; public string ToBin { get; set; } = ""; public decimal Quantity { get; set; } public string Status { get; set; } = "Pending"; }
 public class StorageLocationEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "General"; public decimal Capacity { get; set; } public string Status { get; set; } = "Active"; }

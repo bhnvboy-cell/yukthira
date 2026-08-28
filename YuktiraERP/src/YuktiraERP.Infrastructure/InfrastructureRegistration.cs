@@ -145,6 +145,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();
         services.AddScoped<IThreeWayMatchService, ThreeWayMatchService>();
         services.AddScoped<YuktiraERP.Infrastructure.Services.IQualityNotificationService, QualityNotificationService>();
+        services.AddScoped<YuktiraERP.Infrastructure.Services.IInspectionResultService, InspectionResultService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<CacheService>();
         services.AddHostedService<IntegrationQueueBackgroundService>();

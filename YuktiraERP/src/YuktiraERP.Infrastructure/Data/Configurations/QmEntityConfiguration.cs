@@ -55,3 +55,19 @@ public class QualityNotificationTaskEntityConfiguration : IEntityTypeConfigurati
             .HasForeignKey(e => e.NotificationId);
     }
 }
+
+public class InspectionResultDetailEntityConfiguration : IEntityTypeConfiguration<InspectionResultDetailEntity>
+{
+    public void Configure(EntityTypeBuilder<InspectionResultDetailEntity> builder)
+    {
+        builder.ToTable("inspection_result_details", "yuktira_qm");
+    }
+}
+
+public class UsageDecisionDetailEntityConfiguration : IEntityTypeConfiguration<UsageDecisionDetailEntity>
+{
+    public void Configure(EntityTypeBuilder<UsageDecisionDetailEntity> builder)
+    {
+        builder.ToTable("usage_decision_details", "yuktira_qm");
+    }
+}
