@@ -26,10 +26,10 @@ public class TransactionCodeService : ITransactionCodeService
         ["VF01"] = "/Transactions/Engine/VF01", ["VD01"] = "/SD/Customer/Create", ["VD02"] = "/SD/Customer/Edit", ["VD03"] = "/SD/Customer/Display",
         ["VKD1"] = "/SD/Customer/List",
         // PP - Production Planning
-        ["CS01"] = "/PP/BOM/Create", ["CS02"] = "/PP/BOM/Edit", ["CS03"] = "/PP/BOM/Display",
+        ["CS01"] = "/Transactions/Engine/CS01", ["CS02"] = "/PP/BOM/Edit", ["CS03"] = "/PP/BOM/Display",
         ["CO01"] = "/Transactions/Engine/CO01", ["CO02"] = "/PP/ProductionOrder/Edit", ["CO03"] = "/PP/ProductionOrder/Display",
         ["CO11N"] = "/Transactions/Engine/CO11N", ["MD61"] = "/Transactions/Engine/MD61",
-        ["MD02"] = "/Transactions/Engine/MD02", ["MD01"] = "/PP/MrpRun", ["MD04"] = "/PP/MrpStock", ["CR01"] = "/PP/WorkCenter/Create",
+        ["MD02"] = "/Transactions/Engine/MD02", ["MD01"] = "/PP/MrpRun", ["MD04"] = "/PP/MrpStock", ["CR01"] = "/Transactions/Engine/CR01",
         // QM - Quality Management
         ["QE01"] = "/Transactions/Engine/QE01", ["QE02"] = "/QM/InspectionLot/Edit", ["QE03"] = "/QM/InspectionLot/Display",
         ["QE51N"] = "/Transactions/Engine/QE51N", ["QS01"] = "/QM/InspectionPlan/Create", ["QS02"] = "/QM/InspectionPlan/Edit",
@@ -86,7 +86,11 @@ public class TransactionCodeService : ITransactionCodeService
         ["PM03"] = "/PM/Plan/Create", ["PM04"] = "/PM/Order/Create",
         ["IE01"] = "/Transactions/Engine/IE01", ["IW21"] = "/Transactions/Engine/IW21",
         ["IW31"] = "/Transactions/Engine/IW31", ["IW41"] = "/Transactions/Engine/IW41",
-        ["IW32"] = "/Transactions/Engine/IW32"
+        ["IW32"] = "/Transactions/Engine/IW32", ["IL01"] = "/Transactions/Engine/IL01",
+        // CO - Controlling (additional)
+        ["KO88"] = "/Transactions/Engine/KO88", ["KS01"] = "/Transactions/Engine/KS01",
+        // MM - BP (Business Partner)
+        ["BP"] = "/Transactions/Engine/BP"
     };
 
     public TransactionCodeService(YuktiraDbContext db, IModuleCatalog catalog)
@@ -475,9 +479,12 @@ public class TransactionCodeService : ITransactionCodeService
                     "ABZN" => "Asset Acquisition", "KB11N" => "Cost Center Allocation",
                     "IE01" => "Equipment Master Creation", "IW21" => "Create Maintenance Notification",
                     "IW31" => "Create Maintenance Order", "IW41" => "PM Order Confirmation",
-                    "IW32" => "Change Maintenance Order", "QP01" => "Create Inspection Plan",
+                    "IW32" => "Change Maintenance Order",                     "QP01" => "Create Inspection Plan",
                     "QN01" => "Create Quality Notification (Defect)", "QA11" => "Usage Decision & Stock Posting",
                     "QC21" => "Quality Certificate (COA)",
+                    "KO88" => "Settle Production / PM Order", "KS01" => "Create Cost Center",
+                    "BP" => "Create Business Partner",
+                    "IL01" => "Create Functional Location",
                     _ => kvp.Key
                 };
                 codes.Add(new TransactionCodeEntity
@@ -550,7 +557,7 @@ public class TransactionCodeService : ITransactionCodeService
         "CRM01" or "CRM02" or "CRM03" or
         "LM01" or "LM02" or "LM03" or "LM05" or
         "PS01" or "PS02" or
-        "PM01" or "PM02" or "PM03" or "IE01"
+        "PM01" or "PM02" or "PM03" or "IE01" or "IL01" or "KS01" or "BP"
             => "MasterData",
         // Transactions
         "ME21N" or "ME22N" or "ME23N" or "MIGO" or "MIRO" or "MB1A" or "MB1C" or
@@ -568,7 +575,8 @@ public class TransactionCodeService : ITransactionCodeService
         "ZQM1" or "1FM" or "2F9" or "1E1" or "2QP" or "2QN" or "QMM" or
         "1MP" or "BKR" or "2FA" or "CALIB" or
         "ME51N" or "ME28" or "MD61" or
-        "ABZN" or "KB11N" or "QP01" or "QN01" or "QA11" or "QC21"
+        "ABZN" or "KB11N" or "QP01" or "QN01" or "QA11" or "QC21" or
+        "KO88"
             => "Transactions",
         // Process (MRP run, payroll run, workflow-driven)
         "MD01" or "MD02" => "Process",

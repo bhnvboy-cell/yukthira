@@ -149,6 +149,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IQMMasterDataService, QMMasterDataService>();
         services.AddScoped<IQMInspectionConfigService, QMInspectionConfigService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
+        services.AddScoped<ITransactionSequenceService, TransactionSequenceService>();
         services.AddScoped<CacheService>();
         services.AddHostedService<IntegrationQueueBackgroundService>();
         services.AddHostedService<MrpSchedulerBackgroundService>();

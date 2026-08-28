@@ -69,6 +69,12 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Register(QN01());
         Register(QA11());
         Register(QC21());
+        Register(KO88());
+        Register(KS01());
+        Register(BP());
+        Register(CS01());
+        Register(CR01());
+        Register(IL01());
     }
 
     private static TCodeLayoutConfig QE51N() => new()
@@ -2707,5 +2713,249 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig KO88() => new()
+    {
+        TCode = "KO88", Title = "Settle Production / PM Order", Module = "CO", Icon = "bi-currency-dollar",
+        ToolbarActions = new()
+        {
+            new() { Id = "simulate", Label = "Simulate", Icon = "bi-play-circle", Style = "primary", Handler = "simulate" },
+            new() { Id = "save", Label = "Settle", Icon = "bi-send", Style = "success", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Order Number", Value = "", Key = "orderNumber", Editable = true },
+            new() { Label = "Order Type", Value = "", Key = "orderType" },
+            new() { Label = "Settlement Period", Value = "", Key = "period", Editable = true },
+            new() { Label = "Fiscal Year", Value = "", Key = "fiscalYear", Editable = true },
+            new() { Label = "Settlement Rule", Value = "", Key = "settlementRule" },
+            new() { Label = "Status", Value = "", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "settlement", Label = "Settlement", Icon = "bi-currency-dollar", Active = true },
+            new() { Id = "costAnalysis", Label = "Cost Analysis", Icon = "bi-bar-chart" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "costElement", Label = "Cost Element", Type = "text", Width = 140 },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220 },
+            new() { Key = "planCost", Label = "Plan Cost", Type = "currency", Width = 120, Align = "right" },
+            new() { Key = "actualCost", Label = "Actual Cost", Type = "currency", Width = 120, Align = "right" },
+            new() { Key = "variance", Label = "Variance", Type = "currency", Width = 120, Align = "right" },
+            new() { Key = "settledAmount", Label = "Settled Amount", Type = "currency", Width = 130, Editable = true, Align = "right" },
+            new() { Key = "receiver", Label = "Settlement Receiver", Type = "text", Width = 160, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Settle Order", Icon = "bi-send", Style = "success", Handler = "save", Confirm = true, ConfirmMessage = "Settle this order? Actual costs will be posted to receiver." },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig KS01() => new()
+    {
+        TCode = "KS01", Title = "Create Cost Center", Module = "CO", Icon = "bi-diagram-3",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Cost Center", Value = "", Key = "costCenter", Editable = true },
+            new() { Label = "Name", Value = "", Key = "name", Editable = true },
+            new() { Label = "Cost Center Category", Value = "", Key = "category", Editable = true },
+            new() { Label = "Company Code", Value = "", Key = "companyCode", Editable = true },
+            new() { Label = "Business Area", Value = "", Key = "businessArea", Editable = true },
+            new() { Label = "Valid From", Value = "", Key = "validFrom", Editable = true },
+            new() { Label = "Valid To", Value = "", Key = "validTo", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "basic", Label = "Basic Data", Icon = "bi-card-heading", Active = true },
+            new() { Id = "address", Label = "Address", Icon = "bi-geo-alt" },
+            new() { Id = "control", Label = "Control", Icon = "bi-sliders" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Cost Center", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this cost center?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig BP() => new()
+    {
+        TCode = "BP", Title = "Create Business Partner (Vendor/Customer)", Module = "MM", Icon = "bi-person-lines-fill",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "BP Category", Value = "", Key = "bpCategory", Editable = true },
+            new() { Label = "BP Role", Value = "", Key = "bpRole", Editable = true },
+            new() { Label = "Search Term", Value = "", Key = "searchTerm", Editable = true },
+            new() { Label = "Name 1", Value = "", Key = "name1", Editable = true },
+            new() { Label = "Country", Value = "", Key = "country", Editable = true },
+            new() { Label = "Language", Value = "", Key = "language", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "general", Label = "General Data", Icon = "bi-person", Active = true },
+            new() { Id = "vendorArea", Label = "Vendor Functions", Icon = "bi-bag" },
+            new() { Id = "customerArea", Label = "Customer Functions", Icon = "bi-cart3" },
+            new() { Id = "companyCode", Label = "Company Code Data", Icon = "bi-building" },
+            new() { Id = "purchasing", Label = "Purchasing Data", Icon = "bi-bag-plus" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Partner", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this business partner?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig CS01() => new()
+    {
+        TCode = "CS01", Title = "Create Bill of Materials", Module = "PP", Icon = "bi-layers",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Material", Value = "", Key = "material", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "BOM Usage", Value = "", Key = "bomUsage", Editable = true },
+            new() { Label = "Valid From", Value = "", Key = "validFrom", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "items", Label = "BOM Items", Icon = "bi-list-ol", Active = true },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "item", Label = "Item", Type = "number", Width = 60 },
+            new() { Key = "component", Label = "Component", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 220, Editable = true },
+            new() { Key = "quantity", Label = "Quantity", Type = "number", Width = 100, Editable = true, Validation = new() { Min = 0.001m, Required = true } },
+            new() { Key = "uom", Label = "UoM", Type = "text", Width = 60, Editable = true },
+            new() { Key = "itemCategory", Label = "Category", Type = "dropdown", Width = 110, Editable = true, Options = new() {
+                new() { Value = "L", Label = "Standard" },
+                new() { Value = "R", Label = "Phantom" },
+                new() { Value = "T", Label = "Text" },
+            }},
+            new() { Key = "validFrom", Label = "Valid From", Type = "date", Width = 120, Editable = true },
+            new() { Key = "validation", Label = "", Type = "validation_icon", Width = 40, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create BOM", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this bill of materials?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = false, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true }
+    };
+
+    private static TCodeLayoutConfig CR01() => new()
+    {
+        TCode = "CR01", Title = "Create Work Center", Module = "PP", Icon = "bi-gear",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Work Center", Value = "", Key = "workCenter", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description", Editable = true },
+            new() { Label = "Work Center Category", Value = "", Key = "category", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Work Center Category", Value = "", Key = "wcCategory", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "basic", Label = "Basic Data", Icon = "bi-card-heading", Active = true },
+            new() { Id = "capacities", Label = "Capacities", Icon = "bi-clock-history" },
+            new() { Id = "scheduling", Label = "Scheduling", Icon = "bi-calendar" },
+            new() { Id = "costing", Label = "Costing", Icon = "bi-currency-dollar" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Work Center", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this work center?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig IL01() => new()
+    {
+        TCode = "IL01", Title = "Create Functional Location", Module = "PM", Icon = "bi-geo-alt",
+        ToolbarActions = new()
+        {
+            new() { Id = "save", Label = "Save", Icon = "bi-check-lg", Style = "primary", Handler = "save" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Metadata = new()
+        {
+            new() { Label = "Functional Location", Value = "", Key = "funcLocation", Editable = true },
+            new() { Label = "Description", Value = "", Key = "description", Editable = true },
+            new() { Label = "Location Category", Value = "", Key = "category", Editable = true },
+            new() { Label = "Plant", Value = "", Key = "plant", Editable = true },
+            new() { Label = "Status", Value = "NEW", Key = "status" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "general", Label = "General Data", Icon = "bi-card-heading", Active = true },
+            new() { Id = "location", Label = "Location", Icon = "bi-geo-alt" },
+            new() { Id = "organization", Label = "Organization", Icon = "bi-diagram-3" },
+        },
+        Columns = new()
+        {
+            new() { Key = "field", Label = "Field", Type = "text", Width = 200 },
+            new() { Key = "value", Label = "Value", Type = "text", Width = 300, Editable = true },
+            new() { Key = "description", Label = "Description", Type = "text", Width = 250, Editable = true },
+            new() { Key = "mandatory", Label = "", Type = "mandatory_icon", Width = 30, Fixed = true },
+        },
+        FooterActions = new()
+        {
+            new() { Id = "save", Label = "Create Func. Location", Icon = "bi-check-lg", Style = "primary", Handler = "save", Confirm = true, ConfirmMessage = "Create this functional location?" },
+            new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
     };
 }
