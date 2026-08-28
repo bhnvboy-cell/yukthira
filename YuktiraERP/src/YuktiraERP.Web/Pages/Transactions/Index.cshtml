@@ -79,7 +79,7 @@
                                         <small class="text-secondary">@code.Module</small>
                                     </div>
                                     <div class="ms-auto">
-                                        <button class="btn btn-sm btn-outline-warning fav-btn" data-code-id="@code.Id" title="Toggle favorite"><i class="bi @(code.IsFavorite ? "bi-star-fill" : "bi-star")"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning fav-btn" data-code-id="@code.Id" data-code="@code.Code" data-name="@code.Name" data-icon="@code.Icon" data-route="@code.Route" title="Toggle favorite"><i class="bi @(code.IsFavorite ? "bi-star-fill" : "bi-star")"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -154,8 +154,34 @@
         e.stopPropagation();
         var btn = $(this);
         var codeId = btn.data('code-id');
-        $.post('/api/v1/transaction/favorites/' + codeId, function() {
+        var code = btn.data('code');
+        var name = btn.data('name');
+        var icon = btn.data('icon');
+        var route = btn.data('route');
+        $.post('/Transactions/Favorite?transactionCodeId=' + codeId, function() {
             btn.find('i').toggleClass('bi-star bi-star-fill');
+            // Sync to Dashboard localStorage
+            var FAV_KEY = 'yuktira_favorites';
+            var favs = [];
+            try { favs = JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch(ex) {}
+            var idx = favs.indexOf(code);
+            if (idx === -1) {
+                favs.push(code);
+                // Store tile metadata for Dashboard rendering
+                var META_KEY = 'yuktira_fav_meta';
+                var meta = {};
+                try { meta = JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch(ex) {}
+                meta[code] = { code: code, name: name, icon: icon, route: route };
+                localStorage.setItem(META_KEY, JSON.stringify(meta));
+            } else {
+                favs.splice(idx, 1);
+                var META_KEY = 'yuktira_fav_meta';
+                var meta = {};
+                try { meta = JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch(ex) {}
+                delete meta[code];
+                localStorage.setItem(META_KEY, JSON.stringify(meta));
+            }
+            localStorage.setItem(FAV_KEY, JSON.stringify(favs));
         });
     });
 

@@ -213,19 +213,26 @@
         if (!favs.length) { section.style.display = 'none'; return; }
         section.style.display = '';
         var html = '';
+        var META_KEY = 'yuktira_fav_meta';
+        var meta = {};
+        try { meta = JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch(e) {}
         favs.forEach(function(code) {
+            // Try on-page tile first, then metadata from localStorage
             var tile = document.querySelector('.tile-card[data-code="' + code + '"]');
             if (tile) {
                 html += tile.outerHTML;
+            } else if (meta[code]) {
+                var m = meta[code];
+                var moduleColors = { MM:'#4f46e5', SD:'#0891b2', PP:'#7c3aed', QM:'#059669', FI:'#dc2626', CO:'#ea580c', HR:'#2563eb', WM:'#6b21a8', CRM:'#0d9488', LIMS:'#4338ca', BI:'#be185d', PS:'#1d4ed8', PM:'#b45309', AI:'#6d28d9', WF:'#0f766e', PLG:'#9333ea' };
+                var bgColor = moduleColors[m.module] || '#4f46e5';
+                html += '<a href="' + m.route + '" class="tile-card" data-code="' + m.code + '">';
+                html += '<div class="tile-icon" style="background:' + bgColor + '"><i class="bi ' + m.icon + '"></i></div>';
+                html += '<div class="tile-label">' + m.code + '</div>';
+                html += '<div class="tile-sub">' + m.name + '</div>';
+                html += '</a>';
             }
         });
         grid.innerHTML = html;
-        grid.querySelectorAll('.tile-fav').forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault(); e.stopPropagation();
-                toggleFav(this.getAttribute('data-code'));
-            });
-        });
         grid.querySelectorAll('.tile-card').forEach(function(card) {
             card.addEventListener('click', function() {
                 addRecent(this.getAttribute('data-code'));
