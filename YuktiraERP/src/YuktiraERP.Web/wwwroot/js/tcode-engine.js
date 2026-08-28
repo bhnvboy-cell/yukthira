@@ -567,6 +567,9 @@
         initFilter();
         initToolbarActions();
         initKeyboard();
+        if (rows.length === 0) {
+            for (var i = 0; i < 5; i++) addRow();
+        }
         renderTable();
     }
 
