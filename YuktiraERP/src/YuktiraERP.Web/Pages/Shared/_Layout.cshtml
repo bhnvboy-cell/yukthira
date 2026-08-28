@@ -41,10 +41,9 @@
 
                 <div class="sidebar-footer">
                     <div class="theme-dots" id="sidebarThemeDots" role="radiogroup" aria-label="Theme selection">
-                        <button class="theme-btn" data-theme="modern" title="Modern theme" aria-label="Modern theme" role="radio" aria-checked="false"></button>
-                        <button class="theme-btn" data-theme="classic" title="Classic theme" aria-label="Classic theme" role="radio" aria-checked="false"></button>
-                        <button class="theme-btn" data-theme="premium" title="Premium theme" aria-label="Premium theme" role="radio" aria-checked="false"></button>
-                        <button class="theme-btn" data-theme="dark" title="Dark mode" aria-label="Dark mode" role="radio" aria-checked="false"></button>
+                        <button class="theme-btn" data-theme="modern" title="Modern theme" aria-label="Modern theme" role="radio" aria-checked="false"><span class="theme-label">Modern</span></button>
+                        <button class="theme-btn" data-theme="classic" title="Classical theme" aria-label="Classical theme" role="radio" aria-checked="false"><span class="theme-label">Classical</span></button>
+                        <button class="theme-btn" data-theme="futuristic" title="Futuristic theme" aria-label="Futuristic theme" role="radio" aria-checked="false"><span class="theme-label">Futuristic</span></button>
                     </div>
                     <div class="sidebar-text" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
                         <div class="avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent-light),var(--accent));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0" aria-hidden="true">@(Context.User.Identity.Name?.Substring(0,1).ToUpper()??"U")</div>
@@ -73,6 +72,7 @@
                             <span class="badge bg-danger" id="notifCount" style="display:none" aria-live="polite">0</span>
                         </a>
                         <a href="/Dashboard" class="top-bar-icon" title="Home" aria-label="Home dashboard"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i></a>
+                        <a href="/Settings" class="top-bar-icon" title="Settings" aria-label="Settings"><i class="bi bi-gear" aria-hidden="true"></i></a>
                         <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon" style="margin:0;display:inline-flex">
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
                             <select name="culture" onchange="this.form.submit()" style="background:transparent;border:1px solid var(--sidebar-text-hover,#666);border-radius:4px;color:var(--sidebar-text-hover,#ccc);font-size:12px;padding:2px 4px" title="Language" aria-label="Select language">
@@ -296,6 +296,106 @@
             });
         }
     </script>
+    <!-- Session Timeout Warning Modal (SAP-style) -->
+    @if (Context.User?.Identity?.IsAuthenticated == true)
+    {
+    <div id="sessionTimeoutModal" class="session-timeout-overlay" style="display:none">
+        <div class="session-timeout-dialog">
+            <div class="session-timeout-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <h3>Session Expiring</h3>
+            <p>Your session will expire in <span id="timeoutCountdown">60</span> seconds.</p>
+            <p class="session-timeout-sub">Would you like to continue working?</p>
+            <div class="session-timeout-actions">
+                <button type="button" class="btn-timeout btn-timeout-continue" id="sessionContinueBtn">
+                    <i class="bi bi-play-circle"></i> Continue Session
+                </button>
+                <button type="button" class="btn-timeout btn-timeout-logoff" id="sessionLogoffBtn">
+                    <i class="bi bi-box-arrow-right"></i> Log Off
+                </button>
+            </div>
+            <div class="session-timeout-progress">
+                <div class="session-timeout-progress-bar" id="timeoutProgressBar"></div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <script>
+        // ── Session Timeout Manager (SAP-style) ──
+        (function() {
+            var sessionTimer = null;
+            var warningTimer = null;
+            var countdownInterval = null;
+            var countdownSeconds = 60;
+            var isWarningActive = false;
+            var modal = document.getElementById('sessionTimeoutModal');
+            if (!modal) return;
+
+            var settings = JSON.parse(localStorage.getItem('yuktira_settings') || '{}');
+            var timeoutMinutes = settings.sessionTimeoutMinutes || 30;
+            var warningBeforeSeconds = settings.warningBeforeSeconds || 60;
+            var totalSessionMs = timeoutMinutes * 60 * 1000;
+            var warningMs = totalSessionMs - (warningBeforeSeconds * 1000);
+
+            function resetSessionTimer() {
+                clearTimeout(sessionTimer);
+                clearTimeout(warningTimer);
+                clearInterval(countdownInterval);
+                isWarningActive = false;
+                modal.style.display = 'none';
+
+                warningTimer = setTimeout(function() { showWarning(); }, warningMs);
+                sessionTimer = setTimeout(function() { window.location.href = '/Auth/Logout?reason=timeout'; }, totalSessionMs);
+            }
+
+            function showWarning() {
+                isWarningActive = true;
+                countdownSeconds = warningBeforeSeconds;
+                var countdownEl = document.getElementById('timeoutCountdown');
+                var progressEl = document.getElementById('timeoutProgressBar');
+                modal.style.display = 'flex';
+                countdownEl.textContent = countdownSeconds;
+                progressEl.style.width = '100%';
+                var startTime = Date.now();
+                var totalMs = warningBeforeSeconds * 1000;
+
+                countdownInterval = setInterval(function() {
+                    countdownSeconds = countdownSeconds - 1;
+                    countdownEl.textContent = countdownSeconds;
+                    var elapsed = Date.now() - startTime;
+                    var pct = Math.max(0, ((totalMs - elapsed) / totalMs) * 100);
+                    progressEl.style.width = pct + '%';
+                    if (countdownSeconds === 0 || countdownSeconds < 1) {
+                        clearInterval(countdownInterval);
+                        window.location.href = '/Auth/Logout?reason=timeout';
+                    }
+                }, 1000);
+            }
+
+            function continueSession() {
+                clearInterval(countdownInterval);
+                modal.style.display = 'none';
+                isWarningActive = false;
+                resetSessionTimer();
+            }
+
+            function logoff() { window.location.href = '/Auth/Logout?reason=manual'; }
+
+            document.getElementById('sessionContinueBtn').addEventListener('click', continueSession);
+            document.getElementById('sessionLogoffBtn').addEventListener('click', logoff);
+
+            ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
+                document.addEventListener(evt, function() {
+                    if (!isWarningActive) resetSessionTimer();
+                }, { passive: true });
+            });
+
+            resetSessionTimer();
+        })();
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
