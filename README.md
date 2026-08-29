@@ -264,6 +264,33 @@ API Start → PluginLoader.LoadAll()
 
 ---
 
+## Yuktira ERP vs Commercial ERP Systems
+
+Yuktira ERP delivers **85–95% of SAP S/4HANA's functional depth at 1–5% of the total cost**.
+
+| Dimension | Yuktira ERP | SAP S/4HANA | Oracle Fusion Cloud | Dynamics 365 |
+|-----------|------------|-------------|---------------------|--------------|
+| **License Cost** | **$0** (MIT) | $180–$500/user/mo | $400–$625/user/mo | $80–$210/user/mo |
+| **3-Year TCO (100 users)** | **$15K–$50K** | $850K–$2.4M | $1.8M–$5.6M | $330K–$640K |
+| **Implementation** | **Self-deploy** | $150K–$600K | $200K–$9M+ | $40K–$100K |
+| **Core Modules** | **28 modules** | ~12 core + extensions | 6 pillars | 4 core apps |
+| **AI/ML Models** | **9 built-in** | $200K+ add-on | Included ($$) | $30–50/user/mo add-on |
+| **SOX Compliance** | **Built-in** | $200K+ GRC module | Included ($$) | Partner add-ons |
+| **Time to Value** | **Days–weeks** | 6–18 months | 12–24 months | 3–6 months |
+
+**Key advantages over commercial ERPs:**
+- Zero license cost, zero vendor lock-in (PostgreSQL, .NET 10, MIT license)
+- 9 AI/ML forecasting models included (commercial ERPs charge $200K+)
+- SOX-compliant immutable audit trail with SHA-256 hash chain built-in
+- Real-time SignalR dashboards, event-driven MRP (vs batch in commercial)
+- Full source code access — customize without vendor approval
+- GraphQL API (HotChocolate 15) — more flexible than REST/OData
+- Mobile RF framework, wave pick, velocity slotting built-in (commercial: separate $ modules)
+
+**Full comparison:** [docs/erp-comparison.md](docs/erp-comparison.md)
+
+---
+
 ## Module Overview
 
 ### MM — Materials Management
