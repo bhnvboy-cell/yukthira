@@ -1,184 +1,271 @@
 @page
 @model YuktiraERP.Web.Pages.MM.IndexModel
-@using YuktiraERP.Infrastructure.Data.Entities
+@using YuktiraERP.Web.ViewModels
 @{
     ViewData["Title"] = "Materials Management";
-    var materials = Model.Materials;
-    var vendors = Model.Vendors;
-    var prs = Model.PurchaseRequisitions;
-    var pos = Model.PurchaseOrders;
-    var grns = Model.GoodsReceipts;
-    var stocks = Model.StockItems;
-    var invoices = Model.InvoiceVerifications;
-    var batches = Model.Batches;
+
+    var allMaterials = Model.Materials;
+    var allVendors = Model.Vendors;
+    var allPRs = Model.PurchaseRequisitions;
+    var allPOs = Model.PurchaseOrders;
+    var allGRNs = Model.GoodsReceipts;
+    var allStock = Model.StockItems;
+    var allBatches = Model.Batches;
+    var allInvoices = Model.InvoiceVerifications;
+
+    var vm = new ModuleLayoutViewModel
+    {
+        ModuleTitle = "Materials Management",
+        ModuleCode = "MM",
+        Kpis = new List<KpiCard>
+        {
+            new() { Label = "Total Materials", Value = allMaterials.Count.ToString(), Subtext = "Active master data", Type = "blue" },
+            new() { Label = "Vendors", Value = allVendors.Count.ToString(), Subtext = "Registered suppliers", Type = "teal" },
+            new() { Label = "Open PRs", Value = allPRs.Count(p => p.Status == "Draft" || p.Status == "Pending").ToString(), Subtext = "Awaiting approval", Type = "amber" },
+            new() { Label = "Open POs", Value = allPOs.Count(p => p.Status != "Completed" && p.Status != "Cancelled").ToString(), Subtext = "In process", Type = "green" },
+            new() { Label = "Stock Items", Value = allStock.Count.ToString(), Subtext = "Inventory positions", Type = "purple" },
+            new() { Label = "Batches", Value = allBatches.Count.ToString(), Subtext = "Tracked lots", Type = "red" }
+        },
+        Tabs = new List<TabItem>
+        {
+            new() { Key = "materials", Label = "Materials", Count = allMaterials.Count,
+                PrimaryAction = new PrimaryAction { Label = "Create Material", Href = "/MM/Material/Create", Icon = "bi-plus-lg" } },
+            new() { Key = "vendors", Label = "Vendors", Count = allVendors.Count,
+                PrimaryAction = new PrimaryAction { Label = "Create Vendor", Href = "/MM/Vendor/Create", Icon = "bi-plus-lg" } },
+            new() { Key = "pr", Label = "Purchase Requisitions", Count = allPRs.Count,
+                PrimaryAction = new PrimaryAction { Label = "Create Requisition", Href = "/MM/PR/Create", Icon = "bi-plus-lg" } },
+            new() { Key = "po", Label = "Purchase Orders", Count = allPOs.Count,
+                PrimaryAction = new PrimaryAction { Label = "Create Purchase Order", Href = "/MM/PO/Create", Icon = "bi-plus-lg" } },
+            new() { Key = "grn", Label = "Goods Receipts", Count = allGRNs.Count,
+                PrimaryAction = new PrimaryAction { Label = "Create Goods Receipt", Href = "/MM/GRN/Create", Icon = "bi-plus-lg" } },
+            new() { Key = "stock", Label = "Stock Overview", Count = allStock.Count },
+            new() { Key = "batches", Label = "Batches", Count = allBatches.Count },
+            new() { Key = "invoices", Label = "Invoice Verification", Count = allInvoices.Count,
+                PrimaryAction = new PrimaryAction { Label = "Post Invoice", Href = "/MM/InvoiceVerification/Create", Icon = "bi-plus-lg" } }
+        },
+        ActiveTab = "materials",
+        GridTabs = new List<GridTab>
+        {
+            new()
+            {
+                Key = "materials",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "code", Label = "Material #", Align = "left" },
+                    new() { Key = "name", Label = "Description", Align = "left" },
+                    new() { Key = "type", Label = "Type", Align = "center" },
+                    new() { Key = "uom", Label = "UOM", Align = "center" },
+                    new() { Key = "stock", Label = "Stock", Align = "right" },
+                    new() { Key = "price", Label = "Price", Type = "currency", Align = "right" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" }
+                },
+                Rows = allMaterials.Select(m => new Dictionary<string, string?>
+                {
+                    { "id", m.Id.ToString() },
+                    { "code", m.Code },
+                    { "name", m.Name },
+                    { "type", m.Type },
+                    { "uom", m.UOM },
+                    { "stock", m.Stock.ToString() },
+                    { "price", m.Price.ToString() },
+                    { "status", m.Status }
+                }).ToList(),
+                ViewHref = r => $"/MM/Material/Display?id={r["id"]}",
+                EditHref = r => $"/MM/Material/Edit?id={r["id"]}"
+            },
+            new()
+            {
+                Key = "vendors",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "code", Label = "Vendor Code", Align = "left" },
+                    new() { Key = "name", Label = "Name", Align = "left" },
+                    new() { Key = "taxId", Label = "Tax ID", Align = "left" },
+                    new() { Key = "paymentTerms", Label = "Payment Terms", Align = "center" },
+                    new() { Key = "phone", Label = "Phone", Align = "left" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" }
+                },
+                Rows = allVendors.Select(v => new Dictionary<string, string?>
+                {
+                    { "id", v.Id.ToString() },
+                    { "code", v.Code },
+                    { "name", v.Name },
+                    { "taxId", v.TaxId },
+                    { "paymentTerms", v.PaymentTerms },
+                    { "phone", v.Phone },
+                    { "status", v.Status }
+                }).ToList(),
+                ViewHref = r => $"/MM/Vendor/Display?id={r["id"]}",
+                EditHref = r => $"/MM/Vendor/Edit?id={r["id"]}"
+            },
+            new()
+            {
+                Key = "pr",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "prNumber", Label = "PR Number", Align = "left" },
+                    new() { Key = "itemName", Label = "Item", Align = "left" },
+                    new() { Key = "requestor", Label = "Requestor", Align = "left" },
+                    new() { Key = "quantity", Label = "Qty", Align = "right" },
+                    new() { Key = "totalAmount", Label = "Amount", Type = "currency", Align = "right" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
+                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
+                },
+                Rows = allPRs.Select(p => new Dictionary<string, string?>
+                {
+                    { "id", p.Id.ToString() },
+                    { "prNumber", p.PrNumber },
+                    { "itemName", p.ItemName },
+                    { "requestor", p.Requestor },
+                    { "quantity", p.Quantity },
+                    { "totalAmount", p.TotalAmount.ToString() },
+                    { "status", p.Status },
+                    { "date", p.Date.ToString("yyyy-MM-dd") }
+                }).ToList(),
+                ViewHref = r => $"/MM/PR/Display?id={r["id"]}",
+                EditHref = r => $"/MM/PR/Edit?id={r["id"]}"
+            },
+            new()
+            {
+                Key = "po",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "poNumber", Label = "PO Number", Align = "left" },
+                    new() { Key = "vendorName", Label = "Vendor", Align = "left" },
+                    new() { Key = "itemName", Label = "Item", Align = "left" },
+                    new() { Key = "totalAmount", Label = "Amount", Type = "currency", Align = "right" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
+                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
+                },
+                Rows = allPOs.Select(p => new Dictionary<string, string?>
+                {
+                    { "id", p.Id.ToString() },
+                    { "poNumber", p.PoNumber },
+                    { "vendorName", p.VendorName },
+                    { "itemName", p.ItemName },
+                    { "totalAmount", p.TotalAmount.ToString() },
+                    { "status", p.Status },
+                    { "date", p.Date.ToString("yyyy-MM-dd") }
+                }).ToList(),
+                ViewHref = r => $"/MM/PO/Display?id={r["id"]}",
+                EditHref = r => $"/MM/PO/Edit?id={r["id"]}"
+            },
+            new()
+            {
+                Key = "grn",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "grnNumber", Label = "GRN Number", Align = "left" },
+                    new() { Key = "poNumber", Label = "PO Reference", Align = "left" },
+                    new() { Key = "materialName", Label = "Material", Align = "left" },
+                    new() { Key = "qtyReceived", Label = "Qty Received", Align = "right" },
+                    new() { Key = "qtyAccepted", Label = "Qty Accepted", Align = "right" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
+                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
+                },
+                Rows = allGRNs.Select(g => new Dictionary<string, string?>
+                {
+                    { "id", g.Id.ToString() },
+                    { "grnNumber", g.GrnNumber },
+                    { "poNumber", g.PoNumber },
+                    { "materialName", g.MaterialName },
+                    { "qtyReceived", g.QtyReceived },
+                    { "qtyAccepted", g.QtyAccepted },
+                    { "status", g.Status },
+                    { "date", g.Date.ToString("yyyy-MM-dd") }
+                }).ToList(),
+                ViewHref = r => $"/MM/GRN/Display?id={r["id"]}",
+                EditHref = r => $"/MM/GRN/Edit?id={r["id"]}"
+            },
+            new()
+            {
+                Key = "stock",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "bin", Label = "Bin", Align = "left" },
+                    new() { Key = "materialName", Label = "Material", Align = "left" },
+                    new() { Key = "lot", Label = "Lot", Align = "center" },
+                    new() { Key = "quantity", Label = "Quantity", Align = "right" },
+                    new() { Key = "uom", Label = "UOM", Align = "center" },
+                    new() { Key = "value", Label = "Value", Type = "currency", Align = "right" },
+                    new() { Key = "minMax", Label = "Min / Max", Align = "center" }
+                },
+                Rows = allStock.Select(s => new Dictionary<string, string?>
+                {
+                    { "id", s.Id.ToString() },
+                    { "bin", s.Bin },
+                    { "materialName", s.MaterialName },
+                    { "lot", s.Lot },
+                    { "quantity", s.Quantity.ToString() },
+                    { "uom", s.UOM },
+                    { "value", s.Value.ToString() },
+                    { "minMax", $"{s.MinStock} / {s.MaxStock}" }
+                }).ToList(),
+                ViewHref = null,
+                EditHref = null
+            },
+            new()
+            {
+                Key = "batches",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "batchNumber", Label = "Batch #", Align = "left" },
+                    new() { Key = "materialName", Label = "Material", Align = "left" },
+                    new() { Key = "quantity", Label = "Quantity", Align = "right" },
+                    new() { Key = "manufacturingDate", Label = "Mfg Date", Type = "date", Align = "left" },
+                    new() { Key = "expiryDate", Label = "Expiry", Type = "date", Align = "left" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" }
+                },
+                Rows = allBatches.Select(b => new Dictionary<string, string?>
+                {
+                    { "id", b.Id.ToString() },
+                    { "batchNumber", b.BatchNumber },
+                    { "materialName", b.MaterialName },
+                    { "quantity", b.Quantity.ToString() },
+                    { "manufacturingDate", b.ManufacturingDate.ToString("yyyy-MM-dd") },
+                    { "expiryDate", b.ExpiryDate?.ToString("yyyy-MM-dd") ?? "" },
+                    { "status", b.Status }
+                }).ToList(),
+                ViewHref = r => $"/MM/Batch/Display?id={r["id"]}",
+                EditHref = null
+            },
+            new()
+            {
+                Key = "invoices",
+                Columns = new List<GridColumn>
+                {
+                    new() { Key = "invoiceNumber", Label = "Invoice #", Align = "left" },
+                    new() { Key = "vendorName", Label = "Vendor", Align = "left" },
+                    new() { Key = "poNumber", Label = "PO Reference", Align = "left" },
+                    new() { Key = "amount", Label = "Amount", Type = "currency", Align = "right" },
+                    new() { Key = "matchedAmount", Label = "Matched", Type = "currency", Align = "right" },
+                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
+                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
+                },
+                Rows = allInvoices.Select(i => new Dictionary<string, string?>
+                {
+                    { "id", i.Id.ToString() },
+                    { "invoiceNumber", i.InvoiceNumber },
+                    { "vendorName", i.VendorName },
+                    { "poNumber", i.PoNumber },
+                    { "amount", i.Amount.ToString() },
+                    { "matchedAmount", i.MatchedAmount.ToString() },
+                    { "status", i.Status },
+                    { "date", i.Date.ToString("yyyy-MM-dd") }
+                }).ToList(),
+                ViewHref = r => $"/MM/InvoiceVerification/Display?id={r["id"]}",
+                EditHref = r => $"/MM/InvoiceVerification/Edit?id={r["id"]}"
+            }
+        }
+    };
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-boxes me-2"></i>Materials Management</h2>
-    <div>
-        <a asp-page="/MM/Material/Create" class="btn btn-primary"><i class="bi bi-plus"></i> Create Material</a>
-        <button class="btn btn-outline-secondary" onclick="alert('Export')"><i class="bi bi-download"></i> Export</button>
-    </div>
-</div>
-<ul class="nav nav-tabs mb-3" id="mmTabs">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#materials">Material Masters</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vendors">Vendors</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#pr">Purchase Requisitions</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#po">Purchase Orders</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#grn">Goods Receipts</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#stock">Stock Overview</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#batch">Batches</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invverif">Invoice Verification</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="materials">
-        <div class="card"><div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-sm datatable">
-                    <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>UOM</th><th>Stock</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody>
-                        @foreach (var m in materials)
-                        {
-                            <tr>
-                                <td>@m.Code</td><td>@m.Name</td><td>@m.Type</td><td>@m.UOM</td><td>@m.Stock</td><td>@m.Price.ToString("C2")</td>
-                                <td><span class="badge @(m.Status=="Active"?"bg-success":m.Status=="Low Stock"?"bg-warning":"bg-secondary")">@m.Status</span></td>
-                                <td><a asp-page="/MM/Edit" asp-route-code="@m.Code" class="bi bi-pencil me-2 text-decoration-none"></a></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="vendors">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/MM/Vendor/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Vendor</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Code</th><th>Name</th><th>Tax ID</th><th>Payment Terms</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var v in vendors)
-                    {
-                        <tr>
-                            <td>@v.Code</td><td>@v.Name</td><td>@v.TaxId</td><td>@v.PaymentTerms</td><td>@v.Phone</td>
-                            <td><span class="badge @(v.Status=="Active"?"bg-success":"bg-warning")">@v.Status</span></td>
-                            <td><i class="bi bi-pencil me-2"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="pr">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/MM/PR/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Requisition</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>PR #</th><th>Date</th><th>Requestor</th><th>Item</th><th>Qty</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var r in prs)
-                    {
-                        <tr>
-                            <td>@r.PrNumber</td><td>@r.Date.ToString("d")</td><td>@r.Requestor</td><td>@r.ItemName</td><td>@r.Quantity</td><td>@r.Amount.ToString("C2")</td>
-                            <td><span class="badge bg-info">@r.Status</span></td>
-                            <td><i class="bi bi-pencil me-2"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="po">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/MM/PO/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New PO</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>PO #</th><th>Date</th><th>Vendor</th><th>Item</th><th>Qty</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var o in pos)
-                    {
-                        <tr>
-                            <td>@o.PoNumber</td><td>@o.Date.ToString("d")</td><td>@o.VendorName</td><td>@o.ItemName</td><td>@o.Quantity</td><td>@o.Amount.ToString("C2")</td>
-                            <td><span class="badge @(o.Status=="Approved"?"bg-success":"bg-warning")">@o.Status</span></td>
-                            <td><i class="bi bi-eye me-2"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="grn">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/MM/GRN/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New GRN</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>GRN #</th><th>Date</th><th>PO #</th><th>Material</th><th>Qty Received</th><th>Qty Accepted</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var g in grns)
-                    {
-                        <tr>
-                            <td>@g.GrnNumber</td><td>@g.Date.ToString("d")</td><td>@g.PoNumber</td><td>@g.MaterialName</td><td>@g.QtyReceived</td><td>@g.QtyAccepted</td>
-                            <td><span class="badge @(g.Status=="Posted"?"bg-success":"bg-warning")">@g.Status</span></td>
-                            <td><i class="bi bi-eye"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="stock">
-        <div class="card"><div class="card-body">
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Bin</th><th>Material</th><th>Lot</th><th>Qty</th><th>UOM</th><th>Value</th><th>Min</th><th>Max</th><th>Re-Order</th></tr></thead>
-                <tbody>
-                    @foreach (var s in stocks)
-                    {
-                        <tr>
-                            <td>@s.Bin</td><td>@s.MaterialName</td><td>@s.Lot</td><td>@s.Quantity</td><td>@s.UOM</td><td>@s.Value.ToString("C2")</td><td>@s.MinStock</td><td>@s.MaxStock</td>
-                            <td>                    @if (s.Quantity <= s.MinStock) { <i class="bi bi-exclamation-triangle text-warning"></i> } else { <i class="bi bi-check-circle text-success"></i> }</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="batch">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/MM/Batch/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Batch</a> <a asp-page="/MM/Batch/List" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list"></i> View All</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Batch #</th><th>Material</th><th>Mfg Date</th><th>Expiry</th><th>Qty</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var b in batches.Take(10))
-                    {
-                        <tr>
-                            <td><a asp-page="/MM/Batch/Display" asp-route-id="@b.Id">@b.BatchNumber</a></td>
-                            <td>@b.MaterialName</td>
-                            <td>@b.ManufacturingDate.ToString("d")</td>
-                            <td>@(b.ExpiryDate?.ToString("d") ?? "N/A")</td>
-                            <td>@b.Quantity</td>
-                            <td>
-                                @if (b.Status == "ACTIVE") { <span class="badge bg-success">Active</span> }
-                                else if (b.Status == "EXPIRED") { <span class="badge bg-danger">Expired</span> }
-                                else { <span class="badge bg-secondary">@b.Status</span> }
-                            </td>
-                            <td><a asp-page="/MM/Batch/Display" asp-route-id="@b.Id" class="bi bi-eye me-2 text-decoration-none"></a><a asp-page="/MM/Batch/Traceability" asp-route-id="@b.Id" class="bi bi-diagram-3 text-decoration-none" title="Trace"></a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="invverif">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/MM/InvoiceVerification/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Invoice</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Invoice #</th><th>Date</th><th>PO #</th><th>Vendor</th><th>Amount</th><th>Matched</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var v in invoices)
-                    {
-                        <tr>
-                            <td>@v.InvoiceNumber</td><td>@v.Date.ToString("d")</td><td>@v.PoNumber</td><td>@v.VendorName</td><td>@v.Amount.ToString("C2")</td><td>@v.MatchedAmount.ToString("C2")</td>
-                            <td><span class="badge @(v.Status=="Matched"?"bg-success":v.Status=="Variance"?"bg-danger":"bg-warning")">@v.Status</span></td>
-                            <td><i class="bi bi-eye"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
+}
+
+<partial name="_ModuleLayout" model="vm" />
+
+@section Scripts {
+    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+}

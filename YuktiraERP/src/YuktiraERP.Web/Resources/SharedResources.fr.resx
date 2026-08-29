@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>Yuktira ERP</value></data>
+  <data name="Home" xml:space="preserve"><value>Accueil</value></data>
+  <data name="Settings" xml:space="preserve"><value>Paramètres</value></data>
+  <data name="Logout" xml:space="preserve"><value>Déconnexion</value></data>
+  <data name="Notifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="Search" xml:space="preserve"><value>Rechercher</value></data>
+  <data name="Print" xml:space="preserve"><value>Imprimer / Sauvegarder en PDF</value></data>
+  <data name="SessionExpiring" xml:space="preserve"><value>Session expirant</value></data>
+  <data name="SessionExpireMsg" xml:space="preserve"><value>Votre session expirera dans {0} secondes.</value></data>
+  <data name="SessionContinueQ" xml:space="preserve"><value>Voulez-vous continuer à travailler?</value></data>
+  <data name="ContinueSession" xml:space="preserve"><value>Continuer la session</value></data>
+  <data name="LogOff" xml:space="preserve"><value>Déconnexion</value></data>
+  <data name="Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Update" xml:space="preserve"><value>Mettre à jour</value></data>
+  <data name="Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Create" xml:space="preserve"><value>Créer</value></data>
+  <data name="Back" xml:space="preserve"><value>Retour</value></data>
+  <data name="Edit" xml:space="preserve"><value>Modifier</value></data>
+  <data name="View" xml:space="preserve"><value>Voir</value></data>
+  <data name="Export" xml:space="preserve"><value>Exporter</value></data>
+  <data name="Submit" xml:space="preserve"><value>Soumettre</value></data>
+  <data name="Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Yes" xml:space="preserve"><value>Oui</value></data>
+  <data name="No" xml:space="preserve"><value>Non</value></data>
+  <data name="ConfirmDelete" xml:space="preserve"><value>Supprimer cet enregistrement?</value></data>
+  <data name="NoRecords" xml:space="preserve"><value>Aucun enregistrement trouvé</value></data>
+  <data name="WelcomeBack" xml:space="preserve"><value>Bienvenue,</value></data>
+  <data name="SelectModule" xml:space="preserve"><value>Sélectionnez un module pour commencer</value></data>
+  <data name="PinnedModules" xml:space="preserve"><value>Modules épinglés</value></data>
+  <data name="RecentlyUsed" xml:space="preserve"><value>Récemment utilisés</value></data>
+  <data name="All" xml:space="preserve"><value>Tous</value></data>
+  <data name="SearchModules" xml:space="preserve"><value>Rechercher des modules...</value></data>
+  <data name="RealTimeActivity" xml:space="preserve"><value>Activité en temps réel</value></data>
+  <data name="WaitingUpdates" xml:space="preserve"><value>En attente de mises à jour en direct...</value></data>
+  <data name="Live" xml:space="preserve"><value>En direct</value></data>
+  <data name="Theme" xml:space="preserve"><value>Thème</value></data>
+  <data name="ThemeDesc" xml:space="preserve"><value>Choisissez votre style de mise en page préféré.</value></data>
+  <data name="SessionTimeout" xml:space="preserve"><value>Expiration de session</value></data>
+  <data name="SessionTimeoutDesc" xml:space="preserve"><value>Configurez la déconnexion automatique après inactivité.</value></data>
+  <data name="SessionDuration" xml:space="preserve"><value>Durée de session (minutes)</value></data>
+  <data name="WarningBefore" xml:space="preserve"><value>Avertissement avant (secondes)</value></data>
+  <data name="General" xml:space="preserve"><value>Général</value></data>
+  <data name="Language" xml:space="preserve"><value>Langue</value></data>
+  <data name="SidebarBehavior" xml:space="preserve"><value>Comportement de la barre latérale</value></data>
+  <data name="Animations" xml:space="preserve"><value>Animations</value></data>
+  <data name="Saved" xml:space="preserve"><value>Enregistré</value></data>
+  <data name="Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Status" xml:space="preserve"><value>Statut</value></data>
+  <data name="Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Code" xml:space="preserve"><value>Code</value></data>
+  <data name="Name" xml:space="preserve"><value>Nom</value></data>
+  <data name="Quantity" xml:space="preserve"><value>Quantité</value></data>
+  <data name="Amount" xml:space="preserve"><value>Montant</value></data>
+  <data name="Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Price" xml:space="preserve"><value>Prix</value></data>
+  <data name="Stock" xml:space="preserve"><value>Stock</value></data>
+  <data name="UOM" xml:space="preserve"><value>Unité</value></data>
+  <data name="Active" xml:space="preserve"><value>Actif</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Inactif</value></data>
+  <data name="Pending" xml:space="preserve"><value>En attente</value></data>
+  <data name="Approved" xml:space="preserve"><value>Approuvé</value></data>
+  <data name="Rejected" xml:space="preserve"><value>Rejeté</value></data>
+  <data name="Draft" xml:space="preserve"><value>Brouillon</value></data>
+  <data name="Completed" xml:space="preserve"><value>Terminé</value></data>
+  <data name="Cancelled" xml:space="preserve"><value>Annulé</value></data>
+  <data name="LowStock" xml:space="preserve"><value>Stock bas</value></data>
+  <data name="MaterialsManagement" xml:space="preserve"><value>Gestion des matériaux</value></data>
+  <data name="SalesDistribution" xml:space="preserve"><value>Ventes &amp; Distribution</value></data>
+  <data name="ProductionPlanning" xml:space="preserve"><value>Planification de production</value></data>
+  <data name="CreateMaterial" xml:space="preserve"><value>Créer un matériau</value></data>
+  <data name="CreateVendor" xml:space="preserve"><value>Créer un fournisseur</value></data>
+  <data name="CreateSalesOrder" xml:space="preserve"><value>Créer une commande</value></data>
+  <data name="CreatePurchaseOrder" xml:space="preserve"><value>Créer un bon de commande</value></data>
+  <data name="CreateProductionOrder" xml:space="preserve"><value>Nouvel ordre de production</value></data>
+  <data name="StockOverview" xml:space="preserve"><value>Aperçu du stock</value></data>
+  <data name="NoMatchesFound" xml:space="preserve"><value>Aucune correspondance</value></data>
+  <data name="SignIn" xml:space="preserve"><value>Connexion</value></data>
+  <data name="ClientNumber" xml:space="preserve"><value>Numéro client</value></data>
+  <data name="UserId" xml:space="preserve"><value>Identifiant</value></data>
+  <data name="Password" xml:space="preserve"><value>Mot de passe</value></data>
+  <data name="SkipToContent" xml:space="preserve"><value>Aller au contenu principal</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Recherche de transactions... (Ctrl+K)</value></data>
+  <data name="ToggleDarkMode" xml:space="preserve"><value>Basculer le mode sombre</value></data>
+  <data name="SelectLanguage" xml:space="preserve"><value>Choisir la langue</value></data>
+</root>

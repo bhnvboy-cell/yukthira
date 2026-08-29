@@ -1,25 +1,213 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.FI.FixedAsset.CreateModel
-@{ ViewData["Title"] = "New Fixed Asset"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Fixed Asset</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Asset.AssetName" class="form-label"></label><input asp-for="Asset.AssetName" class="form-control" /><span asp-validation-for="Asset.AssetName" class="text-danger small"></span></div>
-<div class="col-md-3"><label asp-for="Asset.Category" class="form-label"></label><select asp-for="Asset.Category" class="form-select"><option value="Equipment">Equipment</option><option value="Machinery">Machinery</option><option value="Vehicles">Vehicles</option><option value="Property">Property</option><option value="IT">IT</option><option value="Furniture">Furniture</option></select></div>
-<div class="col-md-3"><label asp-for="Asset.Status" class="form-label"></label><select asp-for="Asset.Status" class="form-select"><option value="Active">Active</option><option value="Under Maintenance">Under Maintenance</option><option value="Disposed">Disposed</option></select></div>
+@{ ViewData["Title"] = "Create Fixed Asset"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-pc-display"></i></div>
+        <div class="banner-info">
+            <h5>Create Fixed Asset</h5>
+            <span>AS01 — Asset Master</span>
+        </div>
+        <div class="banner-meta">
+            Company Code: 1000<br />Asset Class: 1500
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Asset.Status" value="Active" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="general">
+                <i class="bi bi-info-circle tab-icon"></i> General Data
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="depreciation">
+                <i class="bi bi-graph-down-arrow tab-icon"></i> Depreciation
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="valuation">
+                <i class="bi bi-currency-dollar tab-icon"></i> Valuation
+            </button>
+        </div>
+
+        <!-- ═══ TAB: General Data ═══ -->
+        <div class="ent-form-panel active" data-panel="general">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Asset Identification</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Asset Code</label>
+                        <input asp-for="Asset.AssetCode" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field" style="grid-column: span 2">
+                        <label>Asset Name <span class="required">*</span></label>
+                        <input asp-for="Asset.AssetName" class="form-control" placeholder="Asset description" />
+                        <span asp-validation-for="Asset.AssetName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Classification</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Asset Category <span class="required">*</span></label>
+                        <select asp-for="Asset.Category" class="form-select">
+                            <option value="Equipment">Equipment</option>
+                            <option value="Machinery">Machinery</option>
+                            <option value="Vehicles">Vehicles</option>
+                            <option value="Property">Property</option>
+                            <option value="IT">IT Equipment</option>
+                            <option value="Furniture">Furniture & Fixtures</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Asset Class</label>
+                        <select class="form-select">
+                            <option value="1500">1500 — Machinery & Equipment</option>
+                            <option value="1600">1600 — Vehicles</option>
+                            <option value="1700">1700 — IT Equipment</option>
+                            <option value="1800">1800 — Buildings</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <select asp-for="Asset.Status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                            <option value="Disposed">Disposed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-geo-alt"></i><h6>Location & Assignment</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Location</label>
+                        <input type="text" class="form-control" placeholder="e.g. Building A, Floor 2" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Cost Center</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="CC-1000">CC-1000 — Production</option>
+                            <option value="CC-2000">CC-2000 — Administration</option>
+                            <option value="CC-3000">CC-3000 — R&D</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Responsible Person</label>
+                        <input type="text" class="form-control" placeholder="Name" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Depreciation ═══ -->
+        <div class="ent-form-panel" data-panel="depreciation">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-graph-down-arrow"></i><h6>Depreciation Method</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Depreciation Method</label>
+                        <select class="form-select">
+                            <option value="Straight Line">Straight Line (SLM)</option>
+                            <option value="Declining Balance">Declining Balance (WDV)</option>
+                            <option value="Double Declining">Double Declining Balance</option>
+                            <option value="Sum of Years">Sum of Years Digits</option>
+                            <option value="Units of Production">Units of Production</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Useful Life (Years) <span class="required">*</span></label>
+                        <input asp-for="Asset.UsefulLifeYears" class="form-control" min="1" max="50" step="1" />
+                        <span asp-validation-for="Asset.UsefulLifeYears" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Depreciation Start Date</label>
+                        <input type="date" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-calculator"></i><h6>Depreciation Details</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Depreciation Period</label>
+                        <select class="form-select">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Depr. Key</label>
+                        <select class="form-select">
+                            <option value="LINE">LINE — Straight Line</option>
+                            <option value="WDV">WDV — Written Down Value</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Useful Life (Months)</label>
+                        <input type="number" class="form-control" min="1" value="12" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Valuation ═══ -->
+        <div class="ent-form-panel" data-panel="valuation">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-currency-dollar"></i><h6>Acquisition Value</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Purchase Date <span class="required">*</span></label>
+                        <input asp-for="Asset.PurchaseDate" class="form-control" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Acquisition Cost <span class="required">*</span></label>
+                        <input asp-for="Asset.Cost" class="form-control" min="0" step="0.01" />
+                        <span asp-validation-for="Asset.Cost" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Salvage / Residual Value</label>
+                        <input asp-for="Asset.SalvageValue" class="form-control" min="0" step="0.01" />
+                        <span asp-validation-for="Asset.SalvageValue" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-cash-stack"></i><h6>Current Values</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Accumulated Depreciation</label>
+                        <input type="number" class="form-control" min="0" step="0.01" value="0" readonly />
+                    </div>
+                    <div class="ent-field">
+                        <label>Net Book Value</label>
+                        <input type="number" class="form-control" min="0" step="0.01" value="0" readonly />
+                    </div>
+                    <div class="ent-field">
+                        <label>Currency</label>
+                        <select class="form-select">
+                            <option value="USD">USD — US Dollar</option>
+                            <option value="INR">INR — Indian Rupee</option>
+                            <option value="EUR">EUR — Euro</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Asset records are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/FI/FixedAsset/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Asset</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Asset.PurchaseDate" class="form-label"></label><input asp-for="Asset.PurchaseDate" class="form-control" type="date" /></div>
-<div class="col-md-4"><label asp-for="Asset.Cost" class="form-label"></label><input asp-for="Asset.Cost" class="form-control" min="0" step="0.01" /><span asp-validation-for="Asset.Cost" class="text-danger small"></span></div>
-<div class="col-md-4"><label asp-for="Asset.SalvageValue" class="form-label"></label><input asp-for="Asset.SalvageValue" class="form-control" min="0" step="0.01" /><span asp-validation-for="Asset.SalvageValue" class="text-danger small"></span></div>
-</div>
-<div class="row mb-4">
-<div class="col-md-4"><label asp-for="Asset.UsefulLifeYears" class="form-label"></label><input asp-for="Asset.UsefulLifeYears" class="form-control" min="1" max="50" step="1" /><span asp-validation-for="Asset.UsefulLifeYears" class="text-danger small"></span></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/FI/FixedAsset/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

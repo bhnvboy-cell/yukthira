@@ -1,20 +1,220 @@
 @page
 @model YuktiraERP.Web.Pages.SD.SalesOrder.CreateModel
 @{ ViewData["Title"] = "Create Sales Order"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Sales Order</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Order.CustomerName" class="form-label"></label><input asp-for="Order.CustomerName" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Order.ItemCount" class="form-label"></label><input asp-for="Order.ItemCount" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Order.Amount" class="form-label"></label><input asp-for="Order.Amount" class="form-control" /></div>
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-receipt"></i></div>
+        <div class="banner-info">
+            <h5>Create Sales Order</h5>
+            <span>VA01 — Sales Order</span>
+        </div>
+        <div class="banner-meta">
+            Sales Org: SO01<br />Dist. Channel: 10
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Order.Status" value="Pending" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="header">
+                <i class="bi bi-person tab-icon"></i> Sold-To / Header
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="items">
+                <i class="bi bi-list-ul tab-icon"></i> Items
+                <span class="tab-badge" id="lineCountBadge">0</span>
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="org">
+                <i class="bi bi-diagram-3 tab-icon"></i> Organization
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Sold-To / Header ═══ -->
+        <div class="ent-form-panel active" data-panel="header">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Customer Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Order Number</label>
+                        <input class="form-control" value="Auto-generated" readonly />
+                    </div>
+                    <div class="ent-field">
+                        <label>Order Date</label>
+                        <input asp-for="Order.OrderDate" class="form-control" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Sold-To Party <span class="required">*</span></label>
+                        <input asp-for="Order.CustomerName" class="form-control" placeholder="Customer name or code" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-geo-alt"></i><h6>Ship-To & Bill-To</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Ship-To Party</label>
+                        <input type="text" class="form-control" placeholder="Ship-to address" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Bill-To Party</label>
+                        <input type="text" class="form-control" placeholder="Bill-to address" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Payment Terms</label>
+                        <select class="form-select">
+                            <option value="Net 30">Net 30</option>
+                            <option value="Net 45">Net 45</option>
+                            <option value="Net 60">Net 60</option>
+                            <option value="Due on Receipt">Due on Receipt</option>
+                            <option value="2/10 Net 30">2/10 Net 30</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Items ═══ -->
+        <div class="ent-form-panel" data-panel="items">
+            <div class="ent-line-items-wrap">
+                <div class="ent-line-items-header">
+                    <h6><i class="bi bi-list-ul"></i> Sales Order Items — <span class="line-count">0</span> lines</h6>
+                    <button type="button" class="btn btn-outline-success btn-sm ent-add-line-btn" data-target="soLineTable">
+                        <i class="bi bi-plus"></i> Add Item
+                    </button>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="ent-line-items-table" id="soLineTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Material</th>
+                                <th>Description</th>
+                                <th>Plant</th>
+                                <th>SLOC</th>
+                                <th>Qty</th>
+                                <th>UOM</th>
+                                <th>Unit Price</th>
+                                <th>Disc %</th>
+                                <th style="text-align:right">Line Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.LineItems.Count; i++)
+                            {
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td><input asp-for="LineItems[i].MaterialName" class="form-control form-control-sm line-material" placeholder="MAT-001" /></td>
+                                    <td><input type="text" class="form-control form-control-sm" placeholder="Description" /></td>
+                                    <td><input type="text" class="form-control form-control-sm" value="1000" /></td>
+                                    <td><input type="text" class="form-control form-control-sm" value="SL01" /></td>
+                                    <td><input asp-for="LineItems[i].Quantity" class="form-control form-control-sm line-qty" type="number" step="0.01" min="0" /></td>
+                                    <td><select asp-for="LineItems[i].UOM" class="form-select form-select-sm"><option>EA</option><option>KG</option><option>LB</option><option>M</option><option>L</option></select></td>
+                                    <td><input asp-for="LineItems[i].UnitPrice" class="form-control form-control-sm line-price" type="number" step="0.01" min="0" /></td>
+                                    <td><input type="number" class="form-control form-control-sm line-discount" step="0.01" min="0" max="100" value="0" /></td>
+                                    <td class="line-total">0.00</td>
+                                    <td><button type="button" class="line-remove" onclick="removeLineItem(this)" title="Remove"><i class="bi bi-trash"></i></button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ent-totals-bar">
+                    <div class="total-item">
+                        <span class="total-label">Lines:</span>
+                        <span class="total-value line-count">0</span>
+                    </div>
+                    <div class="total-item">
+                        <span class="total-label">Net Value:</span>
+                        <span class="total-value grand-total">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Organization ═══ -->
+        <div class="ent-form-panel" data-panel="org">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Sales Area</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Sales Organization</label>
+                        <select class="form-select">
+                            <option value="SO01">SO01 — Domestic Sales</option>
+                            <option value="SO02">SO02 — Export Sales</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Distribution Channel</label>
+                        <select class="form-select">
+                            <option value="10">10 — Direct Sales</option>
+                            <option value="20">20 — Wholesale</option>
+                            <option value="30">30 — Retail</option>
+                            <option value="40">40 — E-Commerce</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Division</label>
+                        <select class="form-select">
+                            <option value="01">01 — Main Division</option>
+                            <option value="02">02 — Secondary</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-truck"></i><h6>Shipping & Delivery</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Incoterms</label>
+                        <select class="form-select">
+                            <option value="FOB">FOB — Free on Board</option>
+                            <option value="CIF">CIF — Cost, Insurance & Freight</option>
+                            <option value="EXW">EXW — Ex Works</option>
+                            <option value="DDP">DDP — Delivered Duty Paid</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Shipping Point</label>
+                        <select class="form-select">
+                            <option value="SP01">SP01 — Main Warehouse</option>
+                            <option value="SP02">SP02 — Dock 1</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Delivery Priority</label>
+                        <select class="form-select">
+                            <option value="Normal">Normal</option>
+                            <option value="High">High</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>SO auto-numbered via Number Range SD/SO
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/SD/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Sales Order</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Order.Status" class="form-label"></label><select asp-for="Order.Status" class="form-select"><option>Pending</option><option>Confirmed</option><option>In Delivery</option><option>Completed</option></select></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/SD/Index" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var badge = document.getElementById('lineCountBadge');
+            if (badge) {
+                var count = document.querySelectorAll('#soLineTable tbody tr').length;
+                badge.textContent = count;
+            }
+        });
+    </script>
+}

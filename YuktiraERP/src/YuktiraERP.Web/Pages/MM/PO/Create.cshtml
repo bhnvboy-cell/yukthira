@@ -1,75 +1,250 @@
 @page
 @model YuktiraERP.Web.Pages.MM.PO.CreateModel
 @{ ViewData["Title"] = "Create Purchase Order"; }
-<div class="row justify-content-center"><div class="col-lg-10">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Purchase Order</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-3"><label asp-for="Order.VendorName" class="form-label"></label><input asp-for="Order.VendorName" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Order.VendorCode" class="form-label"></label><input asp-for="Order.VendorCode" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Order.DepartmentKey" class="form-label"></label><select asp-for="Order.DepartmentKey" class="form-select" asp-items="Model.DepartmentKeyOptions"><option value="">-- Select --</option></select></div>
-<div class="col-md-3"><label asp-for="Order.CostCenter" class="form-label"></label><input asp-for="Order.CostCenter" class="form-control" /></div>
-</div>
-<div class="row mb-3">
-<div class="col-md-3"><label asp-for="Order.PaymentTerms" class="form-label"></label><select asp-for="Order.PaymentTerms" class="form-select"><option>Net 30</option><option>Net 60</option><option>Net 90</option><option>Due on Receipt</option><option>COD</option></select></div>
-<div class="col-md-3"><label asp-for="Order.Incoterms" class="form-label"></label><input asp-for="Order.Incoterms" class="form-control" placeholder="e.g., FOB, CIF" /></div>
-<div class="col-md-3"><label asp-for="Order.Status" class="form-label"></label><select asp-for="Order.Status" class="form-select"><option>Draft</option><option>Pending Approval</option></select></div>
-<div class="col-md-3"><label asp-for="Order.Date" class="form-label"></label><input asp-for="Order.Date" class="form-control" type="date" /></div>
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-cart-plus"></i></div>
+        <div class="banner-info">
+            <h5>Create Purchase Order</h5>
+            <span>ME21N — Purchase Order</span>
+        </div>
+        <div class="banner-meta">
+            Purchasing Org: PO01<br />Doc Type: Standard PO
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Order.Status" value="Draft" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="header">
+                <i class="bi bi-building tab-icon"></i> Header
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="items">
+                <i class="bi bi-list-ul tab-icon"></i> Line Items
+                <span class="tab-badge" id="lineCountBadge">0</span>
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="delivery">
+                <i class="bi bi-truck tab-icon"></i> Delivery & Terms
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Header ═══ -->
+        <div class="ent-form-panel active" data-panel="header">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Vendor & Organization</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>PO Number</label>
+                        <input class="form-control" value="Auto-generated" readonly />
+                    </div>
+                    <div class="ent-field">
+                        <label>Document Date</label>
+                        <input asp-for="Order.Date" class="form-control" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <select asp-for="Order.Status" class="form-select">
+                            <option value="Draft">Draft</option>
+                            <option value="Pending Approval">Pending Approval</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Vendor Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Vendor Name <span class="required">*</span></label>
+                        <input asp-for="Order.VendorName" class="form-control" placeholder="Vendor company name" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Vendor Code</label>
+                        <input asp-for="Order.VendorCode" class="form-control" placeholder="e.g. V-001" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Purchasing Group</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="001">001 — Raw Materials</option>
+                            <option value="002">002 — Packaging</option>
+                            <option value="003">003 — MRO</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-credit-card"></i><h6>Financial Assignment</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Cost Center</label>
+                        <input asp-for="Order.CostCenter" class="form-control" placeholder="e.g. CC-1000" />
+                    </div>
+                    <div class="ent-field">
+                        <label>G/L Account</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="500000">500000 — Material Consumption</option>
+                            <option value="510000">510000 — MRO Expense</option>
+                            <option value="520000">520000 — Packaging Material</option>
+                            <option value="600000">600000 — Services</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Department</label>
+                        <select asp-for="Order.DepartmentKey" class="form-select" asp-items="Model.DepartmentKeyOptions">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Line Items ═══ -->
+        <div class="ent-form-panel" data-panel="items">
+            <div class="ent-line-items-wrap">
+                <div class="ent-line-items-header">
+                    <h6><i class="bi bi-list-ul"></i> Purchase Order Items — <span class="line-count">0</span> lines</h6>
+                    <button type="button" class="btn btn-outline-success btn-sm ent-add-line-btn" data-target="poLineTable">
+                        <i class="bi bi-plus"></i> Add Line
+                    </button>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="ent-line-items-table" id="poLineTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Material Code</th>
+                                <th>Material Name</th>
+                                <th>Plant</th>
+                                <th>SLOC</th>
+                                <th>Qty</th>
+                                <th>UOM</th>
+                                <th>Unit Price</th>
+                                <th>Disc %</th>
+                                <th style="text-align:right">Line Total</th>
+                                <th>Delivery Date</th>
+                                <th>Dept</th>
+                                <th>Batch</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.LineItems.Count; i++)
+                            {
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td><input asp-for="LineItems[i].MaterialCode" class="form-control form-control-sm line-material" placeholder="MAT-001" /></td>
+                                    <td><input asp-for="LineItems[i].MaterialName" class="form-control form-control-sm" placeholder="Description" /></td>
+                                    <td><input asp-for="LineItems[i].Plant" class="form-control form-control-sm" value="1000" /></td>
+                                    <td><input asp-for="LineItems[i].StorageLocation" class="form-control form-control-sm" value="SL01" /></td>
+                                    <td><input asp-for="LineItems[i].Quantity" class="form-control form-control-sm line-qty" type="number" step="0.01" min="0" /></td>
+                                    <td><select asp-for="LineItems[i].UOM" class="form-select form-select-sm"><option>EA</option><option>KG</option><option>LB</option><option>M</option><option>L</option><option>BX</option></select></td>
+                                    <td><input asp-for="LineItems[i].UnitPrice" class="form-control form-control-sm line-price" type="number" step="0.01" min="0" /></td>
+                                    <td><input type="number" class="form-control form-control-sm line-discount" step="0.01" min="0" max="100" value="0" /></td>
+                                    <td class="line-total">0.00</td>
+                                    <td><input asp-for="LineItems[i].DeliveryDate" class="form-control form-control-sm" type="date" /></td>
+                                    <td><select asp-for="LineItems[i].DepartmentKey" class="form-select form-select-sm" asp-items="Model.DepartmentKeyOptions"><option value="">--</option></select></td>
+                                    <td><input asp-for="LineItems[i].BatchNo" class="form-control form-control-sm" /></td>
+                                    <td><button type="button" class="line-remove" onclick="removeLineItem(this)" title="Remove"><i class="bi bi-trash"></i></button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ent-totals-bar">
+                    <div class="total-item">
+                        <span class="total-label">Lines:</span>
+                        <span class="total-value line-count">0</span>
+                    </div>
+                    <div class="total-item">
+                        <span class="total-label">Grand Total:</span>
+                        <span class="total-value grand-total">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Delivery & Terms ═══ -->
+        <div class="ent-form-panel" data-panel="delivery">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-credit-card-2-front"></i><h6>Payment & Incoterms</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Payment Terms</label>
+                        <select asp-for="Order.PaymentTerms" class="form-select">
+                            <option value="Net 30">Net 30</option>
+                            <option value="Net 60">Net 60</option>
+                            <option value="Net 90">Net 90</option>
+                            <option value="Due on Receipt">Due on Receipt</option>
+                            <option value="COD">COD</option>
+                            <option value="2/10 Net 30">2/10 Net 30</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Incoterms</label>
+                        <input asp-for="Order.Incoterms" class="form-control" placeholder="e.g. FOB, CIF, DDP" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Tax Code</label>
+                        <select class="form-select">
+                            <option value="V0">V0 — Standard Tax</option>
+                            <option value="V1">V1 — Reduced Tax</option>
+                            <option value="V2">V2 — Zero Tax</option>
+                            <option value="EX">EX — Exempt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-truck"></i><h6>Delivery Schedule</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Requested Delivery Date</label>
+                        <input type="date" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Shipping Point</label>
+                        <select class="form-select">
+                            <option value="SP01">SP01 — Main Warehouse</option>
+                            <option value="SP02">SP02 — Dock 1</option>
+                            <option value="SP03">SP03 — Dock 2</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Delivery Priority</label>
+                        <select class="form-select">
+                            <option value="Normal">Normal</option>
+                            <option value="High">High</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>PO auto-numbered via Number Range MM/PO
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Purchase Order</button>
+            </div>
+        </div>
+    </form>
 </div>
 
-<h6 class="mt-3 mb-2"><i class="bi bi-list-ul me-1"></i>Line Items</h6>
-<div id="lineItems">
-@for (int i = 0; i < Model.LineItems.Count; i++)
-{
-<div class="card mb-2 border">
-<div class="card-body py-2">
-<input type="hidden" asp-for="LineItems[i].Id" />
-<div class="row g-2 align-items-end">
-<div class="col-md-2"><label class="form-label small">Material Code</label><input asp-for="LineItems[i].MaterialCode" class="form-control form-control-sm" /></div>
-<div class="col-md-2"><label class="form-label small">Material Name</label><input asp-for="LineItems[i].MaterialName" class="form-control form-control-sm" /></div>
-<div class="col-md-1"><label class="form-label small">Qty</label><input asp-for="LineItems[i].Quantity" class="form-control form-control-sm" type="number" step="0.01" /></div>
-<div class="col-md-1"><label class="form-label small">UOM</label><input asp-for="LineItems[i].UOM" class="form-control form-control-sm" value="EA" /></div>
-<div class="col-md-1"><label class="form-label small">Unit Price</label><input asp-for="LineItems[i].UnitPrice" class="form-control form-control-sm" type="number" step="0.01" /></div>
-<div class="col-md-1"><label class="form-label small">Plant</label><input asp-for="LineItems[i].Plant" class="form-control form-control-sm" /></div>
-<div class="col-md-1"><label class="form-label small">SLOC</label><input asp-for="LineItems[i].StorageLocation" class="form-control form-control-sm" /></div>
-<div class="col-md-1"><label class="form-label small">Delivery</label><input asp-for="LineItems[i].DeliveryDate" class="form-control form-control-sm" type="date" /></div>
-<div class="col-md-1"><label class="form-label small">Dept</label><select asp-for="LineItems[i].DepartmentKey" class="form-select form-select-sm" asp-items="Model.DepartmentKeyOptions"><option value="">--</option></select></div>
-<div class="col-md-1"><label class="form-label small">Batch</label><input asp-for="LineItems[i].BatchNo" class="form-control form-control-sm" /></div>
-</div>
-</div>
-</div>
-}
-</div>
-<button type="button" class="btn btn-outline-success btn-sm mb-3" onclick="addLine()"><i class="bi bi-plus"></i> Add Line</button>
-
-<div class="d-flex gap-2">
-<button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
-<a asp-page="/MM/Index" class="btn btn-outline-secondary">Cancel</a>
-</div>
-</form>
-</div></div>
-</div></div>
-
-@section Scripts { <partial name="_ValidationScriptsPartial" />
-<script>
-function addLine() {
-    var idx = document.querySelectorAll('#lineItems .card').length;
-    var html = `<div class="card mb-2 border"><div class="card-body py-2">
-    <input type="hidden" name="LineItems[${idx}].Id" value="00000000-0000-0000-0000-000000000000" />
-    <div class="row g-2 align-items-end">
-    <div class="col-md-2"><label class="form-label small">Material Code</label><input name="LineItems[${idx}].MaterialCode" class="form-control form-control-sm" /></div>
-    <div class="col-md-2"><label class="form-label small">Material Name</label><input name="LineItems[${idx}].MaterialName" class="form-control form-control-sm" /></div>
-    <div class="col-md-1"><label class="form-label small">Qty</label><input name="LineItems[${idx}].Quantity" class="form-control form-control-sm" type="number" step="0.01" /></div>
-    <div class="col-md-1"><label class="form-label small">UOM</label><input name="LineItems[${idx}].UOM" class="form-control form-control-sm" value="EA" /></div>
-    <div class="col-md-1"><label class="form-label small">Unit Price</label><input name="LineItems[${idx}].UnitPrice" class="form-control form-control-sm" type="number" step="0.01" /></div>
-    <div class="col-md-1"><label class="form-label small">Plant</label><input name="LineItems[${idx}].Plant" class="form-control form-control-sm" /></div>
-    <div class="col-md-1"><label class="form-label small">SLOC</label><input name="LineItems[${idx}].StorageLocation" class="form-control form-control-sm" /></div>
-    <div class="col-md-1"><label class="form-label small">Delivery</label><input name="LineItems[${idx}].DeliveryDate" class="form-control form-control-sm" type="date" /></div>
-    <div class="col-md-1"><label class="form-label small">Dept</label><select name="LineItems[${idx}].DepartmentKey" class="form-select form-select-sm">${document.querySelector('select[name="Order.DepartmentKey"]').innerHTML}</select></div>
-    <div class="col-md-1"><label class="form-label small">Batch</label><input name="LineItems[${idx}].BatchNo" class="form-control form-control-sm" /></div>
-    </div></div></div>`;
-    document.getElementById('lineItems').insertAdjacentHTML('beforeend', html);
-}
-</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var badge = document.getElementById('lineCountBadge');
+            if (badge) {
+                var count = document.querySelectorAll('#poLineTable tbody tr').length;
+                badge.textContent = count;
+            }
+        });
+    </script>
 }

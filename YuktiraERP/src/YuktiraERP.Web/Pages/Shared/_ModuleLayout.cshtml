@@ -1,0 +1,237 @@
+@model YuktiraERP.Web.ViewModels.ModuleLayoutViewModel
+@using YuktiraERP.Web.ViewModels
+
+@{
+    var activeTab = Model.ActiveTab ?? Model.Tabs.FirstOrDefault()?.Key ?? "";
+}
+
+<div class="module-root" data-module-root="@Model.ModuleCode" data-active-tab="@activeTab">
+
+@* ── Module Header ── *@
+<div class="module-header">
+    <div class="module-header-left">
+        <h2>@Model.ModuleTitle</h2>
+        <span class="module-badge">@Model.ModuleCode</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.5rem">
+        @foreach (var tab in Model.Tabs.Where(t => t.PrimaryAction != null))
+        {
+            var isActive = tab.Key == activeTab;
+            <a href="@tab.PrimaryAction!.Href"
+               class="btn btn-sm btn-primary module-action-btn"
+               data-action-tab="@tab.Key"
+               style="display:@(isActive ? "inline-flex" : "none");align-items:center;gap:0.35rem;border-radius:6px;font-weight:600">
+                <i class="bi @tab.PrimaryAction!.Icon"></i> @tab.PrimaryAction!.Label
+            </a>
+        }
+        @if (Model.PrimaryAction != null)
+        {
+            <a href="@Model.PrimaryAction.Href"
+               class="btn btn-sm btn-primary module-action-btn module-action-fallback"
+               style="display:inline-flex;align-items:center;gap:0.35rem;border-radius:6px;font-weight:600">
+                <i class="bi @Model.PrimaryAction.Icon"></i> @Model.PrimaryAction.Label
+            </a>
+        }
+    </div>
+</div>
+
+@* ── KPI Cards ── *@
+@if (Model.Kpis.Any())
+{
+    <div class="module-kpi-grid">
+        @foreach (var kpi in Model.Kpis)
+        {
+            <div class="module-kpi-card">
+                <div class="module-kpi-icon @kpi.Type">
+                    <i class="bi @GetKpiIcon(kpi.Type)"></i>
+                </div>
+                <div class="module-kpi-info">
+                    <div class="module-kpi-value">@kpi.Value</div>
+                    <div class="module-kpi-label">@kpi.Label</div>
+                    @if (!string.IsNullOrEmpty(kpi.Subtext))
+                    {
+                        <div class="module-kpi-sub">@kpi.Subtext</div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@* ── Sheet View Container ── *@
+<div class="sheet-view-container">
+
+    @* ── Tabs ── *@
+    <div class="module-tabs">
+        @foreach (var tab in Model.Tabs)
+        {
+            <button class="module-tab @(tab.Key == activeTab ? "active" : "")" data-tab="@tab.Key">
+                @tab.Label
+                <span class="tab-count">@tab.Count</span>
+            </button>
+        }
+    </div>
+
+    @* ── Per-Tab Panels ── *@
+    @foreach (var gridTab in Model.GridTabs)
+    {
+        var isVisible = gridTab.Key == activeTab;
+        <div class="sheet-tab-panel" data-tab-panel="@gridTab.Key" style="@(isVisible ? "" : "display:none")" data-page="1" data-page-size="@Model.PageSize">
+
+            @* ── Toolbar ── *@
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="sheet-search-input" placeholder="Filter rows..." />
+                    </div>
+                    <span class="sheet-selected-count"></span>
+                </div>
+                <div class="sheet-toolbar-right">
+                    <select class="form-select form-select-sm page-size-select" style="width:auto;font-size:0.75rem;padding:0.2rem 0.4rem;border-radius:5px">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            @* ── Data Grid ── *@
+            <div class="sheet-table-wrap" style="max-height:60vh;overflow-y:auto">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="sheet-select-all" /></th>
+                            @foreach (var col in gridTab.Columns.Where(c => c.Visible))
+                            {
+                                <th class="@(col.Align == "right" ? "align-right" : col.Align == "center" ? "align-center" : "")">@col.Label</th>
+                            }
+                            <th class="align-center actions-col" style="min-width:80px">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!gridTab.Rows.Any())
+                        {
+                            <tr>
+                                <td colspan="@(gridTab.Columns.Count(c => c.Visible) + 2)">
+                                    <div class="sheet-empty">
+                                        <i class="bi bi-inbox"></i>
+                                        <div>No records found</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @for (var ri = 0; ri < gridTab.Rows.Count; ri++)
+                        {
+                            var row = gridTab.Rows[ri];
+                            var rowId = row.ContainsKey("id") ? row["id"] : ri.ToString();
+                            <tr data-row="@rowId">
+                                <td class="chk-col"><input type="checkbox" class="sheet-row-cb" /></td>
+                                @foreach (var col in gridTab.Columns.Where(c => c.Visible))
+                                {
+                                    var val = row.ContainsKey(col.Key) ? row[col.Key] : "";
+                                    var alignClass = col.Align == "right" ? "align-right" : col.Align == "center" ? "align-center" : "";
+                                    if (col.Type == "status")
+                                    {
+                                        <td class="align-center">
+                                            <span class="status-badge @GetStatusClass(val)">@val</span>
+                                        </td>
+                                    }
+                                    else if (col.Type == "currency")
+                                    {
+                                        <td class="@alignClass">@FormatCurrency(val)</td>
+                                    }
+                                    else if (col.Type == "date")
+                                    {
+                                        <td class="@alignClass">@FormatDate(val)</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="@alignClass">@(val ?? "")</td>
+                                    }
+                                }
+                                <td class="actions-col align-center">
+                                    <div class="action-btns">
+                                        @if (gridTab.EditHref != null)
+                                        {
+                                            var editUrl = gridTab.EditHref(row);
+                                            if (!string.IsNullOrEmpty(editUrl))
+                                            {
+                                                <a href="@editUrl" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            }
+                                        }
+                                        @if (gridTab.ViewHref != null)
+                                        {
+                                            var viewUrl = gridTab.ViewHref(row);
+                                            if (!string.IsNullOrEmpty(viewUrl))
+                                            {
+                                                <a href="@viewUrl" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @* ── Pagination ── *@
+            <div class="sheet-pagination">
+                <span class="sheet-pagination-info">Showing @gridTab.Rows.Count rows</span>
+                <div class="sheet-pagination-controls">
+                    <button class="page-btn" data-dir="prev" disabled><i class="bi bi-chevron-left"></i></button>
+                    <button class="page-btn active" data-page="1">1</button>
+                    <button class="page-btn" data-dir="next" disabled><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+</div>
+
+@functions {
+    string GetKpiIcon(string type) => type switch
+    {
+        "green" => "bi-check-circle",
+        "blue" => "bi-box-seam",
+        "amber" => "bi-clock-history",
+        "red" => "bi-exclamation-triangle",
+        "purple" => "bi-clipboard-check",
+        "teal" => "bi-graph-up-arrow",
+        _ => "bi-hash"
+    };
+
+    string GetStatusClass(string? status)
+    {
+        if (string.IsNullOrEmpty(status)) return "info";
+        var s = status.ToLower().Replace(" ", "").Replace("-", "").Replace("_", "");
+        return s switch
+        {
+            "completed" or "approved" or "released" or "active" or "matched" or "cleared" or "posted" or "delivered" or "billed" or "paid" or "available" => "success",
+            "pending" or "inprogress" or "partial" or "open" or "sent" or "partiallydelivered" or "partiallyreceived" => "warning",
+            "rejected" or "cancelled" or "blocked" or "expired" or "oos" or "failed" or "overdue" or "recalled" => "danger",
+            "draft" or "created" or "new" => "info",
+            "qualityhold" or "qiheld" or "inquality" or "onhold" => "purple",
+            _ => "info"
+        };
+    }
+
+    string FormatCurrency(string? val)
+    {
+        if (string.IsNullOrEmpty(val)) return "";
+        if (decimal.TryParse(val, System.Globalization.NumberStyles.Currency | System.Globalization.NumberStyles.Number, null, out var num))
+            return num.ToString("C2");
+        return val;
+    }
+
+    string FormatDate(string? val)
+    {
+        if (string.IsNullOrEmpty(val)) return "";
+        if (DateTime.TryParse(val, out var dt))
+            return dt.ToString("dd MMM yyyy");
+        return val;
+    }
+}

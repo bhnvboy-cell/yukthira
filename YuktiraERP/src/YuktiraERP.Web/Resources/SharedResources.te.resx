@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve"><value>యుక్తిరా ERP</value></data>
+  <data name="Home" xml:space="preserve"><value>హోమ్</value></data>
+  <data name="Settings" xml:space="preserve"><value>సెట్టింగ్‌లు</value></data>
+  <data name="Logout" xml:space="preserve"><value>లాగ్ అవుట్</value></data>
+  <data name="Notifications" xml:space="preserve"><value>నోటిఫికేషన్‌లు</value></data>
+  <data name="Search" xml:space="preserve"><value>వెతకండి</value></data>
+  <data name="Print" xml:space="preserve"><value>ప్రింట్ / PDF గా సేవ్ చేయండి</value></data>
+  <data name="SessionExpiring" xml:space="preserve"><value>సెషన్ ముగిస్తోంది</value></data>
+  <data name="SessionExpireMsg" xml:space="preserve"><value>మీ సెషన్ {0} సెకన్లలో ముగుస్తుంది.</value></data>
+  <data name="SessionContinueQ" xml:space="preserve"><value>మీరు పని కొనసాగించాలనుకుంటున్నారా?</value></data>
+  <data name="ContinueSession" xml:space="preserve"><value>సెషన్ కొనసాగించండి</value></data>
+  <data name="LogOff" xml:space="preserve"><value>లాగ్ ఆఫ్</value></data>
+  <data name="Save" xml:space="preserve"><value>సేవ్ చేయండి</value></data>
+  <data name="Cancel" xml:space="preserve"><value>రద్దు చేయండి</value></data>
+  <data name="Update" xml:space="preserve"><value>అప్‌డేట్ చేయండి</value></data>
+  <data name="Delete" xml:space="preserve"><value>తొలగించండి</value></data>
+  <data name="Create" xml:space="preserve"><value>సృష్టించండి</value></data>
+  <data name="Back" xml:space="preserve"><value>వెనుకకు</value></data>
+  <data name="Edit" xml:space="preserve"><value>సవరించండి</value></data>
+  <data name="View" xml:space="preserve"><value>చూడండి</value></data>
+  <data name="Export" xml:space="preserve"><value>ఎగుమతి</value></data>
+  <data name="Submit" xml:space="preserve"><value>సమర్పించండి</value></data>
+  <data name="Close" xml:space="preserve"><value>మూసివేయండి</value></data>
+  <data name="Yes" xml:space="preserve"><value>అవును</value></data>
+  <data name="No" xml:space="preserve"><value>కాదు</value></data>
+  <data name="ConfirmDelete" xml:space="preserve"><value>ఈ రికార్డును తొలగించాలా?</value></data>
+  <data name="NoRecords" xml:space="preserve"><value>రికార్డులు కనుగొనబడలేదు</value></data>
+  <data name="WelcomeBack" xml:space="preserve"><value>తిరిగి స్వాగతం,</value></data>
+  <data name="SelectModule" xml:space="preserve"><value>ప్రారంభించడానికి ఒక మాడ్యూల్ ఎంచుకోండి</value></data>
+  <data name="PinnedModules" xml:space="preserve"><value>పిన్ చేసిన మాడ్యూల్‌లు</value></data>
+  <data name="RecentlyUsed" xml:space="preserve"><value>ఇటీవల ఉపయోగించినవి</value></data>
+  <data name="All" xml:space="preserve"><value>అన్నీ</value></data>
+  <data name="SearchModules" xml:space="preserve"><value>మాడ్యూల్‌లను వెతకండి...</value></data>
+  <data name="RealTimeActivity" xml:space="preserve"><value>రియల్-టైమ్ కార్యాచరణ</value></data>
+  <data name="WaitingUpdates" xml:space="preserve"><value>లైవ్ అప్‌డేట్‌ల కోసం వేచి ఉంది...</value></data>
+  <data name="Live" xml:space="preserve"><value>లైవ్</value></data>
+  <data name="Theme" xml:space="preserve"><value>థీమ్</value></data>
+  <data name="ThemeDesc" xml:space="preserve"><value>మీ ఇష్టమైన లేఔట్ శైలిని ఎంచుకోండి.</value></data>
+  <data name="SessionTimeout" xml:space="preserve"><value>సెషన్ టైమ్ అవుట్</value></data>
+  <data name="SessionTimeoutDesc" xml:space="preserve"><value>నిష్క్రియాపై స్వయంచాలక లాగ్అవుట్‌ను కాన్ఫిగర్ చేయండి.</value></data>
+  <data name="SessionDuration" xml:space="preserve"><value>సెషన్ వ్యవధి (నిమిషాలు)</value></data>
+  <data name="WarningBefore" xml:space="preserve"><value>హెచ్చరిక ముందు (సెకన్లు)</value></data>
+  <data name="General" xml:space="preserve"><value>సాధారణ</value></data>
+  <data name="Language" xml:space="preserve"><value>భాష</value></data>
+  <data name="SidebarBehavior" xml:space="preserve"><value>సైడ్‌బార్ ప్రవర్తన</value></data>
+  <data name="Animations" xml:space="preserve"><value>యానిమేషన్‌లు</value></data>
+  <data name="Saved" xml:space="preserve"><value>సేవ్ చేయబడింది</value></data>
+  <data name="Actions" xml:space="preserve"><value>చర్యలు</value></data>
+  <data name="Status" xml:space="preserve"><value>స్థితి</value></data>
+  <data name="Date" xml:space="preserve"><value>తేదీ</value></data>
+  <data name="Code" xml:space="preserve"><value>కోడ్</value></data>
+  <data name="Name" xml:space="preserve"><value>పేరు</value></data>
+  <data name="Quantity" xml:space="preserve"><value>పరిమాణం</value></data>
+  <data name="Amount" xml:space="preserve"><value>మొత్తం</value></data>
+  <data name="Type" xml:space="preserve"><value>రకం</value></data>
+  <data name="Price" xml:space="preserve"><value>ధర</value></data>
+  <data name="Stock" xml:space="preserve"><value>స్టాక్</value></data>
+  <data name="UOM" xml:space="preserve"><value>కొలమానం</value></data>
+  <data name="Active" xml:space="preserve"><value>యాక్టివ్</value></data>
+  <data name="Inactive" xml:space="preserve"><value>ఇన్‌యాక్టివ్</value></data>
+  <data name="Pending" xml:space="preserve"><value>పెండింగ్</value></data>
+  <data name="Approved" xml:space="preserve"><value>ఆమోదించబడింది</value></data>
+  <data name="Rejected" xml:space="preserve"><value>తిరస్కరించబడింది</value></data>
+  <data name="Draft" xml:space="preserve"><value>డ్రాఫ్ట్</value></data>
+  <data name="Completed" xml:space="preserve"><value>పూర్తయింది</value></data>
+  <data name="Cancelled" xml:space="preserve"><value>రద్దు చేయబడింది</value></data>
+  <data name="LowStock" xml:space="preserve"><value>తక్కువ స్టాక్</value></data>
+  <data name="MaterialsManagement" xml:space="preserve"><value>మెటీరియల్స్ మేనేజ్‌మెంట్</value></data>
+  <data name="SalesDistribution" xml:space="preserve"><value>అమ్మకాలు &amp; పంపిణీ</value></data>
+  <data name="ProductionPlanning" xml:space="preserve"><value>ఉత్పత్తి ప్లానింగ్</value></data>
+  <data name="CreateMaterial" xml:space="preserve"><value>మెటీరియల్ సృష్టించండి</value></data>
+  <data name="CreateVendor" xml:space="preserve"><value>వెండర్ సృష్టించండి</value></data>
+  <data name="CreateSalesOrder" xml:space="preserve"><value>సేల్స్ ఆర్డర్ సృష్టించండి</value></data>
+  <data name="CreatePurchaseOrder" xml:space="preserve"><value>పర్చేస్ ఆర్డర్ సృష్టించండి</value></data>
+  <data name="CreateProductionOrder" xml:space="preserve"><value>కొత్త ఉత్పత్తి ఆర్డర్</value></data>
+  <data name="StockOverview" xml:space="preserve"><value>స్టాక్ ఓవర్‌వ్యూ</value></data>
+  <data name="NoMatchesFound" xml:space="preserve"><value>సరిపోలికలు కనుగొనబడలేదు</value></data>
+  <data name="SignIn" xml:space="preserve"><value>సైన్ ఇన్</value></data>
+  <data name="ClientNumber" xml:space="preserve"><value>క్లయింట్ నంబర్</value></data>
+  <data name="UserId" xml:space="preserve"><value>వినియోగదారు ID</value></data>
+  <data name="Password" xml:space="preserve"><value>పాస్‌వర్డ్</value></data>
+  <data name="SkipToContent" xml:space="preserve"><value>ముఖ్య కంటెంట్‌కు వెళ్ళండి</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>లావాదేవీ శోధన... (Ctrl+K)</value></data>
+  <data name="ToggleDarkMode" xml:space="preserve"><value>డార్క్ మోడ్ టాగిల్ చేయండి</value></data>
+  <data name="SelectLanguage" xml:space="preserve"><value>భాషను ఎంచుకోండి</value></data>
+</root>

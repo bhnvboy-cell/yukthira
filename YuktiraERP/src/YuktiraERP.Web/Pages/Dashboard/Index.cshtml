@@ -1,16 +1,17 @@
 @page
 @model YuktiraERP.Web.Pages.Dashboard.IndexModel
+@inject IStringLocalizer<SharedResources> L
 @{
-    ViewData["Title"] = "Home - Yuktira ERP";
+    ViewData["Title"] = L["Home"] + " - " + L["AppTitle"];
 }
 
 <div class="welcome-bar">
     <div>
-        <h1>Welcome back, @(User.Identity?.Name ?? "User")</h1>
-        <p>Select a module to get started</p>
+        <h1>@L["WelcomeBack"] @(User.Identity?.Name ?? "User")</h1>
+        <p>@L["SelectModule"]</p>
     </div>
-    <div class="live-indicator" id="liveIndicator" title="Real-time dashboard">
-        <span class="live-dot"></span> Live
+    <div class="live-indicator" id="liveIndicator" title="@L["RealTimeActivity"]">
+        <span class="live-dot"></span> @L["Live"]
     </div>
 </div>
 

@@ -1,21 +1,197 @@
 @page
 @model YuktiraERP.Web.Pages.PP.ProductionOrder.CreateModel
-@{ ViewData["Title"] = "New Production Order"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Production Order</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Order.ProductName" class="form-label"></label><input asp-for="Order.ProductName" class="form-control" /><span asp-validation-for="Order.ProductName" class="text-danger small"></span></div>
-<div class="col-md-3"><label asp-for="Order.Quantity" class="form-label"></label><input asp-for="Order.Quantity" class="form-control" min="1" step="1" /><span asp-validation-for="Order.Quantity" class="text-danger small"></span></div>
-<div class="col-md-3"><label asp-for="Order.Status" class="form-label"></label><select asp-for="Order.Status" class="form-select"><option value="Planned">Planned</option><option value="Released">Released</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
+@{ ViewData["Title"] = "Create Production Order"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="banner-info">
+            <h5>Create Production Order</h5>
+            <span>CO01 — Production Order</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000<br />Type: Standard
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Order.Status" value="Planned" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="order">
+                <i class="bi bi-gear tab-icon"></i> Order Header
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="materials">
+                <i class="bi bi-box-seam tab-icon"></i> Materials & BOM
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="scheduling">
+                <i class="bi bi-calendar3 tab-icon"></i> Scheduling & Capacity
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Order Header ═══ -->
+        <div class="ent-form-panel active" data-panel="order">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-gear"></i><h6>Order Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Order Number</label>
+                        <input class="form-control" value="Auto-generated" readonly />
+                    </div>
+                    <div class="ent-field">
+                        <label>Product / Material <span class="required">*</span></label>
+                        <input asp-for="Order.ProductName" class="form-control" placeholder="Material to produce" />
+                        <span asp-validation-for="Order.ProductName" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Quantity <span class="required">*</span></label>
+                        <input asp-for="Order.Quantity" class="form-control" type="number" min="1" step="1" />
+                        <span asp-validation-for="Order.Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-toggle-on"></i><h6>Order Status & Priority</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <select asp-for="Order.Status" class="form-select">
+                            <option value="Planned">Planned</option>
+                            <option value="Released">Released</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Priority</label>
+                        <select class="form-select">
+                            <option value="Normal">Normal</option>
+                            <option value="High">High</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Order Type</label>
+                        <select class="form-select">
+                            <option value="Standard">Standard Production</option>
+                            <option value="Rework">Rework Order</option>
+                            <option value="Pilot">Pilot / Trial</option>
+                            <option value="Remake">Remake Order</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Materials & BOM ═══ -->
+        <div class="ent-form-panel" data-panel="materials">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-box-seam"></i><h6>BOM & Routing Reference</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>BOM Reference</label>
+                        <select class="form-select">
+                            <option value="">-- Select BOM --</option>
+                            <option value="BOM-001">BOM-001 — Standard Assembly</option>
+                            <option value="BOM-002">BOM-002 — Alternative Assembly</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Routing Reference</label>
+                        <select class="form-select">
+                            <option value="">-- Select Routing --</option>
+                            <option value="RT-001">RT-001 — Standard Routing</option>
+                            <option value="RT-002">RT-002 — Alternate Routing</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Work Center</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="WC-01">WC-01 — Assembly Line 1</option>
+                            <option value="WC-02">WC-02 — Assembly Line 2</option>
+                            <option value="WC-03">WC-03 — CNC Machining</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-currency-dollar"></i><h6>Cost Estimate</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Planned Cost</label>
+                        <input type="number" class="form-control" min="0" step="0.01" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Actual Cost</label>
+                        <input type="number" class="form-control" readonly value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Cost Variance</label>
+                        <input type="number" class="form-control" readonly value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Scheduling & Capacity ═══ -->
+        <div class="ent-form-panel" data-panel="scheduling">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-calendar3"></i><h6>Production Dates</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Planned Start Date <span class="required">*</span></label>
+                        <input asp-for="Order.StartDate" class="form-control" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Planned End Date <span class="required">*</span></label>
+                        <input asp-for="Order.EndDate" class="form-control" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Scheduling Type</label>
+                        <select class="form-select">
+                            <option value="Forward">Forward Scheduling</option>
+                            <option value="Backward">Backward Scheduling</option>
+                            <option value="Manual">Manual Scheduling</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-speedometer2"></i><h6>Capacity & Yield</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Planned Yield (%)</label>
+                        <input type="number" class="form-control" min="0" max="100" value="100" step="0.1" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Scrap Qty</label>
+                        <input type="number" class="form-control" min="0" value="0" step="1" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Shift</label>
+                        <select class="form-select">
+                            <option value="All">All Shifts</option>
+                            <option value="1">Shift 1 (Morning)</option>
+                            <option value="2">Shift 2 (Afternoon)</option>
+                            <option value="3">Shift 3 (Night)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Production order auto-numbered
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Production Order</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-4">
-<div class="col-md-4"><label asp-for="Order.StartDate" class="form-label"></label><input asp-for="Order.StartDate" class="form-control" type="date" /></div>
-<div class="col-md-4"><label asp-for="Order.EndDate" class="form-label"></label><input asp-for="Order.EndDate" class="form-control" type="date" /></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,25 +1,326 @@
 @page
 @model YuktiraERP.Web.Pages.MM.Material.CreateModel
 @{ ViewData["Title"] = "Create Material Master"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Material Master</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Material.Code" class="form-label"></label><input asp-for="Material.Code" class="form-control" placeholder="e.g. FG-002" /><span asp-validation-for="Material.Code" class="text-danger small"></span></div>
-<div class="col-md-8"><label asp-for="Material.Name" class="form-label"></label><input asp-for="Material.Name" class="form-control" placeholder="Material description" /><span asp-validation-for="Material.Name" class="text-danger small"></span></div>
+
+<div class="ent-form-wrapper">
+    <!-- ORG BANNER -->
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-box-seam"></i></div>
+        <div class="banner-info">
+            <h5>Create Material Master</h5>
+            <span>MM01 — Material Master Data</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000<br />Client: 1000
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Material.Status" value="Active" />
+
+        <!-- TABS -->
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="basic">
+                <i class="bi bi-tag tab-icon"></i> Basic Data
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="purchasing">
+                <i class="bi bi-cart tab-icon"></i> Purchasing
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="accounting">
+                <i class="bi bi-calculator tab-icon"></i> Accounting
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="plant">
+                <i class="bi bi-geo-alt tab-icon"></i> Plant & Inventory
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Basic Data ═══ -->
+        <div class="ent-form-panel active" data-panel="basic">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Material Identification</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Material Code <span class="required">*</span></label>
+                        <input asp-for="Material.Code" class="form-control" placeholder="e.g. ROH-001, FERT-042" required />
+                        <span asp-validation-for="Material.Code" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field" style="grid-column: span 2">
+                        <label>Description <span class="required">*</span></label>
+                        <input asp-for="Material.Name" class="form-control" placeholder="Material description" required />
+                        <span asp-validation-for="Material.Name" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Classification</h6></div>
+                <div class="ent-field-grid cols-4">
+                    <div class="ent-field">
+                        <label>Material Type <span class="required">*</span></label>
+                        <select asp-for="Material.Type" class="form-select">
+                            <optgroup label="SAP Material Types">
+                                <option value="RAW">ROH — Raw Material</option>
+                                <option value="FINISHED">FERT — Finished Good</option>
+                                <option value="WIP">HALB — Semi-Finished (WIP)</option>
+                                <option value="PACKAGING">VERP — Packaging Material</option>
+                                <option value="CONSUMABLE">HIBE — Operating Supply</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Industry Sector</label>
+                        <select class="form-select" disabled>
+                            <option>Chemical Industry</option>
+                            <option>Automotive</option>
+                            <option>Electronics</option>
+                            <option>Pharmaceutical</option>
+                            <option>Food & Beverage</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Base UOM <span class="required">*</span></label>
+                        <select asp-for="Material.UOM" class="form-select">
+                            <optgroup label="Counting">
+                                <option value="EA">EA — Each (Piece)</option>
+                                <option value="SET">SET — Set</option>
+                                <option value="PR">PR — Pair</option>
+                            </optgroup>
+                            <optgroup label="Weight">
+                                <option value="KG">KG — Kilogram</option>
+                                <option value="LB">LB — Pound</option>
+                                <option value="G">G — Gram</option>
+                                <option value="MG">MG — Milligram</option>
+                                <option value="OZ">OZ — Ounce</option>
+                            </optgroup>
+                            <optgroup label="Volume">
+                                <option value="L">L — Liter</option>
+                                <option value="ML">ML — Milliliter</option>
+                                <option value="GAL">GAL — Gallon</option>
+                                <option value="M3">M³ — Cubic Meter</option>
+                            </optgroup>
+                            <optgroup label="Length / Area">
+                                <option value="M">M — Meter</option>
+                                <option value="CM">CM — Centimeter</option>
+                                <option value="FT">FT — Foot</option>
+                                <option value="IN">IN — Inch</option>
+                                <option value="M2">M² — Square Meter</option>
+                                <option value="FT2">FT² — Square Foot</option>
+                            </optgroup>
+                            <optgroup label="Packaging">
+                                <option value="BX">BX — Box</option>
+                                <option value="CS">CS — Case</option>
+                                <option value="PL">PL — Pallet</option>
+                                <option value="DR">DR — Drum</option>
+                                <option value="BG">BG — Bag</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Material Group</label>
+                        <select class="form-select" disabled>
+                            <option>MATGRP-001</option>
+                            <option>MATGRP-002</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Purchasing ═══ -->
+        <div class="ent-form-panel" data-panel="purchasing">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-cart-check"></i><h6>Purchasing Data</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Purchasing Group</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="001">001 — Raw Materials</option>
+                            <option value="002">002 — Packaging</option>
+                            <option value="003">003 — MRO</option>
+                            <option value="004">004 — Services</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Purchasing Org</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="PO01">PO01 — Plant Purchasing</option>
+                            <option value="PO02">PO02 — Corporate Purchasing</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Planned Delivery Time (days)</label>
+                        <input type="number" class="form-control" min="0" value="7" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-arrow-left-right"></i><h6>Quota & Sourcing</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Min Order Qty</label>
+                        <input type="number" class="form-control" min="0" step="0.01" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Lot Size (rounded)</label>
+                        <input type="number" class="form-control" min="0" step="1" value="1" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Order Unit</label>
+                        <select class="form-select">
+                            <option value="EA">EA</option>
+                            <option value="KG">KG</option>
+                            <option value="LB">LB</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="BX">BX</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Accounting ═══ -->
+        <div class="ent-form-panel" data-panel="accounting">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-currency-dollar"></i><h6>Valuation & Price Control</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Price <span class="required">*</span></label>
+                        <input asp-for="Material.Price" class="form-control" min="0" step="0.01" value="0" />
+                        <span asp-validation-for="Material.Price" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Price Control</label>
+                        <select class="form-select">
+                            <option value="S">S — Standard Price</option>
+                            <option value="V">V — Moving Average Price</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Valuation Class</label>
+                        <select class="form-select">
+                            <option value="3000">3000 — Raw Materials</option>
+                            <option value="3001">3001 — Operating Supplies</option>
+                            <option value="7900">7900 — Finished Goods</option>
+                            <option value="7910">7910 — Semi-Finished</option>
+                            <option value="3100">3100 — Packaging</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-percent"></i><h6>Tax & Currency</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Plant-Specific Currency</label>
+                        <select class="form-select">
+                            <option value="USD">USD — US Dollar</option>
+                            <option value="INR">INR — Indian Rupee</option>
+                            <option value="EUR">EUR — Euro</option>
+                            <option value="GBP">GBP — British Pound</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Tax Classification</label>
+                        <select class="form-select">
+                            <option value="TAXABLE">Taxable</option>
+                            <option value="EXEMPT">Tax Exempt</option>
+                            <option value="ZERO">Zero Rated</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Price Unit</label>
+                        <input type="number" class="form-control" min="1" value="1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Plant & Inventory ═══ -->
+        <div class="ent-form-panel" data-panel="plant">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-geo-alt"></i><h6>Plant & Storage</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Plant</label>
+                        <select class="form-select">
+                            <option value="1000">1000 — Main Plant</option>
+                            <option value="2000">2000 — Secondary Plant</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Storage Location</label>
+                        <select class="form-select">
+                            <option value="SL01">SL01 — General Storage</option>
+                            <option value="SL02">SL02 — Warehouse A</option>
+                            <option value="SL03">SL03 — Warehouse B</option>
+                            <option value="SL04">SL04 — Quality Hold</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Bin Location</label>
+                        <input type="text" class="form-control" placeholder="e.g. A-01-03" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-speedometer2"></i><h6>Stock Parameters</h6></div>
+                <div class="ent-field-grid cols-4">
+                    <div class="ent-field">
+                        <label>Current Stock</label>
+                        <input asp-for="Material.Stock" class="form-control" min="0" step="1" value="0" />
+                        <span asp-validation-for="Material.Stock" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Safety Stock</label>
+                        <input type="number" class="form-control" min="0" step="1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Reorder Point</label>
+                        <input type="number" class="form-control" min="0" step="1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Max Stock Level</label>
+                        <input type="number" class="form-control" min="0" step="1" value="0" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-toggle-on"></i><h6>Status</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Material Status</label>
+                        <select asp-for="Material.Status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Discontinued">Discontinued</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Quality Inspection Required</label>
+                        <select class="form-select">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>All changes are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Material</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Material.Type" class="form-label"></label><select asp-for="Material.Type" class="form-select"><option value="RAW">Raw Material</option><option value="FINISHED">Finished Good</option><option value="WIP">Work In Progress</option><option value="PACKAGING">Packaging</option><option value="CONSUMABLE">Consumable</option></select></div>
-<div class="col-md-3"><label asp-for="Material.UOM" class="form-label"></label><select asp-for="Material.UOM" class="form-select"><option value="EA">Each</option><option value="KG">Kilogram</option><option value="LB">Pound</option><option value="M">Meter</option><option value="L">Liter</option><option value="BX">Box</option><option value="PAL">Pallet</option></select></div>
-<div class="col-md-3"><label asp-for="Material.Stock" class="form-label"></label><input asp-for="Material.Stock" class="form-control" min="0" step="1" /><span asp-validation-for="Material.Stock" class="text-danger small"></span></div>
-<div class="col-md-2"><label asp-for="Material.Price" class="form-label"></label><input asp-for="Material.Price" class="form-control" min="0" step="0.01" /><span asp-validation-for="Material.Price" class="text-danger small"></span></div>
-</div>
-<div class="row mb-4">
-<div class="col-md-4"><label asp-for="Material.Status" class="form-label"></label><select asp-for="Material.Status" class="form-select"><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Low Stock">Low Stock</option><option value="Discontinued">Discontinued</option></select></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

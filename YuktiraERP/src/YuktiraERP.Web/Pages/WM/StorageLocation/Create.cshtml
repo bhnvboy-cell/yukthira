@@ -1,20 +1,192 @@
 @page
 @model YuktiraERP.Web.Pages.WM.StorageLocation.CreateModel
-@{ ViewData["Title"] = "New Storage Location"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Storage Location</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Location.Name" class="form-label"></label><input asp-for="Location.Name" class="form-control" /><span asp-validation-for="Location.Name" class="text-danger small"></span></div>
-<div class="col-md-3"><label asp-for="Location.Type" class="form-label"></label><select asp-for="Location.Type" class="form-select"><option value="Warehouse">Warehouse</option><option value="Rack">Rack</option><option value="Cold Storage">Cold Storage</option><option value="Yard">Yard</option></select></div>
-<div class="col-md-3"><label asp-for="Location.Status" class="form-label"></label><select asp-for="Location.Status" class="form-select"><option value="Active">Active</option><option value="Full">Full</option><option value="Inactive">Inactive</option></select></div>
+@{ ViewData["Title"] = "Create Storage Location"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-geo-alt"></i></div>
+        <div class="banner-info">
+            <h5>Create Storage Location</h5>
+            <span>OX09 — Storage Location Master</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Location.Status" value="Active" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="general">
+                <i class="bi bi-geo-alt tab-icon"></i> General Data
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="capacity">
+                <i class="bi bi-speedometer2 tab-icon"></i> Capacity & Layout
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="settings">
+                <i class="bi bi-sliders tab-icon"></i> Settings
+            </button>
+        </div>
+
+        <!-- ═══ TAB: General Data ═══ -->
+        <div class="ent-form-panel active" data-panel="general">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-geo-alt"></i><h6>Location Identification</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Location Code</label>
+                        <input asp-for="Location.Code" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field" style="grid-column: span 2">
+                        <label>Name <span class="required">*</span></label>
+                        <input asp-for="Location.Name" class="form-control" placeholder="Storage location name" />
+                        <span asp-validation-for="Location.Name" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Classification</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Type <span class="required">*</span></label>
+                        <select asp-for="Location.Type" class="form-select">
+                            <option value="Warehouse">Warehouse</option>
+                            <option value="Rack">Rack</option>
+                            <option value="Cold Storage">Cold Storage</option>
+                            <option value="Yard">Yard</option>
+                            <option value="Bonded">Bonded Warehouse</option>
+                            <option value="Hazmat">Hazardous Storage</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Plant</label>
+                        <select class="form-select">
+                            <option value="1000">1000 — Main Plant</option>
+                            <option value="2000">2000 — Secondary Plant</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Storage Section</label>
+                        <select class="form-select">
+                            <option value="A">Section A — Receiving</option>
+                            <option value="B">Section B — Bulk Storage</option>
+                            <option value="C">Section C — Pick Area</option>
+                            <option value="D">Section D — Shipping</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Capacity & Layout ═══ -->
+        <div class="ent-form-panel" data-panel="capacity">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-speedometer2"></i><h6>Capacity Planning</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Max Capacity (units)</label>
+                        <input asp-for="Location.Capacity" class="form-control" min="0" step="1" />
+                        <span asp-validation-for="Location.Capacity" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Weight Capacity (kg)</label>
+                        <input type="number" class="form-control" min="0" step="1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Volume Capacity (m³)</label>
+                        <input type="number" class="form-control" min="0" step="0.01" value="0" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-box"></i><h6>Bin Layout</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Number of Rows</label>
+                        <input type="number" class="form-control" min="1" value="1" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Number of Columns</label>
+                        <input type="number" class="form-control" min="1" value="1" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Number of Levels</label>
+                        <input type="number" class="form-control" min="1" value="1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Settings ═══ -->
+        <div class="ent-form-panel" data-panel="settings">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-sliders"></i><h6>Operational Settings</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <select asp-for="Location.Status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Full">Full</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Storage Strategy</label>
+                        <select class="form-select">
+                            <option value="FIFO">FIFO — First In, First Out</option>
+                            <option value="LIFO">LIFO — Last In, First Out</option>
+                            <option value="FEFO">FEFO — First Expire, First Out</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Putaway Strategy</label>
+                        <select class="form-select">
+                            <option value="Fixed">Fixed Bin</option>
+                            <option value="Open">Open Storage</option>
+                            <option value="Near">Near Pick Area</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-toggle-on"></i><h6>Features</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Batch Management</label>
+                        <select class="form-select">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes — Required</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Serial Number Management</label>
+                        <select class="form-select">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes — Required</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Quality Inspection</label>
+                        <select class="form-select">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes — On Receipt</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Storage locations are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Location</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-4">
-<div class="col-md-4"><label asp-for="Location.Capacity" class="form-label"></label><input asp-for="Location.Capacity" class="form-control" min="0" step="1" /><span asp-validation-for="Location.Capacity" class="text-danger small"></span></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

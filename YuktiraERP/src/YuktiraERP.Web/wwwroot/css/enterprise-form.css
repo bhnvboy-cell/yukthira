@@ -1,0 +1,348 @@
+/* ── YuktiraERP Enterprise Form Styles ── */
+
+/* ═══════════════════════════════════════════════════
+   TABS NAVIGATION
+   ═══════════════════════════════════════════════════ */
+.ent-form-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.ent-form-tab {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.ent-form-tab:hover {
+    color: var(--primary);
+    background: var(--bg-subtle);
+}
+.ent-form-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+.ent-form-tab .tab-icon {
+    font-size: 0.9rem;
+}
+.ent-form-tab .tab-badge {
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════
+   TAB PANELS
+   ═══════════════════════════════════════════════════ */
+.ent-form-panel {
+    display: none;
+    animation: entFadeIn 0.25s ease;
+}
+.ent-form-panel.active {
+    display: block;
+}
+@keyframes entFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION GROUPS
+   ═══════════════════════════════════════════════════ */
+.ent-section {
+    margin-bottom: 1.5rem;
+}
+.ent-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+}
+.ent-section-header i {
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+.ent-section-header h6 {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text);
+}
+
+/* ═══════════════════════════════════════════════════
+   FIELD GRID (responsive row layout)
+   ═══════════════════════════════════════════════════ */
+.ent-field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem 1rem;
+}
+.ent-field-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.ent-field-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.ent-field-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 768px) {
+    .ent-field-grid,
+    .ent-field-grid.cols-2,
+    .ent-field-grid.cols-3,
+    .ent-field-grid.cols-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM FIELD WRAPPER
+   ═══════════════════════════════════════════════════ */
+.ent-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.ent-field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.ent-field label .required {
+    color: var(--danger, #dc3545);
+    margin-left: 2px;
+}
+.ent-field .form-control,
+.ent-field .form-select {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 6px;
+}
+.ent-field .text-danger {
+    font-size: 0.72rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   INFO FIELDS (read-only / display)
+   ═══════════════════════════════════════════════════ */
+.ent-field .form-control[readonly] {
+    background: var(--bg-subtle, #f8f9fa);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════
+   LINE ITEMS TABLE
+   ═══════════════════════════════════════════════════ */
+.ent-line-items-wrap {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.ent-line-items-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-subtle, #f8f9fa);
+    border-bottom: 1px solid var(--border);
+}
+.ent-line-items-header h6 {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.ent-line-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+.ent-line-items-table th {
+    background: var(--bg-subtle, #f8f9fa);
+    padding: 0.5rem 0.6rem;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+.ent-line-items-table td {
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+.ent-line-items-table td .form-control,
+.ent-line-items-table td .form-select {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.45rem;
+    border-radius: 4px;
+}
+.ent-line-items-table tr:last-child td {
+    border-bottom: none;
+}
+.ent-line-items-table .line-total {
+    font-weight: 700;
+    color: var(--primary);
+    text-align: right;
+    white-space: nowrap;
+}
+.ent-line-items-table .line-remove {
+    color: var(--danger, #dc3545);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0.2rem;
+    font-size: 0.9rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.ent-line-items-table .line-remove:hover {
+    opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOTALS BAR
+   ═══════════════════════════════════════════════════ */
+.ent-totals-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.5rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-subtle, #f8f9fa);
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+}
+.ent-totals-bar .total-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+}
+.ent-totals-bar .total-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+}
+.ent-totals-bar .total-value {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM FOOTER (action buttons)
+   ═══════════════════════════════════════════════════ */
+.ent-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+}
+.ent-form-footer .footer-info {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.ent-form-footer .footer-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   DATA-BIND INDICATOR (auto-calc fields)
+   ═══════════════════════════════════════════════════ */
+.ent-field[data-calculated] .form-control {
+    border-left: 3px solid var(--primary);
+}
+
+/* ═══════════════════════════════════════════════════
+   ORGANIZATIONAL BANNER (entity type, code, etc.)
+   ═══════════════════════════════════════════════════ */
+.ent-org-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #1a5276) 100%);
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+}
+.ent-org-banner .banner-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+.ent-org-banner .banner-info h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.ent-org-banner .banner-info span {
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+.ent-org-banner .banner-meta {
+    margin-left: auto;
+    text-align: right;
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════════════════
+   THEME OVERRIDES
+   ═══════════════════════════════════════════════════ */
+[data-theme="futuristic"] .ent-form-tab.active {
+    border-bottom-color: var(--accent, #d4af37);
+    color: var(--accent, #d4af37);
+}
+[data-theme="futuristic"] .ent-section-header {
+    border-bottom-color: rgba(212,175,55,0.3);
+}
+[data-theme="futuristic"] .ent-org-banner {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid var(--accent, #d4af37);
+}
+[data-theme="minimal"] .ent-form-tab.active {
+    border-bottom-width: 3px;
+    border-bottom-color: var(--primary);
+}
+[data-theme="minimal"] .ent-section-header {
+    border-bottom: 1px solid #ddd;
+}
+[data-theme="classical"] .ent-form-tab {
+    font-size: 0.78rem;
+    padding: 0.5rem 1rem;
+}
+[data-theme="classical"] .ent-form-tab.active {
+    font-weight: 800;
+}

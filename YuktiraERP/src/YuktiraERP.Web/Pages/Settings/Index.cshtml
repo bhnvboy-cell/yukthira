@@ -1,15 +1,16 @@
 @page
 @model YuktiraERP.Web.Pages.Settings.IndexModel
-@{ ViewData["Title"] = "Settings"; Layout = "_Layout"; }
+@inject IStringLocalizer<SharedResources> L
+@{ ViewData["Title"] = L["Settings"]; Layout = "_Layout"; }
 
-<h2><i class="bi bi-gear"></i> Settings</h2>
+<h2><i class="bi bi-gear"></i> @L["Settings"]</h2>
 <hr class="mb-4" />
 
 <!-- Theme Selection -->
 <div class="card mb-4">
-    <div class="card-header fw-semibold"><i class="bi bi-palette"></i> Theme</div>
+    <div class="card-header fw-semibold"><i class="bi bi-palette"></i> @L["Theme"]</div>
     <div class="card-body">
-        <p class="text-muted mb-3">Choose your preferred layout style.</p>
+        <p class="text-muted mb-3">@L["ThemeDesc"]</p>
         <div class="settings-theme-grid">
             <div class="settings-theme-card" data-theme="modern" onclick="selectTheme('modern')">
                 <div class="settings-theme-preview"><i class="bi bi-window-stack text-white"></i></div>
@@ -37,12 +38,12 @@
 
 <!-- Session Timeout -->
 <div class="card mb-4">
-    <div class="card-header fw-semibold"><i class="bi bi-clock-history"></i> Session Timeout</div>
+    <div class="card-header fw-semibold"><i class="bi bi-clock-history"></i> @L["SessionTimeout"]</div>
     <div class="card-body">
-        <p class="text-muted mb-3">Configure automatic logout after inactivity. A warning will appear before expiry.</p>
+        <p class="text-muted mb-3">@L["SessionTimeoutDesc"]</p>
         <div class="row g-3">
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Session Duration (minutes)</label>
+                <label class="form-label fw-semibold">@L["SessionDuration"]</label>
                 <select id="sessionTimeoutMinutes" class="form-select" onchange="saveTimeoutSettings()">
                     <option value="5">5 minutes</option>
                     <option value="10">10 minutes</option>
@@ -55,7 +56,7 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Warning Before (seconds)</label>
+                <label class="form-label fw-semibold">@L["WarningBefore"]</label>
                 <select id="warningBeforeSeconds" class="form-select" onchange="saveTimeoutSettings()">
                     <option value="30">30 seconds</option>
                     <option value="60" selected>60 seconds</option>
@@ -74,11 +75,11 @@
 
 <!-- General -->
 <div class="card mb-4">
-    <div class="card-header fw-semibold"><i class="bi bi-sliders"></i> General</div>
+    <div class="card-header fw-semibold"><i class="bi bi-sliders"></i> @L["General"]</div>
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Language</label>
+                <label class="form-label fw-semibold">@L["Language"]</label>
                 <select id="settingLanguage" class="form-select" onchange="changeLanguage(this.value)">
                     <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en")">English</option>
                     <option value="hi" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hi")">Hindi</option>
@@ -89,7 +90,7 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Sidebar Behavior</label>
+                <label class="form-label fw-semibold">@L["SidebarBehavior"]</label>
                 <select id="settingSidebar" class="form-select" onchange="saveGeneralSettings()">
                     <option value="hover" selected>Expand on hover</option>
                     <option value="collapsed">Always collapsed</option>
@@ -97,7 +98,7 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold">Animations</label>
+                <label class="form-label fw-semibold">@L["Animations"]</label>
                 <select id="settingAnimations" class="form-select" onchange="saveGeneralSettings()">
                     <option value="full" selected>Full animations</option>
                     <option value="reduced">Reduced motion</option>

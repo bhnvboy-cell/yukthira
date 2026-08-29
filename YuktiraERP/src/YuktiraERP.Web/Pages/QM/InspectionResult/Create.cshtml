@@ -1,21 +1,183 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.QM.InspectionResult.CreateModel
-@{ ViewData["Title"] = "New Inspection Result"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Inspection Result</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Result.LotNumber" class="form-label"></label><input asp-for="Result.LotNumber" class="form-control" placeholder="IQ-2024-..." /><span asp-validation-for="Result.LotNumber" class="text-danger small"></span></div>
-<div class="col-md-4"><label asp-for="Result.Characteristic" class="form-label"></label><input asp-for="Result.Characteristic" class="form-control" /></div>
-<div class="col-md-4"><label asp-for="Result.Status" class="form-label"></label><select asp-for="Result.Status" class="form-select"><option value="Passed">Passed</option><option value="Failed">Failed</option></select></div>
+@{ ViewData["Title"] = "Record Inspection Result"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-clipboard-data"></i></div>
+        <div class="banner-info">
+            <h5>Record Inspection Result</h5>
+            <span>QA32 — Inspection Results</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000
+        </div>
+    </div>
+
+    <form method="post">
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="lotref">
+                <i class="bi bi-link tab-icon"></i> Lot Reference
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="results">
+                <i class="bi bi-rulers tab-icon"></i> Measurement Results
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="defect">
+                <i class="bi bi-exclamation-triangle tab-icon"></i> Defect & Disposition
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Lot Reference ═══ -->
+        <div class="ent-form-panel active" data-panel="lotref">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-link"></i><h6>Inspection Lot Reference</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Lot Number <span class="required">*</span></label>
+                        <input asp-for="Result.LotNumber" class="form-control" placeholder="IQ-2024-..." />
+                        <span asp-validation-for="Result.LotNumber" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Characteristic <span class="required">*</span></label>
+                        <input asp-for="Result.Characteristic" class="form-control" placeholder="e.g. Dimension A" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Result Status <span class="required">*</span></label>
+                        <select asp-for="Result.Status" class="form-select">
+                            <option value="Passed">Passed</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Recorded By</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Inspector</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="INS-01">INS-01 — Dr. Smith</option>
+                            <option value="INS-02">INS-02 — Dr. Patel</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Recorded At</label>
+                        <input type="datetime-local" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Inspection Lot Origin</label>
+                        <select class="form-select">
+                            <option value="Goods Receipt">Goods Receipt</option>
+                            <option value="Production">Production</option>
+                            <option value="Stock Transfer">Stock Transfer</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Measurement Results ═══ -->
+        <div class="ent-form-panel" data-panel="results">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-rulers"></i><h6>Measured Values</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Measured Value <span class="required">*</span></label>
+                        <input asp-for="Result.Result" class="form-control" placeholder="e.g. 10.02 mm" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Specification</label>
+                        <input asp-for="Result.Specification" class="form-control" placeholder="e.g. 10.00 ± 0.05 mm" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Unit</label>
+                        <select class="form-select">
+                            <option value="mm">mm</option>
+                            <option value="cm">cm</option>
+                            <option value="m">m</option>
+                            <option value="in">in</option>
+                            <option value="ft">ft</option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="mg">mg</option>
+                            <option value="lb">lb</option>
+                            <option value="L">L</option>
+                            <option value="ml">ml</option>
+                            <option value="°C">°C</option>
+                            <option value="°F">°F</option>
+                            <option value="pH">pH</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3" style="margin-top:0.75rem">
+                    <div class="ent-field">
+                        <label>Tolerance Min</label>
+                        <input type="number" class="form-control" step="0.001" placeholder="Lower limit" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Tolerance Max</label>
+                        <input type="number" class="form-control" step="0.001" placeholder="Upper limit" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Target Value</label>
+                        <input type="number" class="form-control" step="0.001" placeholder="Nominal value" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Defect & Disposition ═══ -->
+        <div class="ent-form-panel" data-panel="defect">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-exclamation-triangle"></i><h6>Defect Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Defect Code</label>
+                        <select class="form-select">
+                            <option value="">-- No Defect --</option>
+                            <option value="D01">D01 — Dimensional</option>
+                            <option value="D02">D02 — Visual</option>
+                            <option value="D03">D03 — Functional</option>
+                            <option value="D04">D04 — Cosmetic</option>
+                            <option value="D05">D05 — Contamination</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Root Cause</label>
+                        <select class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="Process">Process Issue</option>
+                            <option value="Material">Material Issue</option>
+                            <option value="Machine">Machine Issue</option>
+                            <option value="Operator">Operator Error</option>
+                            <option value="Environment">Environment</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Disposition</label>
+                        <select class="form-select">
+                            <option value="Accept">Accept</option>
+                            <option value="Rework">Rework</option>
+                            <option value="Scrap">Scrap</option>
+                            <option value="Return to Vendor">Return to Vendor</option>
+                            <option value="Use As-Is">Use As-Is</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Results are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/QM/InspectionResult/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Result</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-4">
-<div class="col-md-4"><label asp-for="Result.Result" class="form-label"></label><input asp-for="Result.Result" class="form-control" /></div>
-<div class="col-md-4"><label asp-for="Result.Specification" class="form-label"></label><input asp-for="Result.Specification" class="form-control" /></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/QM/InspectionResult/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

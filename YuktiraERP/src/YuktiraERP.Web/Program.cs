@@ -28,15 +28,21 @@ builder.Host.UseSerilog();
 builder.Services.AddRazorPages();
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<YuktiraDbContext>("database", Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy);
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddLocalization();
 builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
 {
-    var supported = new[] { "en", "hi", "ta", "te", "kn", "ml", "fr", "es" };
+    var supported = new[] { "en", "hi", "ta", "te", "fr", "es" };
     options.SetDefaultCulture("en")
         .AddSupportedCultures(supported)
         .AddSupportedUICultures(supported);
 });
 builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(options =>
+    {
+        options.DataAnnotationLocalizerProvider = (type, factory) =>
+            factory.Create(typeof(YuktiraERP.Web.Resources.SharedResources));
+    })
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddSignalR();
 builder.Services.AddYuktiraInfrastructure(builder.Configuration);

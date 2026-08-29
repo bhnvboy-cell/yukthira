@@ -14,7 +14,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <a href="#main-content" class="skip-to-content" id="skipToContent">Skip to main content</a>
+    <a href="#main-content" class="skip-to-content" id="skipToContent">@L["SkipToContent"]</a>
     <div class="app-layout">
         @if (Context.User?.Identity?.IsAuthenticated == true)
         {
@@ -61,22 +61,22 @@
                     <div class="top-bar-center">
                         <div class="top-bar-search">
                             <i class="bi bi-search" aria-hidden="true"></i>
-                            <input type="text" id="globalSearch" placeholder="Transaction search... (Ctrl+K)" autocomplete="off" aria-label="Search transactions">
+                            <input type="text" id="globalSearch" placeholder="@L["SearchPlaceholder"]" autocomplete="off" aria-label="Search transactions">
                             <button type="button" class="top-bar-search-btn" id="globalSearchBtn" title="Search" aria-label="Search"><i class="bi bi-arrow-right"></i></button>
                             <div id="globalSearchResults" class="search-results" style="display:none" role="listbox" aria-label="Search results"></div>
                         </div>
                     </div>
                     <div class="top-bar-right">
-                        <button type="button" class="top-bar-icon" id="darkModeToggle" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi bi-moon-stars"></i></button>
-                        <a href="/Notifications" class="top-bar-icon" title="Notifications" aria-label="Notifications">
+                        <button type="button" class="top-bar-icon" id="darkModeToggle" title="@L["ToggleDarkMode"]" aria-label="@L["ToggleDarkMode"]"><i class="bi bi-moon-stars"></i></button>
+                        <a href="/Notifications" class="top-bar-icon" title="@L["Notifications"]" aria-label="@L["Notifications"]">
                             <i class="bi bi-bell" aria-hidden="true"></i>
                             <span class="badge bg-danger" id="notifCount" style="display:none" aria-live="polite">0</span>
                         </a>
-                        <a href="/Dashboard" class="top-bar-icon" title="Home" aria-label="Home dashboard"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i></a>
-                        <a href="/Settings" class="top-bar-icon" title="Settings" aria-label="Settings"><i class="bi bi-gear" aria-hidden="true"></i></a>
+                        <a href="/Dashboard" class="top-bar-icon" title="@L["Home"]" aria-label="@L["Home"]"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i></a>
+                        <a href="/Settings" class="top-bar-icon" title="@L["Settings"]" aria-label="@L["Settings"]"><i class="bi bi-gear" aria-hidden="true"></i></a>
                         <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon lang-form" style="margin:0;display:inline-flex">
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                            <select name="culture" onchange="this.form.submit()" class="lang-select" title="Language" aria-label="Select language">
+                            <select name="culture" onchange="this.form.submit()" class="lang-select" title="@L["SelectLanguage"]" aria-label="@L["SelectLanguage"]">
                                 <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en")">EN</option>
                                 <option value="hi" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hi")">HI</option>
                                 <option value="ta" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ta")">TA</option>
@@ -85,8 +85,8 @@
                                 <option value="es" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "es")">ES</option>
                             </select>
                         </form>
-                        <a href="#" class="top-bar-icon" id="printBtn" title="Print / Save as PDF" aria-label="Print page"><i class="bi bi-printer" aria-hidden="true"></i></a>
-                        <a href="/Auth/Logout" class="top-bar-icon text-danger" title="Logout" aria-label="Logout"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
+                        <a href="#" class="top-bar-icon" id="printBtn" title="@L["Print"]" aria-label="@L["Print"]"><i class="bi bi-printer" aria-hidden="true"></i></a>
+                        <a href="/Auth/Logout" class="top-bar-icon text-danger" title="@L["Logout"]" aria-label="@L["Logout"]"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </header>
                 <main class="app-main" id="main-content" role="main">
@@ -102,11 +102,13 @@
         }
     </div>
     <link rel="stylesheet" href="~/css/tcode-engine.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/enterprise-form.css" asp-append-version="true" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
     <script src="~/js/yuktira.js"></script>
+    <script src="~/js/enterprise-form.js" asp-append-version="true"></script>
     <script>
         // ── Theme engine ──
         (function() {
@@ -305,15 +307,15 @@
             <div class="session-timeout-icon">
                 <i class="bi bi-clock-history"></i>
             </div>
-            <h3>Session Expiring</h3>
+            <h3>@L["SessionExpiring"]</h3>
             <p>Your session will expire in <span id="timeoutCountdown">60</span> seconds.</p>
-            <p class="session-timeout-sub">Would you like to continue working?</p>
+            <p class="session-timeout-sub">@L["SessionContinueQ"]</p>
             <div class="session-timeout-actions">
                 <button type="button" class="btn-timeout btn-timeout-continue" id="sessionContinueBtn">
-                    <i class="bi bi-play-circle"></i> Continue Session
+                    <i class="bi bi-play-circle"></i> @L["ContinueSession"]
                 </button>
                 <button type="button" class="btn-timeout btn-timeout-logoff" id="sessionLogoffBtn">
-                    <i class="bi bi-box-arrow-right"></i> Log Off
+                    <i class="bi bi-box-arrow-right"></i> @L["LogOff"]
                 </button>
             </div>
             <div class="session-timeout-progress">
