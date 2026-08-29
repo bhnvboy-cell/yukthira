@@ -1312,7 +1312,8 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 ## Documentation
 
-- `docs/user-guide.md` — comprehensive end-user guide: all 35 modules, 75 T-codes, workflows, troubleshooting
+- `docs/user-guide.md` — comprehensive end-user guide: getting started, all 35 modules, 75 T-codes, workflows, troubleshooting
+- `docs/features.md` — complete features & capabilities showcase
 - `docs/architecture.md` — tech stack, patterns, scalability
 - `docs/api-reference.md` — all REST API endpoints
 - `docs/plugin-development.md` — SDK reference, hooks guide, build & deploy
