@@ -5,6 +5,7 @@ using YuktiraERP.Core.Interfaces;
 namespace YuktiraERP.Web.Controllers;
 
 [ApiController]
+[Route("api/v1/kpi")]
 [Route("api/kpi")]
 [Authorize]
 public class KpiController : ControllerBase
