@@ -1,0 +1,124 @@
+@page
+@model YuktiraERP.Web.Pages.QM.Notification.CreateModel
+@{ ViewData["Title"] = "Create Quality Notification"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-bell me-2"></i>Create Quality Notification</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="notifForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="notifTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Data</button>
+        <button type="button" class="ent-tab" data-tab="tabDefect">Defect Details</button>
+    </div>
+    <form id="notifForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Notification Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Notification.NotificationNumber" class="ent-label required">Notification Number</label>
+                        <input asp-for="Notification.NotificationNumber" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.NotificationType" class="ent-label">Notification Type</label>
+                        <select asp-for="Notification.NotificationType" class="ent-select">
+                            <option value="Q1">Q1 - Customer Complaint</option>
+                            <option value="Q2">Q2 - Supplier Non-Conformance</option>
+                            <option value="Q3">Q3 - Internal Defect</option>
+                            <option value="Q4">Q4 - Safety Incident</option>
+                            <option value="Q5">Q5 - Process Deviation</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Status" class="ent-label">Status</label>
+                        <select asp-for="Notification.Status" class="ent-select">
+                            <option value="NEW">NEW</option>
+                            <option value="IN_PROCESS">IN PROCESS</option>
+                            <option value="COMPLETED">COMPLETED</option>
+                            <option value="CLOSED">CLOSED</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Notification.Description" class="ent-label required">Description</label>
+                        <textarea asp-for="Notification.Description" class="ent-input" rows="3" required></textarea>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.CreatedBy" class="ent-label">Created By</label>
+                        <input asp-for="Notification.CreatedBy" class="ent-input" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-box-seam"></i> Material & Plant</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Notification.MaterialCode" class="ent-label">Material Code</label>
+                        <input asp-for="Notification.MaterialCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Plant" class="ent-label">Plant</label>
+                        <select asp-for="Notification.Plant" class="ent-select">
+                            <option value="1000">1000</option>
+                            <option value="2000">2000</option>
+                            <option value="3000">3000</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.BatchNumber" class="ent-label">Batch Number</label>
+                        <input asp-for="Notification.BatchNumber" class="ent-input" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabDefect" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-exclamation-triangle"></i> Defect Information</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Notification.DefectCode" class="ent-label">Defect Code</label>
+                        <select asp-for="Notification.DefectCode" class="ent-select">
+                            <option value="">-- Select --</option>
+                            <option value="DIM">Dimensional</option>
+                            <option value="VIS">Visual</option>
+                            <option value="FUNC">Functional</option>
+                            <option value="CHEM">Chemical</option>
+                            <option value="MECH">Mechanical</option>
+                            <option value="ELEC">Electrical</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Priority" class="ent-label">Priority</label>
+                        <select asp-for="Notification.Priority" class="ent-select">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Impact" class="ent-label">Impact</label>
+                        <select asp-for="Notification.Impact" class="ent-select">
+                            <option value="None">None</option>
+                            <option value="Minor">Minor</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Major">Major</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-1">
+                    <div class="ent-field">
+                        <label asp-for="Notification.RootCause" class="ent-label">Root Cause</label>
+                        <textarea asp-for="Notification.RootCause" class="ent-input" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

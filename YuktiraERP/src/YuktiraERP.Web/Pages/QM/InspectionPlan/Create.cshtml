@@ -1,21 +1,97 @@
 @page
 @model YuktiraERP.Web.Pages.QM.InspectionPlan.CreateModel
 @{ ViewData["Title"] = "Create Inspection Plan"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Inspection Plan</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Plan.MaterialName" class="form-label"></label><input asp-for="Plan.MaterialName" class="form-control" /></div>
-<div class="col-md-6"><label asp-for="Plan.Characteristic" class="form-label"></label><input asp-for="Plan.Characteristic" class="form-control" /></div>
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-journal-plus me-2"></i>Create Inspection Plan</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="planForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="planTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Data</button>
+        <button type="button" class="ent-tab" data-tab="tabChars">Characteristics</button>
+    </div>
+    <form id="planForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Plan Identification</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Plan.PlanId" class="ent-label required">Plan ID</label>
+                        <input asp-for="Plan.PlanId" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Plan.MaterialName" class="ent-label required">Material Code / Name</label>
+                        <input asp-for="Plan.MaterialName" class="ent-input" required />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-rulers"></i> Characteristic & Sampling</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Plan.Characteristic" class="ent-label">Characteristic</label>
+                        <input asp-for="Plan.Characteristic" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Plan.Method" class="ent-label">Method</label>
+                        <input asp-for="Plan.Method" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Plan.Frequency" class="ent-label">Frequency</label>
+                        <select asp-for="Plan.Frequency" class="ent-select">
+                            <option>Each Lot</option>
+                            <option>Every Nth Lot</option>
+                            <option>Daily</option>
+                            <option>Weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-gear"></i> Control & Status</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Plan.ControlKey" class="ent-label">Control Key</label>
+                        <select asp-for="Plan.ControlKey" class="ent-select">
+                            <option value="0001">0001 - Manual Recording</option>
+                            <option value="0002">0002 - Automatic Recording</option>
+                            <option value="0003">0003 - Manual with defects</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Plan.SamplingProcedure" class="ent-label">Sampling Procedure</label>
+                        <select asp-for="Plan.SamplingProcedure" class="ent-select">
+                            <option value="Fixed">Fixed Sample</option>
+                            <option value="Variable">Variable Sample</option>
+                            <option value="SkipLot">Skip Lot</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Plan.Status" class="ent-label">Status</label>
+                        <select asp-for="Plan.Status" class="ent-select">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabChars" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-list-check"></i> Characteristic Definitions</div>
+                <p class="text-muted">Define inspection characteristics, tolerance limits, and evaluation modes for this plan.</p>
+                <div class="ent-field-grid ent-grid-1">
+                    <div class="ent-field">
+                        <label class="ent-label">Characteristic List</label>
+                        <textarea class="ent-input" rows="4" placeholder="Enter characteristics, one per line (e.g., Dimension: 10.0-12.0 mm)"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Plan.Method" class="form-label"></label><input asp-for="Plan.Method" class="form-control" /></div>
-<div class="col-md-4"><label asp-for="Plan.Frequency" class="form-label"></label><select asp-for="Plan.Frequency" class="form-select"><option>Each Lot</option><option>Every Nth Lot</option><option>Daily</option><option>Weekly</option></select></div>
-<div class="col-md-4"><label asp-for="Plan.Status" class="form-label"></label><select asp-for="Plan.Status" class="form-select"><option>Active</option><option>Inactive</option></select></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,109 @@
+@page
+@model YuktiraERP.Web.Pages.QM.COA.CreateModel
+@{ ViewData["Title"] = "Issue Certificate of Analysis"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-file-earmark-check me-2"></i>Issue Certificate of Analysis</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="coaForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="coaTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Data</button>
+        <button type="button" class="ent-tab" data-tab="tabCustomer">Customer & Issuance</button>
+    </div>
+    <form id="coaForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Certificate Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="COA.COANumber" class="ent-label required">COA Number</label>
+                        <input asp-for="COA.COANumber" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.InspectionLotNumber" class="ent-label required">Inspection Lot #</label>
+                        <input asp-for="COA.InspectionLotNumber" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.Status" class="ent-label">Status</label>
+                        <select asp-for="COA.Status" class="ent-select">
+                            <option>Issued</option>
+                            <option>Draft</option>
+                            <option>Revoked</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-box-seam"></i> Material & Batch</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="COA.MaterialCode" class="ent-label">Material Code</label>
+                        <input asp-for="COA.MaterialCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.MaterialName" class="ent-label">Material Name</label>
+                        <input asp-for="COA.MaterialName" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.BatchNumber" class="ent-label">Batch Number</label>
+                        <input asp-for="COA.BatchNumber" class="ent-input" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="COA.Plant" class="ent-label">Plant</label>
+                        <select asp-for="COA.Plant" class="ent-select">
+                            <option value="1000">1000</option>
+                            <option value="2000">2000</option>
+                            <option value="3000">3000</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.OverallResult" class="ent-label">Overall Result</label>
+                        <select asp-for="COA.OverallResult" class="ent-select">
+                            <option>Passed</option>
+                            <option>Failed</option>
+                            <option>Conditional</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.Remarks" class="ent-label">Remarks</label>
+                        <input asp-for="COA.Remarks" class="ent-input" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabCustomer" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-building"></i> Customer Information</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="COA.CustomerName" class="ent-label">Customer Name</label>
+                        <input asp-for="COA.CustomerName" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.CustomerPO" class="ent-label">Customer PO #</label>
+                        <input asp-for="COA.CustomerPO" class="ent-input" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-person-check"></i> Issuance</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="COA.IssuedBy" class="ent-label">Issued By</label>
+                        <input asp-for="COA.IssuedBy" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="COA.IssueDate" class="ent-label">Issue Date</label>
+                        <input asp-for="COA.IssueDate" class="ent-input" type="date" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

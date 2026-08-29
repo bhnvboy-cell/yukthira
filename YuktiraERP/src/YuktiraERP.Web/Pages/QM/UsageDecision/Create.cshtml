@@ -1,21 +1,94 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.QM.UsageDecision.CreateModel
-@{ ViewData["Title"] = "Usage Decision"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Usage Decision</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Decision.LotNumber" class="form-label"></label><input asp-for="Decision.LotNumber" class="form-control" placeholder="IQ-2024-..." /><span asp-validation-for="Decision.LotNumber" class="text-danger small"></span></div>
-<div class="col-md-4"><label asp-for="Decision.MaterialName" class="form-label"></label><input asp-for="Decision.MaterialName" class="form-control" /><span asp-validation-for="Decision.MaterialName" class="text-danger small"></span></div>
-<div class="col-md-4"><label asp-for="Decision.DecisionDate" class="form-label"></label><input asp-for="Decision.DecisionDate" class="form-control" type="date" /></div>
+@{ ViewData["Title"] = "Record Usage Decision"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-check2-circle me-2"></i>Record Usage Decision</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="udForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="udTabs">
+        <button type="button" class="ent-tab active" data-tab="tabLot">Lot Reference</button>
+        <button type="button" class="ent-tab" data-tab="tabDecision">Decision & Stock</button>
+    </div>
+    <form id="udForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabLot">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-clipboard-check"></i> Inspection Lot Reference</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Decision.DecisionId" class="ent-label required">Decision ID</label>
+                        <input asp-for="Decision.DecisionId" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.LotNumber" class="ent-label required">Inspection Lot #</label>
+                        <input asp-for="Decision.LotNumber" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.MaterialName" class="ent-label">Material Description</label>
+                        <input asp-for="Decision.MaterialName" class="ent-input" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Decision.InspectorID" class="ent-label">Inspector ID</label>
+                        <input asp-for="Decision.InspectorID" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.DecisionDate" class="ent-label required">Decision Date</label>
+                        <input asp-for="Decision.DecisionDate" class="ent-input" type="date" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.QualityScore" class="ent-label">Quality Score</label>
+                        <input asp-for="Decision.QualityScore" class="ent-input" type="number" step="0.01" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabDecision" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-check2-square"></i> Usage Decision</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Decision.UDCode" class="ent-label required">UD Code</label>
+                        <select asp-for="Decision.UDCode" class="ent-select">
+                            <option value="Accepted">Accepted (A)</option>
+                            <option value="Accepted w/ Deviation">Accepted w/ Deviation (AD)</option>
+                            <option value="Rejected">Rejected (R)</option>
+                            <option value="Rework">Rework (RW)</option>
+                            <option value="Scrap">Scrap (S)</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.Decision" class="ent-label">Decision Text</label>
+                        <input asp-for="Decision.Decision" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.Notes" class="ent-label">Decision Notes</label>
+                        <textarea asp-for="Decision.Notes" class="ent-input" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-box-arrow-in-down"></i> Stock Posting</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Decision.UnrestrictedStock" class="ent-label">Unrestricted Stock Qty</label>
+                        <input asp-for="Decision.UnrestrictedStock" class="ent-input" type="number" step="0.01" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.BlockedStock" class="ent-label">Blocked Stock Qty</label>
+                        <input asp-for="Decision.BlockedStock" class="ent-input" type="number" step="0.01" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Decision.ScrapQuantity" class="ent-label">Scrap Qty</label>
+                        <input asp-for="Decision.ScrapQuantity" class="ent-input" type="number" step="0.01" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-8"><label asp-for="Decision.Decision" class="form-label"></label><input asp-for="Decision.Decision" class="form-control" /><span asp-validation-for="Decision.Decision" class="text-danger small"></span></div>
-</div>
-<div class="mb-4"><label asp-for="Decision.Notes" class="form-label"></label><textarea asp-for="Decision.Notes" class="form-control" rows="2"></textarea></div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/QM/UsageDecision/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

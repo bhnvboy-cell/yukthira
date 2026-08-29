@@ -120,10 +120,10 @@ public class MaterialStagingEntity : EntityBase
 }
 
 // QM
-public class InspectionLotEntity : EntityBase { public string LotNumber { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Quantity { get; set; } = ""; public int Inspected { get; set; } public int Passed { get; set; } public int Failed { get; set; } public string Status { get; set; } = "Pending"; }
-public class InspectionPlanEntity : EntityBase { public string PlanId { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Characteristic { get; set; } = ""; public string Method { get; set; } = ""; public string Frequency { get; set; } = ""; public string Status { get; set; } = "Active"; }
-public class InspectionResultEntity : EntityBase { public string ResultId { get; set; } = ""; public string LotNumber { get; set; } = ""; public string Characteristic { get; set; } = ""; public string Result { get; set; } = ""; public string Specification { get; set; } = ""; public string Status { get; set; } = "Passed"; }
-public class UsageDecisionEntity : EntityBase { public string DecisionId { get; set; } = ""; public string LotNumber { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Decision { get; set; } = "Accept"; public string Notes { get; set; } = ""; public DateTime DecisionDate { get; set; } }
+public class InspectionLotEntity : EntityBase { public string LotNumber { get; set; } = ""; public string MaterialCode { get; set; } = ""; public string MaterialName { get; set; } = ""; public string Plant { get; set; } = "1000"; public string StorageLocation { get; set; } = ""; public string BatchNumber { get; set; } = ""; public string InspectionType { get; set; } = "01"; public string Quantity { get; set; } = ""; public string BaseUOM { get; set; } = "EA"; public string ReferenceOrderNumber { get; set; } = ""; public int Inspected { get; set; } public int Passed { get; set; } public int Failed { get; set; } public int SampleSize { get; set; } = 0; public string InspectionPlanID { get; set; } = ""; public string AssignedInspector { get; set; } = ""; public string Status { get; set; } = "Created"; }
+public class InspectionPlanEntity : EntityBase { public string PlanId { get; set; } = ""; public string MaterialName { get; set; } = ""; public string MaterialCode { get; set; } = ""; public string Characteristic { get; set; } = ""; public string Method { get; set; } = ""; public string Frequency { get; set; } = ""; public string ControlKey { get; set; } = ""; public string SamplingProcedure { get; set; } = ""; public DateTime? ValidityStart { get; set; } public DateTime? ValidityEnd { get; set; } public string Status { get; set; } = "Active"; }
+public class InspectionResultEntity : EntityBase { public string ResultId { get; set; } = ""; public string LotNumber { get; set; } = ""; public string BatchNumber { get; set; } = ""; public string Characteristic { get; set; } = ""; public string Result { get; set; } = ""; public string Specification { get; set; } = ""; public decimal TargetMin { get; set; } = 0; public decimal TargetMax { get; set; } = 0; public decimal MeasuredValue { get; set; } = 0; public string Unit { get; set; } = ""; public string Evaluation { get; set; } = "Pass"; public string InspectorNotes { get; set; } = ""; public string InspectorID { get; set; } = ""; public string Status { get; set; } = "Passed"; }
+public class UsageDecisionEntity : EntityBase { public string DecisionId { get; set; } = ""; public string LotNumber { get; set; } = ""; public string MaterialName { get; set; } = ""; public string UDCode { get; set; } = "Accepted"; public string Decision { get; set; } = "Accept"; public decimal QualityScore { get; set; } = 0; public string InspectorID { get; set; } = ""; public decimal UnrestrictedStock { get; set; } = 0; public decimal BlockedStock { get; set; } = 0; public decimal ScrapQuantity { get; set; } = 0; public string Notes { get; set; } = ""; public DateTime DecisionDate { get; set; } }
 
 public class QualityNotificationEntity : EntityBase
 {
@@ -137,6 +137,7 @@ public class QualityNotificationEntity : EntityBase
     public string MaterialCode { get; set; } = "";
     public string MaterialName { get; set; } = "";
     public string Batch { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
     public string PartnerId { get; set; } = "";
     public string PartnerName { get; set; } = "";
     public string SubjectCoding { get; set; } = "";
@@ -144,6 +145,8 @@ public class QualityNotificationEntity : EntityBase
     public string DefectCode { get; set; } = "";
     public string DefectType { get; set; } = "";
     public string CauseCode { get; set; } = "";
+    public string Impact { get; set; } = "None";
+    public string RootCause { get; set; } = "";
     public string Priority { get; set; } = "Medium";
     public string Status { get; set; } = "NEW";
     public string CreatedBy { get; set; } = "";
@@ -159,6 +162,24 @@ public class QualityNotificationTaskEntity : EntityBase
     public string CompletionText { get; set; } = "";
     public string Status { get; set; } = "OPEN";
     public DateTime? CompletedAt { get; set; }
+}
+
+public class CertificateOfAnalysisEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string COANumber { get; set; } = "";
+    public string InspectionLotNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string Plant { get; set; } = "1000";
+    public string IssuedBy { get; set; } = "";
+    public DateTime IssueDate { get; set; } = DateTime.UtcNow;
+    public string CustomerName { get; set; } = "";
+    public string CustomerPO { get; set; } = "";
+    public string OverallResult { get; set; } = "Passed";
+    public string Remarks { get; set; } = "";
+    public string Status { get; set; } = "Issued";
 }
 
 public class InspectionResultDetailEntity : EntityBase

@@ -1,205 +1,129 @@
 @page
 @model YuktiraERP.Web.Pages.QM.InspectionLot.CreateModel
 @{ ViewData["Title"] = "Create Inspection Lot"; }
-
 <div class="ent-form-wrapper">
-    <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-clipboard-check"></i></div>
-        <div class="banner-info">
-            <h5>Create Inspection Lot</h5>
-            <span>QA01 — Quality Inspection Lot</span>
-        </div>
-        <div class="banner-meta">
-            Plant: 1000<br />Inspection Type: 01
+    <div class="ent-form-header">
+        <h2><i class="bi bi-clipboard-plus me-2"></i>Create Inspection Lot</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="inspLotForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
-
-    <form method="post">
-        <input type="hidden" asp-for="Lot.Status" value="Pending" />
-
-        <div class="ent-form-tabs">
-            <button type="button" class="ent-form-tab active" data-tab="lotdata">
-                <i class="bi bi-clipboard tab-icon"></i> Lot Data
-            </button>
-            <button type="button" class="ent-form-tab" data-tab="inspection">
-                <i class="bi bi-search tab-icon"></i> Inspection Parameters
-            </button>
-            <button type="button" class="ent-form-tab" data-tab="samples">
-                <i class="bi bi-droplet tab-icon"></i> Sample & Decision
-            </button>
-        </div>
-
-        <!-- ═══ TAB: Lot Data ═══ -->
-        <div class="ent-form-panel active" data-panel="lotdata">
+    <div class="ent-form-tabs" id="lotTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Data</button>
+        <button type="button" class="ent-tab" data-tab="tabSource">Reference & Source</button>
+        <button type="button" class="ent-tab" data-tab="tabSample">Sampling & Inspection</button>
+    </div>
+    <form id="inspLotForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-clipboard"></i><h6>Lot Identification</h6></div>
-                <div class="ent-field-grid cols-3">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Lot Identification</div>
+                <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
-                        <label>Lot Number</label>
-                        <input class="form-control" value="Auto-generated" readonly />
+                        <label asp-for="Lot.LotNumber" class="ent-label required">Inspection Lot Number</label>
+                        <input asp-for="Lot.LotNumber" class="ent-input" required />
                     </div>
                     <div class="ent-field">
-                        <label>Inspection Type <span class="required">*</span></label>
-                        <select class="form-select">
-                            <option value="01">01 — Goods Receipt Inspection</option>
-                            <option value="02">02 — In-Process Inspection</option>
-                            <option value="04">04 — Final Inspection</option>
-                            <option value="05">05 — Stock Transfer Inspection</option>
-                            <option value="08">08 — Source Inspection</option>
-                            <option value="09">09 — Delivery Inspection</option>
+                        <label asp-for="Lot.InspectionType" class="ent-label">Inspection Type</label>
+                        <select asp-for="Lot.InspectionType" class="ent-select">
+                            <option value="01">01 - Goods Receipt Inspection</option>
+                            <option value="02">02 - In-Process Inspection</option>
+                            <option value="03">03 - Final Inspection</option>
+                            <option value="04">04 - Source Inspection</option>
+                            <option value="05">05 - Stock Transfer Inspection</option>
+                            <option value="06">06 - Production Completion</option>
+                            <option value="08">08 - Network Activity Inspection</option>
                         </select>
                     </div>
                     <div class="ent-field">
-                        <label>Plant <span class="required">*</span></label>
-                        <select class="form-select">
-                            <option value="1000">1000 — Main Plant</option>
-                            <option value="2000">2000 — Secondary Plant</option>
+                        <label asp-for="Lot.Status" class="ent-label">Status</label>
+                        <select asp-for="Lot.Status" class="ent-select">
+                            <option>Created</option>
+                            <option>In Testing</option>
+                            <option>Completed</option>
+                            <option>UD Made</option>
+                            <option>Closed</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-box"></i><h6>Material Information</h6></div>
-                <div class="ent-field-grid cols-3">
+                <div class="ent-section-title"><i class="bi bi-box-seam"></i> Material & Plant</div>
+                <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
-                        <label>Material Name <span class="required">*</span></label>
-                        <input asp-for="Lot.MaterialName" class="form-control" placeholder="Material description" />
+                        <label asp-for="Lot.MaterialCode" class="ent-label required">Material Code</label>
+                        <input asp-for="Lot.MaterialCode" class="ent-input" required />
                     </div>
                     <div class="ent-field">
-                        <label>Batch Number</label>
-                        <input type="text" class="form-control" placeholder="e.g. B-2026-001" />
+                        <label asp-for="Lot.MaterialName" class="ent-label">Material Description</label>
+                        <input asp-for="Lot.MaterialName" class="ent-input" />
                     </div>
                     <div class="ent-field">
-                        <label>Quantity <span class="required">*</span></label>
-                        <input asp-for="Lot.Quantity" class="form-control" type="number" step="0.01" min="0" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ TAB: Inspection Parameters ═══ -->
-        <div class="ent-form-panel" data-panel="inspection">
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-search"></i><h6>Inspection Plan & Scope</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Inspection Plan ID</label>
-                        <select class="form-select">
-                            <option value="">-- Select --</option>
-                            <option value="QP-001">QP-001 — Raw Material Incoming</option>
-                            <option value="QP-002">QP-002 — In-Process Check</option>
-                            <option value="QP-003">QP-003 — Finished Good Final</option>
-                            <option value="QP-004">QP-004 — Packaging Material</option>
+                        <label asp-for="Lot.Plant" class="ent-label">Plant</label>
+                        <select asp-for="Lot.Plant" class="ent-select">
+                            <option value="1000">1000 - Manufacturing Plant</option>
+                            <option value="2000">2000 - Warehouse Plant</option>
+                            <option value="3000">3000 - Quality Plant</option>
                         </select>
                     </div>
-                    <div class="ent-field">
-                        <label>Assigned Inspector</label>
-                        <select class="form-select">
-                            <option value="">-- Select --</option>
-                            <option value="INS-01">INS-01 — Dr. Smith</option>
-                            <option value="INS-02">INS-02 — Dr. Patel</option>
-                            <option value="INS-03">INS-03 — Dr. Kim</option>
-                        </select>
-                    </div>
-                    <div class="ent-field">
-                        <label>Scope (%)</label>
-                        <input type="number" class="form-control" min="0" max="100" step="1" value="100" />
-                    </div>
                 </div>
-            </div>
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-rulers"></i><h6>Characteristics</h6></div>
-                <div class="ent-field-grid cols-3">
+                <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
-                        <label>Characteristic 1</label>
-                        <input type="text" class="form-control" placeholder="e.g. Dimensional" />
+                        <label asp-for="Lot.StorageLocation" class="ent-label">Storage Location</label>
+                        <input asp-for="Lot.StorageLocation" class="ent-input" />
                     </div>
                     <div class="ent-field">
-                        <label>Characteristic 2</label>
-                        <input type="text" class="form-control" placeholder="e.g. Visual" />
+                        <label asp-for="Lot.BatchNumber" class="ent-label">Batch Number</label>
+                        <input asp-for="Lot.BatchNumber" class="ent-input" />
                     </div>
                     <div class="ent-field">
-                        <label>Characteristic 3</label>
-                        <input type="text" class="form-control" placeholder="e.g. Chemical" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ TAB: Sample & Decision ═══ -->
-        <div class="ent-form-panel" data-panel="samples">
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-droplet"></i><h6>Sampling</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Sample Size</label>
-                        <input type="number" class="form-control" min="0" step="1" placeholder="e.g. 10" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Sampling Procedure</label>
-                        <select class="form-select">
-                            <option value="Fixed">Fixed Sample Size</option>
-                            <option value="Random">Random Sampling</option>
-                            <option value="Stratified">Stratified Sampling</option>
-                        </select>
-                    </div>
-                    <div class="ent-field">
-                        <label>Acceptance Number (Ac)</label>
-                        <input type="number" class="form-control" min="0" value="0" />
-                    </div>
-                </div>
-            </div>
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-check2-circle"></i><h6>Initial Results</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Inspected Qty</label>
-                        <input asp-for="Lot.Inspected" class="form-control" type="number" min="0" value="0" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Passed Qty</label>
-                        <input asp-for="Lot.Passed" class="form-control" type="number" min="0" value="0" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Failed Qty</label>
-                        <input asp-for="Lot.Failed" class="form-control" type="number" min="0" value="0" />
-                    </div>
-                </div>
-            </div>
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-toggle-on"></i><h6>Status</h6></div>
-                <div class="ent-field-grid cols-2">
-                    <div class="ent-field">
-                        <label>Lot Status</label>
-                        <select asp-for="Lot.Status" class="form-select">
-                            <option value="Pending">Pending</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Accepted">Accepted</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
-                    </div>
-                    <div class="ent-field">
-                        <label>Stock Proposal</label>
-                        <select class="form-select">
-                            <option value="Unrestricted">Unrestricted Use</option>
-                            <option value="Quality Hold">Quality Hold</option>
-                            <option value="Blocked">Blocked Stock</option>
+                        <label asp-for="Lot.BaseUOM" class="ent-label">Base Unit of Measure</label>
+                        <select asp-for="Lot.BaseUOM" class="ent-select">
+                            <option value="EA">EA - Each</option>
+                            <option value="KG">KG - Kilogram</option>
+                            <option value="L">L - Liter</option>
+                            <option value="M">M - Meter</option>
+                            <option value="PC">PC - Piece</option>
+                            <option value="SET">SET - Set</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="ent-form-footer">
-            <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>Inspection lot auto-numbered via QM/QA
+        <div class="ent-form-panel" data-panel="tabSource" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-link-45deg"></i> Reference Data</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Lot.ReferenceOrderNumber" class="ent-label">Reference Order Number</label>
+                        <input asp-for="Lot.ReferenceOrderNumber" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Lot.InspectionPlanID" class="ent-label">Inspection Plan ID</label>
+                        <input asp-for="Lot.InspectionPlanID" class="ent-input" />
+                    </div>
+                </div>
             </div>
-            <div class="footer-actions">
-                <a asp-page="/QM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Inspection Lot</button>
+        </div>
+        <div class="ent-form-panel" data-panel="tabSample" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-layers"></i> Sampling</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Lot.Quantity" class="ent-label">Lot Quantity</label>
+                        <input asp-for="Lot.Quantity" class="ent-input" type="number" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Lot.SampleSize" class="ent-label">Sample Size</label>
+                        <input asp-for="Lot.SampleSize" class="ent-input" type="number" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Lot.AssignedInspector" class="ent-label">Assigned Inspector</label>
+                        <input asp-for="Lot.AssignedInspector" class="ent-input" />
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 </div>
-
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -88,3 +88,11 @@ public class QMInspectionConfigEntityConfiguration : IEntityTypeConfiguration<QM
         builder.ToTable("qm_inspection_configs", "yuktira_qm");
     }
 }
+
+public class CertificateOfAnalysisEntityConfiguration : IEntityTypeConfiguration<CertificateOfAnalysisEntity>
+{
+    public void Configure(EntityTypeBuilder<CertificateOfAnalysisEntity> builder)
+    {
+        builder.ToTable("certificates_of_analysis", "yuktira_qm");
+    }
+}
