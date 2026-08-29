@@ -3,42 +3,376 @@
 @using YuktiraERP.Infrastructure.Data.Entities
 @{
     ViewData["Title"] = "Customer Relationship Management";
-    var leads = Model.Leads;
-    var contacts = Model.Contacts;
-    var campaigns = Model.Campaigns;
-    var tickets = Model.ServiceTickets;
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-person-lines-fill me-2"></i>CRM</h2>
-    <div><a asp-page="/CRM/Lead/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Lead</a></div>
-</div>
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#leads">Leads</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#contacts">Contacts</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#opportunities">Opportunities</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#campaigns">Campaigns</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#service">Service</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="leads">
-        <div class="card"><div class="card-body">
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Lead ID</th><th>Company</th><th>Contact</th><th>Source</th><th>Value</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var l in leads)
-                    {
-                        <tr>
-                            <td>@l.LeadId</td><td>@l.Company</td><td>@l.Contact</td><td>@l.Source</td><td>@l.Value.ToString("C0")</td>
-                            <td><span class="badge @(l.Status=="New"?"bg-info":l.Status=="Qualified"?"bg-warning":"bg-success")">@l.Status</span></td>
-                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-arrow-right"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+<div class="module-root" data-module-root="crm">
+    <div class="module-header">
+        <div class="module-header-left">
+            <h2><i class="bi bi-person-lines-fill me-2"></i>Customer Relationship Management</h2>
+            <span class="module-badge">CRM</span>
+        </div>
+        <div class="module-header-right">
+            <a asp-page="/CRM/Lead/Create" class="btn btn-primary module-action-btn" data-action-tab="leads"><i class="bi bi-plus-circle me-1"></i> Create Lead</a>
+            <a asp-page="/CRM/Opportunity/Create" class="btn btn-primary module-action-btn" data-action-tab="opportunities" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Opportunity</a>
+            <a asp-page="/CRM/Account/Create" class="btn btn-primary module-action-btn" data-action-tab="accounts" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Account</a>
+            <a asp-page="/CRM/Pipeline/Create" class="btn btn-primary module-action-btn" data-action-tab="pipelines" style="display:none"><i class="bi bi-plus-circle me-1"></i> New Deal</a>
+            <a asp-page="/CRM/ServiceTicket/Create" class="btn btn-primary module-action-btn" data-action-tab="tickets" style="display:none"><i class="bi bi-plus-circle me-1"></i> Log Service Ticket</a>
+        </div>
     </div>
-    <div class="tab-pane fade" id="contacts"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/CRM/Contact/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Contact</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var c in contacts){<tr><td>@c.ContactId</td><td>@c.Name</td><td>@c.Email</td><td>@c.Phone</td><td>@c.Company</td><td><span class="badge bg-success">@c.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
-    <div class="tab-pane fade" id="opportunities"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/CRM/Opportunity/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Opportunity</a></div><p class="text-muted">Pipeline tracking with stages, probability, expected close date, and sales forecasting.</p></div></div></div>
-    <div class="tab-pane fade" id="campaigns"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/CRM/Campaign/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Campaign</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Start</th><th>End</th><th>Budget</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var c in campaigns){<tr><td>@c.CampaignId</td><td>@c.Name</td><td>@c.Type</td><td>@c.StartDate.ToString("d")</td><td>@c.EndDate.ToString("d")</td><td>@c.Budget.ToString("C0")</td><td><span class="badge @(c.Status=="Active"?"bg-success":"bg-secondary")">@c.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
-    <div class="tab-pane fade" id="service"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/CRM/ServiceTicket/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Ticket</a></div><table class="table table-hover table-sm"><thead><tr><th>Ticket ID</th><th>Customer</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>@foreach(var t in tickets){<tr><td>@t.TicketId</td><td>@t.CustomerName</td><td>@t.Subject</td><td><span class="badge @(t.Priority=="High"?"bg-danger":t.Priority=="Medium"?"bg-warning":"bg-info")">@t.Priority</span></td><td><span class="badge bg-info">@t.Status</span></td><td>@t.CreatedDate.ToString("d")</td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+
+    <div class="module-kpi-grid">
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon green"><i class="bi bi-currency-dollar"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@(Model.TotalOpenPipelineValue.ToString("C0"))</div>
+                <div class="module-kpi-label">Open Pipeline Value</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon amber"><i class="bi bi-percent"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@(Model.ConversionRate)%</div>
+                <div class="module-kpi-label">Conversion Rate</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon blue"><i class="bi bi-trophy"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.WonOpportunitiesYTD</div>
+                <div class="module-kpi-label">Won Opportunities YTD</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon purple"><i class="bi bi-graph-up"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@(Model.AverageDealSize.ToString("C0"))</div>
+                <div class="module-kpi-label">Avg Deal Size</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon red"><i class="bi bi-headset"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.OpenSupportTickets</div>
+                <div class="module-kpi-label">Open Support Tickets</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-tabs" id="crmTabs">
+        <button type="button" class="module-tab active" data-tab="leads"><i class="bi bi-person-plus"></i> Leads & Prospects <span class="tab-count">@Model.Leads.Count</span></button>
+        <button type="button" class="module-tab" data-tab="opportunities"><i class="bi bi-lightning"></i> Opportunities <span class="tab-count">@Model.Opportunities.Count</span></button>
+        <button type="button" class="module-tab" data-tab="accounts"><i class="bi bi-building"></i> Accounts & Contacts <span class="tab-count">@Model.Accounts.Count</span></button>
+        <button type="button" class="module-tab" data-tab="pipelines"><i class="bi bi-kanban"></i> Sales Pipelines <span class="tab-count">@Model.SalesPipelines.Count</span></button>
+        <button type="button" class="module-tab" data-tab="tickets"><i class="bi bi-ticket-detailed"></i> Complaints / Tickets <span class="tab-count">@Model.ServiceTickets.Count</span></button>
+    </div>
+
+    <!-- ═══ TAB: Leads & Prospects ═══ -->
+    <div class="module-tab-panel active" data-panel="leads">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search leads..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right">
+                    <span class="sheet-selected-count"></span>
+                </div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Lead Id</th>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th>Source</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Leads.Any())
+                        {
+                            @foreach (var l in Model.Leads)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@l.LeadId</strong></td>
+                                    <td>@l.Company</td>
+                                    <td>@l.Contact</td>
+                                    <td><span class="status-badge info">@l.Source</span></td>
+                                    <td>@l.Value.ToString("C0")</td>
+                                    <td><span class="status-badge @(l.Status=="New"?"info":l.Status=="Qualified"?"warning":"success")">@l.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/CRM/Lead/Edit" asp-route-id="@l.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/CRM/Lead/Display" asp-route-id="@l.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-person-plus"></i><div>No leads found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Leads.Count leads</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Opportunities ═══ -->
+    <div class="module-tab-panel" data-panel="opportunities" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search opportunities..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Opp Id</th>
+                            <th>Opportunity Name</th>
+                            <th>Company</th>
+                            <th>Sales Stage</th>
+                            <th>Value</th>
+                            <th>Closing Probability</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Opportunities.Any())
+                        {
+                            @foreach (var o in Model.Opportunities)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@o.OppId</strong></td>
+                                    <td>@o.OpportunityName</td>
+                                    <td>@o.Company</td>
+                                    <td><span class="status-badge info">@o.SalesStage</span></td>
+                                    <td>@o.Value.ToString("C0")</td>
+                                    <td>@o.ClosingProbability%</td>
+                                    <td><span class="status-badge @(o.Status=="Open"?"info":o.Status=="Closed Won"?"success":o.Status=="Closed Lost"?"danger":"warning")">@o.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/CRM/Opportunity/Edit" asp-route-id="@o.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/CRM/Opportunity/Display" asp-route-id="@o.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-lightning"></i><div>No opportunities found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Opportunities.Count opportunities</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Accounts & Contacts ═══ -->
+    <div class="module-tab-panel" data-panel="accounts" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search accounts..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Account Id</th>
+                            <th>Account Name</th>
+                            <th>Account Type</th>
+                            <th>Industry</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Accounts.Any())
+                        {
+                            @foreach (var a in Model.Accounts)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@a.AccountId</strong></td>
+                                    <td>@a.AccountName</td>
+                                    <td><span class="status-badge info">@a.AccountType</span></td>
+                                    <td>@a.Industry</td>
+                                    <td>@a.Phone</td>
+                                    <td><span class="status-badge @(a.Status=="Active"?"success":a.Status=="Inactive"?"danger":"warning")">@a.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/CRM/Account/Edit" asp-route-id="@a.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/CRM/Account/Display" asp-route-id="@a.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-building"></i><div>No accounts found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Accounts.Count accounts</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Sales Pipelines ═══ -->
+    <div class="module-tab-panel" data-panel="pipelines" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search pipelines..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Pipeline Id</th>
+                            <th>Deal Name</th>
+                            <th>Account Name</th>
+                            <th>Stage</th>
+                            <th>Deal Value</th>
+                            <th>Winning Probability</th>
+                            <th>Expected Close Date</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.SalesPipelines.Any())
+                        {
+                            @foreach (var p in Model.SalesPipelines)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@p.PipelineId</strong></td>
+                                    <td>@p.DealName</td>
+                                    <td>@p.AccountName</td>
+                                    <td><span class="status-badge info">@p.Stage</span></td>
+                                    <td>@p.DealValue.ToString("C0")</td>
+                                    <td>@p.WinningProbability%</td>
+                                    <td>@p.ExpectedCloseDate.ToString("dd MMM yyyy")</td>
+                                    <td><span class="status-badge @(p.Status=="Open"?"info":p.Status=="Won"?"success":p.Status=="Lost"?"danger":"warning")">@p.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/CRM/Pipeline/Edit" asp-route-id="@p.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/CRM/Pipeline/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-kanban"></i><div>No sales pipelines found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.SalesPipelines.Count pipelines</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Complaints / Tickets ═══ -->
+    <div class="module-tab-panel" data-panel="tickets" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search tickets..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Ticket Id</th>
+                            <th>Customer Name</th>
+                            <th>Subject</th>
+                            <th>Ticket Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ServiceTickets.Any())
+                        {
+                            @foreach (var t in Model.ServiceTickets)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@t.TicketId</strong></td>
+                                    <td>@t.CustomerName</td>
+                                    <td>@t.Subject</td>
+                                    <td><span class="status-badge info">@t.TicketType</span></td>
+                                    <td><span class="status-badge @(t.Priority=="High"||t.Priority=="Critical"?"danger":t.Priority=="Medium"?"warning":"info")">@t.Priority</span></td>
+                                    <td><span class="status-badge @(t.Status=="Open"?"info":t.Status=="In Progress"?"warning":t.Status=="Resolved"?"success":"secondary")">@t.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/CRM/ServiceTicket/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/CRM/ServiceTicket/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-ticket-detailed"></i><div>No service tickets found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.ServiceTickets.Count tickets</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+}

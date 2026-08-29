@@ -4,22 +4,22 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
-namespace YuktiraERP.Web.Pages.HR.Employee;
+namespace YuktiraERP.Web.Pages.HR.Recruitment;
 
 [Authorize]
 public class CreateModel : PageModel
 {
-    private readonly IRepository<EmployeeEntity, Guid> _repo;
+    private readonly IRepository<RecruitmentEntity, Guid> _repo;
     private readonly ITenantContext _tenant;
 
-    public CreateModel(IRepository<EmployeeEntity, Guid> repo, ITenantContext tenant)
+    public CreateModel(IRepository<RecruitmentEntity, Guid> repo, ITenantContext tenant)
     {
         _repo = repo;
         _tenant = tenant;
     }
 
     [BindProperty]
-    public EmployeeEntity Employee { get; set; } = new();
+    public RecruitmentEntity Recruitment { get; set; } = new();
 
     public IActionResult OnGet() => Page();
 
@@ -27,9 +27,10 @@ public class CreateModel : PageModel
     {
         if (!ModelState.IsValid) return Page();
 
-        Employee.Code = "EMP-" + DateTime.Now.Ticks;
-        Employee.TenantId = _tenant.TenantId;
-        await _repo.AddAsync(Employee);
+        Recruitment.RequisitionId = "REQ-" + DateTime.Now.Ticks;
+        Recruitment.TenantId = _tenant.TenantId;
+        Recruitment.RequestedDate = DateTime.UtcNow;
+        await _repo.AddAsync(Recruitment);
         return RedirectToPage("/HR/Index");
     }
 }

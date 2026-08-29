@@ -1,0 +1,143 @@
+@page
+@model YuktiraERP.Web.Pages.CRM.Account.CreateModel
+@{ ViewData["Title"] = "Create Account"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-building me-2"></i>Create Account</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="accForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-building"></i></div>
+        <div class="banner-info">
+            <h5>Create Account</h5>
+            <span>Manage customer and partner accounts</span>
+        </div>
+        <div class="banner-meta">CRM Module</div>
+    </div>
+
+    <div class="ent-form-tabs" id="accTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Information</button>
+        <button type="button" class="ent-tab" data-tab="tabAddress">Address &amp; Contact</button>
+        <button type="button" class="ent-tab" data-tab="tabFinancial">Financial Details</button>
+    </div>
+
+    <form id="accForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Account Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label asp-for="Account.AccountId" class="ent-label">Account ID</label>
+                        <input asp-for="Account.AccountId" class="form-control" readonly placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.AccountName" class="ent-label"><span class="required">*</span> Account Name</label>
+                        <input asp-for="Account.AccountName" class="form-control" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.AccountType" class="ent-label">Account Type</label>
+                        <select asp-for="Account.AccountType" class="form-select">
+                            <option>Customer</option>
+                            <option>Prospect</option>
+                            <option>Partner</option>
+                            <option>Vendor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label asp-for="Account.Industry" class="ent-label">Industry</label>
+                        <input asp-for="Account.Industry" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.Website" class="ent-label">Website</label>
+                        <input asp-for="Account.Website" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.Status" class="ent-label">Status</label>
+                        <select asp-for="Account.Status" class="form-select">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                            <option>Suspended</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-panel" data-panel="tabAddress" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-geo-alt"></i><h6>Contact &amp; Address</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Account.Phone" class="ent-label">Phone</label>
+                        <input asp-for="Account.Phone" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.Email" class="ent-label">Email</label>
+                        <input asp-for="Account.Email" class="form-control" type="email" />
+                    </div>
+                </div>
+                <div class="ent-field">
+                    <label asp-for="Account.Address" class="ent-label">Address</label>
+                    <textarea asp-for="Account.Address" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Account.City" class="ent-label">City</label>
+                        <input asp-for="Account.City" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.Country" class="ent-label">Country</label>
+                        <input asp-for="Account.Country" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-panel" data-panel="tabFinancial" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-cash-stack"></i><h6>Financial Information</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Account.Currency" class="ent-label">Currency</label>
+                        <select asp-for="Account.Currency" class="form-select">
+                            <option>USD</option>
+                            <option>EUR</option>
+                            <option>INR</option>
+                            <option>GBP</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.PaymentTerms" class="ent-label">Payment Terms</label>
+                        <input asp-for="Account.PaymentTerms" class="form-control" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Account.CreditLimit" class="ent-label">Credit Limit</label>
+                        <input asp-for="Account.CreditLimit" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Account.AssignedTo" class="ent-label">Assigned To</label>
+                        <input asp-for="Account.AssignedTo" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
+            <div class="footer-actions">
+                <a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Styles { <link rel="stylesheet" href="~/css/enterprise-form.css" /> }
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

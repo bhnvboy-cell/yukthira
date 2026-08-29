@@ -1,0 +1,120 @@
+@page
+@model YuktiraERP.Web.Pages.CRM.Pipeline.CreateModel
+@{ ViewData["Title"] = "Create Sales Pipeline Deal"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <div class="ent-form-header-content">
+            <div class="ent-form-header-icon"><i class="bi bi-kanban"></i></div>
+            <div>
+                <h2>New Deal</h2>
+                <p class="ent-form-subtitle">Add deal to sales pipeline</p>
+                <span class="ent-form-meta">CRM Module</span>
+            </div>
+        </div>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="pipelineForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="pipelineTabs">
+        <button type="button" class="ent-tab active" data-tab="tabDeal">Deal Information</button>
+        <button type="button" class="ent-tab" data-tab="tabSales">Sales Details</button>
+        <button type="button" class="ent-tab" data-tab="tabTimeline">Timeline &amp; Notes</button>
+    </div>
+    <form id="pipelineForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabDeal">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Deal Information</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.PipelineId" class="ent-label">Pipeline ID</label>
+                        <input asp-for="Pipeline.PipelineId" class="ent-input" readonly placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.DealName" class="ent-label required">Deal Name</label>
+                        <input asp-for="Pipeline.DealName" class="ent-input" required placeholder="Enter deal name" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.AccountName" class="ent-label">Account Name</label>
+                        <input asp-for="Pipeline.AccountName" class="ent-input" placeholder="Enter account name" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.ContactPerson" class="ent-label">Contact Person</label>
+                        <input asp-for="Pipeline.ContactPerson" class="ent-input" placeholder="Enter contact person" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.AssignedTo" class="ent-label">Assigned To</label>
+                        <input asp-for="Pipeline.AssignedTo" class="ent-input" placeholder="Enter assigned person" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.Status" class="ent-label">Status</label>
+                        <select asp-for="Pipeline.Status" class="ent-select">
+                            <option value="Open">Open</option>
+                            <option value="Won">Won</option>
+                            <option value="Lost">Lost</option>
+                            <option value="On Hold">On Hold</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabSales" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-diagram-3"></i> Sales Details</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.SalesOrg" class="ent-label">Sales Organization</label>
+                        <input asp-for="Pipeline.SalesOrg" class="ent-input" placeholder="Enter sales org" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.ProductLine" class="ent-label">Product Line</label>
+                        <input asp-for="Pipeline.ProductLine" class="ent-input" placeholder="Enter product line" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.Stage" class="ent-label">Stage</label>
+                        <select asp-for="Pipeline.Stage" class="ent-select">
+                            <option value="Prospecting">Prospecting</option>
+                            <option value="Qualification">Qualification</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Closed Won">Closed Won</option>
+                            <option value="Closed Lost">Closed Lost</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.DealValue" class="ent-label">Deal Value</label>
+                        <input asp-for="Pipeline.DealValue" class="ent-input" type="number" step="0.01" placeholder="0.00" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Pipeline.WinningProbability" class="ent-label">Winning Probability (%)</label>
+                        <input asp-for="Pipeline.WinningProbability" class="ent-input" type="number" min="0" max="100" step="1" placeholder="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabTimeline" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-calendar-event"></i> Timeline</div>
+                <div class="ent-field">
+                    <label asp-for="Pipeline.ExpectedCloseDate" class="ent-label required">Expected Close Date</label>
+                    <input asp-for="Pipeline.ExpectedCloseDate" class="ent-input" type="date" required />
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-text-left"></i> Notes</div>
+                <div class="ent-field">
+                    <label asp-for="Pipeline.Notes" class="ent-label">Notes</label>
+                    <textarea asp-for="Pipeline.Notes" class="ent-input" rows="4" placeholder="Enter any notes about this deal"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Styles { <link rel="stylesheet" href="~/css/enterprise-form.css" /> }
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

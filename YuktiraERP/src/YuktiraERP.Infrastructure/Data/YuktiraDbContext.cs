@@ -80,12 +80,17 @@ public class YuktiraDbContext : DbContext
     public DbSet<PayrollEntryEntity> PayrollEntries => Set<PayrollEntryEntity>();
     public DbSet<AttendanceEntity> Attendances => Set<AttendanceEntity>();
     public DbSet<AppraisalEntity> Appraisals => Set<AppraisalEntity>();
+    public DbSet<OrgUnitEntity> OrgUnits => Set<OrgUnitEntity>();
+    public DbSet<TimeEntryEntity> TimeEntries => Set<TimeEntryEntity>();
+    public DbSet<RecruitmentEntity> Recruitments => Set<RecruitmentEntity>();
     // CRM
     public DbSet<LeadEntity> Leads => Set<LeadEntity>();
     public DbSet<OpportunityEntity> Opportunities => Set<OpportunityEntity>();
     public DbSet<ContactEntity> Contacts => Set<ContactEntity>();
     public DbSet<CampaignEntity> Campaigns => Set<CampaignEntity>();
     public DbSet<ServiceTicketEntity> ServiceTickets => Set<ServiceTicketEntity>();
+    public DbSet<CrmAccountEntity> CrmAccounts => Set<CrmAccountEntity>();
+    public DbSet<SalesPipelineEntity> SalesPipelines => Set<SalesPipelineEntity>();
     // LIMS
     public DbSet<SampleEntity> Samples => Set<SampleEntity>();
     public DbSet<TestResultEntity> TestResults => Set<TestResultEntity>();

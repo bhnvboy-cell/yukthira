@@ -1,21 +1,168 @@
 @page
 @model YuktiraERP.Web.Pages.HR.Employee.CreateModel
-@{ ViewData["Title"] = "Create Employee"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Employee</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Employee.Name" class="form-label"></label><input asp-for="Employee.Name" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Employee.Department" class="form-label"></label><input asp-for="Employee.Department" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Employee.Designation" class="form-label"></label><input asp-for="Employee.Designation" class="form-control" /></div>
+@{ ViewData["Title"] = "Hire Employee"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-person-plus me-2"></i>Hire Employee</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="empForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Employee</button>
+            <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-person-plus"></i></div>
+        <div class="banner-info">
+            <h5>Hire Employee</h5>
+            <span>Create new employee master record</span>
+        </div>
+        <div class="banner-meta">HR Module</div>
+    </div>
+
+    <div class="ent-form-tabs" id="empTabs">
+        <button type="button" class="ent-tab active" data-tab="tabPersonal">Personal Details</button>
+        <button type="button" class="ent-tab" data-tab="tabEmployment">Employment &amp; Organization</button>
+        <button type="button" class="ent-tab" data-tab="tabCompensation">Compensation &amp; Benefits</button>
+    </div>
+
+    <form id="empForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabPersonal">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Personal Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label asp-for="Employee.PersonnelNumber" class="ent-label">Personnel Number</label>
+                        <input asp-for="Employee.PersonnelNumber" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.Name" class="ent-label"><span class="required">*</span> Full Name</label>
+                        <input asp-for="Employee.Name" class="form-control" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.Email" class="ent-label">Email</label>
+                        <input asp-for="Employee.Email" class="form-control" type="email" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label asp-for="Employee.Mobile" class="ent-label">Mobile</label>
+                        <input asp-for="Employee.Mobile" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.DateOfBirth" class="ent-label">Date of Birth</label>
+                        <input asp-for="Employee.DateOfBirth" class="form-control" type="date" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-check2-square"></i><h6>Status</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Employee.Status" class="ent-label">Status</label>
+                        <select asp-for="Employee.Status" class="form-select">
+                            <option>Active</option>
+                            <option>On Leave</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.EmployeeGroup" class="ent-label">Employee Group</label>
+                        <select asp-for="Employee.EmployeeGroup" class="form-select">
+                            <option>Permanent</option>
+                            <option>Contract</option>
+                            <option>Intern</option>
+                            <option>Temporary</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-panel" data-panel="tabEmployment" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Organization Assignment</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Employee.CompanyCode" class="ent-label">Company Code</label>
+                        <input asp-for="Employee.CompanyCode" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.PersonnelArea" class="ent-label">Personnel Area</label>
+                        <input asp-for="Employee.PersonnelArea" class="form-control" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Employee.OrgUnitCode" class="ent-label">Org Unit Code</label>
+                        <input asp-for="Employee.OrgUnitCode" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.Position" class="ent-label">Position</label>
+                        <input asp-for="Employee.Position" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Work Structure</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Employee.Department" class="ent-label">Department</label>
+                        <input asp-for="Employee.Department" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.Designation" class="ent-label">Designation</label>
+                        <input asp-for="Employee.Designation" class="form-control" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Employee.CostCenter" class="ent-label">Cost Center</label>
+                        <input asp-for="Employee.CostCenter" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.JoiningDate" class="ent-label">Joining Date</label>
+                        <input asp-for="Employee.JoiningDate" class="form-control" type="date" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-panel" data-panel="tabCompensation" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-cash-stack"></i><h6>Salary &amp; Payment</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="Employee.BasicSalary" class="ent-label">Basic Salary</label>
+                        <input asp-for="Employee.BasicSalary" class="form-control" type="number" step="0.01" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Employee.PaymentMethod" class="ent-label">Payment Method</label>
+                        <select asp-for="Employee.PaymentMethod" class="form-select">
+                            <option>Bank Transfer</option>
+                            <option>Cash</option>
+                            <option>Check</option>
+                            <option>UPI</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-sticky"></i><h6>Notes</h6></div>
+                <div class="ent-field">
+                    <label class="ent-label">Additional Notes</label>
+                    <textarea class="form-control" rows="4" placeholder="Any additional notes about this employee..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
+            <div class="footer-actions">
+                <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Employee</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Employee.Mobile" class="form-label"></label><input asp-for="Employee.Mobile" class="form-control" /></div>
-<div class="col-md-4"><label asp-for="Employee.Status" class="form-label"></label><select asp-for="Employee.Status" class="form-select"><option>Active</option><option>On Leave</option><option>Inactive</option></select></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+@section Styles { <link rel="stylesheet" href="~/css/enterprise-form.css" /> }
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

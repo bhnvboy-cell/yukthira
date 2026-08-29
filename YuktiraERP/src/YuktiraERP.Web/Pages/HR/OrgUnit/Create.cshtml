@@ -1,0 +1,103 @@
+@page
+@model YuktiraERP.Web.Pages.HR.OrgUnit.CreateModel
+@{ ViewData["Title"] = "Create Organizational Unit"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-diagram-3 me-2"></i>Create Org Unit</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="orgForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-diagram-3"></i></div>
+        <div class="banner-info">
+            <h5>Create Org Unit</h5>
+            <span>Define organizational structure</span>
+        </div>
+        <div class="banner-meta">HR Module</div>
+    </div>
+
+    <div class="ent-form-tabs" id="orgTabs">
+        <button type="button" class="ent-tab active" data-tab="tabDetails">Unit Details</button>
+        <button type="button" class="ent-tab" data-tab="tabManagement">Management &amp; Structure</button>
+    </div>
+
+    <form id="orgForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabDetails">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Unit Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.UnitCode" class="ent-label">Unit Code</label>
+                        <input asp-for="OrgUnit.UnitCode" class="form-control" placeholder="Auto-generated" readonly />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.UnitName" class="ent-label"><span class="required">*</span> Unit Name</label>
+                        <input asp-for="OrgUnit.UnitName" class="form-control" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.UnitType" class="ent-label">Unit Type</label>
+                        <select asp-for="OrgUnit.UnitType" class="form-select">
+                            <option>Department</option>
+                            <option>Division</option>
+                            <option>Section</option>
+                            <option>Team</option>
+                            <option>Plant</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.Location" class="ent-label">Location</label>
+                        <input asp-for="OrgUnit.Location" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.Status" class="ent-label">Status</label>
+                        <select asp-for="OrgUnit.Status" class="form-select">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-panel" data-panel="tabManagement" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-people"></i><h6>Management &amp; Structure</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.ParentUnit" class="ent-label">Parent Unit</label>
+                        <input asp-for="OrgUnit.ParentUnit" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.Manager" class="ent-label">Manager</label>
+                        <input asp-for="OrgUnit.Manager" class="form-control" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.CostCenter" class="ent-label">Cost Center</label>
+                        <input asp-for="OrgUnit.CostCenter" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="OrgUnit.Headcount" class="ent-label">Headcount</label>
+                        <input asp-for="OrgUnit.Headcount" class="form-control" type="number" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
+            <div class="footer-actions">
+                <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Styles { <link rel="stylesheet" href="~/css/enterprise-form.css" /> }
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

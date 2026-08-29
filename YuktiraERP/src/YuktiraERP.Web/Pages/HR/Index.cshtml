@@ -3,41 +3,372 @@
 @using YuktiraERP.Infrastructure.Data.Entities
 @{
     ViewData["Title"] = "Human Resources";
-    var employees = Model.Employees;
-    var attendances = Model.Attendances;
-    var appraisals = Model.Appraisals;
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-people me-2"></i>Human Resources</h2>
-    <div><a asp-page="/HR/Employee/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Employee</a></div>
-</div>
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#employees">Employees</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#attendance">Attendance</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#leave">Leave</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#payroll">Payroll</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#appraisal">Appraisal</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="employees">
-        <div class="card"><div class="card-body">
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Designation</th><th>Mobile</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var emp in employees)
-                    {
-                        <tr>
-                            <td>@emp.Code</td><td>@emp.Name</td><td>@emp.Department</td><td>@emp.Designation</td><td>@emp.Mobile</td>
-                            <td><span class="badge @(emp.Status=="Active"?"bg-success":"bg-warning")">@emp.Status</span></td>
-                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+<div class="module-root" data-module-root="hr">
+    <div class="module-header">
+        <div class="module-header-left">
+            <h2><i class="bi bi-people me-2"></i>Human Resources</h2>
+            <span class="module-badge">HR</span>
+        </div>
+        <div class="module-header-right">
+            <a asp-page="/HR/Employee/Create" class="btn btn-primary module-action-btn" data-action-tab="employees"><i class="bi bi-plus-circle me-1"></i> Hire Employee</a>
+            <a asp-page="/HR/OrgUnit/Create" class="btn btn-primary module-action-btn" data-action-tab="orgunits" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Org Unit</a>
+            <a asp-page="/HR/TimeEntry/Create" class="btn btn-primary module-action-btn" data-action-tab="timeattendance" style="display:none"><i class="bi bi-plus-circle me-1"></i> Log Time</a>
+            <a asp-page="/HR/Payroll/Create" class="btn btn-primary module-action-btn" data-action-tab="payroll" style="display:none"><i class="bi bi-lightning me-1"></i> Run Payroll</a>
+            <a asp-page="/HR/Recruitment/Create" class="btn btn-primary module-action-btn" data-action-tab="recruitment" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Requisition</a>
+        </div>
     </div>
-    <div class="tab-pane fade" id="attendance"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Attendance/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> Mark Attendance</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Employee</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var a in attendances){<tr><td>@a.AttendanceId</td><td>@a.EmployeeName</td><td>@a.Date.ToString("d")</td><td><span class="badge @(a.Status=="Present"?"bg-success":a.Status=="Absent"?"bg-danger":"bg-warning")">@a.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
-    <div class="tab-pane fade" id="leave"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Leave/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Leave Request</a></div><p class="text-muted">Leave application with approval workflow, balance tracking, and calendar view.</p></div></div></div>
-    <div class="tab-pane fade" id="payroll"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Payroll/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Payroll Entry</a></div><p class="text-muted">Payroll processing with salary structure, deductions, tax calculation, and payslip generation.</p></div></div></div>
-    <div class="tab-pane fade" id="appraisal"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/HR/Appraisal/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Appraisal</a></div><table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Employee</th><th>Period</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var a in appraisals){<tr><td>@a.AppraisalId</td><td>@a.EmployeeName</td><td>@a.Period</td><td>@a.Rating/5</td><td><span class="badge @(a.Status=="Completed"?"bg-success":"bg-warning")">@a.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
+
+    <div class="module-kpi-grid">
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon green"><i class="bi bi-person-check"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.TotalActiveHeadcount</div>
+                <div class="module-kpi-label">Total Active Headcount</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon amber"><i class="bi bi-calendar-x"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.PendingLeaveRequests</div>
+                <div class="module-kpi-label">Pending Leave Requests</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon blue"><i class="bi bi-person-plus"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.OpenRequisitions</div>
+                <div class="module-kpi-label">Open Requisitions</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon purple"><i class="bi bi-cash-stack"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.MonthlyPayrollTotal.ToString("C0")</div>
+                <div class="module-kpi-label">Monthly Payroll Total</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon red"><i class="bi bi-person-dash"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.AbsenteeismRate%</div>
+                <div class="module-kpi-label">Absenteeism Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-tabs" id="hrTabs">
+        <button type="button" class="module-tab active" data-tab="employees"><i class="bi bi-person-badge"></i> Employee Master <span class="tab-count">@Model.Employees.Count</span></button>
+        <button type="button" class="module-tab" data-tab="orgunits"><i class="bi bi-diagram-3"></i> Org Management <span class="tab-count">@Model.OrgUnits.Count</span></button>
+        <button type="button" class="module-tab" data-tab="timeattendance"><i class="bi bi-clock-history"></i> Time &amp; Attendance <span class="tab-count">@Model.TimeEntries.Count</span></button>
+        <button type="button" class="module-tab" data-tab="payroll"><i class="bi bi-wallet2"></i> Payroll Processing <span class="tab-count">@Model.PayrollEntries.Count</span></button>
+        <button type="button" class="module-tab" data-tab="recruitment"><i class="bi bi-briefcase"></i> Recruitment <span class="tab-count">@Model.Recruitments.Count</span></button>
+    </div>
+
+    <!-- ═══ TAB: Employee Master ═══ -->
+    <div class="module-tab-panel active" data-panel="employees">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search employees..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right">
+                    <span class="sheet-selected-count"></span>
+                </div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Personnel Number</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Employees.Any())
+                        {
+                            @foreach (var emp in Model.Employees)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@emp.Code</strong></td>
+                                    <td>@emp.Name</td>
+                                    <td>@emp.Department</td>
+                                    <td>@emp.Designation</td>
+                                    <td>@emp.PersonnelNumber</td>
+                                    <td><span class="status-badge @(emp.Status == "Active" ? "success" : emp.Status == "On Leave" ? "warning" : "danger")">@emp.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/HR/Employee/Edit" asp-route-id="@emp.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/HR/Employee/Display" asp-route-id="@emp.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-person-badge"></i><div>No employees found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Employees.Count employees</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Org Management ═══ -->
+    <div class="module-tab-panel" data-panel="orgunits" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search org units..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Unit Code</th>
+                            <th>Unit Name</th>
+                            <th>Unit Type</th>
+                            <th>Manager</th>
+                            <th>Headcount</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.OrgUnits.Any())
+                        {
+                            @foreach (var u in Model.OrgUnits)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@u.UnitCode</strong></td>
+                                    <td>@u.UnitName</td>
+                                    <td>@u.UnitType</td>
+                                    <td>@u.Manager</td>
+                                    <td>@u.Headcount</td>
+                                    <td><span class="status-badge @(u.Status == "Active" ? "success" : "danger")">@u.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/HR/OrgUnit/Edit" asp-route-id="@u.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/HR/OrgUnit/Display" asp-route-id="@u.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-diagram-3"></i><div>No org units found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.OrgUnits.Count org units</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Time & Attendance ═══ -->
+    <div class="module-tab-panel" data-panel="timeattendance" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search time entries..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Entry ID</th>
+                            <th>Employee Name</th>
+                            <th>Entry Date</th>
+                            <th>Entry Type</th>
+                            <th>Hours</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TimeEntries.Any())
+                        {
+                            @foreach (var t in Model.TimeEntries)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@t.EntryId</strong></td>
+                                    <td>@t.EmployeeName</td>
+                                    <td>@t.EntryDate.ToString("dd MMM yyyy")</td>
+                                    <td>@t.EntryType</td>
+                                    <td>@t.Hours</td>
+                                    <td><span class="status-badge @(t.Status == "Approved" ? "success" : t.Status == "Rejected" ? "danger" : "info")">@t.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/HR/TimeEntry/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/HR/TimeEntry/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-clock-history"></i><div>No time entries found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.TimeEntries.Count entries</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Payroll Processing ═══ -->
+    <div class="module-tab-panel" data-panel="payroll" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search payroll entries..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Payroll ID</th>
+                            <th>Employee Name</th>
+                            <th>Period</th>
+                            <th>Gross Pay</th>
+                            <th>Deductions</th>
+                            <th>Net Pay</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.PayrollEntries.Any())
+                        {
+                            @foreach (var p in Model.PayrollEntries)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@p.PayrollId</strong></td>
+                                    <td>@p.EmployeeName</td>
+                                    <td>@p.Period</td>
+                                    <td>@p.GrossPay.ToString("C")</td>
+                                    <td>@p.Deductions.ToString("C")</td>
+                                    <td>@p.NetPay.ToString("C")</td>
+                                    <td><span class="status-badge @(p.Status == "Paid" ? "success" : p.Status == "Processed" ? "info" : "warning")">@p.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/HR/Payroll/Edit" asp-route-id="@p.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/HR/Payroll/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-wallet2"></i><div>No payroll entries found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.PayrollEntries.Count entries</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Recruitment ═══ -->
+    <div class="module-tab-panel" data-panel="recruitment" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search requisitions..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Requisition ID</th>
+                            <th>Job Title</th>
+                            <th>Department</th>
+                            <th>Headcount</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Recruitments.Any())
+                        {
+                            @foreach (var r in Model.Recruitments)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@r.RequisitionId</strong></td>
+                                    <td>@r.JobTitle</td>
+                                    <td>@r.Department</td>
+                                    <td>@r.Headcount</td>
+                                    <td><span class="status-badge @(r.Priority == "High" ? "danger" : r.Priority == "Low" ? "info" : "warning")">@r.Priority</span></td>
+                                    <td><span class="status-badge @(r.Status == "Open" ? "info" : r.Status == "Filled" ? "success" : r.Status == "Cancelled" ? "danger" : "warning")">@r.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/HR/Recruitment/Edit" asp-route-id="@r.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/HR/Recruitment/Display" asp-route-id="@r.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-briefcase"></i><div>No requisitions found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Recruitments.Count requisitions</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+}

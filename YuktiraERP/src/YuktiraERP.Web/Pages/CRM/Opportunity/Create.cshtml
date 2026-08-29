@@ -1,21 +1,135 @@
 @page
 @model YuktiraERP.Web.Pages.CRM.Opportunity.CreateModel
 @{ ViewData["Title"] = "Create Opportunity"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Opportunity</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Opportunity.OpportunityName" class="form-label"></label><input asp-for="Opportunity.OpportunityName" class="form-control" /></div>
-<div class="col-md-6"><label asp-for="Opportunity.Company" class="form-label"></label><input asp-for="Opportunity.Company" class="form-control" /></div>
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <div class="ent-form-header-content">
+            <div class="ent-form-header-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <div>
+                <h2>Create Opportunity</h2>
+                <p class="ent-form-subtitle">Track and manage sales opportunities</p>
+                <span class="ent-form-meta">CRM Module</span>
+            </div>
+        </div>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="oppForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Opportunity</button>
+            <a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="oppTabs">
+        <button type="button" class="ent-tab active" data-tab="tabDetails">Opportunity Details</button>
+        <button type="button" class="ent-tab" data-tab="tabSales">Sales Organization</button>
+        <button type="button" class="ent-tab" data-tab="tabFinancial">Financial &amp; Closing</button>
+    </div>
+    <form id="oppForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabDetails">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> General</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.OpportunityName" class="ent-label required">Opportunity Name</label>
+                        <input asp-for="Opportunity.OpportunityName" class="ent-input" required placeholder="Enter opportunity name" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.AccountId" class="ent-label">Account ID</label>
+                        <input asp-for="Opportunity.AccountId" class="ent-input" placeholder="Enter account ID" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.ContactPerson" class="ent-label">Contact Person</label>
+                        <input asp-for="Opportunity.ContactPerson" class="ent-input" placeholder="Enter contact person" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.AssignedTo" class="ent-label">Assigned To</label>
+                        <input asp-for="Opportunity.AssignedTo" class="ent-input" placeholder="Enter assigned person" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-text-left"></i> Description</div>
+                <div class="ent-field">
+                    <label asp-for="Opportunity.ProductItems" class="ent-label">Product Items</label>
+                    <textarea asp-for="Opportunity.ProductItems" class="ent-input" rows="3" placeholder="Describe product items or services involved"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabSales" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-diagram-3"></i> Sales Structure</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.SalesOrg" class="ent-label">Sales Organization</label>
+                        <input asp-for="Opportunity.SalesOrg" class="ent-input" placeholder="Enter sales org" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.DistributionChannel" class="ent-label">Distribution Channel</label>
+                        <select asp-for="Opportunity.DistributionChannel" class="ent-select">
+                            <option value="">-- Select --</option>
+                            <option value="Direct">Direct</option>
+                            <option value="Indirect">Indirect</option>
+                            <option value="Online">Online</option>
+                            <option value="Partner">Partner</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.SalesStage" class="ent-label">Sales Stage</label>
+                        <select asp-for="Opportunity.SalesStage" class="ent-select">
+                            <option value="Prospecting">Prospecting</option>
+                            <option value="Qualification">Qualification</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Closed Won">Closed Won</option>
+                            <option value="Closed Lost">Closed Lost</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-building"></i> Account &amp; Company</div>
+                <div class="ent-field">
+                    <label asp-for="Opportunity.Company" class="ent-label">Company</label>
+                    <input asp-for="Opportunity.Company" class="ent-input" placeholder="Enter company name" />
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabFinancial" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-currency-dollar"></i> Value &amp; Probability</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.Value" class="ent-label">Value</label>
+                        <input asp-for="Opportunity.Value" class="ent-input" type="number" step="0.01" placeholder="0.00" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.TargetValue" class="ent-label">Target Value</label>
+                        <input asp-for="Opportunity.TargetValue" class="ent-input" type="number" step="0.01" placeholder="0.00" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.ClosingProbability" class="ent-label">Closing Probability (%)</label>
+                        <input asp-for="Opportunity.ClosingProbability" class="ent-input" type="number" min="0" max="100" step="1" placeholder="0" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-calendar-event"></i> Timeline</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.ExpectedCloseDate" class="ent-label">Expected Close Date</label>
+                        <input asp-for="Opportunity.ExpectedCloseDate" class="ent-input" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Opportunity.Status" class="ent-label">Status</label>
+                        <select asp-for="Opportunity.Status" class="ent-select">
+                            <option value="Open">Open</option>
+                            <option value="Won">Won</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-4"><label asp-for="Opportunity.Value" class="form-label"></label><input asp-for="Opportunity.Value" class="form-control" /></div>
-<div class="col-md-4"><label asp-for="Opportunity.Stage" class="form-label"></label><select asp-for="Opportunity.Stage" class="form-select"><option>Prospecting</option><option>Qualification</option><option>Proposal</option><option>Negotiation</option><option>Closed Won</option><option>Closed Lost</option></select></div>
-<div class="col-md-4"><label asp-for="Opportunity.Status" class="form-label"></label><select asp-for="Opportunity.Status" class="form-select"><option>Open</option><option>Won</option><option>Lost</option></select></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+@section Styles { <link rel="stylesheet" href="~/css/enterprise-form.css" /> }
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

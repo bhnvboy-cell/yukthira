@@ -1,0 +1,104 @@
+@page
+@model YuktiraERP.Web.Pages.HR.TimeEntry.CreateModel
+@{ ViewData["Title"] = "Log Time Entry"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-clock-history me-2"></i>Log Time Entry</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="teForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="banner-info">
+            <h5>Log Time / Leave</h5>
+            <span>Record work hours or leave requests</span>
+        </div>
+        <div class="banner-meta">HR Module</div>
+    </div>
+
+    <div class="ent-form-tabs" id="teTabs">
+        <button type="button" class="ent-tab active" data-tab="tabEntry">Time Entry</button>
+        <button type="button" class="ent-tab" data-tab="tabDetails">Details</button>
+    </div>
+
+    <form id="teForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabEntry">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Employee &amp; Entry</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.EmployeeCode" class="ent-label"><span class="required">*</span> Employee Code</label>
+                        <input asp-for="TimeEntry.EmployeeCode" class="form-control" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.EmployeeName" class="ent-label"><span class="required">*</span> Employee Name</label>
+                        <input asp-for="TimeEntry.EmployeeName" class="form-control" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.EntryType" class="ent-label">Entry Type</label>
+                        <select asp-for="TimeEntry.EntryType" class="form-select">
+                            <option>Work</option>
+                            <option>Leave</option>
+                            <option>Overtime</option>
+                            <option>Training</option>
+                            <option>Break</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.Hours" class="ent-label"><span class="required">*</span> Hours</label>
+                        <input asp-for="TimeEntry.Hours" class="form-control" type="number" step="0.25" min="0" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.EntryDate" class="ent-label"><span class="required">*</span> Entry Date</label>
+                        <input asp-for="TimeEntry.EntryDate" class="form-control" type="date" required />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-panel" data-panel="tabDetails" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Additional Details</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.ProjectCode" class="ent-label">Project Code</label>
+                        <input asp-for="TimeEntry.ProjectCode" class="form-control" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.Status" class="ent-label">Status</label>
+                        <select asp-for="TimeEntry.Status" class="form-select">
+                            <option>Submitted</option>
+                            <option>Approved</option>
+                            <option>Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.Description" class="ent-label">Description</label>
+                        <textarea asp-for="TimeEntry.Description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="TimeEntry.ApprovedBy" class="ent-label">Approved By</label>
+                        <input asp-for="TimeEntry.ApprovedBy" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
+            <div class="footer-actions">
+                <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Styles { <link rel="stylesheet" href="~/css/enterprise-form.css" /> }
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

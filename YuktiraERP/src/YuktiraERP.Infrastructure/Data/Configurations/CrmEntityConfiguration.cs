@@ -19,6 +19,8 @@ public class OpportunityEntityConfiguration : IEntityTypeConfiguration<Opportuni
     {
         builder.ToTable("crm_opportunities", "yuktira_crm");
         builder.Property(e => e.Value).HasColumnType("decimal(18,2)");
+        builder.Property(e => e.ClosingProbability).HasColumnType("decimal(5,2)");
+        builder.Property(e => e.TargetValue).HasColumnType("decimal(18,2)");
     }
 }
 
@@ -44,5 +46,23 @@ public class ServiceTicketEntityConfiguration : IEntityTypeConfiguration<Service
     public void Configure(EntityTypeBuilder<ServiceTicketEntity> builder)
     {
         builder.ToTable("crm_service_tickets", "yuktira_crm");
+    }
+}
+
+public class CrmAccountEntityConfiguration : IEntityTypeConfiguration<CrmAccountEntity>
+{
+    public void Configure(EntityTypeBuilder<CrmAccountEntity> builder)
+    {
+        builder.ToTable("crm_accounts", "yuktira_crm");
+    }
+}
+
+public class SalesPipelineEntityConfiguration : IEntityTypeConfiguration<SalesPipelineEntity>
+{
+    public void Configure(EntityTypeBuilder<SalesPipelineEntity> builder)
+    {
+        builder.ToTable("crm_sales_pipelines", "yuktira_crm");
+        builder.Property(e => e.DealValue).HasColumnType("decimal(18,2)");
+        builder.Property(e => e.WinningProbability).HasColumnType("decimal(5,2)");
     }
 }
