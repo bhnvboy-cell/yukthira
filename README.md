@@ -70,7 +70,7 @@ Material requirements planning grid: BOM explosion across finished goods → sub
 Plugin registry with per-tenant enable/disable. Currently ships with AdvancedQC (SPC charts, control charts, auto COA), DairyExtension (milk collection, fat/SNF testing, procurement), ExtraReports (profitability, variance, executive summary). API endpoints: `GET /api/v1/plugins`, `POST /api/v1/plugins/{code}/install`.
 
 ### Transaction Code Sidebar
-107 SAP-style codes (MM01, VA01, FB50, MIRO, PS01, PM01, etc.) organized by module with search, favorites, and role-based visibility. Enter-key triggers direct API execution fallback when debounced search results aren't ready. Includes the PS/PM module codes (PS01–PS04, PM01–PM04). All creation forms now use SAP-standard transaction codes: MM01 (material), FK01 (vendor), ME21N (PO), VA01 (SO), XD01 (customer), QA01 (inspection lot), QA32 (results), CO01 (production order), FB60 (AP), FB70 (AR), AS01 (asset), OX09 (storage location).
+107 SAP-style codes (MM01, VA01, FB50, MIRO, PS01, PM01, etc.) organized by module with search, favorites, and role-based visibility. Enter-key triggers direct API execution fallback when debounced search results aren't ready. Includes the PS/PM module codes (PS01–PS04, PM01–PM04). All creation forms now use standardized transaction codes: MM01 (material), FK01 (vendor), ME21N (PO), VA01 (SO), XD01 (customer), QA01 (inspection lot), QA32 (results), CO01 (production order), FB60 (AP), FB70 (AR), AS01 (asset), OX09 (storage location).
 
 ### Module Registry & Sidebar
 The dashboard and sidebar are driven by a central **module catalog** (`ModuleCatalog`, registered as a singleton in `Infrastructure`): 28 modules (MM, SD, WM, PP, QM, PM, FI, CO, HR, CRM, PS, LIMS, BI, AI, CR, RF, WV, VS, UJ, TX, CN, SX, PD, ME, WF, APP, NOT, TCD, TCG, AUD, ADM, CST, INT, PLG) grouped into Operations / Finance / People / Projects & Labs / Analytics / Compliance / System with per-module icons and category colors. Modules resolve from routes and transaction codes derive module + SAP-style group (MasterData / Transactions / Process / Reports / Configuration / Administration / Analytics / Utilities) from the catalog — e.g. MM01=MasterData, MIGO=Transactions, MD01=Process, MB52=Reports, BI01=Configuration, SU01=Administration.
@@ -78,8 +78,8 @@ The dashboard and sidebar are driven by a central **module catalog** (`ModuleCat
 ### Full CRUD Pages
 Every entity has a full Web UI CRUD set — **List** (searchable table with View/Edit/Delete), **Display** (read-only detail), **Edit** (pre-filled form), and **Create** — wired together with redirects after save. 32 entity types previously limited to Create-only now have complete List/Edit/Display pages (GRN, Invoice Verification, PR, SD Billing/Delivery/Inquiry/Quotation, PP Plan/Routing/WorkCenter, QM InspectionResult/UsageDecision, WM Bin, FI FixedAsset/Ledger, CO CostElement/ProfitCenter/InternalOrder, HR Appraisal/Attendance/Leave/Payroll, CRM Campaign/Contact/ServiceTicket, LIMS Instrument/Specification/TestResult, PS ProjTask/Timesheet, PM Order/Plan).
 
-### SAP-Grade Enterprise Creation Forms (v1.0.7)
-All 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to enterprise-grade tabbed layouts with SAP-standard fields:
+### Yuktira Enterprise Creation Forms
+All 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to enterprise-grade tabbed layouts with standardized fields:
 
 | Module | Form | Tabs | Key SAP Fields |
 |--------|------|------|---------------|
@@ -1181,7 +1181,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.0.7 | August 2026 | SAP-grade enterprise creation forms: 12 forms across MM/SD/QM/PP/FI/WM upgraded to tabbed layout with SAP-standard fields (types, valuation, org assignments, line items with auto-calc), enterprise-form.css/js, _ModuleLayout.cshtml universal layout, 7-language localization, 4 UI themes, session timeout, dynamic action buttons |
+| 1.0.7 | August 2026 | Yuktira enterprise creation forms: 12 forms across MM/SD/QM/PP/FI/WM upgraded to tabbed layout with standardized fields (types, valuation, org assignments, line items with auto-calc), enterprise-form.css/js, _ModuleLayout.cshtml universal layout, 7-language localization, 4 UI themes, session timeout, dynamic action buttons |
 | 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app, PP module tenant isolation, webhook dispatch consolidation, real SAP HANA connector, CVE fixes |
 | 1.0.4 | August 2026 | Gap-filling II: tax engine, multi-currency, real EDI conversion, email/SMS delivery with logging, CO cost allocations, i18n localization, domain entity behavior, fixed-asset lifecycle, webhook delivery verified |
 | 1.0.3 | August 2026 | Gap-filling: real stock Goods Issue, finance loop (AP/AR aging, payments, period close, bank recon, depreciation), payroll persistence, TOTP MFA, DB-backed approvals, background jobs, tenant write-safety, PDF fails loudly |
@@ -1192,7 +1192,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 ### Changelog
 
 **1.0.7 (August 2026)**
-- SAP-grade enterprise creation forms: all 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to multi-tab layout with SAP-standard field schemas
+- Yuktira enterprise creation forms: all 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to multi-tab layout with standardized field schemas
 - MM/Material (MM01): 4 tabs — Basic Data (material type ROH/FERT/HALB/VERP/HIBE, 20+ UOM options), Purchasing (purchasing org/group, min order qty, lot size), Accounting (price control S/V, valuation class, currency, tax classification), Plant & Inventory (plant, storage location, safety stock, reorder point, max stock)
 - MM/Vendor (FK01): 3 tabs — General Data (contact, address), Purchasing (purchasing org, incoterms, lead time), Accounting (payment terms, payment method, reconciliation account, tax ID, dunning)
 - MM/PO (ME21N): 3 tabs — Header (vendor, cost center, GL account, department), Line Items (material table with auto-calc: qty × price − discount = line total), Delivery (incoterms, tax code, delivery priority)
@@ -1205,7 +1205,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - FI/AR (FB70): 3 tabs — Invoice Header (invoice #, customer, SO ref), Accounting (GL account, profit center, tax code, currency), Payment (terms, due date, dunning level)
 - FI/FixedAsset (AS01): 3 tabs — General Data (category, class, location, cost center), Depreciation (method SLM/WDV/DDB/SYD/UOP, useful life, start date), Valuation (purchase date, cost, salvage value, NBV)
 - WM/StorageLocation (OX09): 3 tabs — General Data (type, plant, section), Capacity (max/weight/volume capacity, bin layout), Settings (strategy FIFO/LIFO/FEFO, putaway, batch/serial/QI flags)
-- Infrastructure: enterprise-form.css (multi-tab form, SAP banner, section groups, line items, totals bar, theme overrides for futuristic/minimal/classical), enterprise-form.js (tab switching, add/remove line items with reindex, auto-calc totals), _ModuleLayout.cshtml (universal module layout with KPIs, tabs, data grid), ModuleLayoutViewModel.cs (KpiCard, TabItem with PrimaryAction, GridTab, GridColumn)
+- Infrastructure: enterprise-form.css (multi-tab form, banner, section groups, line items, totals bar, theme overrides for futuristic/minimal/classical), enterprise-form.js (tab switching, add/remove line items with reindex, auto-calc totals), _ModuleLayout.cshtml (universal module layout with KPIs, tabs, data grid), ModuleLayoutViewModel.cs (KpiCard, TabItem with PrimaryAction, GridTab, GridColumn)
 - Localization: SharedResources.resx + 6 language files (hi, ta, te, fr, es) with 75+ keys for UI strings, 7 languages wired via IStringLocalizer
 - UI themes: 4 themes (Modern, Classical, Minimal, Futuristic) with per-theme form styling
 - Session timeout: SAP-style configurable warning modal with countdown and continue/log off
