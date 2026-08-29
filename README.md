@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.0.6** | **August 2026**
+**Version 1.0.7** | **August 2026**
 
 ---
 
@@ -70,13 +70,37 @@ Material requirements planning grid: BOM explosion across finished goods → sub
 Plugin registry with per-tenant enable/disable. Currently ships with AdvancedQC (SPC charts, control charts, auto COA), DairyExtension (milk collection, fat/SNF testing, procurement), ExtraReports (profitability, variance, executive summary). API endpoints: `GET /api/v1/plugins`, `POST /api/v1/plugins/{code}/install`.
 
 ### Transaction Code Sidebar
-107 SAP-style codes (MM01, VA01, FB50, MIRO, PS01, PM01, etc.) organized by module with search, favorites, and role-based visibility. Enter-key triggers direct API execution fallback when debounced search results aren't ready. Includes the PS/PM module codes (PS01–PS04, PM01–PM04).
+107 SAP-style codes (MM01, VA01, FB50, MIRO, PS01, PM01, etc.) organized by module with search, favorites, and role-based visibility. Enter-key triggers direct API execution fallback when debounced search results aren't ready. Includes the PS/PM module codes (PS01–PS04, PM01–PM04). All creation forms now use SAP-standard transaction codes: MM01 (material), FK01 (vendor), ME21N (PO), VA01 (SO), XD01 (customer), QA01 (inspection lot), QA32 (results), CO01 (production order), FB60 (AP), FB70 (AR), AS01 (asset), OX09 (storage location).
 
 ### Module Registry & Sidebar
 The dashboard and sidebar are driven by a central **module catalog** (`ModuleCatalog`, registered as a singleton in `Infrastructure`): 28 modules (MM, SD, WM, PP, QM, PM, FI, CO, HR, CRM, PS, LIMS, BI, AI, CR, RF, WV, VS, UJ, TX, CN, SX, PD, ME, WF, APP, NOT, TCD, TCG, AUD, ADM, CST, INT, PLG) grouped into Operations / Finance / People / Projects & Labs / Analytics / Compliance / System with per-module icons and category colors. Modules resolve from routes and transaction codes derive module + SAP-style group (MasterData / Transactions / Process / Reports / Configuration / Administration / Analytics / Utilities) from the catalog — e.g. MM01=MasterData, MIGO=Transactions, MD01=Process, MB52=Reports, BI01=Configuration, SU01=Administration.
 
 ### Full CRUD Pages
 Every entity has a full Web UI CRUD set — **List** (searchable table with View/Edit/Delete), **Display** (read-only detail), **Edit** (pre-filled form), and **Create** — wired together with redirects after save. 32 entity types previously limited to Create-only now have complete List/Edit/Display pages (GRN, Invoice Verification, PR, SD Billing/Delivery/Inquiry/Quotation, PP Plan/Routing/WorkCenter, QM InspectionResult/UsageDecision, WM Bin, FI FixedAsset/Ledger, CO CostElement/ProfitCenter/InternalOrder, HR Appraisal/Attendance/Leave/Payroll, CRM Campaign/Contact/ServiceTicket, LIMS Instrument/Specification/TestResult, PS ProjTask/Timesheet, PM Order/Plan).
+
+### SAP-Grade Enterprise Creation Forms (v1.0.7)
+All 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to enterprise-grade tabbed layouts with SAP-standard fields:
+
+| Module | Form | Tabs | Key SAP Fields |
+|--------|------|------|---------------|
+| **MM** | Material (MM01) | Basic Data, Purchasing, Accounting, Plant & Inventory | ROH/FERT/HALB types, 20+ UOM options, valuation class, price control (S/V), safety stock, reorder point, min order qty, GL account |
+| **MM** | Vendor (FK01) | General Data, Purchasing, Accounting & Payment | Purchasing org, reconciliation account, incoterms (FOB/CIF/EXW/DDP), payment method, dunning procedure, quality rating |
+| **MM** | Purchase Order (ME21N) | Header, Line Items (auto-calc), Delivery & Terms | Tax code, G/L account, delivery priority, line item discount %, auto-calculated totals |
+| **SD** | Sales Order (VA01) | Sold-To/Header, Items (line-item table), Organization | Sales org, distribution channel, division, ship-to/bill-to, incoterms, line items with auto-calc |
+| **SD** | Customer (XD01) | General Data, Sales Area, Financial | Sales org, dist channel, division, credit limit, reconciliation account, credit rating, dunning level |
+| **QM** | Inspection Lot (QA01) | Lot Data, Inspection Parameters, Sample & Decision | Inspection type 01–09, batch number, plant, sample size, inspection plan ID, assigned inspector, stock proposal |
+| **QM** | Inspection Result (QA32) | Lot Reference, Measurement Results, Defect & Disposition | Measured value, specification, tolerance range, unit selection, defect code, root cause, disposition |
+| **PP** | Production Order (CO01) | Order Header, Materials & BOM, Scheduling & Capacity | BOM/routing reference, work center, cost estimate, scheduling type, yield %, scrap qty |
+| **FI** | Accounts Payable (FB60) | Invoice Header, Accounting, Payment Terms | G/L account, cost center, tax code, payment method, dunning level |
+| **FI** | Accounts Receivable (FB70) | Invoice Header, Accounting, Payment Terms | Profit center, tax code, payment method, dunning level |
+| **FI** | Fixed Asset (AS01) | General Data, Depreciation, Valuation | Depreciation method (SLM/WDV/DDB/SYD/UOP), useful life, salvage value, net book value |
+| **WM** | Storage Location (OX09) | General Data, Capacity & Layout, Settings | Storage strategy (FIFO/LIFO/FEFO), putaway strategy, batch/serial/QI flags |
+
+**Form Infrastructure:**
+- `enterprise-form.css` — Multi-tab form component with SAP-style org banner, section groups, line items table, totals bar, theme overrides (futuristic/minimal/classical)
+- `enterprise-form.js` — Tab switching, add/remove line items with auto-reindex, auto-calc totals (qty × unit price − discount)
+- `_ModuleLayout.cshtml` — Universal module layout with KPI cards, tabbed data grid, pagination
+- All forms include SOX audit trail notice in footer
 
 ### Print / Save-as-PDF
 Every page (module Index, List, Display, Dashboard, transactions) shows a **Print** button in the top bar (or press `Ctrl+P`). It expands horizontally-scrolled tables and opens the browser print dialog with a dedicated print stylesheet — the sidebar, top bar, and action buttons are hidden, tables render with clean borders, and rows avoid page breaks. From the dialog you can print directly or choose **"Save as PDF"** (available in every modern browser), giving a clean paper-friendly copy of any module screen.
@@ -1157,6 +1181,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.0.7 | August 2026 | SAP-grade enterprise creation forms: 12 forms across MM/SD/QM/PP/FI/WM upgraded to tabbed layout with SAP-standard fields (types, valuation, org assignments, line items with auto-calc), enterprise-form.css/js, _ModuleLayout.cshtml universal layout, 7-language localization, 4 UI themes, session timeout, dynamic action buttons |
 | 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app, PP module tenant isolation, webhook dispatch consolidation, real SAP HANA connector, CVE fixes |
 | 1.0.4 | August 2026 | Gap-filling II: tax engine, multi-currency, real EDI conversion, email/SMS delivery with logging, CO cost allocations, i18n localization, domain entity behavior, fixed-asset lifecycle, webhook delivery verified |
 | 1.0.3 | August 2026 | Gap-filling: real stock Goods Issue, finance loop (AP/AR aging, payments, period close, bank recon, depreciation), payroll persistence, TOTP MFA, DB-backed approvals, background jobs, tenant write-safety, PDF fails loudly |
@@ -1165,6 +1190,27 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**1.0.7 (August 2026)**
+- SAP-grade enterprise creation forms: all 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to multi-tab layout with SAP-standard field schemas
+- MM/Material (MM01): 4 tabs — Basic Data (material type ROH/FERT/HALB/VERP/HIBE, 20+ UOM options), Purchasing (purchasing org/group, min order qty, lot size), Accounting (price control S/V, valuation class, currency, tax classification), Plant & Inventory (plant, storage location, safety stock, reorder point, max stock)
+- MM/Vendor (FK01): 3 tabs — General Data (contact, address), Purchasing (purchasing org, incoterms, lead time), Accounting (payment terms, payment method, reconciliation account, tax ID, dunning)
+- MM/PO (ME21N): 3 tabs — Header (vendor, cost center, GL account, department), Line Items (material table with auto-calc: qty × price − discount = line total), Delivery (incoterms, tax code, delivery priority)
+- SD/SalesOrder (VA01): 3 tabs — Sold-To (customer, payment terms, ship-to/bill-to), Items (line-item table with auto-calc, plant/SLOC per line), Organization (sales org, distribution channel, division, incoterms)
+- SD/Customer (XD01): 3 tabs — General Data (contact, address), Sales Area (sales org, dist channel, division, shipping), Financial (payment terms, credit limit, reconciliation account, tax, credit rating)
+- QM/InspectionLot (QA01): 3 tabs — Lot Data (inspection type 01–09, batch, plant), Inspection Parameters (plan ID, inspector, scope, characteristics), Sample & Decision (sample size, sampling procedure, acceptance number, stock proposal)
+- QM/InspectionResult (QA32): 3 tabs — Lot Reference (lot number, characteristic, inspector), Measurement (measured value, specification, tolerance range, 15 unit types), Defect (defect code, root cause, disposition)
+- PP/ProductionOrder (CO01): 3 tabs — Order Header (product, quantity, priority, order type), Materials & BOM (BOM/routing reference, work center, cost estimate), Scheduling (dates, scheduling type, yield %, scrap, shift)
+- FI/AP (FB60): 3 tabs — Invoice Header (invoice #, vendor, PO ref), Accounting (GL account, cost center, tax code, currency), Payment (terms, due date, payment method)
+- FI/AR (FB70): 3 tabs — Invoice Header (invoice #, customer, SO ref), Accounting (GL account, profit center, tax code, currency), Payment (terms, due date, dunning level)
+- FI/FixedAsset (AS01): 3 tabs — General Data (category, class, location, cost center), Depreciation (method SLM/WDV/DDB/SYD/UOP, useful life, start date), Valuation (purchase date, cost, salvage value, NBV)
+- WM/StorageLocation (OX09): 3 tabs — General Data (type, plant, section), Capacity (max/weight/volume capacity, bin layout), Settings (strategy FIFO/LIFO/FEFO, putaway, batch/serial/QI flags)
+- Infrastructure: enterprise-form.css (multi-tab form, SAP banner, section groups, line items, totals bar, theme overrides for futuristic/minimal/classical), enterprise-form.js (tab switching, add/remove line items with reindex, auto-calc totals), _ModuleLayout.cshtml (universal module layout with KPIs, tabs, data grid), ModuleLayoutViewModel.cs (KpiCard, TabItem with PrimaryAction, GridTab, GridColumn)
+- Localization: SharedResources.resx + 6 language files (hi, ta, te, fr, es) with 75+ keys for UI strings, 7 languages wired via IStringLocalizer
+- UI themes: 4 themes (Modern, Classical, Minimal, Futuristic) with per-theme form styling
+- Session timeout: SAP-style configurable warning modal with countdown and continue/log off
+- Dynamic action buttons per tab on MM and SD module pages
+- All 261 tests pass, build clean
 
 **1.0.5 (August 2026)**
 - Observability: `/health` (with database ping via `AddDbContextCheck`) and `/health/ready` in both API and Web; Serilog structured logging (console + daily rolling file `logs/api-.log`, `logs/web-.log`, 14 retained) with request logging that enriches TenantId/Path; Prometheus metrics via `prometheus-net` (`/metrics`) — HTTP request rate/duration/counters ready for Grafana dashboards
