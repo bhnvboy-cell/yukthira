@@ -1314,6 +1314,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 - `docs/user-guide.md` — comprehensive end-user guide: getting started, all 35 modules, 75 T-codes, workflows, troubleshooting
 - `docs/features.md` — complete features & capabilities showcase
+- `docs/erp-comparison.html` — competitive analysis vs SAP, Oracle, D365 + future roadmap (open in browser, Ctrl+P to save as PDF)
 - `docs/architecture.md` — tech stack, patterns, scalability
 - `docs/api-reference.md` — all REST API endpoints
 - `docs/plugin-development.md` — SDK reference, hooks guide, build & deploy
