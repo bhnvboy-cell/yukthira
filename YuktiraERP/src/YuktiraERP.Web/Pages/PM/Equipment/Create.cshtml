@@ -1,21 +1,148 @@
 @page
 @model YuktiraERP.Web.Pages.PM.Equipment.CreateModel
 @{ ViewData["Title"] = "Create Equipment"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-    <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Equipment</h5></div>
-    <div class="card-body">
-        <form method="post">
-            <div class="row mb-3">
-                <div class="col-md-4"><label asp-for="Equipment.EquipmentCode" class="form-label"></label><input asp-for="Equipment.EquipmentCode" class="form-control" placeholder="EQ-001" /></div>
-                <div class="col-md-4"><label asp-for="Equipment.Name" class="form-label"></label><input asp-for="Equipment.Name" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="Equipment.Type" class="form-label"></label><select asp-for="Equipment.Type" class="form-select"><option>Machine</option><option>Vehicle</option><option>Instrument</option><option>Building</option></select></div>
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-gear me-2"></i>Create Equipment Master</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="equipForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="equipTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Data</button>
+        <button type="button" class="ent-tab" data-tab="tabLocation">Location & Organization</button>
+        <button type="button" class="ent-tab" data-tab="tabManufacturer">Manufacturer Data</button>
+    </div>
+    <form id="equipForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Equipment Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Equipment.EquipmentCode" class="ent-label required">Equipment Number</label>
+                        <input asp-for="Equipment.EquipmentCode" class="ent-input" required placeholder="EQ-00001" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Name" class="ent-label required">Equipment Description</label>
+                        <input asp-for="Equipment.Name" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Description" class="ent-label">Long Description</label>
+                        <input asp-for="Equipment.Description" class="ent-input" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Category" class="ent-label">Category</label>
+                        <select asp-for="Equipment.Category" class="ent-select">
+                            <option value="M">M - Machine</option>
+                            <option value="P">P - Production Resource</option>
+                            <option value="I">I - Instrument</option>
+                            <option value="T">T - Transport</option>
+                            <option value="B">B - Building</option>
+                            <option value="E">E - Electronic</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.SerialNumber" class="ent-label">Serial Number</label>
+                        <input asp-for="Equipment.SerialNumber" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Status" class="ent-label">Status</label>
+                        <select asp-for="Equipment.Status" class="ent-select">
+                            <option>Operational</option>
+                            <option>Under Maintenance</option>
+                            <option>Inactive</option>
+                            <option>Decommissioned</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-4"><label asp-for="Equipment.Location" class="form-label"></label><input asp-for="Equipment.Location" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="Equipment.Department" class="form-label"></label><input asp-for="Equipment.Department" class="form-control" /></div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-calendar"></i> Installation</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Equipment.InstallationDate" class="ent-label">Installation Date</label>
+                        <input asp-for="Equipment.InstallationDate" class="ent-input" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Manufacturer" class="ent-label">Manufacturer</label>
+                        <input asp-for="Equipment.Manufacturer" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Model" class="ent-label">Model</label>
+                        <input asp-for="Equipment.Model" class="ent-input" />
+                    </div>
+                </div>
             </div>
-            <div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a></div>
-        </form>
-    </div></div>
-</div></div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabLocation" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-geo-alt"></i> Location & Organization</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Equipment.FunctionalLocationCode" class="ent-label">Functional Location</label>
+                        <input asp-for="Equipment.FunctionalLocationCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Plant" class="ent-label">Plant</label>
+                        <select asp-for="Equipment.Plant" class="ent-select">
+                            <option value="1000">1000 - Manufacturing</option>
+                            <option value="2000">2000 - Warehouse</option>
+                            <option value="3000">3000 - Quality Lab</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Location" class="ent-label">Room / Area</label>
+                        <input asp-for="Equipment.Location" class="ent-input" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Equipment.WorkCenter" class="ent-label">Work Center</label>
+                        <input asp-for="Equipment.WorkCenter" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.CostCenter" class="ent-label">Cost Center</label>
+                        <input asp-for="Equipment.CostCenter" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Department" class="ent-label">Department</label>
+                        <input asp-for="Equipment.Department" class="ent-input" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabManufacturer" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-building"></i> Manufacturer & Technical Data</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Manufacturer" class="ent-label">Manufacturer Name</label>
+                        <input asp-for="Equipment.Manufacturer" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Equipment.Model" class="ent-label">Model Number</label>
+                        <input asp-for="Equipment.Model" class="ent-input" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label class="ent-label">Warranty Expiry</label>
+                        <input class="ent-input" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label class="ent-label">Technical Object Type</label>
+                        <select class="ent-select">
+                            <option>Single Equipment</option>
+                            <option>Functional Location</option>
+                            <option>Assembly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

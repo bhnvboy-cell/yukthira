@@ -1,0 +1,85 @@
+@page
+@model YuktiraERP.Web.Pages.PM.Location.CreateModel
+@{ ViewData["Title"] = "Create Functional Location"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-geo-alt me-2"></i>Create Functional Location</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="locForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="locTabs">
+        <button type="button" class="ent-tab active" data-tab="tabGeneral">General Data</button>
+        <button type="button" class="ent-tab" data-tab="tabOrg">Organization</button>
+    </div>
+    <form id="locForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabGeneral">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Location Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Location.LocationCode" class="ent-label required">Location Code</label>
+                        <input asp-for="Location.LocationCode" class="ent-input" required placeholder="FL-00001" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Location.Name" class="ent-label required">Location Name</label>
+                        <input asp-for="Location.Name" class="ent-input" required />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Location.Description" class="ent-label">Description</label>
+                        <input asp-for="Location.Description" class="ent-input" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Location.LocationType" class="ent-label">Location Type</label>
+                        <select asp-for="Location.LocationType" class="ent-select">
+                            <option>Functional</option>
+                            <option>Storage</option>
+                            <option>Machine Area</option>
+                            <option>Building</option>
+                            <option>Floor</option>
+                            <option>Room</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Location.ParentLocationCode" class="ent-label">Parent Location</label>
+                        <input asp-for="Location.ParentLocationCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Location.Status" class="ent-label">Status</label>
+                        <select asp-for="Location.Status" class="ent-select">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabOrg" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-building"></i> Organization</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Location.Plant" class="ent-label">Plant</label>
+                        <select asp-for="Location.Plant" class="ent-select">
+                            <option value="1000">1000</option>
+                            <option value="2000">2000</option>
+                            <option value="3000">3000</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Location.CostCenter" class="ent-label">Cost Center</label>
+                        <input asp-for="Location.CostCenter" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Location.MaintPlannerGroup" class="ent-label">Maintenance Planner Group</label>
+                        <input asp-for="Location.MaintPlannerGroup" class="ent-input" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

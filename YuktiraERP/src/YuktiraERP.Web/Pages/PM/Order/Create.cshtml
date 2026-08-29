@@ -1,24 +1,134 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PM.Order.CreateModel
 @{ ViewData["Title"] = "Create Maintenance Order"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-    <div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Maintenance Order</h5></div>
-    <div class="card-body">
-        <form method="post">
-            <div class="row mb-3">
-                <div class="col-md-4"><label asp-for="Order.OrderNumber" class="form-label"></label><input asp-for="Order.OrderNumber" class="form-control" placeholder="MO-001" /></div>
-                <div class="col-md-4"><label asp-for="Order.EquipmentCode" class="form-label"></label><input asp-for="Order.EquipmentCode" class="form-control" placeholder="EQ-001" /></div>
-                <div class="col-md-4"><label asp-for="Order.Priority" class="form-label"></label><select asp-for="Order.Priority" class="form-select"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-clipboard-check me-2"></i>Create Maintenance Order</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="orderForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="orderTabs">
+        <button type="button" class="ent-tab active" data-tab="tabHeader">Order Header</button>
+        <button type="button" class="ent-tab" data-tab="tabSchedule">Scheduling & Capacity</button>
+        <button type="button" class="ent-tab" data-tab="tabMaterials">Materials & Spares</button>
+    </div>
+    <form id="orderForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabHeader">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Order Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Order.OrderNumber" class="ent-label required">Order Number</label>
+                        <input asp-for="Order.OrderNumber" class="ent-input" required placeholder="MO-00001" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.OrderType" class="ent-label required">Order Type</label>
+                        <select asp-for="Order.OrderType" class="ent-select">
+                            <option value="PM01">PM01 - Breakdown / Corrective</option>
+                            <option value="PM02">PM02 - Preventive / Scheduled</option>
+                            <option value="PM03">PM03 - Improvement</option>
+                            <option value="PM04">PM04 - Calibration</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.Priority" class="ent-label">Priority</label>
+                        <select asp-for="Order.Priority" class="ent-select">
+                            <option value="Low">Low (4)</option>
+                            <option value="Medium" selected>Medium (3)</option>
+                            <option value="High">High (2)</option>
+                            <option value="Critical">Critical (1)</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-12"><label asp-for="Order.Description" class="form-label"></label><textarea asp-for="Order.Description" class="form-control" rows="2"></textarea></div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-gear"></i> Object Assignment</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Order.EquipmentCode" class="ent-label">Equipment ID</label>
+                        <input asp-for="Order.EquipmentCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.FunctionalLocationCode" class="ent-label">Functional Location</label>
+                        <input asp-for="Order.FunctionalLocationCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.Description" class="ent-label required">Description</label>
+                        <textarea asp-for="Order.Description" class="ent-input" rows="2" required></textarea>
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Order.WorkCenter" class="ent-label">Work Center</label>
+                        <input asp-for="Order.WorkCenter" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.CostCenter" class="ent-label">Cost Center</label>
+                        <input asp-for="Order.CostCenter" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.Status" class="ent-label">Status</label>
+                        <select asp-for="Order.Status" class="ent-select">
+                            <option>Created</option>
+                            <option>Released</option>
+                            <option>In Progress</option>
+                            <option>Confirmed</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-4"><label asp-for="Order.ScheduledDate" class="form-label"></label><input asp-for="Order.ScheduledDate" class="form-control" type="date" /></div>
-                <div class="col-md-3"><label asp-for="Order.Cost" class="form-label"></label><input asp-for="Order.Cost" class="form-control" type="number" step="0.01" /></div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabSchedule" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-calendar3"></i> Scheduling</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Order.ScheduledStartDate" class="ent-label">Planned Start Date</label>
+                        <input asp-for="Order.ScheduledStartDate" class="ent-input" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.ScheduledFinishDate" class="ent-label">Planned Finish Date</label>
+                        <input asp-for="Order.ScheduledFinishDate" class="ent-input" type="date" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.PlannedHours" class="ent-label">Planned Hours</label>
+                        <input asp-for="Order.PlannedHours" class="ent-input" type="number" step="0.5" />
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Order.ActualHours" class="ent-label">Actual Hours</label>
+                        <input asp-for="Order.ActualHours" class="ent-input" type="number" step="0.5" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Order.Cost" class="ent-label">Estimated Cost</label>
+                        <input asp-for="Order.Cost" class="ent-input" type="number" step="0.01" />
+                    </div>
+                    <div class="ent-field">
+                        <label class="ent-label">Operations Sequence</label>
+                        <input class="ent-input" placeholder="Op 10: Work Center, Hrs" />
+                    </div>
+                </div>
             </div>
-            <div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PM/Order/List" class="btn btn-outline-secondary">Cancel</a></div>
-        </form>
-    </div></div>
-</div></div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabMaterials" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-box-seam"></i> Material Spares List</div>
+                <div class="ent-field-grid ent-grid-1">
+                    <div class="ent-field">
+                        <label class="ent-label">Material Requirements</label>
+                        <table class="sheet-table" style="font-size:0.8rem">
+                            <thead><tr><th>Material Code</th><th>Description</th><th>Required Qty</th><th>Storage Location</th><th>Unit Price</th></tr></thead>
+                            <tbody>
+                                <tr><td><input class="ent-input" placeholder="MAT-001" /></td><td><input class="ent-input" placeholder="Bearing 6205" /></td><td><input class="ent-input" type="number" value="2" /></td><td><input class="ent-input" placeholder="SL01" /></td><td><input class="ent-input" type="number" step="0.01" /></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

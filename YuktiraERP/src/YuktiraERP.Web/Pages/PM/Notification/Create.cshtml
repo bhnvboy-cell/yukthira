@@ -1,0 +1,114 @@
+@page
+@model YuktiraERP.Web.Pages.PM.Notification.CreateModel
+@{ ViewData["Title"] = "Create PM Notification"; }
+<div class="ent-form-wrapper">
+    <div class="ent-form-header">
+        <h2><i class="bi bi-bell me-2"></i>Create Maintenance Notification</h2>
+        <div class="ent-form-header-actions">
+            <button type="submit" form="notifForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+    <div class="ent-form-tabs" id="notifTabs">
+        <button type="button" class="ent-tab active" data-tab="tabRef">Equipment & Fault</button>
+        <button type="button" class="ent-tab" data-tab="tabDetails">Incident Details</button>
+    </div>
+    <form id="notifForm" method="post">
+        <div class="ent-form-panel active" data-panel="tabRef">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Notification Header</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Notification.NotificationNumber" class="ent-label required">Notification Number</label>
+                        <input asp-for="Notification.NotificationNumber" class="ent-input" required placeholder="PM-20260829-001" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.NotificationType" class="ent-label">Notification Type</label>
+                        <select asp-for="Notification.NotificationType" class="ent-select">
+                            <option value="M1">M1 - Malfunction Report</option>
+                            <option value="M2">M2 - Maintenance Request</option>
+                            <option value="M3">M3 - Improvement Request</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Status" class="ent-label">Status</label>
+                        <select asp-for="Notification.Status" class="ent-select">
+                            <option>NEW</option>
+                            <option>IN_PROCESS</option>
+                            <option>COMPLETED</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-gear"></i> Equipment & Fault Assignment</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Notification.EquipmentCode" class="ent-label">Equipment ID</label>
+                        <input asp-for="Notification.EquipmentCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.FunctionalLocationCode" class="ent-label">Functional Location</label>
+                        <input asp-for="Notification.FunctionalLocationCode" class="ent-input" />
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Plant" class="ent-label">Plant</label>
+                        <select asp-for="Notification.Plant" class="ent-select">
+                            <option value="1000">1000</option>
+                            <option value="2000">2000</option>
+                            <option value="3000">3000</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field">
+                        <label asp-for="Notification.FaultCode" class="ent-label">Fault Code</label>
+                        <select asp-for="Notification.FaultCode" class="ent-select">
+                            <option value="">-- Select --</option>
+                            <option value="MECH">MECH - Mechanical</option>
+                            <option value="ELEC">ELEC - Electrical</option>
+                            <option value="HYD">HYD - Hydraulic</option>
+                            <option value="PNEU">PNEU - Pneumatic</option>
+                            <option value="OPT">OPT - Optical</option>
+                            <option value="CHEM">CHEM - Chemical</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.BreakdownFlag" class="ent-label">Breakdown?</label>
+                        <select asp-for="Notification.BreakdownFlag" class="ent-select">
+                            <option value="true">Yes - Breakdown</option>
+                            <option value="false" selected>No - Planned</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.Priority" class="ent-label">Priority</label>
+                        <select asp-for="Notification.Priority" class="ent-select">
+                            <option>Low</option>
+                            <option selected>Medium</option>
+                            <option>High</option>
+                            <option>Critical</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" data-panel="tabDetails" style="display:none">
+            <div class="ent-section">
+                <div class="ent-section-title"><i class="bi bi-exclamation-triangle"></i> Incident Details</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field">
+                        <label asp-for="Notification.Description" class="ent-label required">Anomaly Description</label>
+                        <textarea asp-for="Notification.Description" class="ent-input" rows="4" required></textarea>
+                    </div>
+                    <div class="ent-field">
+                        <label asp-for="Notification.ReportedBy" class="ent-label">Reported By</label>
+                        <input asp-for="Notification.ReportedBy" class="ent-input" />
+                        <label asp-for="Notification.IncidentTime" class="ent-label mt-2">Incident Time</label>
+                        <input asp-for="Notification.IncidentTime" class="ent-input" type="datetime-local" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

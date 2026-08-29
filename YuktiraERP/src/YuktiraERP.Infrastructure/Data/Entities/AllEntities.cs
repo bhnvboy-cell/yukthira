@@ -310,9 +310,106 @@ public class ProjectEntity : EntityBase { public string ProjectCode { get; set; 
 public class ProjectTaskEntity : EntityBase { public string TaskCode { get; set; } = ""; public string Name { get; set; } = ""; public string ProjectCode { get; set; } = ""; public string AssignedTo { get; set; } = ""; public decimal PlannedHours { get; set; } public decimal ActualHours { get; set; } public DateTime StartDate { get; set; } public DateTime EndDate { get; set; } public string Status { get; set; } = "Not Started"; }
 public class TimesheetEntryEntity : EntityBase { public string EmployeeName { get; set; } = ""; public string ProjectCode { get; set; } = ""; public string TaskCode { get; set; } = ""; public DateTime Date { get; set; } public decimal Hours { get; set; } public string Description { get; set; } = ""; public string Status { get; set; } = "Submitted"; }
 // PM - Plant Maintenance
-public class EquipmentEntity : EntityBase { public string EquipmentCode { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "Machine"; public string Location { get; set; } = ""; public string Department { get; set; } = ""; public string Status { get; set; } = "Operational"; }
-public class MaintenancePlanEntity : EntityBase { public string PlanCode { get; set; } = ""; public string Name { get; set; } = ""; public string EquipmentCode { get; set; } = ""; public string Frequency { get; set; } = "Monthly"; public string TaskDescription { get; set; } = ""; public decimal EstimatedHours { get; set; } public string Status { get; set; } = "Active"; }
-public class MaintenanceOrderEntity : EntityBase { public string OrderNumber { get; set; } = ""; public string EquipmentCode { get; set; } = ""; public string Description { get; set; } = ""; public string Priority { get; set; } = "Medium"; public DateTime ScheduledDate { get; set; } public DateTime CompletedDate { get; set; } public decimal Cost { get; set; } public string Status { get; set; } = "Open"; }
+public class EquipmentEntity : EntityBase
+{
+    public string EquipmentCode { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Category { get; set; } = "M";
+    public string SerialNumber { get; set; } = "";
+    public string Manufacturer { get; set; } = "";
+    public string Model { get; set; } = "";
+    public DateTime InstallationDate { get; set; } = DateTime.UtcNow;
+    public string FunctionalLocationCode { get; set; } = "";
+    public string Plant { get; set; } = "1000";
+    public string WorkCenter { get; set; } = "";
+    public string CostCenter { get; set; } = "";
+    public string Location { get; set; } = "";
+    public string Department { get; set; } = "";
+    public string Type { get; set; } = "Machine";
+    public string Status { get; set; } = "Operational";
+}
+
+public class FunctionalLocationEntity : EntityBase
+{
+    public string LocationCode { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string LocationType { get; set; } = "Functional";
+    public string ParentLocationCode { get; set; } = "";
+    public string Plant { get; set; } = "1000";
+    public string CostCenter { get; set; } = "";
+    public string MaintPlannerGroup { get; set; } = "";
+    public string Status { get; set; } = "Active";
+}
+
+public class MaintenanceNotificationEntity : EntityBase
+{
+    public string NotificationNumber { get; set; } = "";
+    public string NotificationType { get; set; } = "M1";
+    public string EquipmentCode { get; set; } = "";
+    public string FunctionalLocationCode { get; set; } = "";
+    public string FaultCode { get; set; } = "";
+    public string FaultGroup { get; set; } = "";
+    public bool BreakdownFlag { get; set; } = false;
+    public string Description { get; set; } = "";
+    public string Priority { get; set; } = "Medium";
+    public string ReportedBy { get; set; } = "";
+    public DateTime IncidentTime { get; set; } = DateTime.UtcNow;
+    public string Plant { get; set; } = "1000";
+    public string Status { get; set; } = "NEW";
+}
+
+public class MaintenancePlanEntity : EntityBase
+{
+    public string PlanCode { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string EquipmentCode { get; set; } = "";
+    public string FunctionalLocationCode { get; set; } = "";
+    public string PlanCategory { get; set; } = "Time-Based";
+    public string Frequency { get; set; } = "Monthly";
+    public string TaskDescription { get; set; } = "";
+    public decimal EstimatedHours { get; set; }
+    public string WorkCenter { get; set; } = "";
+    public string MaintPlannerGroup { get; set; } = "";
+    public DateTime? NextDueDate { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class MaintenanceOrderEntity : EntityBase
+{
+    public string OrderNumber { get; set; } = "";
+    public string OrderType { get; set; } = "PM01";
+    public string EquipmentCode { get; set; } = "";
+    public string FunctionalLocationCode { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Priority { get; set; } = "Medium";
+    public string WorkCenter { get; set; } = "";
+    public string CostCenter { get; set; } = "";
+    public DateTime ScheduledStartDate { get; set; }
+    public DateTime ScheduledFinishDate { get; set; }
+    public DateTime CompletedDate { get; set; }
+    public decimal PlannedHours { get; set; }
+    public decimal ActualHours { get; set; }
+    public decimal Cost { get; set; }
+    public string Status { get; set; } = "Created";
+}
+
+public class SparePartEntity : EntityBase
+{
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string EquipmentCode { get; set; } = "";
+    public string Plant { get; set; } = "1000";
+    public string StorageLocation { get; set; } = "";
+    public decimal RequiredQuantity { get; set; }
+    public decimal IssuedQuantity { get; set; }
+    public decimal UnitPrice { get; set; }
+    public string UOM { get; set; } = "EA";
+    public string OrderNumber { get; set; } = "";
+    public string Status { get; set; } = "Reserved";
+}
 
 // Audit
 public class AuditLogEntity : EntityBase { public Guid? TenantId { get; set; } public Guid? UserId { get; set; } public string UserName { get; set; } = ""; public string ModuleName { get; set; } = ""; public string EntityName { get; set; } = ""; public string ActionType { get; set; } = ""; public string Description { get; set; } = ""; public string OldValues { get; set; } = ""; public string NewValues { get; set; } = ""; public string IpAddress { get; set; } = ""; public string DeviceInfo { get; set; } = ""; public string UserAgent { get; set; } = ""; public string SessionId { get; set; } = ""; public bool IsFlagged { get; set; } public DateTime Timestamp { get; set; } = DateTime.UtcNow; }

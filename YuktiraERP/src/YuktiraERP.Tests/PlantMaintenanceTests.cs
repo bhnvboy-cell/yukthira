@@ -93,7 +93,7 @@ public class PlantMaintenanceTests
             EquipmentCode = "EQ-VISCOMETER-001",
             Description = $"Calibration and recalibration of viscometer per notification {notification.NotificationNumber}",
             Priority = "Medium",
-            ScheduledDate = DateTime.UtcNow.AddDays(1),
+            ScheduledStartDate = DateTime.UtcNow.AddDays(1),
             Cost = 0,
             Status = "CREATED"
         };

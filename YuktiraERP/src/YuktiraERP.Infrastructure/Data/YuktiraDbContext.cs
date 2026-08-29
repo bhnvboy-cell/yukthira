@@ -69,8 +69,11 @@ public class YuktiraDbContext : DbContext
     public DbSet<TimesheetEntryEntity> TimesheetEntries => Set<TimesheetEntryEntity>();
     // PM - Plant Maintenance
     public DbSet<EquipmentEntity> Equipments => Set<EquipmentEntity>();
+    public DbSet<FunctionalLocationEntity> FunctionalLocations => Set<FunctionalLocationEntity>();
+    public DbSet<MaintenanceNotificationEntity> MaintenanceNotifications => Set<MaintenanceNotificationEntity>();
     public DbSet<MaintenancePlanEntity> MaintenancePlans => Set<MaintenancePlanEntity>();
     public DbSet<MaintenanceOrderEntity> MaintenanceOrders => Set<MaintenanceOrderEntity>();
+    public DbSet<SparePartEntity> SpareParts => Set<SparePartEntity>();
     // HR
     public DbSet<EmployeeEntity> Employees => Set<EmployeeEntity>();
     public DbSet<LeaveRequestEntity> LeaveRequests => Set<LeaveRequestEntity>();

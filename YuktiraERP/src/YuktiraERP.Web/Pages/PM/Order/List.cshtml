@@ -9,14 +9,14 @@
     <div class="card shadow-sm">
         <div class="card-body p-0" style="overflow-x:auto">
             <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light"><tr><th>OrderNumber</th><th>EquipmentCode</th><th>Description</th><th>Priority</th><th>ScheduledDate</th><th style="width:160px">Actions</th></tr></thead>
+                <thead class="table-light"><tr><th>OrderNumber</th><th>EquipmentCode</th><th>Description</th><th>Priority</th><th>ScheduledStartDate</th><th style="width:160px">Actions</th></tr></thead>
                 <tbody>
                     @if (Model.Items.Count == 0) {
                         <tr><td colspan="9" class="text-center text-muted py-4">No records found</td></tr>
                     }
                     @foreach (var item in Model.Items) {
                         <tr>
-                            <td>@item.OrderNumber</td><td>@item.EquipmentCode</td><td>@item.Description</td><td>@item.Priority</td><td>@item.ScheduledDate</td>
+                            <td>@item.OrderNumber</td><td>@item.EquipmentCode</td><td>@item.Description</td><td>@item.Priority</td><td>@item.ScheduledStartDate</td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <a href="/PM/Order/Display?id=@item.Id" class="btn btn-outline-info" title="View"><i class="bi bi-eye"></i></a>

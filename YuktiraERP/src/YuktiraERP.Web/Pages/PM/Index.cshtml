@@ -1,58 +1,445 @@
 @page
 @model YuktiraERP.Web.Pages.PM.IndexModel
 @using YuktiraERP.Infrastructure.Data.Entities
-@{
-    ViewData["Title"] = "Plant Maintenance";
-    var equipments = Model.Equipments;
-    var plans = Model.Plans;
-    var orders = Model.Orders;
+@{ ViewData["Title"] = "Plant Maintenance"; }
+<div class="module-root" data-module-root="pm">
+    <div class="module-header">
+        <div class="module-header-left">
+            <h2><i class="bi bi-tools me-2"></i>Plant Maintenance</h2>
+            <span class="module-badge">PM</span>
+        </div>
+        <div class="module-header-right">
+            <a asp-page="/PM/Equipment/Create" class="btn btn-primary module-action-btn" data-action-tab="equipment"><i class="bi bi-plus-circle me-1"></i> Create Equipment</a>
+            <a asp-page="/PM/Location/Create" class="btn btn-primary module-action-btn" data-action-tab="locations" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Location</a>
+            <a asp-page="/PM/Notification/Create" class="btn btn-primary module-action-btn" data-action-tab="notifications" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Notification</a>
+            <a asp-page="/PM/Order/Create" class="btn btn-primary module-action-btn" data-action-tab="orders" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Order</a>
+            <a asp-page="/PM/Plan/Create" class="btn btn-primary module-action-btn" data-action-tab="plans" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Plan</a>
+            <a asp-page="/PM/Spares/Create" class="btn btn-primary module-action-btn" data-action-tab="spares" style="display:none"><i class="bi bi-plus-circle me-1"></i> Issue Spares</a>
+        </div>
+    </div>
+
+    <div class="module-kpi-grid">
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon blue"><i class="bi bi-gear"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.ActiveEquipmentCount</div>
+                <div class="module-kpi-label">Active Equipment Assets</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon amber"><i class="bi bi-clipboard-check"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.OpenOrdersCount</div>
+                <div class="module-kpi-label">Open Maintenance Orders</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.OverduePlansCount</div>
+                <div class="module-kpi-label">Overdue Preventive Plans</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon orange"><i class="bi bi-clock-history"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.BreakdownHours</div>
+                <div class="module-kpi-label">Breakdown Downtime (hrs)</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon teal"><i class="bi bi-box-seam"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@String.Format("{0:N0}", Model.SparesValue)</div>
+                <div class="module-kpi-label">Spares Consumption Value</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-tabs" id="pmTabs">
+        <button type="button" class="module-tab active" data-tab="equipment"><i class="bi bi-gear"></i> Equipment Master <span class="tab-count">@Model.Equipments.Count</span></button>
+        <button type="button" class="module-tab" data-tab="locations"><i class="bi bi-geo-alt"></i> Functional Locations <span class="tab-count">@Model.Locations.Count</span></button>
+        <button type="button" class="module-tab" data-tab="notifications"><i class="bi bi-bell"></i> Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
+        <button type="button" class="module-tab" data-tab="orders"><i class="bi bi-clipboard-check"></i> Maintenance Orders <span class="tab-count">@Model.Orders.Count</span></button>
+        <button type="button" class="module-tab" data-tab="plans"><i class="bi bi-calendar-check"></i> Maintenance Plans <span class="tab-count">@Model.Plans.Count</span></button>
+        <button type="button" class="module-tab" data-tab="spares"><i class="bi bi-box-seam"></i> Spares & Parts <span class="tab-count">@Model.Spares.Count</span></button>
+    </div>
+
+    <!-- ═══ TAB: Equipment Master ═══ -->
+    <div class="module-tab-panel active" data-panel="equipment">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search equipment..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Asset #</th>
+                            <th>Equipment Name</th>
+                            <th>Category</th>
+                            <th>Functional Location</th>
+                            <th>Plant</th>
+                            <th>Work Center</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Equipments.Any())
+                        {
+                            @foreach (var e in Model.Equipments)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@e.EquipmentCode</strong></td>
+                                    <td>@e.Name</td>
+                                    <td><span class="status-badge @(e.Category=="M"?"info":e.Category=="P"?"warning":"success")">@e.Category</span></td>
+                                    <td>@e.FunctionalLocationCode</td>
+                                    <td>@e.Plant</td>
+                                    <td>@e.WorkCenter</td>
+                                    <td><span class="status-badge @(e.Status=="Operational"?"success":e.Status=="Under Maintenance"?"warning":"danger")">@e.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-gear"></i><div>No equipment found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Equipments.Count equipment</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Functional Locations ═══ -->
+    <div class="module-tab-panel" data-panel="locations" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search locations..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Location Code</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Parent Location</th>
+                            <th>Plant</th>
+                            <th>Cost Center</th>
+                            <th>Planner Group</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Locations.Any())
+                        {
+                            @foreach (var l in Model.Locations)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@l.LocationCode</strong></td>
+                                    <td>@l.Name</td>
+                                    <td><span class="status-badge info">@l.LocationType</span></td>
+                                    <td>@l.ParentLocationCode</td>
+                                    <td>@l.Plant</td>
+                                    <td>@l.CostCenter</td>
+                                    <td>@l.MaintPlannerGroup</td>
+                                    <td><span class="status-badge @(l.Status=="Active"?"success":"warning")">@l.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-geo-alt"></i><div>No functional locations found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Locations.Count locations</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Notifications ═══ -->
+    <div class="module-tab-panel" data-panel="notifications" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search notifications..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Notification #</th>
+                            <th>Type</th>
+                            <th>Equipment</th>
+                            <th>Fault Code</th>
+                            <th>Breakdown</th>
+                            <th>Priority</th>
+                            <th>Reported By</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Notifications.Any())
+                        {
+                            @foreach (var n in Model.Notifications)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@n.NotificationNumber</strong></td>
+                                    <td><span class="status-badge info">@n.NotificationType</span></td>
+                                    <td>@n.EquipmentCode</td>
+                                    <td>@n.FaultCode</td>
+                                    <td><span class="status-badge @(n.BreakdownFlag?"danger":"success")">@(n.BreakdownFlag?"Yes":"No")</span></td>
+                                    <td><span class="status-badge @(n.Priority=="High"||n.Priority=="Critical"?"danger":n.Priority=="Medium"?"warning":"info")">@n.Priority</span></td>
+                                    <td>@n.ReportedBy</td>
+                                    <td><span class="status-badge @(n.Status=="NEW"?"info":n.Status=="IN_PROGRESS"?"warning":n.Status=="COMPLETED"?"success":"info")">@n.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-bell"></i><div>No notifications found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Notifications.Count notifications</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Maintenance Orders ═══ -->
+    <div class="module-tab-panel" data-panel="orders" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search orders..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Order #</th>
+                            <th>Order Type</th>
+                            <th>Equipment</th>
+                            <th>Functional Location</th>
+                            <th>Priority</th>
+                            <th>Work Center</th>
+                            <th>Scheduled Date</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Orders.Any())
+                        {
+                            @foreach (var o in Model.Orders)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@o.OrderNumber</strong></td>
+                                    <td><span class="status-badge @(o.OrderType=="PM01"?"danger":"info")">@o.OrderType</span></td>
+                                    <td>@o.EquipmentCode</td>
+                                    <td>@o.FunctionalLocationCode</td>
+                                    <td><span class="status-badge @(o.Priority=="High"||o.Priority=="Critical"?"danger":o.Priority=="Medium"?"warning":"info")">@o.Priority</span></td>
+                                    <td>@o.WorkCenter</td>
+                                    <td>@o.ScheduledStartDate.ToString("dd MMM yyyy")</td>
+                                    <td><span class="status-badge @(o.Status=="Created"?"info":o.Status=="Released"?"warning":o.Status=="Confirmed"?"success":o.Status=="TECO Closed"?"purple":"danger")">@o.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PM/Order/Display" asp-route-id="@o.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-clipboard-check"></i><div>No maintenance orders found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Orders.Count orders</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Maintenance Plans ═══ -->
+    <div class="module-tab-panel" data-panel="plans" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search plans..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Plan #</th>
+                            <th>Name</th>
+                            <th>Equipment</th>
+                            <th>Category</th>
+                            <th>Frequency</th>
+                            <th>Work Center</th>
+                            <th>Next Due</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Plans.Any())
+                        {
+                            @foreach (var p in Model.Plans)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@p.PlanCode</strong></td>
+                                    <td>@p.Name</td>
+                                    <td>@p.EquipmentCode</td>
+                                    <td><span class="status-badge info">@p.PlanCategory</span></td>
+                                    <td>@p.Frequency</td>
+                                    <td>@p.WorkCenter</td>
+                                    <td>@(p.NextDueDate?.ToString("dd MMM yyyy") ?? "--")</td>
+                                    <td><span class="status-badge @(p.Status=="Active"?"success":"warning")">@p.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PM/Plan/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-calendar-check"></i><div>No maintenance plans found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Plans.Count plans</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Spares & Parts ═══ -->
+    <div class="module-tab-panel" data-panel="spares" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search spares..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Material Code</th>
+                            <th>Material Name</th>
+                            <th>Equipment</th>
+                            <th>Order #</th>
+                            <th>Required Qty</th>
+                            <th>Issued Qty</th>
+                            <th>Unit Price</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Spares.Any())
+                        {
+                            @foreach (var s in Model.Spares)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@s.MaterialCode</strong></td>
+                                    <td>@s.MaterialName</td>
+                                    <td>@s.EquipmentCode</td>
+                                    <td>@s.OrderNumber</td>
+                                    <td>@s.RequiredQuantity @s.UOM</td>
+                                    <td>@s.IssuedQuantity @s.UOM</td>
+                                    <td>@String.Format("{0:C2}", s.UnitPrice)</td>
+                                    <td><span class="status-badge @(s.Status=="Reserved"?"info":s.Status=="Issued"?"success":"warning")">@s.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-box-seam"></i><div>No spares or parts found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Spares.Count spares</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-tools me-2"></i>Plant Maintenance (PM)</h2>
-</div>
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#equip">Equipment</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#plans">Maintenance Plans</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#orders">Maintenance Orders</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="equip">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/PM/Equipment/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Equipment</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Location</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var e in equipments) {
-                        <tr><td><a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id">@e.EquipmentCode</a></td><td>@e.Name</td><td>@e.Type</td><td>@e.Location</td><td>@e.Department</td><td><span class="badge @(e.Status=="Operational"?"bg-success":"bg-warning")">@e.Status</span></td><td><a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id" class="btn btn-outline-secondary btn-sm"><i class="bi bi-eye"></i></a></td></tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="plans">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/PM/Plan/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Maintenance Plan</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Code</th><th>Name</th><th>Equipment</th><th>Frequency</th><th>Est. Hours</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var p in plans) {
-                        <tr><td>@p.PlanCode</td><td>@p.Name</td><td>@p.EquipmentCode</td><td>@p.Frequency</td><td>@p.EstimatedHours</td><td><span class="badge @(p.Status=="Active"?"bg-success":"bg-warning")">@p.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="orders">
-        <div class="card"><div class="card-body">
-            <div class="mb-2"><a asp-page="/PM/Order/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Maintenance Order</a></div>
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Order#</th><th>Equipment</th><th>Description</th><th>Priority</th><th>Scheduled</th><th>Completed</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var o in orders) {
-                        <tr><td>@o.OrderNumber</td><td>@o.EquipmentCode</td><td>@o.Description</td><td><span class="badge @(o.Priority=="High"?"bg-danger":"bg-info")">@o.Priority</span></td><td>@o.ScheduledDate.ToString("d")</td><td>@(o.CompletedDate == default ? "--" : o.CompletedDate.ToString("d"))</td><td>@o.Cost.ToString("C0")</td><td><span class="badge bg-secondary">@o.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-</div>
+
+@section Scripts {
+    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+}

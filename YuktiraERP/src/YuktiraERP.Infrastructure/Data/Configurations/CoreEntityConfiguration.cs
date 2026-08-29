@@ -176,6 +176,24 @@ public class EquipmentEntityConfiguration : IEntityTypeConfiguration<EquipmentEn
     }
 }
 
+public class FunctionalLocationEntityConfiguration : IEntityTypeConfiguration<FunctionalLocationEntity>
+{
+    public void Configure(EntityTypeBuilder<FunctionalLocationEntity> builder)
+    {
+        builder.ToTable("functional_locations", "yuktira_pm");
+        builder.HasIndex(e => e.LocationCode).IsUnique();
+    }
+}
+
+public class MaintenanceNotificationEntityConfiguration : IEntityTypeConfiguration<MaintenanceNotificationEntity>
+{
+    public void Configure(EntityTypeBuilder<MaintenanceNotificationEntity> builder)
+    {
+        builder.ToTable("maintenance_notifications", "yuktira_pm");
+        builder.HasIndex(e => e.NotificationNumber).IsUnique();
+    }
+}
+
 public class MaintenancePlanEntityConfiguration : IEntityTypeConfiguration<MaintenancePlanEntity>
 {
     public void Configure(EntityTypeBuilder<MaintenancePlanEntity> builder)
@@ -191,5 +209,14 @@ public class MaintenanceOrderEntityConfiguration : IEntityTypeConfiguration<Main
     {
         builder.ToTable("maintenance_orders", "yuktira_pm");
         builder.Property(e => e.Cost).HasColumnType("decimal(18,2)");
+    }
+}
+
+public class SparePartEntityConfiguration : IEntityTypeConfiguration<SparePartEntity>
+{
+    public void Configure(EntityTypeBuilder<SparePartEntity> builder)
+    {
+        builder.ToTable("spare_parts", "yuktira_pm");
+        builder.Property(e => e.UnitPrice).HasColumnType("decimal(18,4)");
     }
 }
