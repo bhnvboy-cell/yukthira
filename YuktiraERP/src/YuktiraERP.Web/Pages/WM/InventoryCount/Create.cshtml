@@ -1,0 +1,126 @@
+@page
+@model YuktiraERP.Web.Pages.WM.InventoryCount.CreateModel
+@{ ViewData["Title"] = "Start Cycle Count"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-clipboard-check"></i></div>
+        <div class="banner-info">
+            <h5>Start Cycle Count</h5>
+            <span>WM04 — Physical Inventory Count</span>
+        </div>
+        <div class="banner-meta">Warehouse: WH01</div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Count.Status" value="Planned" />
+        <input type="hidden" asp-for="Count.TenantId" />
+        <input type="hidden" asp-for="Count.CountedBins" value="0" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="count-scope">
+                <i class="bi bi-clipboard-check tab-icon"></i> Count Scope
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="count-details">
+                <i class="bi bi-person-workspace tab-icon"></i> Assignment & Schedule
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Count Scope ═══ -->
+        <div class="ent-form-panel active" data-panel="count-scope">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-clipboard-check"></i><h6>Inventory Count Parameters</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Count Number</label>
+                        <input asp-for="Count.CountNumber" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Warehouse Number (LGNUM) <span class="required">*</span></label>
+                        <select asp-for="Count.WarehouseNumber" class="form-select">
+                            <option value="">Select warehouse...</option>
+                            <option value="WH01">WH01 — Main Warehouse</option>
+                            <option value="WH02">WH02 — Distribution Center</option>
+                            <option value="WH03">WH03 — Cold Chain Facility</option>
+                        </select>
+                        <span asp-validation-for="Count.WarehouseNumber" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Storage Type (LGTYP)</label>
+                        <select asp-for="Count.StorageType" class="form-select">
+                            <option value="">All Storage Types</option>
+                            <option value="Bulk">Bulk Storage</option>
+                            <option value="Rack">Rack Storage</option>
+                            <option value="Floor">Floor Storage</option>
+                            <option value="Shelf">Shelf Storage</option>
+                            <option value="Cold">Cold Storage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Bin Range (LGPLA)</label>
+                        <input asp-for="Count.BinRange" class="form-control" placeholder="e.g., A-01 to A-99" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Count Type <span class="required">*</span></label>
+                        <select asp-for="Count.CountType" class="form-select">
+                            <option value="Full">Full Warehouse Count</option>
+                            <option value="Partial">Partial / Zone Count</option>
+                            <option value="Random">Random Sample Count</option>
+                            <option value="Cycle">Continuous Cycle Count</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Total Bins to Count</label>
+                        <input type="number" asp-for="Count.TotalBins" class="form-control" min="1" value="1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Assignment & Schedule ═══ -->
+        <div class="ent-form-panel" data-panel="count-details">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person-workspace"></i><h6>Assignment</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Assigned Counter <span class="required">*</span></label>
+                        <select asp-for="Count.AssignedTo" class="form-select">
+                            <option value="">Select counter...</option>
+                            <option value="CT-001">CT-001 — Sarah Johnson</option>
+                            <option value="CT-002">CT-002 — Mike Williams</option>
+                            <option value="CT-003">CT-003 — Lisa Chen</option>
+                            <option value="CT-004">CT-004 — Team Alpha</option>
+                        </select>
+                        <span asp-validation-for="Count.AssignedTo" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Scheduled Date <span class="required">*</span></label>
+                        <input type="date" asp-for="Count.ScheduledDate" class="form-control" />
+                        <span asp-validation-for="Count.ScheduledDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Count Instructions</h6></div>
+                <div class="ent-field" style="grid-column: span 2">
+                    <label>Special Instructions</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter any special counting instructions, tolerance thresholds, or priority notes..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Physical inventory counts are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-play-circle me-1"></i>Start Count</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

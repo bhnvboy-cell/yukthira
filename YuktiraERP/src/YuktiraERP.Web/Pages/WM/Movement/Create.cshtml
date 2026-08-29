@@ -1,0 +1,168 @@
+@page
+@model YuktiraERP.Web.Pages.WM.Movement.CreateModel
+@{ ViewData["Title"] = "Post Goods Movement"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-box-arrow-in-right"></i></div>
+        <div class="banner-info">
+            <h5>Post Goods Movement</h5>
+            <span>WM05 — Stock Movement Posting</span>
+        </div>
+        <div class="banner-meta">Warehouse: WH01</div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Movement.Status" value="Posted" />
+        <input type="hidden" asp-for="Movement.TenantId" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="movement-type">
+                <i class="bi bi-diagram-3 tab-icon"></i> Movement Type
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="movement-details">
+                <i class="bi bi-box-seam tab-icon"></i> Material & Quantity
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Movement Type ═══ -->
+        <div class="ent-form-panel active" data-panel="movement-type">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Movement Configuration (SAP MVT Types)</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Movement Number</label>
+                        <input asp-for="Movement.MovementNumber" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Movement Type (BWART) <span class="required">*</span></label>
+                        <select asp-for="Movement.MovementType" class="form-select">
+                            <option value="">Select movement type...</option>
+                            <optgroup label="Receipts">
+                                <option value="101">101 — GR for Purchase Order</option>
+                                <option value="103">103 — GR for PO into QI</option>
+                                <option value="105">105 — GR for PO into Blocked</option>
+                            </optgroup>
+                            <optgroup label="Issues">
+                                <option value="201">201 — GI for Production Order</option>
+                                <option value="221">221 — GI for Project</option>
+                                <option value="261">261 — GI Consumption</option>
+                            </optgroup>
+                            <optgroup label="Transfers">
+                                <option value="301">301 — Transfer Plant-to-Plant</option>
+                                <option value="309">309 — Transfer Material-to-Material</option>
+                                <option value="311">311 — Transfer to QI Stock</option>
+                                <option value="321">321 — Transfer QI to Unrestricted</option>
+                                <option value="322">322 — Transfer Unrestricted to QI</option>
+                                <option value="343">343 — Transfer Blocked to Unrestricted</option>
+                                <option value="999">999 — WM Stock Transfer</option>
+                            </optgroup>
+                            <optgroup label="Returns">
+                                <option value="122">122 — Return to Vendor</option>
+                                <option value="161">161 — Returns from Customer</option>
+                            </optgroup>
+                            <optgroup label="Adjustments">
+                                <option value="501">501 — Receipt w/o PO</option>
+                                <option value="551">551 — Scrapping</option>
+                                <option value="561">561 — Initial Inventory</option>
+                            </optgroup>
+                        </select>
+                        <span asp-validation-for="Movement.MovementType" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Posting Date</label>
+                        <input type="date" asp-for="Movement.MovementDate" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Material & Quantity ═══ -->
+        <div class="ent-form-panel" data-panel="movement-details">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-box-seam"></i><h6>Material Details</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Material Code <span class="required">*</span></label>
+                        <input asp-for="Movement.MaterialCode" class="form-control" placeholder="e.g., RM-10001" />
+                        <span asp-validation-for="Movement.MaterialCode" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field" style="grid-column: span 2">
+                        <label>Material Name <span class="required">*</span></label>
+                        <input asp-for="Movement.MaterialName" class="form-control" placeholder="Material description" />
+                        <span asp-validation-for="Movement.MaterialName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Source Bin <span class="required">*</span></label>
+                        <select asp-for="Movement.SourceBin" class="form-select">
+                            <option value="">Select source bin...</option>
+                            <option value="A-01-01">A-01-01 — Receiving</option>
+                            <option value="A-02-01">A-02-01 — Bulk</option>
+                            <option value="B-01-01">B-01-01 — Rack Level 1</option>
+                            <option value="B-01-02">B-01-02 — Rack Level 2</option>
+                            <option value="C-01-01">C-01-01 — Pick Face</option>
+                            <option value="D-01-01">D-01-01 — Shipping</option>
+                        </select>
+                        <span asp-validation-for="Movement.SourceBin" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Destination Bin <span class="required">*</span></label>
+                        <select asp-for="Movement.DestinationBin" class="form-select">
+                            <option value="">Select destination bin...</option>
+                            <option value="A-01-01">A-01-01 — Receiving</option>
+                            <option value="A-02-01">A-02-01 — Bulk</option>
+                            <option value="B-01-01">B-01-01 — Rack Level 1</option>
+                            <option value="B-01-02">B-01-02 — Rack Level 2</option>
+                            <option value="C-01-01">C-01-01 — Pick Face</option>
+                            <option value="D-01-01">D-01-01 — Shipping</option>
+                        </select>
+                        <span asp-validation-for="Movement.DestinationBin" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-4">
+                    <div class="ent-field">
+                        <label>Quantity <span class="required">*</span></label>
+                        <input type="number" asp-for="Movement.Quantity" class="form-control" min="0.01" step="0.01" placeholder="0.00" />
+                        <span asp-validation-for="Movement.Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>UOM <span class="required">*</span></label>
+                        <select asp-for="Movement.UOM" class="form-select">
+                            <option value="EA">EA</option>
+                            <option value="KG">KG</option>
+                            <option value="LB">LB</option>
+                            <option value="L">L</option>
+                            <option value="M">M</option>
+                            <option value="M2">M2</option>
+                            <option value="M3">M3</option>
+                            <option value="CS">CS</option>
+                            <option value="PLT">PLT</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Batch Number</label>
+                        <input asp-for="Movement.BatchNumber" class="form-control" placeholder="Optional" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Posted By</label>
+                        <input asp-for="Movement.PostedBy" class="form-control" placeholder="Operator ID" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Stock movements are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Post Movement</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

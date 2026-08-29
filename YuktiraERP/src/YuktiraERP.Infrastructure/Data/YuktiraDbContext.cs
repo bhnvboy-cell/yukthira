@@ -47,6 +47,10 @@ public class YuktiraDbContext : DbContext
     // WM
     public DbSet<WarehouseTransferEntity> WarehouseTransfers => Set<WarehouseTransferEntity>();
     public DbSet<StorageLocationEntity> StorageLocations => Set<StorageLocationEntity>();
+    public DbSet<BinEntity> Bins => Set<BinEntity>();
+    public DbSet<TransferOrderEntity> TransferOrders => Set<TransferOrderEntity>();
+    public DbSet<WaveEntity> Waves => Set<WaveEntity>();
+    public DbSet<InventoryCountEntity> InventoryCounts => Set<InventoryCountEntity>();
     // FI
     public DbSet<JournalEntryEntity> JournalEntries => Set<JournalEntryEntity>();
     public DbSet<APEntryEntity> APEntries => Set<APEntryEntity>();

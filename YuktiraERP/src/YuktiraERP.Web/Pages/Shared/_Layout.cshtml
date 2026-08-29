@@ -290,13 +290,14 @@
     </script>
 
     <script>
-        // ── PWA: service worker registration ──
+        // ── Unregister old service worker and clear cache ──
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').catch(function(err) {
-                    console.warn('Service worker registration failed', err);
-                });
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                regs.forEach(function(r) { r.unregister(); });
             });
+        }
+        if ('caches' in window) {
+            caches.keys().then(function(keys) { keys.forEach(function(k) { caches.delete(k); }); });
         }
     </script>
     <!-- Session Timeout Warning Modal (SAP-style) -->

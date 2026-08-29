@@ -3,35 +3,401 @@
 @using YuktiraERP.Infrastructure.Data.Entities
 @{
     ViewData["Title"] = "Warehouse Management";
-    var items = Model.StockItems;
-    var locations = Model.StorageLocations;
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-house-door me-2"></i>Warehouse Management</h2>
-    <div><a asp-page="/WM/Bin/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Inventory Item</a></div>
-</div>
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#inventory">Inventory</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#transfers">Transfers</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#locations">Storage Locations</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="inventory">
-        <div class="card"><div class="card-body">
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Material</th><th>Bin</th><th>Lot</th><th>Qty</th><th>UOM</th><th>Value</th><th>Min</th><th>Max</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var s in items)
-                    {
-                        <tr>
-                            <td>@s.MaterialName</td><td>@s.Bin</td><td>@s.Lot</td><td>@s.Quantity</td><td>@s.UOM</td><td>@s.Value.ToString("C2")</td><td>@s.MinStock</td><td>@s.MaxStock</td>
-                            <td><i class="bi bi-pencil me-2"></i><i class="bi bi-arrow-right"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+<div class="module-root" data-module-root="wm">
+    <div class="module-header">
+        <div class="module-header-left">
+            <h2><i class="bi bi-house-door me-2"></i>Warehouse Management</h2>
+            <span class="module-badge">WM</span>
+        </div>
+        <div class="module-header-right">
+            <a asp-page="/WM/Bin/Create" class="btn btn-primary module-action-btn" data-action-tab="bins"><i class="bi bi-plus-circle me-1"></i> Create Storage Bin</a>
+            <a asp-page="/WM/TransferOrder/Create" class="btn btn-primary module-action-btn" data-action-tab="transfers" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Transfer Order</a>
+            <a asp-page="/WM/Movement/Create" class="btn btn-primary module-action-btn" data-action-tab="movements" style="display:none"><i class="bi bi-plus-circle me-1"></i> Post Goods Movement</a>
+            <a asp-page="/WM/Wave/Create" class="btn btn-primary module-action-btn" data-action-tab="waves" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Picking Wave</a>
+            <a asp-page="/WM/InventoryCount/Create" class="btn btn-primary module-action-btn" data-action-tab="counts" style="display:none"><i class="bi bi-plus-circle me-1"></i> Start Cycle Count</a>
+        </div>
     </div>
-    <div class="tab-pane fade" id="transfers"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/WM/Transfer/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Transfer</a></div><p class="text-muted">Stock transfer orders between storage locations and plants with in-transit tracking.</p></div></div></div>
-    <div class="tab-pane fade" id="locations"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/WM/StorageLocation/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Location</a></div><table class="table table-hover table-sm"><thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Capacity</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var l in locations){<tr><td>@l.Code</td><td>@l.Name</td><td>@l.Type</td><td>@l.Capacity</td><td><span class="badge @(l.Status=="Active"?"bg-success":"bg-secondary")">@l.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
+
+    <div class="module-kpi-grid">
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon amber"><i class="bi bi-grid-3x3"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@(Model.Bins.Count > 0 ? Math.Round((double)Model.Bins.Count(b => b.Status == "Active") / Model.Bins.Count * 100, 1).ToString() : "0")%</div>
+                <div class="module-kpi-label">Bin Occupancy</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon blue"><i class="bi bi-arrow-left-right"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.TransferOrders.Count(t => t.Status == "Created" || t.Status == "In Progress")</div>
+                <div class="module-kpi-label">Open Transfer Orders</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon purple"><i class="bi bi-bag-check"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.Waves.Count(w => w.Status == "Planned" || w.Status == "In Progress")</div>
+                <div class="module-kpi-label">Pending Picks</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon green"><i class="bi bi-currency-dollar"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@(Model.StockItems.Sum(s => s.Value).ToString("C0"))</div>
+                <div class="module-kpi-label">Inventory Valuation</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon red"><i class="bi bi-speedometer"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.Bins.Count(b => b.CurrentWeight < b.MaxWeight * 0.1m && b.Status == "Active")</div>
+                <div class="module-kpi-label">Low Velocity Bins</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-tabs" id="wmTabs">
+        <button type="button" class="module-tab active" data-tab="bins"><i class="bi bi-grid-3x3"></i> Storage Bins <span class="tab-count">@Model.Bins.Count</span></button>
+        <button type="button" class="module-tab" data-tab="transfers"><i class="bi bi-arrow-left-right"></i> Transfer Orders <span class="tab-count">@Model.TransferOrders.Count</span></button>
+        <button type="button" class="module-tab" data-tab="movements"><i class="bi bi-box-arrow-in-right"></i> Stock Movement <span class="tab-count">@Model.Movements.Count</span></button>
+        <button type="button" class="module-tab" data-tab="waves"><i class="bi bi-water"></i> Wave Picking <span class="tab-count">@Model.Waves.Count</span></button>
+        <button type="button" class="module-tab" data-tab="counts"><i class="bi bi-clipboard-check"></i> Physical Inventory <span class="tab-count">@Model.InventoryCounts.Count</span></button>
+    </div>
+
+    <!-- ═══ TAB: Storage Bins ═══ -->
+    <div class="module-tab-panel active" data-panel="bins">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search bins..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right">
+                    <span class="sheet-selected-count"></span>
+                </div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Warehouse</th>
+                            <th>Storage Type</th>
+                            <th>Bin Code</th>
+                            <th>Bin Type</th>
+                            <th>Putaway</th>
+                            <th>Weight</th>
+                            <th>Volume</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Bins.Any())
+                        {
+                            @foreach (var b in Model.Bins)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td>@b.WarehouseNumber</td>
+                                    <td>@b.StorageType</td>
+                                    <td><strong>@b.BinCode</strong></td>
+                                    <td>@b.BinType</td>
+                                    <td>@b.PutawayStrategy</td>
+                                    <td>@b.CurrentWeight / @b.MaxWeight kg</td>
+                                    <td>@b.CurrentVolume / @b.MaxVolume m³</td>
+                                    <td><span class="status-badge @(b.Status == "Active" ? "success" : b.Status == "Full" ? "warning" : "danger")">@b.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/WM/Bin/Edit" asp-route-id="@b.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/WM/Bin/Display" asp-route-id="@b.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-grid-3x3"></i><div>No storage bins found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Bins.Count bins</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Transfer Orders ═══ -->
+    <div class="module-tab-panel" data-panel="transfers" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search transfer orders..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Order #</th>
+                            <th>Material</th>
+                            <th>Source Bin</th>
+                            <th>Destination Bin</th>
+                            <th>Qty</th>
+                            <th>UOM</th>
+                            <th>Batch</th>
+                            <th>Mvt Type</th>
+                            <th>Operator</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TransferOrders.Any())
+                        {
+                            @foreach (var t in Model.TransferOrders)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@t.OrderNumber</strong></td>
+                                    <td>@t.MaterialCode</td>
+                                    <td>@t.SourceBin</td>
+                                    <td>@t.DestinationBin</td>
+                                    <td>@t.Quantity</td>
+                                    <td>@t.BaseUOM</td>
+                                    <td>@t.TargetBatch</td>
+                                    <td>@t.MovementType</td>
+                                    <td>@t.AssignedOperator</td>
+                                    <td><span class="status-badge @(t.Status == "Completed" ? "success" : t.Status == "In Progress" ? "info" : t.Status == "Cancelled" ? "danger" : "warning")">@t.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/WM/Transfer/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/WM/Transfer/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="12" class="sheet-empty"><i class="bi bi-arrow-left-right"></i><div>No transfer orders found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.TransferOrders.Count orders</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Stock Movement ═══ -->
+    <div class="module-tab-panel" data-panel="movements" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search movements..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Movement #</th>
+                            <th>Type</th>
+                            <th>Material</th>
+                            <th>Source Bin</th>
+                            <th>Destination Bin</th>
+                            <th>Qty</th>
+                            <th>UOM</th>
+                            <th>Batch</th>
+                            <th>Posted By</th>
+                            <th>Date</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Movements.Any())
+                        {
+                            @foreach (var m in Model.Movements)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@m.MovementNumber</strong></td>
+                                    <td><span class="status-badge info">@m.MovementType</span></td>
+                                    <td>@m.MaterialCode</td>
+                                    <td>@m.SourceBin</td>
+                                    <td>@m.DestinationBin</td>
+                                    <td>@m.Quantity</td>
+                                    <td>@m.UOM</td>
+                                    <td>@m.BatchNumber</td>
+                                    <td>@m.PostedBy</td>
+                                    <td>@m.MovementDate.ToString("dd MMM yyyy")</td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/WM/Movement/Display" asp-route-id="@m.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="12" class="sheet-empty"><i class="bi bi-box-arrow-in-right"></i><div>No stock movements found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Movements.Count movements</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Wave Picking ═══ -->
+    <div class="module-tab-panel" data-panel="waves" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search waves..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Wave #</th>
+                            <th>Delivery Notes</th>
+                            <th>Priority</th>
+                            <th>Zone</th>
+                            <th>Cutoff</th>
+                            <th>Items</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Waves.Any())
+                        {
+                            @foreach (var w in Model.Waves)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@w.WaveNumber</strong></td>
+                                    <td>@w.DeliveryNotes</td>
+                                    <td><span class="status-badge @(w.Priority <= 2 ? "danger" : w.Priority <= 4 ? "warning" : "info")">P@(w.Priority)</span></td>
+                                    <td>@w.AssignedZone</td>
+                                    <td>@w.CutoffTime.ToString("dd MMM HH:mm")</td>
+                                    <td>@w.ItemCount</td>
+                                    <td><span class="status-badge @(w.Status == "Completed" ? "success" : w.Status == "In Progress" ? "info" : "warning")">@w.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/WM/Wave/Display" asp-route-id="@w.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-water"></i><div>No picking waves found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Waves.Count waves</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Physical Inventory ═══ -->
+    <div class="module-tab-panel" data-panel="counts" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search cycle counts..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Count #</th>
+                            <th>Warehouse</th>
+                            <th>Storage Type</th>
+                            <th>Bin Range</th>
+                            <th>Count Type</th>
+                            <th>Assigned To</th>
+                            <th>Scheduled</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.InventoryCounts.Any())
+                        {
+                            @foreach (var c in Model.InventoryCounts)
+                            {
+                                var pct = c.TotalBins > 0 ? Math.Round((double)c.CountedBins / c.TotalBins * 100) : 0;
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@c.CountNumber</strong></td>
+                                    <td>@c.WarehouseNumber</td>
+                                    <td>@c.StorageType</td>
+                                    <td>@c.BinRange</td>
+                                    <td>@c.CountType</td>
+                                    <td>@c.AssignedTo</td>
+                                    <td>@c.ScheduledDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        <div style="display:flex;align-items:center;gap:8px">
+                                            <div style="flex:1;height:6px;background:var(--border-color,#e2e8f0);border-radius:3px;overflow:hidden"><div style="height:100%;width:@pct%;background:var(--primary,#2563eb);border-radius:3px"></div></div>
+                                            <span style="font-size:11px;color:var(--text-muted,#94a3b8)">@c.CountedBins/@c.TotalBins</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge @(c.Status == "Completed" ? "success" : c.Status == "In Progress" ? "info" : "warning")">@c.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/WM/InventoryCount/Display" asp-route-id="@c.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="11" class="sheet-empty"><i class="bi bi-clipboard-check"></i><div>No cycle counts found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.InventoryCounts.Count counts</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+}

@@ -77,6 +77,14 @@ public class StockMovementEntityConfiguration : IEntityTypeConfiguration<StockMo
         builder.Property(e => e.Quantity).HasColumnType("decimal(18,4)");
         builder.Property(e => e.StockBefore).HasColumnType("decimal(18,4)");
         builder.Property(e => e.StockAfter).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.MaterialCode).HasColumnName("material_code");
+        builder.Property(e => e.SourceBin).HasColumnName("source_bin");
+        builder.Property(e => e.DestinationBin).HasColumnName("destination_bin");
+        builder.Property(e => e.UOM).HasColumnName("uom");
+        builder.Property(e => e.BatchNumber).HasColumnName("batch_number");
+        builder.Property(e => e.PostedBy).HasColumnName("posted_by");
+        builder.Property(e => e.MovementDate).HasColumnName("movement_date");
+        builder.Property(e => e.MovementNumber).HasColumnName("movement_number");
     }
 }
 

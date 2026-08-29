@@ -1,0 +1,116 @@
+@page
+@model YuktiraERP.Web.Pages.WM.Wave.CreateModel
+@{ ViewData["Title"] = "Create Picking Wave"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-water"></i></div>
+        <div class="banner-info">
+            <h5>Create Picking Wave</h5>
+            <span>WM03 — Wave Picking Management</span>
+        </div>
+        <div class="banner-meta">Warehouse: WH01</div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Wave.Status" value="Planned" />
+        <input type="hidden" asp-for="Wave.TenantId" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="wave-config">
+                <i class="bi bi-water tab-icon"></i> Wave Configuration
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="deliveries">
+                <i class="bi bi-truck tab-icon"></i> Delivery Selection
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Wave Configuration ═══ -->
+        <div class="ent-form-panel active" data-panel="wave-config">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-water"></i><h6>Wave Parameters</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Wave Number</label>
+                        <input asp-for="Wave.WaveNumber" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Priority <span class="required">*</span></label>
+                        <select asp-for="Wave.Priority" class="form-select">
+                            <option value="1">P1 — Critical (Rush)</option>
+                            <option value="2">P2 — High (Express)</option>
+                            <option value="3" selected>P3 — Normal</option>
+                            <option value="4">P4 — Low (Economy)</option>
+                            <option value="5">P5 — Background</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Assigned Zone <span class="required">*</span></label>
+                        <select asp-for="Wave.AssignedZone" class="form-select">
+                            <option value="">Select zone...</option>
+                            <option value="Zone-A">Zone A — Pick Area</option>
+                            <option value="Zone-B">Zone B — Bulk Storage</option>
+                            <option value="Zone-C">Zone C — Cold Chain</option>
+                            <option value="Zone-D">Zone D — Hazmat</option>
+                            <option value="All">All Zones</option>
+                        </select>
+                        <span asp-validation-for="Wave.AssignedZone" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Wave Cutoff Time <span class="required">*</span></label>
+                        <input type="datetime-local" asp-for="Wave.CutoffTime" class="form-control" />
+                        <span asp-validation-for="Wave.CutoffTime" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Item Count</label>
+                        <input type="number" asp-for="Wave.ItemCount" class="form-control" min="0" value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Delivery Selection ═══ -->
+        <div class="ent-form-panel" data-panel="deliveries">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-truck"></i><h6>Delivery Notes</h6></div>
+                <div class="ent-field" style="grid-column: span 3">
+                    <label>Delivery Notes (comma-separated) <span class="required">*</span></label>
+                    <textarea asp-for="Wave.DeliveryNotes" class="form-control" rows="4" placeholder="Enter delivery note numbers, one per line or comma-separated:&#10;DN-20260828-001&#10;DN-20260828-002&#10;DN-20260828-003"></textarea>
+                    <span asp-validation-for="Wave.DeliveryNotes" class="text-danger"></span>
+                    <small class="text-muted">Enter delivery note references to include in this picking wave</small>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Wave Summary</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Total Deliveries</label>
+                        <input type="text" class="form-control" readonly value="Auto-calculated on save" style="background:#f8fafc" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Estimated Pick Time</label>
+                        <input type="text" class="form-control" readonly value="Based on item count" style="background:#f8fafc" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Assigned Pickers</label>
+                        <input type="text" class="form-control" readonly value="Auto-assign on release" style="background:#f8fafc" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Picking waves are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Create Wave</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

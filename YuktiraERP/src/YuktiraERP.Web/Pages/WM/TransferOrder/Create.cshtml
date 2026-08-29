@@ -1,0 +1,178 @@
+@page
+@model YuktiraERP.Web.Pages.WM.TransferOrder.CreateModel
+@{ ViewData["Title"] = "Create Transfer Order"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-arrow-left-right"></i></div>
+        <div class="banner-info">
+            <h5>Create Transfer Order</h5>
+            <span>WM02 — Transfer Order Management</span>
+        </div>
+        <div class="banner-meta">Warehouse: WH01</div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Order.Status" value="Created" />
+        <input type="hidden" asp-for="Order.TenantId" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="material">
+                <i class="bi bi-box-seam tab-icon"></i> Material & Bin
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="quantity">
+                <i class="bi bi-rulers tab-icon"></i> Quantity & Batch
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="assignment">
+                <i class="bi bi-person tab-icon"></i> Assignment
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Material & Bin ═══ -->
+        <div class="ent-form-panel active" data-panel="material">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-box-seam"></i><h6>Material Information</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Material Code <span class="required">*</span></label>
+                        <input asp-for="Order.MaterialCode" class="form-control" placeholder="e.g., RM-10001" />
+                        <span asp-validation-for="Order.MaterialCode" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field" style="grid-column: span 2">
+                        <label>Material Name <span class="required">*</span></label>
+                        <input asp-for="Order.MaterialName" class="form-control" placeholder="Material description" />
+                        <span asp-validation-for="Order.MaterialName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-arrow-left-right"></i><h6>Bin Assignment (SAP EWM)</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Source Bin (FRBIN) <span class="required">*</span></label>
+                        <select asp-for="Order.SourceBin" class="form-select">
+                            <option value="">Select source bin...</option>
+                            <option value="A-01-01">A-01-01 — Receiving</option>
+                            <option value="A-02-01">A-02-01 — Bulk</option>
+                            <option value="B-01-01">B-01-01 — Rack Level 1</option>
+                            <option value="B-01-02">B-01-02 — Rack Level 2</option>
+                            <option value="C-01-01">C-01-01 — Pick Face</option>
+                            <option value="D-01-01">D-01-01 — Shipping</option>
+                        </select>
+                        <span asp-validation-for="Order.SourceBin" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Destination Bin (TOBIN) <span class="required">*</span></label>
+                        <select asp-for="Order.DestinationBin" class="form-select">
+                            <option value="">Select destination bin...</option>
+                            <option value="A-01-01">A-01-01 — Receiving</option>
+                            <option value="A-02-01">A-02-01 — Bulk</option>
+                            <option value="B-01-01">B-01-01 — Rack Level 1</option>
+                            <option value="B-01-02">B-01-02 — Rack Level 2</option>
+                            <option value="C-01-01">C-01-01 — Pick Face</option>
+                            <option value="D-01-01">D-01-01 — Shipping</option>
+                        </select>
+                        <span asp-validation-for="Order.DestinationBin" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Quantity & Batch ═══ -->
+        <div class="ent-form-panel" data-panel="quantity">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-rulers"></i><h6>Quantity Details</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Transfer Quantity <span class="required">*</span></label>
+                        <input type="number" asp-for="Order.Quantity" class="form-control" min="0.01" step="0.01" placeholder="0.00" />
+                        <span asp-validation-for="Order.Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Base Unit of Measure <span class="required">*</span></label>
+                        <select asp-for="Order.BaseUOM" class="form-select">
+                            <option value="EA">EA — Each</option>
+                            <option value="KG">KG — Kilogram</option>
+                            <option value="LB">LB — Pound</option>
+                            <option value="L">L — Liter</option>
+                            <option value="M">M — Meter</option>
+                            <option value="M2">M2 — Square Meter</option>
+                            <option value="M3">M3 — Cubic Meter</option>
+                            <option value="CS">CS — Case</option>
+                            <option value="PLT">PLT — Pallet</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Movement Type (BWART) <span class="required">*</span></label>
+                        <select asp-for="Order.MovementType" class="form-select">
+                            <option value="999">999 — Stock Transfer (WM)</option>
+                            <option value="101">101 — Putaway from Production</option>
+                            <option value="103">103 — Receipt from Purchase Order</option>
+                            <option value="201">201 — Goods Issue to Production</option>
+                            <option value="261">261 — Consumption</option>
+                            <option value="301">301 — Transfer Posting Plant-to-Plant</option>
+                            <option value="311">311 — Transfer to QI Stock</option>
+                            <option value="321">321 — Transfer from QI to Unrestricted</option>
+                            <option value="501">501 — Receipt without PO</option>
+                            <option value="551">551 — Scrapping</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Target Batch Number</label>
+                        <input asp-for="Order.TargetBatch" class="form-control" placeholder="Batch reference (optional)" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Order Date</label>
+                        <input type="date" asp-for="Order.OrderDate" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Assignment ═══ -->
+        <div class="ent-form-panel" data-panel="assignment">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Operator Assignment</h6></div>
+                <div class="ent-field-grid cols-2">
+                    <div class="ent-field">
+                        <label>Assigned Operator <span class="required">*</span></label>
+                        <select asp-for="Order.AssignedOperator" class="form-select">
+                            <option value="">Select operator...</option>
+                            <option value="OP-001">OP-001 — John Smith</option>
+                            <option value="OP-002">OP-002 — Maria Garcia</option>
+                            <option value="OP-003">OP-003 — Chen Wei</option>
+                            <option value="OP-004">OP-004 — Priya Patel</option>
+                            <option value="OP-005">OP-005 — Auto-Assign</option>
+                        </select>
+                        <span asp-validation-for="Order.AssignedOperator" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Order Number</label>
+                        <input asp-for="Order.OrderNumber" class="form-control" placeholder="Auto-generated" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Additional Notes</h6></div>
+                <div class="ent-field" style="grid-column: span 2">
+                    <label>Remarks</label>
+                    <textarea class="form-control" rows="3" placeholder="Special handling instructions, priority notes..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Transfer orders are SOX-audit logged
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Create Order</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
