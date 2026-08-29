@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.0.7** | **August 2026**
+**Version 1.0.8** | **August 2026**
 
 ---
 
@@ -1181,6 +1181,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.0.8 | August 2026 | WM/PP/QM/PM module upgrades with SAP-grade parameters, 75 TCode layouts (21 new), TCode Engine API fixes, 5 new entities, comprehensive user guide |
 | 1.0.7 | August 2026 | Yuktira enterprise creation forms: 12 forms across MM/SD/QM/PP/FI/WM upgraded to tabbed layout with standardized fields (types, valuation, org assignments, line items with auto-calc), enterprise-form.css/js, _ModuleLayout.cshtml universal layout, 7-language localization, 4 UI themes, session timeout, dynamic action buttons |
 | 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app, PP module tenant isolation, webhook dispatch consolidation, real SAP HANA connector, CVE fixes |
 | 1.0.4 | August 2026 | Gap-filling II: tax engine, multi-currency, real EDI conversion, email/SMS delivery with logging, CO cost allocations, i18n localization, domain entity behavior, fixed-asset lifecycle, webhook delivery verified |
@@ -1190,6 +1191,16 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**1.0.8 (August 2026)**
+- **WM Module Refactor**: 4 new entities (Bin, TransferOrder, Wave, InventoryCount) with SAP EWM parameters (bin capacity, putaway strategies FIFO/LIFO/FEFO, wave-based picking, RF scanning); StockMovement extended with WM fields; 5 Create forms, WM/Index.cshtml with 5 tabs and 5 KPIs; schema `yuktira_wm`; migration `023_wm_module.sql`
+- **PP Module Upgrade**: SAP PP/DS parameters across BOM (+8 fields: alt BOM, base qty, effectivity), WorkCenter (+7: capacity categories, shift model, efficiency), Routing (+8: group, lot size, verification), ProductionOrder (+5: scheduling type, yield, scrap); new OrderConfirmationEntity; PP/Index.cshtml with 6 tabs and 5 KPIs; migration `024_pp_enhancements.sql`
+- **QM Module Upgrade**: Extended InspectionLot (+8: material, plant, batch, inspector), InspectionResult (+8: batch, target range, evaluation), UsageDecision (+6: UD code, quality score, stock posting), InspectionPlan (+4: material, control key), QualityNotification (+3: batch, impact, root cause); new CertificateOfAnalysisEntity; 6 SAP-grade Create forms (InspectionLot 3-tab, InspectionResult 3-tab param grid, InspectionPlan 2-tab, UsageDecision 2-tab stock posting, Notification, COA); QM/Index.cshtml with 6 tabs and 5 KPIs; migration `025_qm_enhancements.sql`
+- **PM Module Upgrade**: 3 new entities (FunctionalLocation, MaintenanceNotification, SparePart) with SAP PM parameters; extended Equipment (+8: category M/P/I, serial, manufacturer, model), MaintenanceOrder (+7: type PM01–PM04, cost center, planned/actual hours), MaintenancePlan (+5: category, planner group, next due); 6 SAP-grade Create forms (Equipment 3-tab, Order 3-tab, Notification 2-tab, Location 2-tab, Plan 2-tab, Spares 2-tab); PM/Index.cshtml with 6 tabs and 5 KPIs; migration `026_pm_enhancements.sql`
+- **TCode Engine API Fixes**: Created TCodeEngineController in Web project (was only in Api); seeded 21 missing transaction codes (CO11N, ME51N, ME28, MD61, F-53, IL01, CRRETURN, CRINSPECT, CRUDPOST, CRCREDIT, CRSUPPLY, CRSRET, CRDEBIT, RFSCAN, RFPICK, WAVEPK, VSLOTT, PPDS, MRPEVT, CONSOL, TAXRET, AIOCR); fixed VL01N typo; added `api/v1/[controller]` route prefix; created WorkflowController stub; migration `027_seed_missing_tcodes.sql`
+- **75 TCode Layouts Registered**: All transaction codes verified with 200 OK via API
+- **Comprehensive User Guide**: Complete end-user documentation covering all 35 modules, 75 T-codes, workflows, and troubleshooting (`docs/user-guide.md`)
+- All 261 tests pass, build clean
 
 **1.0.7 (August 2026)**
 - Yuktira enterprise creation forms: all 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to multi-tab layout with standardized field schemas
@@ -1249,7 +1260,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - Schema: `database/scripts/007_new_entities.sql` (StockMovements, FiscalPeriods, BankReconciliations, Payments, DepreciationSchedules, ApprovalSteps) and `008_tenantid_columns.sql` (TenantId on APEntrys/AREntrys/PayrollEntrys/goods_receipts/invoice_verifications/AdminUsers.MfaSecret)
 - Backup/restore scripts fixed and verified end-to-end: `backup.ps1` / `restore.ps1` now auto-locate PostgreSQL client tools (`C:\Program Files\PostgreSQL\13-18\bin`), default to the app's `postgres` user on `127.0.0.1:5432`, accept an optional `-Password`, and rename the reserved `$Host` param to `$Server` — tested with a real dump (custom format, 30-backup rotation) and a full restore into a scratch database (99 tables verified)
 - Print / Save-as-PDF: global Print button in the top bar (and `Ctrl+P`) on every page with a print stylesheet that hides chrome (sidebar/top bar/action buttons), expands scrolled tables, and produces clean paper-friendly output in the browser print dialog (incl. "Save as PDF")
-- Module registry: new `ModuleCatalog` (28 modules in 7 categories with icons/colors) drives the Dashboard tiles, sidebar navigation, and transaction-code module/group classification; exposed via `IModuleCatalog` (Core) implemented in Infrastructure as a singleton
+- Module registry: new `ModuleCatalog` (35 modules in 7 categories with icons/colors) drives the Dashboard tiles, sidebar navigation, and transaction-code module/group classification; exposed via `IModuleCatalog` (Core) implemented in Infrastructure as a singleton
 - Legacy flat pages: 13 duplicated flat page routes (MM/Create, MM/CreateGRN, MM/CreatePO, MM/CreatePR, MM/CreateVendor, MM/GoodsReceipt, SD/CreateCustomer, PP/Create, QM/Create, FI/Create, HR/Create, CRM/Create, LIMS/Create) converted to server-side redirects to their canonical sub-folder pages; `MIGO` t-code route fixed to `/MM/GRN/Create`
 - T-code reclassification: `TransactionCodeService` now derives module from the catalog (`GetModuleForRoute`) and classifies codes into SAP-style groups (MasterData / Transactions / Process / Reports / Configuration / Administration / Analytics / Utilities); seed reconciliation back-fills missing codes
 - Full CRUD pages: generated List + Edit + Display pages for 32 entity types that previously had Create-only pages (see "Full CRUD Pages" above), with Create pages now redirecting/Cancelling to their List pages
@@ -1268,7 +1279,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 **1.0.0 (July 2026)**
 - Core: JWT auth, multi-tenancy, audit, RBAC, password policy, suspicious detection
-- MM/SD/PP/QM/WM/FI/HR/CRM/LIMS/CO/PS/PM modules with entity framework + repository pattern
+- MM/SD/PP/QM/WM/FI/HR/CRM/LIMS/CO/PS/PM modules with entity framework + repository pattern (35 modules total)
 - Workflow engine: DB-backed BPMN runtime (start/approval/task/decision/email/end nodes), validation rules, expression evaluator, TIMER/API_CALL nodes, simulation mode
 - AI engine: 9 models (MA, WMA, ES, LR, Seasonal, Holt-Winters, ARIMA, anomaly detection, accuracy dashboard)
 - MRP engine: BOM explosion, shortage alerts, planned orders, capacity planning, multi-plant, vendor lead-time, capacity leveling, run history, exception messages
@@ -1280,10 +1291,10 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - Accounting: journal posting, trial balance, P&L, balance sheet
 - Payroll: PF/ESI/PT/TDS calculation
 - Notifications: in-app + email + SMS with 10 templates
-- Transaction codes: 60+ SAP-style codes with search, favorites, permissions
+- Transaction codes: 75 SAP-style codes with search, favorites, permissions
 - xUnit test project: 35 tests across Auth, Workflow, Integration, Tax, EDI, Cost Allocation, Localization, Currency, entity behavior and webhooks
-- PostgreSQL migration pipeline with auto-discovery and tracking (15 migration scripts)
-- Entity configurations with multi-schema mappings (16 schemas)
+- PostgreSQL migration pipeline with auto-discovery and tracking (27 migration scripts)
+- Entity configurations with multi-schema mappings (20 schemas)
 - 3 example plugins: AdvancedQC, DairyExtension, ExtraReports
 - Health check endpoints, structured error responses
 
@@ -1301,7 +1312,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 ## Documentation
 
-- `docs/user-guide.md` — installation, access, transaction codes, modules
+- `docs/user-guide.md` — comprehensive end-user guide: all 35 modules, 75 T-codes, workflows, troubleshooting
 - `docs/architecture.md` — tech stack, patterns, scalability
 - `docs/api-reference.md` — all REST API endpoints
 - `docs/plugin-development.md` — SDK reference, hooks guide, build & deploy
@@ -1317,7 +1328,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | Docker | `.\scripts\deploy.ps1 -Build -Run` | http://localhost:5001 |
 | Production (PostgreSQL) | `init-db.bat` then `run-api.bat` + `run-web.bat` | Configured URL |
 | Apache proxy | See `apache-config/yuktira-erp.conf` | https://erp.yourdomain.com |
-| Database install | `init-db.bat` | Creates DB, applies 001–013, seeds sample data |
+| Database install | `init-db.bat` | Creates DB, applies 001–027, seeds sample data |
 | Stop all | `kill.bat` | Stops running YuktiraERP dotnet processes |
 | Backup | `.\scripts\backup.ps1` | Daily pg_dump |
 | Restore | `.\scripts\restore.ps1 -BackupFile <file>` | Point-in-time recovery |
