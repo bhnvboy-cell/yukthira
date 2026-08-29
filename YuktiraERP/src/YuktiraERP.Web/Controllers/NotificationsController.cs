@@ -5,6 +5,7 @@ using YuktiraERP.Core.Interfaces;
 namespace YuktiraERP.Web.Controllers;
 
 [ApiController]
+[Route("api/v1/notifications")]
 [Route("api/notifications")]
 [Authorize]
 public class NotificationsController : ControllerBase
