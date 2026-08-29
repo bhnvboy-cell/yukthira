@@ -1,20 +1,150 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.WorkCenter.CreateModel
-@{ ViewData["Title"] = "New Work Center"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Work Center</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="WorkCenter.Name" class="form-label"></label><input asp-for="WorkCenter.Name" class="form-control" /><span asp-validation-for="WorkCenter.Name" class="text-danger small"></span></div>
-<div class="col-md-3"><label asp-for="WorkCenter.Department" class="form-label"></label><input asp-for="WorkCenter.Department" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="WorkCenter.Status" class="form-label"></label><select asp-for="WorkCenter.Status" class="form-select"><option value="Active">Active</option><option value="Maintenance">Maintenance</option><option value="Inactive">Inactive</option></select></div>
+@{ ViewData["Title"] = "Create Work Center"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-building"></i></div>
+        <div class="banner-info">
+            <h5>Create Work Center</h5>
+            <span>CR01 — Work Center Master (SAP PP)</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000<br />Auto-numbered
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="WorkCenter.Status" value="Active" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="identification">
+                <i class="bi bi-building tab-icon"></i> Identification
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="capacity">
+                <i class="bi bi-speedometer tab-icon"></i> Capacity & Scheduling
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="costing">
+                <i class="bi bi-currency-dollar tab-icon"></i> Costing
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Identification ═══ -->
+        <div class="ent-form-panel active" data-panel="identification">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Work Center Details</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Work Center Code</label>
+                        <input class="form-control" value="Auto-generated" readonly style="background:#f8fafc" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Name <span class="required">*</span></label>
+                        <input asp-for="WorkCenter.Name" class="form-control" placeholder="e.g., CNC Machining Center" />
+                        <span asp-validation-for="WorkCenter.Name" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Category</label>
+                        <select asp-for="WorkCenter.WorkCenterCategory" class="form-select">
+                            <option value="Machine">Machine</option>
+                            <option value="Labor">Labor</option>
+                            <option value="Crew">Crew</option>
+                            <option value="Pool">Capacity Pool</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Department <span class="required">*</span></label>
+                        <input asp-for="WorkCenter.Department" class="form-control" placeholder="e.g., Manufacturing" />
+                        <span asp-validation-for="WorkCenter.Department" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Cost Center</label>
+                        <input asp-for="WorkCenter.CostCenter" class="form-control" placeholder="e.g., CC-4000" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Responsible Person</label>
+                        <input asp-for="WorkCenter.ResponsiblePerson" class="form-control" placeholder="Work center supervisor" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <select asp-for="WorkCenter.Status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Maintenance">Under Maintenance</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Capacity & Scheduling ═══ -->
+        <div class="ent-form-panel" data-panel="capacity">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-speedometer"></i><h6>Capacity Parameters</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Capacity per Shift <span class="required">*</span></label>
+                        <input asp-for="WorkCenter.CapacityPerShift" class="form-control" type="number" min="0" step="1" />
+                        <span asp-validation-for="WorkCenter.CapacityPerShift" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Shifts per Day</label>
+                        <select asp-for="WorkCenter.ShiftsPerDay" class="form-select">
+                            <option value="1">1 Shift</option>
+                            <option value="2">2 Shifts</option>
+                            <option value="3">3 Shifts</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Capacity per Day</label>
+                        <input class="form-control" value="0" readonly style="background:#f8fafc" />
+                        <small class="text-muted">Calculated: Shifts x Capacity/Shift</small>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-clock"></i><h6>Standard Times</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Machine Time (hrs)</label>
+                        <input asp-for="WorkCenter.MachineTimeHrs" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Labor Time (hrs)</label>
+                        <input asp-for="WorkCenter.LaborTimeHrs" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Queue Time (hrs)</label>
+                        <input type="number" class="form-control" min="0" step="0.1" value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Costing ═══ -->
+        <div class="ent-form-panel" data-panel="costing">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-currency-dollar"></i><h6>Cost Rates</h6></div>
+                <div style="background:var(--bg-secondary,#f8fafc);border-radius:8px;padding:1rem;border:1px dashed var(--border-color,#e2e8f0)">
+                    <p class="text-muted mb-0" style="font-size:0.85rem"><i class="bi bi-info-circle me-1"></i> Cost rates are configured in the Cost Center accounting module. Work center costing rates inherit from the assigned Cost Center. Activity-based costing rates can be maintained in the Activity Type master data.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Work center code auto-generated
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/PP/WorkCenter/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Work Center</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-4">
-<div class="col-md-4"><label asp-for="WorkCenter.CapacityPerShift" class="form-label"></label><input asp-for="WorkCenter.CapacityPerShift" class="form-control" min="0" step="1" /><span asp-validation-for="WorkCenter.CapacityPerShift" class="text-danger small"></span></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PP/WorkCenter/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

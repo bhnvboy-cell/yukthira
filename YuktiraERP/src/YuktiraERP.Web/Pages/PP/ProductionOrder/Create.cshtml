@@ -7,18 +7,18 @@
         <div class="banner-icon"><i class="bi bi-gear-wide-connected"></i></div>
         <div class="banner-info">
             <h5>Create Production Order</h5>
-            <span>CO01 — Production Order</span>
+            <span>CO01 — Production Order (SAP PP)</span>
         </div>
         <div class="banner-meta">
-            Plant: 1000<br />Type: Standard
+            Plant: 1000<br />Auto-numbered
         </div>
     </div>
 
     <form method="post">
-        <input type="hidden" asp-for="Order.Status" value="Planned" />
+        <input type="hidden" asp-for="Order.Status" value="PLANNED" />
 
         <div class="ent-form-tabs">
-            <button type="button" class="ent-form-tab active" data-tab="order">
+            <button type="button" class="ent-form-tab active" data-tab="header">
                 <i class="bi bi-gear tab-icon"></i> Order Header
             </button>
             <button type="button" class="ent-form-tab" data-tab="materials">
@@ -30,37 +30,21 @@
         </div>
 
         <!-- ═══ TAB: Order Header ═══ -->
-        <div class="ent-form-panel active" data-panel="order">
+        <div class="ent-form-panel active" data-panel="header">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-gear"></i><h6>Order Information</h6></div>
+                <div class="ent-section-header"><i class="bi bi-gear"></i><h6>Order Type & Identification</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Order Number</label>
-                        <input class="form-control" value="Auto-generated" readonly />
+                        <input class="form-control" value="Auto-generated" readonly style="background:#f8fafc" />
                     </div>
                     <div class="ent-field">
-                        <label>Product / Material <span class="required">*</span></label>
-                        <input asp-for="Order.ProductName" class="form-control" placeholder="Material to produce" />
-                        <span asp-validation-for="Order.ProductName" class="text-danger"></span>
-                    </div>
-                    <div class="ent-field">
-                        <label>Quantity <span class="required">*</span></label>
-                        <input asp-for="Order.Quantity" class="form-control" type="number" min="1" step="1" />
-                        <span asp-validation-for="Order.Quantity" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-toggle-on"></i><h6>Order Status & Priority</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Status</label>
-                        <select asp-for="Order.Status" class="form-select">
-                            <option value="Planned">Planned</option>
-                            <option value="Released">Released</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
+                        <label>Order Type <span class="required">*</span></label>
+                        <select asp-for="Order.OrderType" class="form-select">
+                            <option value="PP01">PP01 — Standard Production</option>
+                            <option value="PP02">PP02 — Process Manufacturing</option>
+                            <option value="REWORK">REWORK — Rework Order</option>
+                            <option value="PILOT">PILOT — Pilot / Trial</option>
                         </select>
                     </div>
                     <div class="ent-field">
@@ -71,14 +55,70 @@
                             <option value="Urgent">Urgent</option>
                         </select>
                     </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-box-seam"></i><h6>Material & Quantity</h6></div>
+                <div class="ent-field-grid cols-3">
                     <div class="ent-field">
-                        <label>Order Type</label>
-                        <select class="form-select">
-                            <option value="Standard">Standard Production</option>
-                            <option value="Rework">Rework Order</option>
-                            <option value="Pilot">Pilot / Trial</option>
-                            <option value="Remake">Remake Order</option>
+                        <label>Material Code <span class="required">*</span></label>
+                        <input asp-for="Order.MaterialCode" class="form-control" placeholder="e.g., FG-10001" />
+                        <span asp-validation-for="Order.MaterialCode" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Material Description <span class="required">*</span></label>
+                        <input asp-for="Order.ProductName" class="form-control" placeholder="Finished good description" />
+                        <span asp-validation-for="Order.ProductName" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Target Quantity <span class="required">*</span></label>
+                        <input asp-for="Order.Quantity" class="form-control" type="number" min="1" step="1" />
+                        <span asp-validation-for="Order.Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Base UOM</label>
+                        <select asp-for="Order.BaseUOM" class="form-select">
+                            <option value="EA">EA — Each</option>
+                            <option value="KG">KG — Kilogram</option>
+                            <option value="L">L — Liter</option>
+                            <option value="M">M — Meter</option>
+                            <option value="LB">LB — Pound</option>
+                            <option value="BOX">BOX — Box</option>
                         </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Plant</label>
+                        <select asp-for="Order.Plant" class="form-select">
+                            <option value="1000">1000 — Manufacturing Plant</option>
+                            <option value="2000">2000 — Assembly Plant</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Storage Location</label>
+                        <select asp-for="Order.StorageLocation" class="form-select">
+                            <option value="RM01">RM01 — Raw Material</option>
+                            <option value="FG01">FG01 — Finished Goods</option>
+                            <option value="SFG01">SFG01 — Semi-Finished</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-person"></i><h6>MRP Controller</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>MRP Controller</label>
+                        <input asp-for="Order.MRPController" class="form-control" placeholder="e.g., PC01" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Batch Number</label>
+                        <input asp-for="Order.BatchNo" class="form-control" placeholder="Optional batch" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <input class="form-control" value="PLANNED" readonly style="background:#f8fafc" />
                     </div>
                 </div>
             </div>
@@ -91,23 +131,19 @@
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>BOM Reference</label>
-                        <select class="form-select">
+                        <select asp-for="Order.BOMId" asp-items="Model.BOMOptions" class="form-select">
                             <option value="">-- Select BOM --</option>
-                            <option value="BOM-001">BOM-001 — Standard Assembly</option>
-                            <option value="BOM-002">BOM-002 — Alternative Assembly</option>
                         </select>
                     </div>
                     <div class="ent-field">
                         <label>Routing Reference</label>
-                        <select class="form-select">
+                        <select asp-for="Order.RoutingId" asp-items="Model.RoutingOptions" class="form-select">
                             <option value="">-- Select Routing --</option>
-                            <option value="RT-001">RT-001 — Standard Routing</option>
-                            <option value="RT-002">RT-002 — Alternate Routing</option>
                         </select>
                     </div>
                     <div class="ent-field">
                         <label>Work Center</label>
-                        <select class="form-select">
+                        <select asp-for="Order.StorageLocation" class="form-select">
                             <option value="">-- Select --</option>
                             <option value="WC-01">WC-01 — Assembly Line 1</option>
                             <option value="WC-02">WC-02 — Assembly Line 2</option>
@@ -117,19 +153,25 @@
                 </div>
             </div>
             <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-list-check"></i><h6>Component Reservation List</h6></div>
+                <div style="background:var(--bg-secondary,#f8fafc);border-radius:8px;padding:1rem;border:1px dashed var(--border-color,#e2e8f0)">
+                    <p class="text-muted mb-0" style="font-size:0.85rem"><i class="bi bi-info-circle me-1"></i> Components will be auto-resolved from BOM after order release. Manual reservations can be added after creation.</p>
+                </div>
+            </div>
+            <div class="ent-section">
                 <div class="ent-section-header"><i class="bi bi-currency-dollar"></i><h6>Cost Estimate</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Planned Cost</label>
-                        <input type="number" class="form-control" min="0" step="0.01" value="0" />
+                        <input asp-for="Order.PlannedCost" class="form-control" type="number" min="0" step="0.01" />
                     </div>
                     <div class="ent-field">
                         <label>Actual Cost</label>
-                        <input type="number" class="form-control" readonly value="0" />
+                        <input asp-for="Order.ActualCost" class="form-control" readonly value="0" style="background:#f8fafc" />
                     </div>
                     <div class="ent-field">
                         <label>Cost Variance</label>
-                        <input type="number" class="form-control" readonly value="0" />
+                        <input class="form-control" readonly value="0" style="background:#f8fafc" />
                     </div>
                 </div>
             </div>
@@ -141,11 +183,11 @@
                 <div class="ent-section-header"><i class="bi bi-calendar3"></i><h6>Production Dates</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
-                        <label>Planned Start Date <span class="required">*</span></label>
+                        <label>Scheduled Start Date <span class="required">*</span></label>
                         <input asp-for="Order.StartDate" class="form-control" type="date" />
                     </div>
                     <div class="ent-field">
-                        <label>Planned End Date <span class="required">*</span></label>
+                        <label>Scheduled Finish Date <span class="required">*</span></label>
                         <input asp-for="Order.EndDate" class="form-control" type="date" />
                     </div>
                     <div class="ent-field">
@@ -166,8 +208,8 @@
                         <input type="number" class="form-control" min="0" max="100" value="100" step="0.1" />
                     </div>
                     <div class="ent-field">
-                        <label>Scrap Qty</label>
-                        <input type="number" class="form-control" min="0" value="0" step="1" />
+                        <label>Scrap Quantity</label>
+                        <input asp-for="Order.ScrapQty" type="number" class="form-control" min="0" value="0" step="1" />
                     </div>
                     <div class="ent-field">
                         <label>Shift</label>
@@ -180,11 +222,17 @@
                     </div>
                 </div>
             </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-list-check"></i><h6>Routing Operations List</h6></div>
+                <div style="background:var(--bg-secondary,#f8fafc);border-radius:8px;padding:1rem;border:1px dashed var(--border-color,#e2e8f0)">
+                    <p class="text-muted mb-0" style="font-size:0.85rem"><i class="bi bi-info-circle me-1"></i> Operations will be copied from the selected Routing upon order release. Individual operation scheduling is available in detailed view.</p>
+                </div>
+            </div>
         </div>
 
         <div class="ent-form-footer">
             <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>Production order auto-numbered
+                <i class="bi bi-shield-check me-1"></i>Production order auto-numbered, status set to PLANNED
             </div>
             <div class="footer-actions">
                 <a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>

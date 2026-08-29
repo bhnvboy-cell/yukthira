@@ -1,22 +1,148 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.Routing.CreateModel
 @{ ViewData["Title"] = "Create Production Routing"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Production Routing</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Routing.ProductName" class="form-label"></label><input asp-for="Routing.ProductName" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Routing.OperationNo" class="form-label"></label><input asp-for="Routing.OperationNo" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Routing.WorkCenter" class="form-label"></label><input asp-for="Routing.WorkCenter" class="form-control" /></div>
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-diagram-3"></i></div>
+        <div class="banner-info">
+            <h5>Create Production Routing</h5>
+            <span>CA01 — Routing (SAP PP)</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000<br />Auto-numbered
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Routing.Status" value="Active" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="header">
+                <i class="bi bi-info-circle tab-icon"></i> Routing Header
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="operation">
+                <i class="bi bi-gear tab-icon"></i> Operation Detail
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="times">
+                <i class="bi bi-clock tab-icon"></i> Standard Times
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Routing Header ═══ -->
+        <div class="ent-form-panel active" data-panel="header">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Routing Identification</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Routing ID</label>
+                        <input class="form-control" value="Auto-generated" readonly style="background:#f8fafc" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Routing Group</label>
+                        <input asp-for="Routing.RoutingGroup" class="form-control" placeholder="e.g., MECH" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Group Counter</label>
+                        <input asp-for="Routing.RoutingGroupCounter" class="form-control" type="number" min="1" value="1" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Material Description <span class="required">*</span></label>
+                        <input asp-for="Routing.ProductName" class="form-control" placeholder="Material this routing applies to" />
+                        <span asp-validation-for="Routing.ProductName" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Control Key</label>
+                        <select asp-for="Routing.ControlKey" class="form-select">
+                            <option value="PP01">PP01 — Standard</option>
+                            <option value="PP02">PP02 — With Confirmation</option>
+                            <option value="PP03">PP03 — With Costing</option>
+                            <option value="PP04">PP04 — Automatic</option>
+                        </select>
+                    </div>
+                    <div class="ent-field">
+                        <label>Status</label>
+                        <select asp-for="Routing.Status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Operation Detail ═══ -->
+        <div class="ent-form-panel" data-panel="operation">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-gear"></i><h6>Operation Details</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Operation Number <span class="required">*</span></label>
+                        <input asp-for="Routing.OperationNo" class="form-control" type="number" min="10" step="10" value="10" />
+                        <span asp-validation-for="Routing.OperationNo" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Operation Description</label>
+                        <input asp-for="Routing.OperationDescription" class="form-control" placeholder="e.g., CNC Turning" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Work Center <span class="required">*</span></label>
+                        <input asp-for="Routing.WorkCenter" class="form-control" placeholder="e.g., WC-01" />
+                        <span asp-validation-for="Routing.WorkCenter" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Standard Times ═══ -->
+        <div class="ent-form-panel" data-panel="times">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-clock"></i><h6>Standard Times</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Setup Time (hrs) <span class="required">*</span></label>
+                        <input asp-for="Routing.SetupTimeHrs" class="form-control" type="number" min="0" step="0.1" />
+                        <span asp-validation-for="Routing.SetupTimeHrs" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Machine Time (hrs)</label>
+                        <input asp-for="Routing.MachineTimeHrs" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Labor Time (hrs)</label>
+                        <input asp-for="Routing.LaborTimeHrs" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                </div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Run Time (hrs) <span class="required">*</span></label>
+                        <input asp-for="Routing.RunTimeHrs" class="form-control" type="number" min="0" step="0.1" />
+                        <span asp-validation-for="Routing.RunTimeHrs" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Queue Time (hrs)</label>
+                        <input asp-for="Routing.QueueTimeHrs" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Scrap %</label>
+                        <input asp-for="Routing.ScrapPercent" class="form-control" type="number" min="0" max="100" step="0.1" value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Routing auto-numbered
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/PP/Routing/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Routing</button>
+            </div>
+        </div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-3"><label asp-for="Routing.SetupTimeHrs" class="form-label"></label><input asp-for="Routing.SetupTimeHrs" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Routing.RunTimeHrs" class="form-label"></label><input asp-for="Routing.RunTimeHrs" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Routing.Status" class="form-label"></label><select asp-for="Routing.Status" class="form-select"><option>Active</option><option>Inactive</option></select></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PP/Routing/List" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -33,6 +33,7 @@ public class YuktiraDbContext : DbContext
     public DbSet<ProductionOrderEntity> ProductionOrders => Set<ProductionOrderEntity>();
     public DbSet<ProductionOrderItemEntity> ProductionOrderItems => Set<ProductionOrderItemEntity>();
     public DbSet<MaterialStagingEntity> MaterialStagings => Set<MaterialStagingEntity>();
+    public DbSet<OrderConfirmationEntity> OrderConfirmations => Set<OrderConfirmationEntity>();
     // QM
     public DbSet<InspectionLotEntity> InspectionLots => Set<InspectionLotEntity>();
     public DbSet<InspectionPlanEntity> InspectionPlans => Set<InspectionPlanEntity>();

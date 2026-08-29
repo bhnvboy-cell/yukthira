@@ -1,0 +1,131 @@
+@page
+@model YuktiraERP.Web.Pages.PP.Confirmation.CreateModel
+@{ ViewData["Title"] = "Confirm Production Order"; }
+
+<div class="ent-form-wrapper">
+    <div class="ent-org-banner">
+        <div class="banner-icon"><i class="bi bi-check2-square"></i></div>
+        <div class="banner-info">
+            <h5>Confirm Production Order</h5>
+            <span>CO11N — Order Confirmation (SAP PP)</span>
+        </div>
+        <div class="banner-meta">
+            Plant: 1000<br />Auto-numbered
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="Confirmation.Status" value="Confirmed" />
+
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" data-tab="order">
+                <i class="bi bi-gear tab-icon"></i> Order & Operation
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="quantities">
+                <i class="bi bi-speedometer tab-icon"></i> Quantities
+            </button>
+            <button type="button" class="ent-form-tab" data-tab="times">
+                <i class="bi bi-clock tab-icon"></i> Actual Times
+            </button>
+        </div>
+
+        <!-- ═══ TAB: Order & Operation ═══ -->
+        <div class="ent-form-panel active" data-panel="order">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-gear"></i><h6>Production Order Reference</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Confirmation Number</label>
+                        <input class="form-control" value="Auto-generated" readonly style="background:#f8fafc" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Production Order # <span class="required">*</span></label>
+                        <select asp-for="Confirmation.ProductionOrderNumber" asp-items="Model.OrderOptions" class="form-select">
+                            <option value="">-- Select Production Order --</option>
+                        </select>
+                        <span asp-validation-for="Confirmation.ProductionOrderNumber" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Operation Number</label>
+                        <input asp-for="Confirmation.OperationNumber" class="form-control" type="number" min="10" step="10" value="10" />
+                    </div>
+                </div>
+            </div>
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Work Center</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Work Center</label>
+                        <input asp-for="Confirmation.WorkCenter" class="form-control" placeholder="e.g., WC-01" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Confirmed By</label>
+                        <input asp-for="Confirmation.ConfirmedBy" class="form-control" placeholder="Operator name" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Confirmation Date</label>
+                        <input asp-for="Confirmation.ConfirmationDate" class="form-control" type="date" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Quantities ═══ -->
+        <div class="ent-form-panel" data-panel="quantities">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-speedometer"></i><h6>Yield & Scrap</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Yield Quantity <span class="required">*</span></label>
+                        <input asp-for="Confirmation.YieldQuantity" class="form-control" type="number" min="0" step="1" />
+                        <span asp-validation-for="Confirmation.YieldQuantity" class="text-danger"></span>
+                    </div>
+                    <div class="ent-field">
+                        <label>Scrap Quantity</label>
+                        <input asp-for="Confirmation.ScrapQuantity" class="form-control" type="number" min="0" step="1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Backflush Goods Issue</label>
+                        <div style="padding-top:0.5rem">
+                            <input asp-for="Confirmation.BackflushGoodsIssue" type="checkbox" class="form-check-input" style="width:1.2rem;height:1.2rem;margin-right:0.5rem" />
+                            <label class="form-check-label" for="Confirmation_BackflushGoodsIssue" style="font-size:0.9rem">Auto-deduct components from inventory</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ TAB: Actual Times ═══ -->
+        <div class="ent-form-panel" data-panel="times">
+            <div class="ent-section">
+                <div class="ent-section-header"><i class="bi bi-clock"></i><h6>Actual Activity Times</h6></div>
+                <div class="ent-field-grid cols-3">
+                    <div class="ent-field">
+                        <label>Actual Setup Time (hrs)</label>
+                        <input asp-for="Confirmation.ActualSetupTime" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Actual Machine Time (hrs)</label>
+                        <input asp-for="Confirmation.ActualMachineTime" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                    <div class="ent-field">
+                        <label>Actual Labor Time (hrs)</label>
+                        <input asp-for="Confirmation.ActualLaborTime" class="form-control" type="number" min="0" step="0.1" value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-form-footer">
+            <div class="footer-info">
+                <i class="bi bi-shield-check me-1"></i>Confirmation auto-numbered
+            </div>
+            <div class="footer-actions">
+                <a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Confirm Production</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

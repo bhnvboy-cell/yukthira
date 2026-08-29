@@ -3,50 +3,452 @@
 @using YuktiraERP.Infrastructure.Data.Entities
 @{
     ViewData["Title"] = "Production Planning";
-    var plans = Model.ProductionPlans;
-    var workCenters = Model.WorkCenters;
-    var prodOrders = Model.ProductionOrders;
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-gear me-2"></i>Production Planning</h2>
-    <div><a asp-page="/PP/Plan/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Create Plan</a></div>
-</div>
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#plans">Production Plans</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#bom">Bill of Materials</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#routing">Routing</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#workcenters">Work Centers</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#prodorders">Production Orders</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mrp">MRP</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="plans">
-        <div class="card"><div class="card-body">
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Plan ID</th><th>Product</th><th>Qty</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var p in plans)
-                    {
-                        <tr>
-                            <td>@p.PlanId</td><td>@p.ProductName</td><td>@p.Quantity</td><td>@p.StartDate.ToString("d")</td><td>@p.EndDate.ToString("d")</td>
-                            <td><span class="badge @(p.Status=="Released"?"bg-success":p.Status=="In Progress"?"bg-info":"bg-warning")">@p.Status</span></td>
-                            <td><i class="bi bi-pencil me-2"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
-    </div>
-    <div class="tab-pane fade" id="bom"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/BOM/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New BOM</a></div><p class="text-muted">BOM structure with multilevel component explosion, where-used list, and engineering change control.</p></div></div></div>
-    <div class="tab-pane fade" id="routing"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/Routing/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Routing</a></div><p class="text-muted">Production routing with operation sequencing, work center assignment, and standard times.</p></div></div></div>
-    <div class="tab-pane fade" id="workcenters"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/WorkCenter/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Work Center</a></div><table class="table table-hover table-sm"><thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Capacity/Shift</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var w in workCenters){<tr><td>@w.Code</td><td>@w.Name</td><td>@w.Department</td><td>@w.CapacityPerShift</td><td><span class="badge @(w.Status=="Active"?"bg-success":"bg-warning")">@w.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
-    <div class="tab-pane fade" id="prodorders"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/PP/ProductionOrder/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Production Order</a></div><table class="table table-hover table-sm"><thead><tr><th>Order #</th><th>Product</th><th>Qty</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var o in prodOrders){<tr><td>@o.OrderNumber</td><td>@o.ProductName</td><td>@o.Quantity</td><td>@o.StartDate.ToString("d")</td><td>@o.EndDate.ToString("d")</td><td><span class="badge @(o.Status=="In Progress"?"bg-info":"bg-warning")">@o.Status</span></td><td><i class="bi bi-eye"></i></td></tr>}</tbody></table></div></div></div>
-    <div class="tab-pane fade" id="mrp"><div class="card"><div class="card-body">
-        <div class="d-flex gap-2 mb-2">
-            <a asp-page="/PP/Mrp" class="btn btn-outline-primary btn-sm"><i class="bi bi-cpu"></i> MRP &amp; Capacity Planning</a>
-            <a asp-page="/PP/MrpRun" class="btn btn-outline-primary btn-sm"><i class="bi bi-play"></i> MRP Run (MD01)</a>
-            <a asp-page="/PP/MrpStock" class="btn btn-outline-primary btn-sm"><i class="bi bi-clipboard-data"></i> Stock / Requirements (MD04)</a>
+<div class="module-root" data-module-root="pp">
+    <div class="module-header">
+        <div class="module-header-left">
+            <h2><i class="bi bi-gear-wide-connected me-2"></i>Production Planning</h2>
+            <span class="module-badge">PP</span>
         </div>
-        <p class="text-muted mb-0">Material Requirements Planning with BOM explosion, capacity leveling, and AI-powered demand forecasting.</p>
-    </div></div></div>
+        <div class="module-header-right">
+            <a asp-page="/PP/ProductionOrder/Create" class="btn btn-primary module-action-btn" data-action-tab="prodorders"><i class="bi bi-plus-circle me-1"></i> Create Prod Order</a>
+            <a asp-page="/PP/BOM/Create" class="btn btn-primary module-action-btn" data-action-tab="bom" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create BOM</a>
+            <a asp-page="/PP/WorkCenter/Create" class="btn btn-primary module-action-btn" data-action-tab="workcenters" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Work Center</a>
+            <a asp-page="/PP/Routing/Create" class="btn btn-primary module-action-btn" data-action-tab="routings" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Routing</a>
+            <a asp-page="/PP/Confirmation/Create" class="btn btn-primary module-action-btn" data-action-tab="confirmations" style="display:none"><i class="bi bi-plus-circle me-1"></i> Confirm Production</a>
+            <a href="javascript:void(0)" class="btn btn-warning module-action-btn" data-action-tab="mrp" style="display:none" onclick="alert('MRP execution dialog will open here')"><i class="bi bi-lightning me-1"></i> Execute MRP Run</a>
+        </div>
+    </div>
+
+    <div class="module-kpi-grid">
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon blue"><i class="bi bi-gear"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.ActiveOrderCount</div>
+                <div class="module-kpi-label">Active Prod Orders</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon amber"><i class="bi bi-speedometer"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.CapacityUtilization%</div>
+                <div class="module-kpi-label">Capacity Utilization</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon green"><i class="bi bi-check-circle"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.ConfirmationsTodayCount</div>
+                <div class="module-kpi-label">Confirmations Today</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@Model.MaterialShortageCount</div>
+                <div class="module-kpi-label">Material Shortage Alerts</div>
+            </div>
+        </div>
+        <div class="module-kpi-card">
+            <div class="module-kpi-icon teal"><i class="bi bi-calendar-check"></i></div>
+            <div class="module-kpi-info">
+                <div class="module-kpi-value">@(Model.OnTimeRate)%</div>
+                <div class="module-kpi-label">On-Time Completion</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-tabs" id="ppTabs">
+        <button type="button" class="module-tab active" data-tab="prodorders"><i class="bi bi-gear"></i> Production Orders <span class="tab-count">@Model.ProductionOrders.Count</span></button>
+        <button type="button" class="module-tab" data-tab="bom"><i class="bi bi-box-seam"></i> BOM <span class="tab-count">@Model.BillOfMaterials.Count</span></button>
+        <button type="button" class="module-tab" data-tab="workcenters"><i class="bi bi-building"></i> Work Centers <span class="tab-count">@Model.WorkCenters.Count</span></button>
+        <button type="button" class="module-tab" data-tab="routings"><i class="bi bi-diagram-3"></i> Routings <span class="tab-count">@Model.Routings.Count</span></button>
+        <button type="button" class="module-tab" data-tab="mrp"><i class="bi bi-cpu"></i> MRP Run</button>
+        <button type="button" class="module-tab" data-tab="confirmations"><i class="bi bi-check2-square"></i> Order Confirmation <span class="tab-count">@Model.Confirmations.Count</span></button>
+    </div>
+
+    <!-- ═══ TAB: Production Orders ═══ -->
+    <div class="module-tab-panel active" data-panel="prodorders">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search production orders..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Order #</th>
+                            <th>Material Code</th>
+                            <th>Material Description</th>
+                            <th>Target Qty</th>
+                            <th>Confirmed Qty</th>
+                            <th>Start Date</th>
+                            <th>Finish Date</th>
+                            <th>Work Center</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ProductionOrders.Any())
+                        {
+                            @foreach (var o in Model.ProductionOrders)
+                            {
+                                var confirmedQty = o.YieldQty;
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@o.OrderNumber</strong></td>
+                                    <td>@o.MaterialCode</td>
+                                    <td>@o.ProductName</td>
+                                    <td>@o.Quantity @o.BaseUOM</td>
+                                    <td>@confirmedQty</td>
+                                    <td>@o.StartDate.ToString("dd MMM yyyy")</td>
+                                    <td>@o.EndDate.ToString("dd MMM yyyy")</td>
+                                    <td>@o.StorageLocation</td>
+                                    <td><span class="status-badge @(o.Status=="PLANNED"?"info":o.Status=="RELEASED"?"warning":o.Status=="IN_PROGRESS"?"purple":o.Status=="COMPLETED"?"success":o.Status=="TECO"?"completed":"danger")">@o.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PP/ProductionOrder/Edit" asp-route-id="@o.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/PP/ProductionOrder/Display" asp-route-id="@o.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="11" class="sheet-empty"><i class="bi bi-gear"></i><div>No production orders found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.ProductionOrders.Count orders</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: BOM ═══ -->
+    <div class="module-tab-panel" data-panel="bom" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search BOMs..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>BOM ID</th>
+                            <th>Material Code</th>
+                            <th>Product</th>
+                            <th>Component</th>
+                            <th>Comp. Code</th>
+                            <th>Qty</th>
+                            <th>UOM</th>
+                            <th>Usage</th>
+                            <th>Scrap %</th>
+                            <th>Valid From</th>
+                            <th>Valid To</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.BillOfMaterials.Any())
+                        {
+                            @foreach (var b in Model.BillOfMaterials)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@b.BomId</strong></td>
+                                    <td>@b.MaterialCode</td>
+                                    <td>@b.ProductName</td>
+                                    <td>@b.ComponentName</td>
+                                    <td>@b.ComponentCode</td>
+                                    <td>@b.Quantity</td>
+                                    <td>@b.UOM</td>
+                                    <td>@b.BOMUsage</td>
+                                    <td>@b.ComponentScrap%</td>
+                                    <td>@b.ValidFrom.ToString("dd MMM yyyy")</td>
+                                    <td>@b.ValidTo.ToString("dd MMM yyyy")</td>
+                                    <td><span class="status-badge @(b.Status=="Active"?"success":"warning")">@b.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PP/BOM/Edit" asp-route-id="@b.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/PP/BOM/Display" asp-route-id="@b.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="14" class="sheet-empty"><i class="bi bi-box-seam"></i><div>No BOMs found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.BillOfMaterials.Count BOMs</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Work Centers ═══ -->
+    <div class="module-tab-panel" data-panel="workcenters" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search work centers..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Department</th>
+                            <th>Cost Center</th>
+                            <th>Capacity/Shift</th>
+                            <th>Shifts/Day</th>
+                            <th>Capacity/Day</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.WorkCenters.Any())
+                        {
+                            @foreach (var w in Model.WorkCenters)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@w.Code</strong></td>
+                                    <td>@w.Name</td>
+                                    <td>@w.WorkCenterCategory</td>
+                                    <td>@w.Department</td>
+                                    <td>@w.CostCenter</td>
+                                    <td>@w.CapacityPerShift</td>
+                                    <td>@w.ShiftsPerDay</td>
+                                    <td>@w.CapacityPerDay</td>
+                                    <td><span class="status-badge @(w.Status=="Active"?"success":w.Status=="Maintenance"?"warning":"danger")">@w.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PP/WorkCenter/Edit" asp-route-id="@w.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/PP/WorkCenter/Display" asp-route-id="@w.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="11" class="sheet-empty"><i class="bi bi-building"></i><div>No work centers found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.WorkCenters.Count work centers</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Routings ═══ -->
+    <div class="module-tab-panel" data-panel="routings" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search routings..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Routing ID</th>
+                            <th>Group</th>
+                            <th>Product</th>
+                            <th>Op #</th>
+                            <th>Description</th>
+                            <th>Work Center</th>
+                            <th>Setup (hrs)</th>
+                            <th>Machine (hrs)</th>
+                            <th>Labor (hrs)</th>
+                            <th>Scrap %</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Routings.Any())
+                        {
+                            @foreach (var r in Model.Routings)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@r.RoutingId</strong></td>
+                                    <td>@r.RoutingGroup</td>
+                                    <td>@r.ProductName</td>
+                                    <td>@r.OperationNo</td>
+                                    <td>@r.OperationDescription</td>
+                                    <td>@r.WorkCenter</td>
+                                    <td>@r.SetupTimeHrs</td>
+                                    <td>@r.MachineTimeHrs</td>
+                                    <td>@r.LaborTimeHrs</td>
+                                    <td>@r.ScrapPercent%</td>
+                                    <td><span class="status-badge @(r.Status=="Active"?"success":"warning")">@r.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a asp-page="/PP/Routing/Edit" asp-route-id="@r.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                            <a asp-page="/PP/Routing/Display" asp-route-id="@r.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="13" class="sheet-empty"><i class="bi bi-diagram-3"></i><div>No routings found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Routings.Count routings</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: MRP Run ═══ -->
+    <div class="module-tab-panel" data-panel="mrp" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left"><div class="sheet-search"></div></div>
+                <div class="sheet-toolbar-right"></div>
+            </div>
+            <div style="padding:2rem">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem">
+                    <a asp-page="/PP/MrpRun" class="module-kpi-card" style="text-decoration:none;cursor:pointer">
+                        <div class="module-kpi-icon blue"><i class="bi bi-play-circle"></i></div>
+                        <div class="module-kpi-info">
+                            <div class="module-kpi-label" style="font-weight:700;font-size:0.9rem">MD01 — MRP Run</div>
+                            <div class="module-kpi-sub">Run material requirements planning</div>
+                        </div>
+                    </a>
+                    <a asp-page="/PP/Mrp" class="module-kpi-card" style="text-decoration:none;cursor:pointer">
+                        <div class="module-kpi-icon amber"><i class="bi bi-cpu"></i></div>
+                        <div class="module-kpi-info">
+                            <div class="module-kpi-label" style="font-weight:700;font-size:0.9rem">MRP & Capacity Planning</div>
+                            <div class="module-kpi-sub">BOM explosion and capacity leveling</div>
+                        </div>
+                    </a>
+                    <a asp-page="/PP/MrpStock" class="module-kpi-card" style="text-decoration:none;cursor:pointer">
+                        <div class="module-kpi-icon green"><i class="bi bi-clipboard-data"></i></div>
+                        <div class="module-kpi-info">
+                            <div class="module-kpi-label" style="font-weight:700;font-size:0.9rem">MD04 — Stock/Requirements</div>
+                            <div class="module-kpi-sub">Material stock and requirements list</div>
+                        </div>
+                    </a>
+                </div>
+                <p class="text-muted">Material Requirements Planning with BOM explosion, capacity leveling, exception messages, and AI-powered demand forecasting.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Order Confirmation ═══ -->
+    <div class="module-tab-panel" data-panel="confirmations" style="display:none">
+        <div class="sheet-view-container">
+            <div class="sheet-toolbar">
+                <div class="sheet-toolbar-left">
+                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search confirmations..." class="sheet-search-input" /></div>
+                </div>
+                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+            </div>
+            <div class="sheet-table-wrap">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
+                            <th>Confirmation #</th>
+                            <th>Prod Order #</th>
+                            <th>Operation #</th>
+                            <th>Yield Qty</th>
+                            <th>Scrap Qty</th>
+                            <th>Setup (hrs)</th>
+                            <th>Machine (hrs)</th>
+                            <th>Labor (hrs)</th>
+                            <th>Backflush</th>
+                            <th>Confirmed By</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="actions-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Confirmations.Any())
+                        {
+                            @foreach (var c in Model.Confirmations)
+                            {
+                                <tr>
+                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
+                                    <td><strong>@c.ConfirmationNumber</strong></td>
+                                    <td>@c.ProductionOrderNumber</td>
+                                    <td>@c.OperationNumber</td>
+                                    <td>@c.YieldQuantity</td>
+                                    <td>@c.ScrapQuantity</td>
+                                    <td>@c.ActualSetupTime</td>
+                                    <td>@c.ActualMachineTime</td>
+                                    <td>@c.ActualLaborTime</td>
+                                    <td><span class="status-badge @(c.BackflushGoodsIssue?"success":"info")">@(c.BackflushGoodsIssue?"Yes":"No")</span></td>
+                                    <td>@c.ConfirmedBy</td>
+                                    <td>@c.ConfirmationDate.ToString("dd MMM yyyy")</td>
+                                    <td><span class="status-badge @(c.Status=="Confirmed"?"success":"warning")">@c.Status</span></td>
+                                    <td class="actions-col">
+                                        <div class="action-btns">
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="14" class="sheet-empty"><i class="bi bi-check2-square"></i><div>No confirmations found</div></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="sheet-pagination">
+                <div class="sheet-pagination-info">Showing @Model.Confirmations.Count confirmations</div>
+                <div class="sheet-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+}

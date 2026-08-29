@@ -23,15 +23,21 @@ public class BillingDocumentEntity : EntityBase { public Guid TenantId { get; se
 
 // PP
 public class ProductionPlanEntity : EntityBase { public Guid TenantId { get; set; } public string PlanId { get; set; } = ""; public string ProductName { get; set; } = ""; public decimal Quantity { get; set; } public DateTime StartDate { get; set; } public DateTime EndDate { get; set; } public string Status { get; set; } = "Planned"; }
-public class BillOfMaterialEntity : EntityBase { public Guid TenantId { get; set; } public string BomId { get; set; } = ""; public string ProductName { get; set; } = ""; public string ComponentName { get; set; } = ""; public decimal Quantity { get; set; } public string UOM { get; set; } = "EA"; public string Status { get; set; } = "Active"; }
-public class ProductionRoutingEntity : EntityBase { public Guid TenantId { get; set; } public string RoutingId { get; set; } = ""; public string ProductName { get; set; } = ""; public int OperationNo { get; set; } public string WorkCenter { get; set; } = ""; public decimal SetupTimeHrs { get; set; } public decimal RunTimeHrs { get; set; } public string Status { get; set; } = "Active"; }
-public class WorkCenterEntity : EntityBase { public Guid TenantId { get; set; } public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Department { get; set; } = ""; public decimal CapacityPerShift { get; set; } public string Status { get; set; } = "Active"; }
+public class BillOfMaterialEntity : EntityBase { public Guid TenantId { get; set; } public string BomId { get; set; } = ""; public string ProductName { get; set; } = ""; public string MaterialCode { get; set; } = ""; public string ComponentName { get; set; } = ""; public string ComponentCode { get; set; } = ""; public decimal Quantity { get; set; } public string UOM { get; set; } = "EA"; public string BOMUsage { get; set; } = "Production"; public decimal BaseQuantity { get; set; } = 1; public string ItemCategory { get; set; } = "L"; public decimal ComponentScrap { get; set; } = 0; public DateTime ValidFrom { get; set; } = DateTime.UtcNow; public DateTime ValidTo { get; set; } = DateTime.UtcNow.AddYears(5); public string Status { get; set; } = "Active"; }
+public class ProductionRoutingEntity : EntityBase { public Guid TenantId { get; set; } public string RoutingId { get; set; } = ""; public string RoutingGroup { get; set; } = ""; public int RoutingGroupCounter { get; set; } = 1; public string ProductName { get; set; } = ""; public int OperationNo { get; set; } public string OperationDescription { get; set; } = ""; public string WorkCenter { get; set; } = ""; public decimal SetupTimeHrs { get; set; } public decimal MachineTimeHrs { get; set; } = 0; public decimal LaborTimeHrs { get; set; } = 0; public decimal QueueTimeHrs { get; set; } = 0; public decimal RunTimeHrs { get; set; } public decimal ScrapPercent { get; set; } = 0; public string ControlKey { get; set; } = "PP01"; public string Status { get; set; } = "Active"; }
+public class WorkCenterEntity : EntityBase { public Guid TenantId { get; set; } public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Department { get; set; } = ""; public decimal CapacityPerShift { get; set; } public int ShiftsPerDay { get; set; } = 1; public decimal CapacityPerDay { get; set; } = 0; public string WorkCenterCategory { get; set; } = "Machine"; public string CostCenter { get; set; } = ""; public decimal MachineTimeHrs { get; set; } = 0; public decimal LaborTimeHrs { get; set; } = 0; public string ResponsiblePerson { get; set; } = ""; public string Status { get; set; } = "Active"; }
 public class ProductionOrderEntity : EntityBase
 {
     public Guid TenantId { get; set; }
     public string OrderNumber { get; set; } = "";
+    public string OrderType { get; set; } = "PP01";
     public string ProductName { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
     public decimal Quantity { get; set; }
+    public string BaseUOM { get; set; } = "EA";
+    public string Plant { get; set; } = "1000";
+    public string StorageLocation { get; set; } = "RM01";
+    public string MRPController { get; set; } = "";
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string Status { get; set; } = "PLANNED";
@@ -83,6 +89,24 @@ public class ProductionOrderItemEntity : EntityBase
     public decimal ScrapQty { get; set; } = 0;
     public string UOM { get; set; } = "EA";
     public string Status { get; set; } = "PLANNED";
+}
+
+public class OrderConfirmationEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string ConfirmationNumber { get; set; } = "";
+    public string ProductionOrderNumber { get; set; } = "";
+    public int OperationNumber { get; set; } = 10;
+    public decimal YieldQuantity { get; set; } = 0;
+    public decimal ScrapQuantity { get; set; } = 0;
+    public decimal ActualSetupTime { get; set; } = 0;
+    public decimal ActualMachineTime { get; set; } = 0;
+    public decimal ActualLaborTime { get; set; } = 0;
+    public bool BackflushGoodsIssue { get; set; } = false;
+    public string WorkCenter { get; set; } = "";
+    public string ConfirmedBy { get; set; } = "";
+    public DateTime ConfirmationDate { get; set; } = DateTime.UtcNow;
+    public string Status { get; set; } = "Confirmed";
 }
 
 public class MaterialStagingEntity : EntityBase

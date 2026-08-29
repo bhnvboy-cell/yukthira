@@ -43,3 +43,16 @@ public class ProductionOrderEntityConfiguration : IEntityTypeConfiguration<Produ
         builder.ToTable("production_orders", "yuktira_pp");
     }
 }
+
+public class OrderConfirmationEntityConfiguration : IEntityTypeConfiguration<OrderConfirmationEntity>
+{
+    public void Configure(EntityTypeBuilder<OrderConfirmationEntity> builder)
+    {
+        builder.ToTable("OrderConfirmations", "yuktira_pp");
+        builder.Property(e => e.YieldQuantity).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.ScrapQuantity).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.ActualSetupTime).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.ActualMachineTime).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.ActualLaborTime).HasColumnType("decimal(18,4)");
+    }
+}
