@@ -261,6 +261,46 @@ public class QMInspectionConfigEntity : EntityBase
     public string CreatedBy { get; set; } = "";
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 4.2: UD Reversal & Stock Reversion Engine
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class StockBalanceEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "1000";
+    public string StorageLocation { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string StockType { get; set; } = "Unrestricted";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal UnitPrice { get; set; }
+    public decimal TotalValue { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class InspectionLotAuditEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid InspectionLotId { get; set; }
+    public string LotNumber { get; set; } = "";
+    public string Action { get; set; } = "";
+    public string PreviousStatus { get; set; } = "";
+    public string NewStatus { get; set; } = "";
+    public string PreviousUDCode { get; set; } = "";
+    public string NewUDCode { get; set; } = "";
+    public string StockMovementType { get; set; } = "";
+    public decimal StockQuantityMoved { get; set; }
+    public string StockFromLocation { get; set; } = "";
+    public string StockToLocation { get; set; } = "";
+    public string Reason { get; set; } = "";
+    public string UserId { get; set; } = "";
+    public DateTime ActionTimestamp { get; set; } = DateTime.UtcNow;
+    public string Notes { get; set; } = "";
+}
+
 // WM
 public class WarehouseTransferEntity : EntityBase { public string TransferId { get; set; } = ""; public DateTime Date { get; set; } public string MaterialName { get; set; } = ""; public string FromBin { get; set; } = ""; public string ToBin { get; set; } = ""; public decimal Quantity { get; set; } public string Status { get; set; } = "Pending"; }
 public class StorageLocationEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "General"; public decimal Capacity { get; set; } public string Status { get; set; } = "Active"; }

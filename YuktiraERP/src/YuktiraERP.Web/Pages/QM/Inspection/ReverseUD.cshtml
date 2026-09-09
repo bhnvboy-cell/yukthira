@@ -1,0 +1,234 @@
+@page
+@model YuktiraERP.Web.Pages.QM.Inspection.ReverseUDModel
+@{
+    ViewData["Title"] = "UD Reversal & Stock Reversion";
+}
+
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+
+<style>
+    .ud-reversal-header { background: linear-gradient(135deg, #7c2d12 0%, #c2410c 100%); color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 16px; }
+    .ud-reversal-header h2 { margin: 0 0 4px 0; font-size: 18px; font-weight: 600; }
+    .ud-reversal-header p { margin: 0; font-size: 12px; opacity: 0.7; }
+    .section-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .section-card h5 { margin: 0 0 16px 0; font-size: 14px; font-weight: 600; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .form-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 4px; display: block; }
+    .form-group input, .form-group textarea, .form-group select { font-size: 13px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; box-sizing: border-box; }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .btn { font-size: 12px; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; }
+    .btn-validate { background: #2563eb; color: #fff; }
+    .btn-validate:hover { background: #1d4ed8; }
+    .btn-reverse { background: #dc2626; color: #fff; }
+    .btn-reverse:hover { background: #b91c1c; }
+    .btn-reverse:disabled { background: #94a3b8; cursor: not-allowed; }
+    .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+    .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .alert-warning { background: #fffbeb; border: 1px solid #fed7aa; color: #92400e; }
+    .lot-info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; background: #f8fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0; }
+    .lot-info-item { }
+    .lot-info-item .label { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+    .lot-info-item .value { font-size: 14px; font-weight: 600; color: #1e293b; margin-top: 2px; }
+    .stock-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .stock-table th { background: #f1f5f9; padding: 8px 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+    .stock-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+    .stock-table tr:hover td { background: #f8fafc; }
+    .stock-type-badge { font-size: 10px; padding: 2px 8px; border-radius: 3px; font-weight: 600; }
+    .stock-type-unrestricted { background: #dcfce7; color: #166534; }
+    .stock-type-qi { background: #fef3c7; color: #92400e; }
+    .stock-type-blocked { background: #fecaca; color: #991b1b; }
+    .stock-type-scrapped { background: #e2e8f0; color: #475569; }
+    .reversal-summary { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    .reversal-summary h6 { margin: 0 0 12px 0; font-size: 13px; color: #991b1b; font-weight: 600; }
+    .reversal-step { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 13px; }
+    .reversal-step .step-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .step-from { background: #dc2626; }
+    .step-arrow { color: #94a3b8; font-size: 16px; }
+    .step-to { background: #16a34a; }
+</style>
+
+<div class="ud-reversal-header">
+    <h2><i class="bi bi-arrow-counterclockwise me-2"></i>Usage Decision Reversal & Stock Reversion</h2>
+    <p>Reverse a completed Usage Decision and return stock from Unrestricted/Blocked to Quality Inspection (Movement Type 322)</p>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-error"><i class="bi bi-exclamation-triangle me-2"></i>@Model.ErrorMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>@Model.SuccessMessage</div>
+}
+
+<form method="post">
+    <div class="section-card">
+        <h5><i class="bi bi-search me-2"></i>Step 1: Validate Inspection Lot</h5>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Inspection Lot ID (GUID)</label>
+                <input asp-for="LotIdInput" placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000" />
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button type="submit" asp-page-handler="Validate" class="btn btn-validate">
+                    <i class="bi bi-search"></i> Validate Lot
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.FoundLot != null)
+{
+    <div class="section-card">
+        <h5><i class="bi bi-info-circle me-2"></i>Inspection Lot Details</h5>
+        <div class="lot-info-grid">
+            <div class="lot-info-item">
+                <div class="label">Lot Number</div>
+                <div class="value">@Model.FoundLot.LotNumber</div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Material</div>
+                <div class="value">@Model.FoundLot.MaterialCode — @Model.FoundLot.MaterialName</div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Plant / Storage Location</div>
+                <div class="value">@Model.FoundLot.Plant / @Model.FoundLot.StorageLocation</div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Batch Number</div>
+                <div class="value">@Model.FoundLot.BatchNumber</div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Quantity</div>
+                <div class="value">@Model.FoundLot.Quantity @Model.FoundLot.BaseUOM</div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Status</div>
+                <div class="value"><span class="badge bg-warning text-dark">@Model.FoundLot.Status</span></div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Inspection Type</div>
+                <div class="value">@Model.FoundLot.InspectionType</div>
+            </div>
+            <div class="lot-info-item">
+                <div class="label">Inspector</div>
+                <div class="value">@Model.FoundLot.AssignedInspector</div>
+            </div>
+        </div>
+
+        @if (Model.CurrentUD != null)
+        {
+            <div style="margin-top:16px; background:#fff7ed; padding:12px 16px; border-radius:6px; border:1px solid #fed7aa;">
+                <div style="font-size:11px; text-transform:uppercase; color:#92400e; font-weight:600; margin-bottom:8px;">Current Usage Decision</div>
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; font-size:13px;">
+                    <div><strong>UD Code:</strong> @Model.CurrentUD.UDCode</div>
+                    <div><strong>Description:</strong> @Model.CurrentUD.UDDescription</div>
+                    <div><strong>Date:</strong> @(Model.CurrentUD.DecisionDate?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</div>
+                    <div><strong>Decided By:</strong> @Model.CurrentUD.DecidedBy</div>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; font-size:13px; margin-top:8px;">
+                    <div><strong>Stock Proposal:</strong> @Model.CurrentUD.StockProposal</div>
+                    <div><strong>Certificate:</strong> @Model.CurrentUD.CertificateReceived</div>
+                    <div><strong>Status:</strong> @Model.CurrentUD.Status</div>
+                </div>
+            </div>
+        }
+
+        <form method="post" style="margin-top:16px;">
+            <input type="hidden" asp-for="LotIdInput" />
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Reversal Reason (Required)</label>
+                    <textarea asp-for="ReversalReason" placeholder="Enter the reason for reversing this Usage Decision..." rows="3"></textarea>
+                </div>
+            </div>
+            @if (Model.CurrentUD != null)
+            {
+                <button type="submit" asp-page-handler="Reverse" class="btn btn-reverse">
+                    <i class="bi bi-arrow-counterclockwise"></i> Execute UD Reversal
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-reverse" disabled>
+                    <i class="bi bi-arrow-counterclockwise"></i> Execute UD Reversal
+                </button>
+            }
+        </form>
+    </div>
+}
+
+@if (Model.ReversalResult != null && Model.ReversalResult.Success)
+{
+    <div class="reversal-summary">
+        <h6><i class="bi bi-check-circle me-2"></i>Reversal Completed Successfully</h6>
+        <div class="reversal-step">
+            <div class="step-icon step-from">1</div>
+            <div><strong>From:</strong> @Model.ReversalResult.PreviousUDCode stock (@Model.ReversalResult.StockFromType)</div>
+        </div>
+        <div class="reversal-step">
+            <div class="step-icon" style="background:#f59e0b;">→</div>
+            <div><strong>Movement Type 322:</strong> @Model.ReversalResult.StockQuantityMoved units transferred</div>
+        </div>
+        <div class="reversal-step">
+            <div class="step-icon step-to">2</div>
+            <div><strong>To:</strong> Quality Inspection (@Model.ReversalResult.StockToType)</div>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:#64748b;">
+            Audit ID: @Model.ReversalResult.AuditId | Lot: @Model.ReversalResult.InspectionLotNumber | 
+            Timestamp: @Model.ReversalResult.ReversalTimestamp.ToString("yyyy-MM-dd HH:mm:ss UTC") | 
+            New Status: @Model.ReversalResult.NewStatus
+        </div>
+    </div>
+}
+
+<div class="section-card">
+    <h5><i class="bi bi-table me-2"></i>Current Stock Balances</h5>
+    <table class="stock-table">
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Batch</th>
+                <th>Plant</th>
+                <th>Stock Type</th>
+                <th>Quantity</th>
+                <th>UOM</th>
+                <th>Unit Price</th>
+                <th>Total Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.StockBalances.Any())
+            {
+                @foreach (var sb in Model.StockBalances)
+                {
+                    var badgeClass = sb.StockType switch
+                    {
+                        "Unrestricted" => "stock-type-badge stock-type-unrestricted",
+                        "QualityInspection" => "stock-type-badge stock-type-qi",
+                        "Blocked" => "stock-type-badge stock-type-blocked",
+                        "Scrapped" => "stock-type-badge stock-type-scrapped",
+                        _ => "stock-type-badge"
+                    };
+                    <tr>
+                        <td><strong>@sb.MaterialCode</strong> — @sb.MaterialName</td>
+                        <td>@sb.BatchNumber</td>
+                        <td>@sb.Plant / @sb.StorageLocation</td>
+                        <td><span class="@badgeClass">@sb.StockType</span></td>
+                        <td>@sb.Quantity.ToString("N2")</td>
+                        <td>@sb.UOM</td>
+                        <td>@sb.UnitPrice.ToString("C2")</td>
+                        <td>@sb.TotalValue.ToString("C2")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:20px;">No stock balances found.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

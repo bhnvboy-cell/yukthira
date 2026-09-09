@@ -256,6 +256,9 @@ public class YuktiraDbContext : DbContext
     public DbSet<PricingConditionEntity> PricingConditions => Set<PricingConditionEntity>();
     public DbSet<PricingConditionStepEntity> PricingConditionSteps => Set<PricingConditionStepEntity>();
     public DbSet<BillingDocumentLineEntity> BillingDocumentLines => Set<BillingDocumentLineEntity>();
+    // Phase 4.2: UD Reversal & Stock Reversion
+    public DbSet<StockBalanceEntity> StockBalances => Set<StockBalanceEntity>();
+    public DbSet<InspectionLotAuditEntity> InspectionLotAudits => Set<InspectionLotAuditEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

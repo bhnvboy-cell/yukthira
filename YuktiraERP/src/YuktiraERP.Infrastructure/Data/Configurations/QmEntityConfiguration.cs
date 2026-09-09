@@ -96,3 +96,24 @@ public class CertificateOfAnalysisEntityConfiguration : IEntityTypeConfiguration
         builder.ToTable("certificates_of_analysis", "yuktira_qm");
     }
 }
+
+public class StockBalanceEntityConfiguration : IEntityTypeConfiguration<StockBalanceEntity>
+{
+    public void Configure(EntityTypeBuilder<StockBalanceEntity> builder)
+    {
+        builder.ToTable("stock_balances", "yuktira_mm");
+        builder.Property(s => s.Quantity).HasColumnType("decimal(18,4)");
+        builder.Property(s => s.UnitPrice).HasColumnType("decimal(18,4)");
+        builder.Property(s => s.TotalValue).HasColumnType("decimal(18,2)");
+    }
+}
+
+public class InspectionLotAuditEntityConfiguration : IEntityTypeConfiguration<InspectionLotAuditEntity>
+{
+    public void Configure(EntityTypeBuilder<InspectionLotAuditEntity> builder)
+    {
+        builder.ToTable("inspection_lot_audits", "yuktira_qm");
+        builder.Property(a => a.StockQuantityMoved).HasColumnType("decimal(18,4)");
+        builder.HasOne<InspectionLotEntity>().WithMany().HasForeignKey(a => a.InspectionLotId);
+    }
+}
