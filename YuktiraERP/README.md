@@ -1,13 +1,13 @@
 <div align="center">
 
-# YuktiraERP v1.0.0
+# YuktiraERP v1.1.0
 
 ### Open-Source Enterprise Resource Planning
 
-**.NET 10 · PostgreSQL 16 · GraphQL · SignalR · AI/ML**
+**.NET 10 · PostgreSQL 18 · GraphQL · SignalR · AI/ML**
 
-[![Tests](https://img.shields.io/badge/tests-261%20passing-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
+[![Tests](https://img.shields.io/badge/tests-275%20passing-brightgreen)]()
+[![Version](https://img.shields.io/badge/version-1.1.0-blue)]()
 [![License](https://img.shields.io/badge/license-open%20source-green)]()
 
 > **99%+ cost savings vs SAP S/4HANA · 90%+ vs Dynamics 365**
@@ -23,7 +23,7 @@
 git clone https://github.com/bhnvboy-cell/yukthira.git
 cd YuktiraERP
 
-# Database (PostgreSQL 16)
+# Database (PostgreSQL 18)
 createdb yuktira_erp
 
 # Build & Run
@@ -34,7 +34,7 @@ dotnet run --project src/YuktiraERP.Web --urls http://localhost:5001
 
 # Open browser
 # http://localhost:5001
-# Login: superadmin / yuktira123
+# Login: superadmin / yuktira123 / Client: 1000
 ```
 
 ---
@@ -58,16 +58,16 @@ dotnet run --project src/YuktiraERP.Web --urls http://localhost:5001
 │  └──────────────────────────────────────────────────────────┘   │
 │         │                                                        │
 │  ┌──────┴──────────────────────────────────────────────────┐    │
-│  │  SERVICE LAYER (69 registrations, 74 service files)    │    │
+│  │  SERVICE LAYER (70+ registrations, 75+ service files)  │    │
 │  │  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────────┐    │    │
 │  │  │ REST │ │GraphQL│ │SignalR│ │  AI  │ │ Workflow │    │    │
 │  │  │ API  │ │  15   │ │  2   │ │ Eng  │ │  Engine  │    │    │
-│  │  │54 ctrl│ │types │ │ hubs │ │      │ │  (FSM)   │    │    │
+│  │  │55 ctrl│ │types │ │ hubs │ │      │ │  (FSM)   │    │    │
 │  │  └──────┘ └──────┘ └──────┘ └──────┘ └──────────┘    │    │
 │  └────────────────────┬───────────────────────────────────┘    │
 │                       │                                        │
 │  ┌────────────────────┼───────────────────────────────────┐    │
-│  │  DATA LAYER (189 entities, PostgreSQL 16)              │    │
+│  │  DATA LAYER (191 entities, PostgreSQL 18)              │    │
 │  │  EF Core · Multi-Tenant · Auto-Audit · Batch/Serial   │    │
 │  └────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
@@ -86,7 +86,10 @@ YuktiraERP/
 │   ├── YuktiraERP.PluginSdk/         Plugin interfaces, hot-loading
 │   ├── YuktiraERP.Api/               REST + GraphQL + SignalR
 │   ├── YuktiraERP.Web/               Razor Pages frontend
-│   └── YuktiraERP.Tests/             261 unit/integration tests
+│   └── YuktiraERP.Tests/             275 unit/integration tests
+├── database/
+│   └── scripts/                      SQL migration scripts
+└── report.md                         Development progress report
 ```
 
 ---
@@ -105,13 +108,16 @@ YuktiraERP/
 
 ---
 
-## Workflow Diagrams
+## E2E Pipeline (SAP Transaction Codes)
 
 ### Procure-to-Pay (P2P)
 
 ```
 ME21N ──► MIGO (101) ──► QA11 ──► MIRO
 Create PO   Goods Rcp    Usage Dec   Invoice
+   │            │            │           │
+   └────────────┴────────────┴───────────┘
+              Movement Types: 101, 102, 103
 ```
 
 ### Order-to-Cash (O2C)
@@ -119,39 +125,87 @@ Create PO   Goods Rcp    Usage Dec   Invoice
 ```
 VA01 ──► VL01N ──► QC21 ──► VL02N (PGI) ──► VF01
 Create SO  Delivery  COA     Goods Issue    Billing
+   │          │        │          │             │
+   └──────────┴────────┴──────────┴─────────────┘
+              Movement Types: 601, 602
 ```
 
-### Plan-to-Produce (P2P-PROD)
+### Quality Management (QM)
 
 ```
-MD61 ──► CO01 ──► MIGO (261) ──► CO11N ──► MIGO (101) ──► KO88
-  PIR     Prod Ord  GI         Confirm      GR         Settle
+MIGO (101) ──► Inspection Lot ──► QA32 ──► QA11 ──► 321 ──► Unrestricted
+    │              │                │          │         │
+    │              │                │          │         └── Quality Release
+    │              │                │          └── Usage Decision
+    │              │                └── Results Recording
+    │              └── Auto-created for QM-enabled materials
+    └── Goods Receipt with Movement Type 101
 ```
 
-### Maintenance Cycle (PM-CYCLE)
+### UD Reversal (ZQIC Equivalent)
 
 ```
-IE01 ──► IW21 ──► IW31 ──► MIGO (261) ──► IW41 ──► IW32 ──► KO88
-Equip    Notif    PM Ord   Spares GI     Confirm   TECO    Settle
+QA11 (Completed) ──► ReverseUD ──► Movement Type 322 ──► InInspection
+     │                  │                │                    │
+     │                  │                │                    └── Lot status reset
+     │                  │                └── Stock: Unrestricted → QualityInspection
+     │                  └── Full audit trail + reason
+     └── Usage Decision reversal engine
+```
+
+### E2E Pipeline Diagnostic
+
+```
+PO ──► GR(101) ──► Inspection Lot ──► UD ──► Release(321) ──► SO ──► Delivery ──► Billing ──► FI
+ │         │              │             │           │           │          │            │         │
+ └─────────┴──────────────┴─────────────┴───────────┴───────────┴──────────┴────────────┴─────────┘
+                                    11-Step Automated Verification Engine
 ```
 
 ---
 
 ## API Reference
 
-### REST API (54 Controllers)
+### REST API (55 Controllers)
 
 | Module | Route | Operations |
 |--------|-------|-----------|
-| MM | `/api/mm/*` | Material, Vendor, PR, PO, GRN, Batch, Stock |
-| SD | `/api/sd/*` | Customer, SO, Delivery, Billing |
+| MM | `/api/mm/*` | Material, Vendor, PR, PO, GRN, Batch, Stock, MMBE |
+| SD | `/api/sd/*` | Customer, SO, Delivery, Billing, VF03 Pricing |
 | PP | `/api/pp` | Production Order, BOM, Routing |
-| QM | `/api/qm` | Inspection Lot, Notification, Usage Decision |
-| FI | `/api/fi/*` | GL, AP, AR, Tax, Currency, Bank |
+| QM | `/api/qm` | Inspection Lot, Notification, Usage Decision, UD Reversal |
+| FI | `/api/fi/*` | GL, AP, AR, Tax, Currency, Bank, FB03 |
 | CO | `/api/co` | Cost Center, Profit Center, Internal Order |
 | PM | `/api/pm` | Equipment, Maintenance Order, Plan |
 | HR | `/api/hr` | Employee, Payroll, Attendance |
 | WM | `/api/wm` | Transfer, Storage Location, RF |
+| Pipeline | `/api/PipelineDiagnostic/*` | E2E Diagnostic Engine |
+
+### New API Endpoints
+
+```bash
+# E2E Pipeline Diagnostic (11-step verification)
+POST /api/PipelineDiagnostic/execute              # Full pipeline run
+POST /api/PipelineDiagnostic/validate/po           # Validate PO
+POST /api/PipelineDiagnostic/validate/gr           # Validate GR (101)
+POST /api/PipelineDiagnostic/validate/inspection-lot # Validate Inspection Lot
+POST /api/PipelineDiagnostic/validate/usage-decision # Validate UD
+POST /api/PipelineDiagnostic/validate/quality-release # Validate Release (321)
+POST /api/PipelineDiagnostic/validate/delivery     # Validate Delivery
+POST /api/PipelineDiagnostic/validate/billing      # Validate Billing (VF01)
+POST /api/PipelineDiagnostic/validate/fi-ledger    # Validate FI Ledger (FB03)
+POST /api/PipelineDiagnostic/validate/stock-integrity # Validate Stock
+
+# UD Reversal
+POST /api/qm/usage-decisions/reverse              # Reverse UD (322)
+
+# Stock Overview (MMBE)
+POST /api/mm/stock-overview/mmbe                  # Hierarchical stock view
+
+# Movement Types
+POST /api/mm/movement-types/post                  # Post movement with validation
+POST /api/mm/movement-types/validate              # Validate before posting
+```
 
 ### GraphQL
 
@@ -175,6 +229,19 @@ query {
 |-----|-----|--------|
 | Notifications | `/hubs/notifications` | `ReceiveNotification` |
 | Dashboard | `/hubs/dashboard` | `DashboardUpdate`, `StockChange`, `OrderUpdate`, `SoxViolation` |
+
+---
+
+## Web UI Pages (Razor Pages)
+
+| Module | Page | TCode | Description |
+|--------|------|-------|-------------|
+| MM | `/MM/StockOverview` | MMBE | SAP-style hierarchical stock overview |
+| QM | `/QM/Inspection/QA32` | QA32 | Inspection lot selection screen |
+| QM | `/QM/Inspection/QA33` | QA33 | Inspection results recording |
+| QM | `/QM/Inspection/ReverseUD` | ZQIC | UD Reversal & Stock Reversion |
+| QM | `/Quality/PipelineDiagnostic` | — | E2E Pipeline Diagnostic Engine |
+| SD | `/SD/Billing/VF03` | VF03 | Billing document pricing conditions |
 
 ---
 
@@ -223,6 +290,24 @@ SAP S/4HANA · SAP HANA · Oracle ERP · MES · LIMS
 
 ---
 
+## Movement Types Supported
+
+| MT | Description | Usage |
+|----|-------------|-------|
+| 101 | Goods Receipt | PO receipt into inventory/QI |
+| 102 | GR Reversal | Reverse goods receipt |
+| 103 | GR Blocked Stock | Receipt into GR blocked stock |
+| 110 | Conditional GR Release | Release from GR blocked |
+| 321 | Quality Release | QI → Unrestricted |
+| 322 | UD Reversal | Unrestricted/Blocked → QI |
+| 350 | Custom Transfer | Custom UD reversal transfers |
+| 601 | Goods Issue | Outbound delivery |
+| 602 | GI Reversal | Reverse goods issue |
+| 261 | GI Production | Issue to production order |
+| 101 | GR Production | Receipt from production |
+
+---
+
 ## Performance
 
 | Metric | Value |
@@ -237,7 +322,7 @@ SAP S/4HANA · SAP HANA · Oracle ERP · MES · LIMS
 
 ## Test Coverage
 
-**261/261 tests passing** across 20+ categories:
+**275/275 tests passing** across 20+ categories:
 
 - QC, PM, PP, Procurement, Sales, Cross-module
 - Customer complaint & return (12 tests)
@@ -245,6 +330,8 @@ SAP S/4HANA · SAP HANA · Oracle ERP · MES · LIMS
 - Wave pick, velocity slotting, PP/DS scheduling
 - MRP events, consolidation, localization tax
 - AI document OCR, predictive analytics
+- Pricing engine (13 tests)
+- E2E pipeline validation
 
 ```bash
 dotnet test src/YuktiraERP.Tests
@@ -258,7 +345,7 @@ dotnet test src/YuktiraERP.Tests
 |---------|:----------:|:-----------:|:-------------:|:----:|
 | License Cost | **Free** | $$$$$ | $$$$$ | $$$$ |
 | Source Code | Open | Closed | Closed | Closed |
-| 189 Entities | ✅ | ✅ | ✅ | ✅ |
+| 191 Entities | ✅ | ✅ | ✅ | ✅ |
 | Universal Journal | ✅ | ✅ | ✅ | ✅ |
 | SOX Compliance | ✅ | ✅ | ✅ | ✅ |
 | Wave Pick | ✅ | ✅ | ✅ | ✅ |
@@ -270,6 +357,8 @@ dotnet test src/YuktiraERP.Tests
 | Plugin System | ✅ | ✅ | ✅ | ✅ |
 | Mobile RF | ✅ | ✅ | ✅ | ✅ |
 | AI/ML Built-in | ✅ | Limited | ✅ | ✅ |
+| E2E Pipeline Diagnostic | ✅ | ❌ | ❌ | ❌ |
+| UD Reversal Engine | ✅ | ✅ | ✅ | ✅ |
 | **TCO (5 years)** | **$0** | **$2M-10M** | **$1M-5M** | **$500K-2M** |
 
 ---
@@ -277,8 +366,8 @@ dotnet test src/YuktiraERP.Tests
 ## Environment
 
 - .NET 10 SDK
-- PostgreSQL 16
-- Connection: `Host=localhost;Database=yuktira_erp;Username=postgres;Password=postgres`
+- PostgreSQL 18
+- Connection: `Host=localhost;Database=yuktira_erp;Username=postgres;Password=(trust)`
 
 ---
 
@@ -290,7 +379,7 @@ Open Source — Free for commercial and personal use.
 
 <div align="center">
 
-**v1.0.0** · Built with ❤️ to democratize enterprise ERP
+**v1.1.0** · Built with ❤️ to democratize enterprise ERP
 
 [GitHub](https://github.com/bhnvboy-cell/yukthira)
 

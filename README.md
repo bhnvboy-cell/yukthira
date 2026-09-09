@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.0.8** | **August 2026**
+**Version 1.1.0** | **September 2026**
 
 ---
 
@@ -23,7 +23,7 @@ Then open **http://localhost:5001** and login with:
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- PostgreSQL 16 (required — the app connects to a local `yuktira_erp` database on startup and runs the EF Core migration/seeding pipeline)
+- PostgreSQL 18 (required — the app connects to a local `yuktira_erp` database on startup and runs the EF Core migration/seeding pipeline)
 
 ## Structure
 
@@ -1192,6 +1192,17 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 ### Changelog
 
+**1.1.0 (September 2026)**
+- **UD Reversal & Stock Reversion Engine (ZQIC Equivalent)**: Full-stack implementation allowing Quality Supervisors to reverse completed Usage Decisions. `InspectionResultService.ReverseUsageDecisionAsync` executes atomic reversal via `IDbContextTransaction` — moves stock from Unrestricted/Blocked back to QualityInspection (Movement Type 322), resets lot status to `InInspection`, sets UD code to `REVERSED`, and creates full audit trail in `InspectionLotAuditEntity`. New entities: `StockBalanceEntity` (yuktira_mm.stock_balances), `InspectionLotAuditEntity` (yuktira_qm.inspection_lot_audits). Razor page `Pages/QM/Inspection/ReverseUD.cshtml` with validate/reverse form, lot info grid, stock balance table, and reversal summary. SQL migration: `042_ud_reversal_tables.sql`
+- **E2E Pipeline Diagnostic Engine (11-Step Automated Verification)**: `PipelineDiagnosticService` orchestrates end-to-end validation across MM, QM, SD, and FI modules. Steps: PO → GR(101) → Inspection Lot → Results → UD → Quality Release(321) → SO → Delivery → Billing(VF01) → FI Ledger(FB03) → Stock Integrity. Document traceability chain, FI balance validation (Dr=Cr with 0.01 tolerance), broken reference detection, auto-resolution recommendations. API: `POST /api/PipelineDiagnostic/execute` + 9 individual step endpoints. Razor page `/Quality/PipelineDiagnostic` with pipeline flow visualization, expandable step cards, traceability grid, critical issues panel
+- **MIGO→MMBE Stock Sync**: `MovementTypeEngineService` and `GoodsMovementService` now update BOTH `material_masters.Stock` AND `yuktira_mm.stock` table, ensuring MIGO movements are reflected in MMBE stock overview
+- **Pricing Calculation Engine**: `PricingEngineService.CalculateItemPricingAsync` evaluates condition steps (BasePrice→Discount→Surcharge→Freight→Tax→Deduction) with intermediate sub-totals. `SalesBillingService.ReleaseBillingDocumentToFIAsync` creates balanced GL entries (AR Dr 1400, Revenue Cr 4000, Freight Cr 4100, Tax Cr 2300) in `UniversalJournalEntity` + `AREntryEntity`
+- **MMBE Stock Overview (TCode MMBE)**: Hierarchical stock aggregation (Material→SLoc→Batch→Plant) with SAP-style TreeGrid, expand/collapse, KPIs, CSV export, F8 hotkey
+- **QA32/QA33 Selection Screen**: Full-stack inspection lot selection with filter, pagination, and usage decision display
+- **Pharma Integration Test**: 7-step workflow with 77/77 verification checks passing
+- **Currency Seed Expansion**: 49 currencies with unique index on (Code, TenantId)
+- All 275 tests pass, build clean
+
 **1.0.8 (August 2026)**
 - **WM Module Refactor**: 4 new entities (Bin, TransferOrder, Wave, InventoryCount) with SAP EWM parameters (bin capacity, putaway strategies FIFO/LIFO/FEFO, wave-based picking, RF scanning); StockMovement extended with WM fields; 5 Create forms, WM/Index.cshtml with 5 tabs and 5 KPIs; schema `yuktira_wm`; migration `023_wm_module.sql`
 - **PP Module Upgrade**: SAP PP/DS parameters across BOM (+8 fields: alt BOM, base qty, effectivity), WorkCenter (+7: capacity categories, shift model, efficiency), Routing (+8: group, lot size, verification), ProductionOrder (+5: scheduling type, yield, scrap); new OrderConfirmationEntity; PP/Index.cshtml with 6 tabs and 5 KPIs; migration `024_pp_enhancements.sql`
@@ -1200,7 +1211,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - **TCode Engine API Fixes**: Created TCodeEngineController in Web project (was only in Api); seeded 21 missing transaction codes (CO11N, ME51N, ME28, MD61, F-53, IL01, CRRETURN, CRINSPECT, CRUDPOST, CRCREDIT, CRSUPPLY, CRSRET, CRDEBIT, RFSCAN, RFPICK, WAVEPK, VSLOTT, PPDS, MRPEVT, CONSOL, TAXRET, AIOCR); fixed VL01N typo; added `api/v1/[controller]` route prefix; created WorkflowController stub; migration `027_seed_missing_tcodes.sql`
 - **75 TCode Layouts Registered**: All transaction codes verified with 200 OK via API
 - **Comprehensive User Guide**: Complete end-user documentation covering all 35 modules, 75 T-codes, workflows, and troubleshooting (`docs/user-guide.md`)
-- All 261 tests pass, build clean
+- All 275 tests pass, build clean
 
 **1.0.7 (August 2026)**
 - Yuktira enterprise creation forms: all 12 creation forms across MM, SD, QM, PP, FI, and WM modules upgraded to multi-tab layout with standardized field schemas
@@ -1221,7 +1232,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 - UI themes: 4 themes (Modern, Classical, Minimal, Futuristic) with per-theme form styling
 - Session timeout: SAP-style configurable warning modal with countdown and continue/log off
 - Dynamic action buttons per tab on MM and SD module pages
-- All 261 tests pass, build clean
+- All 275 tests pass, build clean
 
 **1.0.5 (August 2026)**
 - Observability: `/health` (with database ping via `AddDbContextCheck`) and `/health/ready` in both API and Web; Serilog structured logging (console + daily rolling file `logs/api-.log`, `logs/web-.log`, 14 retained) with request logging that enriches TenantId/Path; Prometheus metrics via `prometheus-net` (`/metrics`) — HTTP request rate/duration/counters ready for Grafana dashboards

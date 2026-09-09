@@ -20,7 +20,7 @@ YuktiraERP is a **complete, open-source Enterprise Resource Planning (ERP) syste
 | **Transaction Codes** | 75 SAP-style quick-access codes |
 | **UI Themes** | 4 themes (Modern, Classical, Minimal, Futuristic) + Dark Mode |
 | **Languages** | 7 languages (English, Hindi, Tamil, Telugu, French, Spanish, Kannada, Malayalam) |
-| **Test Coverage** | 261/261 tests passing |
+| **Test Coverage** | 275/275 tests passing |
 | **Database** | PostgreSQL with 27 migration scripts |
 | **API** | RESTful API with GraphQL support |
 | **Real-time** | SignalR notifications and live updates |
