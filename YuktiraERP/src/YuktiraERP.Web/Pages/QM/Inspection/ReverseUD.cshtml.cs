@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
@@ -13,11 +14,13 @@ public class ReverseUDModel : PageModel
 {
     private readonly IInspectionResultService _inspectionService;
     private readonly ITenantContext _tenant;
+    private readonly YuktiraDbContext _db;
 
-    public ReverseUDModel(IInspectionResultService inspectionService, ITenantContext tenant)
+    public ReverseUDModel(IInspectionResultService inspectionService, ITenantContext tenant, YuktiraDbContext db)
     {
         _inspectionService = inspectionService;
         _tenant = tenant;
+        _db = db;
     }
 
     [BindProperty]
@@ -27,7 +30,7 @@ public class ReverseUDModel : PageModel
     public string ReversalReason { get; set; } = "";
 
     public InspectionLotEntity? FoundLot { get; set; }
-    public UsageDecisionDetailEntity? CurrentUD { get; set; }
+    public UsageDecisionEntity? CurrentUD { get; set; }
     public UDReversalResult? ReversalResult { get; set; }
     public List<StockBalanceEntity> StockBalances { get; set; } = new();
     public string? ErrorMessage { get; set; }
@@ -57,8 +60,7 @@ public class ReverseUDModel : PageModel
         }
 
         CurrentUD = null;
-        var allUDs = await _inspectionService.GetAllUsageDecisionsAsync(take: 200);
-        CurrentUD = allUDs.FirstOrDefault(u => u.LotNumber == FoundLot.LotNumber);
+        CurrentUD = await _db.UsageDecisions.FirstOrDefaultAsync(u => u.LotNumber == FoundLot.LotNumber);
 
         return Page();
     }

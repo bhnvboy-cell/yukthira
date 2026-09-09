@@ -125,14 +125,14 @@
                 <div style="font-size:11px; text-transform:uppercase; color:#92400e; font-weight:600; margin-bottom:8px;">Current Usage Decision</div>
                 <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; font-size:13px;">
                     <div><strong>UD Code:</strong> @Model.CurrentUD.UDCode</div>
-                    <div><strong>Description:</strong> @Model.CurrentUD.UDDescription</div>
-                    <div><strong>Date:</strong> @(Model.CurrentUD.DecisionDate?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</div>
-                    <div><strong>Decided By:</strong> @Model.CurrentUD.DecidedBy</div>
+                    <div><strong>Decision:</strong> @Model.CurrentUD.Decision</div>
+                    <div><strong>Date:</strong> @Model.CurrentUD.DecisionDate.ToString("yyyy-MM-dd HH:mm")</div>
+                    <div><strong>Inspector:</strong> @Model.CurrentUD.InspectorID</div>
                 </div>
                 <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; font-size:13px; margin-top:8px;">
-                    <div><strong>Stock Proposal:</strong> @Model.CurrentUD.StockProposal</div>
-                    <div><strong>Certificate:</strong> @Model.CurrentUD.CertificateReceived</div>
-                    <div><strong>Status:</strong> @Model.CurrentUD.Status</div>
+                    <div><strong>Unrestricted Stock:</strong> @Model.CurrentUD.UnrestrictedStock</div>
+                    <div><strong>Blocked Stock:</strong> @Model.CurrentUD.BlockedStock</div>
+                    <div><strong>Scrap Quantity:</strong> @Model.CurrentUD.ScrapQuantity</div>
                 </div>
             </div>
         }
