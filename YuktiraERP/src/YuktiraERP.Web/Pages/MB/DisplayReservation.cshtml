@@ -1,0 +1,75 @@
+@page
+@model YuktiraERP.Web.Pages.MB.DisplayReservationModel
+@{
+    ViewData["Title"] = "MB23/24 - Display/Change Reservation";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-bookmark me-2"></i>MB23/24 - Display/Change Reservation</h4>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger py-2">@Model.Error</div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-info text-white"><h6 class="mb-0">Search Reservations</h6></div>
+    <div class="card-body">
+        <form method="get">
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label class="form-label">Material Code</label>
+                <input asp-for="MaterialCode" class="form-control" placeholder="Optional" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Plant</label>
+                <input asp-for="Plant" class="form-control" placeholder="Optional" />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Reservations != null && Model.Reservations.Any())
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Reservations (@Model.Reservations.Count)</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                        <tr>
+                            <th>Reservation #</th>
+                            <th>Date</th>
+                            <th>Plant</th>
+                            <th>Total Reserved</th>
+                            <th>Total Issued</th>
+                            <th>Status</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Reservations)
+                    {
+                        <tr>
+                            <td>@r.ReservationNumber</td>
+                            <td>@r.RequirementDate.ToString("dd/MM/yyyy")</td>
+                            <td>@r.Plant</td>
+                            <td>@r.TotalReservedQuantity</td>
+                            <td>@r.TotalIssuedQuantity</td>
+                            <td><span class="badge bg-@(r.Status == "Active" ? "success" : "secondary")">@r.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (Model.Reservations != null)
+{
+    <div class="alert alert-info">No reservations found.</div>
+}
+<a href="/MB/Index" class="btn btn-secondary">Back</a>
+</div>
+</div>

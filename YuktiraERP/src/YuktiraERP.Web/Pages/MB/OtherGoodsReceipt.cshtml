@@ -1,0 +1,109 @@
+@page
+@model YuktiraERP.Web.Pages.MB.OtherGoodsReceiptModel
+@{
+    ViewData["Title"] = "MB1C - Other Goods Receipt";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-plus-circle me-2"></i>MB1C - Other Goods Receipt</h4>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success py-2">@Model.SuccessMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger py-2">@Model.Error</div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-primary text-white"><h6 class="mb-0">Other Goods Receipt</h6></div>
+    <div class="card-body">
+        <form method="post">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Movement Type</label>
+                <select asp-for="MovementType" class="form-select">
+                    <option value="561">561 - Initial Stock</option>
+                    <option value="651">651 - Customer Return</option>
+                    <option value="103">103 - GR into GR Blocked</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Posting Date</label>
+                <input asp-for="Request.PostingDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Plant</label>
+                <input asp-for="Request.Plant" class="form-control" placeholder="1000" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Storage Location</label>
+                <input asp-for="Request.StorageLocation" class="form-control" />
+            </div>
+        </div>
+
+        <h6>Line Items</h6>
+        <table class="table table-bordered table-sm" id="lineItems">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Material Code</th>
+                    <th>Material Name</th>
+                    <th>Quantity</th>
+                    <th>UOM</th>
+                    <th>Unit Price</th>
+                    <th>Batch</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><input name="Request.Lines[0].MaterialCode" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].MaterialName" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].Quantity" type="number" step="0.001" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].UOM" class="form-control form-control-sm" value="EA" /></td>
+                    <td><input name="Request.Lines[0].UnitPrice" type="number" step="0.01" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].BatchNumber" class="form-control form-control-sm" /></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">X</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addLine()"><i class="bi bi-plus me-1"></i>Add Line</button>
+
+        <div class="mt-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Post Receipt</button>
+            <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Result != null && Model.Result.Success)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Document Posted</h6></div>
+        <div class="card-body">
+            <p><strong>Document Number:</strong> @Model.Result.DocumentNumber</p>
+        </div>
+    </div>
+}
+</div>
+</div>
+
+<script>
+function addLine() {
+    var tbody = document.querySelector('#lineItems tbody');
+    var idx = tbody.rows.length;
+    var row = '<tr><td>' + (idx + 1) + '</td>' +
+        '<td><input name="Request.Lines[' + idx + '].MaterialCode" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].MaterialName" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].Quantity" type="number" step="0.001" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].UOM" class="form-control form-control-sm" value="EA" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].UnitPrice" type="number" step="0.01" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].BatchNumber" class="form-control form-control-sm" /></td>' +
+        '<td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'tr\').remove()">X</button></td></tr>';
+    tbody.insertAdjacentHTML('beforeend', row);
+}
+</script>

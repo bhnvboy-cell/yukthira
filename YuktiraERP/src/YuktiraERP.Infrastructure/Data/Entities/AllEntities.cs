@@ -278,7 +278,11 @@ public class StockBalanceEntity : EntityBase
     public string UOM { get; set; } = "EA";
     public decimal UnitPrice { get; set; }
     public decimal TotalValue { get; set; }
+    public decimal MinStock { get; set; }
+    public decimal MaxStock { get; set; }
+    public decimal ReorderPoint { get; set; }
     public string Status { get; set; } = "Active";
+    public string Xmin { get; set; } = "0";
 }
 
 public class InspectionLotAuditEntity : EntityBase
@@ -1755,5 +1759,171 @@ public class BillingDocumentLineEntity : EntityBase
     public decimal TaxAmount { get; set; }
     public decimal GrossAmount { get; set; }
     public string TaxCode { get; set; } = "";
+    public string Status { get; set; } = "Active";
+}
+
+// ============================================================
+// MB INVENTORY TRANSACTION SUITE - NEW ENTITIES (52 Elements)
+// ============================================================
+
+public class MaterialDocumentHeaderEntity : EntityBase
+{
+    public string TenantId { get; set; } = "";
+    public string DocumentNumber { get; set; } = "";
+    public DateTime PostingDate { get; set; } = DateTime.UtcNow;
+    public DateTime DocumentDate { get; set; } = DateTime.UtcNow;
+    public int MovementType { get; set; }
+    public string MovementTypeDescription { get; set; } = "";
+    public string? SpecialStockIndicator { get; set; }
+    public string UserId { get; set; } = "";
+    public string? RefDocument { get; set; }
+    public string? HeaderText { get; set; }
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public decimal TotalQuantity { get; set; }
+    public decimal TotalValue { get; set; }
+    public string Status { get; set; } = "Posted";
+    public bool IsReversal { get; set; }
+    public string? ReversalOfDocumentId { get; set; }
+    public string? PostedBy { get; set; }
+    public DateTime? PostedAt { get; set; }
+    public string Xmin { get; set; } = "0";
+}
+
+public class MaterialDocumentItemEntity : EntityBase
+{
+    public string TenantId { get; set; } = "";
+    public string MaterialDocumentHeaderId { get; set; } = "";
+    public int LineNumber { get; set; }
+    public string MaterialId { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string? BatchNumber { get; set; }
+    public int MovementType { get; set; }
+    public decimal Quantity { get; set; }
+    public string UnitOfMeasure { get; set; } = "EA";
+    public string StockBucket { get; set; } = "Unrestricted";
+    public decimal UnitPrice { get; set; }
+    public decimal ValuationAmount { get; set; }
+    public string? VendorCode { get; set; }
+    public string? VendorName { get; set; }
+    public string? CustomerCode { get; set; }
+    public string? CustomerName { get; set; }
+    public string? ProductionOrderNo { get; set; }
+    public string? PurchaseOrderNo { get; set; }
+    public string? SalesOrderNo { get; set; }
+    public string? CostCenter { get; set; }
+    public string? ProfitCenter { get; set; }
+    public string? GLAccount { get; set; }
+    public string? SpecialStockIndicator { get; set; }
+    public string? ItemText { get; set; }
+    public string? UnloadingPoint { get; set; }
+    public DateTime? ShelfLifeDate { get; set; }
+    public DateTime? ManufactureDate { get; set; }
+    public bool IsReversal { get; set; }
+}
+
+public class StockMovementHistoryEntity : EntityBase
+{
+    public string TenantId { get; set; } = "";
+    public string DocumentNumber { get; set; } = "";
+    public string MaterialDocumentHeaderId { get; set; } = "";
+    public int LineNumber { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public int MovementType { get; set; }
+    public string MovementTypeDescription { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal UnitPrice { get; set; }
+    public decimal TotalValue { get; set; }
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string? BatchNumber { get; set; }
+    public string StockBucket { get; set; } = "Unrestricted";
+    public decimal StockBefore { get; set; }
+    public decimal StockAfter { get; set; }
+    public decimal ValueBefore { get; set; }
+    public decimal ValueAfter { get; set; }
+    public string? Reference { get; set; }
+    public string? PostedBy { get; set; }
+    public DateTime MovementDate { get; set; } = DateTime.UtcNow;
+    public string? VendorCode { get; set; }
+    public string? CustomerCode { get; set; }
+    public string? ProductionOrderNo { get; set; }
+    public string? PurchaseOrderNo { get; set; }
+    public string? SalesOrderNo { get; set; }
+    public string? CostCenter { get; set; }
+    public string Status { get; set; } = "Posted";
+}
+
+public class StockReservationHeaderEntity : EntityBase
+{
+    public string TenantId { get; set; } = "";
+    public string ReservationNumber { get; set; } = "";
+    public DateTime RequirementDate { get; set; } = DateTime.UtcNow.AddDays(7);
+    public string? CostCenter { get; set; }
+    public string? OrderNumber { get; set; }
+    public string? ProductionOrderNo { get; set; }
+    public string? SalesOrderNo { get; set; }
+    public string? WBSElement { get; set; }
+    public string? HeaderText { get; set; }
+    public string ReservationType { get; set; } = "Manual";
+    public decimal TotalReservedQuantity { get; set; }
+    public decimal TotalIssuedQuantity { get; set; }
+    public bool IsCompleted { get; set; }
+    public bool IsDeleted { get; set; }
+    public string Plant { get; set; } = "1000";
+    public string Status { get; set; } = "Active";
+    public string CreatedBy { get; set; } = "";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string? DeletedBy { get; set; }
+    public DateTime? DeletedAt { get; set; }
+}
+
+public class StockReservationItemEntity : EntityBase
+{
+    public string TenantId { get; set; } = "";
+    public string ReservationHeaderId { get; set; } = "";
+    public int LineNumber { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string? BatchNumber { get; set; }
+    public decimal RequiredQuantity { get; set; }
+    public decimal IssuedQuantity { get; set; }
+    public decimal OutstandingQuantity => RequiredQuantity - IssuedQuantity;
+    public string UOM { get; set; } = "EA";
+    public string? ItemText { get; set; }
+    public bool IsCompleted { get; set; }
+    public bool IsDeleted { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class InventoryValuationLedgerEntity : EntityBase
+{
+    public string TenantId { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string? BatchNumber { get; set; }
+    public DateTime ValuationDate { get; set; } = DateTime.UtcNow;
+    public string DocumentNumber { get; set; } = "";
+    public int MovementType { get; set; }
+    public decimal QuantityReceived { get; set; }
+    public decimal ValueReceived { get; set; }
+    public decimal QuantityIssued { get; set; }
+    public decimal ValueIssued { get; set; }
+    public decimal OpeningQuantity { get; set; }
+    public decimal OpeningValue { get; set; }
+    public decimal ClosingQuantity { get; set; }
+    public decimal ClosingValue { get; set; }
+    public decimal MovingAveragePrice { get; set; }
+    public string ValuationClass { get; set; } = "";
+    public string PriceControl { get; set; } = "V";
     public string Status { get; set; } = "Active";
 }

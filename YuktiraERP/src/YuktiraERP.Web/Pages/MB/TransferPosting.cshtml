@@ -1,0 +1,132 @@
+@page
+@model YuktiraERP.Web.Pages.MB.TransferPostingModel
+@{
+    ViewData["Title"] = "MB1B - Transfer Posting";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-arrow-left-right me-2"></i>MB1B - Transfer Posting</h4>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success py-2">@Model.SuccessMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger py-2">@Model.Error</div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-primary text-white"><h6 class="mb-0">Transfer Posting</h6></div>
+    <div class="card-body">
+        <form method="post">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Movement Type</label>
+                <select asp-for="MovementType" class="form-select">
+                    <option value="301">301 - Plant to Plant</option>
+                    <option value="311">311 - SLoc to SLoc</option>
+                    <option value="321">321 - QI to Unrestricted</option>
+                    <option value="322">322 - Unrestricted to QI</option>
+                    <option value="343">343 - Unrestricted to Blocked</option>
+                    <option value="349">349 - Blocked to Unrestricted</option>
+                    <option value="411">411 - Consignment to Unrestricted</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Posting Date</label>
+                <input asp-for="Request.PostingDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Plant (From)</label>
+                <input asp-for="Request.Plant" class="form-control" placeholder="1000" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">SLoc (From)</label>
+                <input asp-for="Request.StorageLocation" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Plant (To)</label>
+                <input asp-for="ToPlant" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">SLoc (To)</label>
+                <input asp-for="ToStorageLocation" class="form-control" />
+            </div>
+        </div>
+
+        <h6>Line Items</h6>
+        <table class="table table-bordered table-sm" id="lineItems">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Material Code</th>
+                    <th>Material Name</th>
+                    <th>Quantity</th>
+                    <th>UOM</th>
+                    <th>Batch</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><input name="Request.Lines[0].MaterialCode" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].MaterialName" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].Quantity" type="number" step="0.001" class="form-control form-control-sm" /></td>
+                    <td><input name="Request.Lines[0].UOM" class="form-control form-control-sm" value="EA" /></td>
+                    <td><input name="Request.Lines[0].BatchNumber" class="form-control form-control-sm" /></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">X</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addLine()"><i class="bi bi-plus me-1"></i>Add Line</button>
+
+        <div class="mt-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Post Transfer</button>
+            <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Result != null && Model.Result.Success)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Document Posted</h6></div>
+        <div class="card-body">
+            <p><strong>Document Number:</strong> @Model.Result.DocumentNumber</p>
+            @if (Model.Result.StockImpacts.Any())
+            {
+                <table class="table table-sm">
+                    <thead><tr><th>Material</th><th>Before</th><th>After</th></tr></thead>
+                    <tbody>
+                        @foreach (var impact in Model.Result.StockImpacts)
+                        {
+                            <tr><td>@impact.MaterialCode</td><td>@impact.QuantityBefore</td><td>@impact.QuantityAfter</td></tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+</div>
+</div>
+
+<script>
+function addLine() {
+    var tbody = document.querySelector('#lineItems tbody');
+    var idx = tbody.rows.length;
+    var row = '<tr><td>' + (idx + 1) + '</td>' +
+        '<td><input name="Request.Lines[' + idx + '].MaterialCode" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].MaterialName" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].Quantity" type="number" step="0.001" class="form-control form-control-sm" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].UOM" class="form-control form-control-sm" value="EA" /></td>' +
+        '<td><input name="Request.Lines[' + idx + '].BatchNumber" class="form-control form-control-sm" /></td>' +
+        '<td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'tr\').remove()">X</button></td></tr>';
+    tbody.insertAdjacentHTML('beforeend', row);
+}
+</script>

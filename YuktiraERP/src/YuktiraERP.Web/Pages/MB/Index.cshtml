@@ -1,0 +1,53 @@
+@page
+@model YuktiraERP.Web.Pages.MB.IndexModel
+@{
+    ViewData["Title"] = "MB - Inventory Transactions";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-box-seam me-2"></i>MB - Inventory Transaction Suite</h4>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white"><h6 class="mb-0">Goods Movements</h6></div>
+            <div class="card-body">
+                <a href="/MB/PostGoodsReceipt" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-arrow-down-circle me-1"></i>MB01 - Goods Receipt</a>
+                <a href="/MB/PostGoodsIssue" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-arrow-up-circle me-1"></i>MB1A - Goods Issue</a>
+                <a href="/MB/TransferPosting" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-arrow-left-right me-1"></i>MB1B - Transfer Posting</a>
+                <a href="/MB/OtherGoodsReceipt" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-plus-circle me-1"></i>MB1C - Other Goods Receipt</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-success text-white"><h6 class="mb-0">Reservations</h6></div>
+            <div class="card-body">
+                <a href="/MB/CreateReservation" class="btn btn-outline-success w-100 mb-2"><i class="bi bi-bookmark-plus me-1"></i>MB21 - Create Reservation</a>
+                <a href="/MB/DisplayReservation" class="btn btn-outline-success w-100 mb-2"><i class="bi bi-bookmark me-1"></i>MB23/24 - Display/Change</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info text-white"><h6 class="mb-0">Document Display</h6></div>
+            <div class="card-body">
+                <a href="/MB/DisplayMaterialDocument" class="btn btn-outline-info w-100 mb-2"><i class="bi bi-file-earmark-text me-1"></i>MB03 - Material Document</a>
+                <a href="/MB/DisplayReservation" class="btn btn-outline-info w-100 mb-2"><i class="bi bi-file-earmark-text me-1"></i>MB23 - Display Reservation</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-warning text-dark"><h6 class="mb-0">Reports</h6></div>
+            <div class="card-body">
+                <a href="/MB/MB51Report" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-list-ul me-1"></i>MB51 - Document List</a>
+                <a href="/MB/MB52StockOverview" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-bar-chart me-1"></i>MB52 - Stock Overview</a>
+                <a href="/MB/MB5BHistorical" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-calendar-range me-1"></i>MB5B - Historical Stock</a>
+                <a href="/MB/MB5LReconciliation" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-balance me-1"></i>MB5L - MM/FI Reconciliation</a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>

@@ -259,6 +259,13 @@ public class YuktiraDbContext : DbContext
     // Phase 4.2: UD Reversal & Stock Reversion
     public DbSet<StockBalanceEntity> StockBalances => Set<StockBalanceEntity>();
     public DbSet<InspectionLotAuditEntity> InspectionLotAudits => Set<InspectionLotAuditEntity>();
+    // Phase 5: MB Inventory Transaction Suite
+    public DbSet<MaterialDocumentHeaderEntity> MaterialDocumentHeaders => Set<MaterialDocumentHeaderEntity>();
+    public DbSet<MaterialDocumentItemEntity> MaterialDocumentItems => Set<MaterialDocumentItemEntity>();
+    public DbSet<StockMovementHistoryEntity> StockMovementHistory => Set<StockMovementHistoryEntity>();
+    public DbSet<StockReservationHeaderEntity> StockReservationHeaders => Set<StockReservationHeaderEntity>();
+    public DbSet<StockReservationItemEntity> StockReservationItems => Set<StockReservationItemEntity>();
+    public DbSet<InventoryValuationLedgerEntity> InventoryValuationLedger => Set<InventoryValuationLedgerEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

@@ -1,0 +1,81 @@
+@page
+@model YuktiraERP.Web.Pages.MB.MB5LReconciliationModel
+@{
+    ViewData["Title"] = "MB5L - MM/FI Reconciliation";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-balance me-2"></i>MB5L - MM/FI Reconciliation</h4>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-warning text-dark"><h6 class="mb-0">Filters</h6></div>
+    <div class="card-body">
+        <form method="get">
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label class="form-label">Material Code</label>
+                <input asp-for="MaterialCode" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Plant</label>
+                <input asp-for="Plant" class="form-control" />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+                <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Data != null && Model.Data.Any())
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Reconciliation Results (@Model.Data.Count items)</h6></div>
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Material</th>
+                        <th>Plant</th>
+                        <th>SLoc</th>
+                        <th>MM Qty</th>
+                        <th>MM Value</th>
+                        <th>FI Debit</th>
+                        <th>FI Credit</th>
+                        <th>FI Balance</th>
+                        <th>Difference</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Data)
+                    {
+                        <tr class="@(r.IsReconciled ? "" : "table-danger")">
+                            <td>@r.MaterialCode</td>
+                            <td>@r.Plant</td>
+                            <td>@r.StorageLocation</td>
+                            <td>@r.MmStockQuantity</td>
+                            <td>@r.MmStockValue.ToString("N2")</td>
+                            <td>@r.FiGlDebit.ToString("N2")</td>
+                            <td>@r.FiGlCredit.ToString("N2")</td>
+                            <td>@r.FiGlBalance.ToString("N2")</td>
+                            <td>@r.Difference.ToString("N2")</td>
+                            <td>
+                                @if (r.IsReconciled) { <span class="badge bg-success">Reconciled</span> }
+                                else { <span class="badge bg-danger">Discrepancy</span> }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (Model.Data != null)
+{
+    <div class="alert alert-info">No data found matching criteria.</div>
+}
+</div>
+</div>

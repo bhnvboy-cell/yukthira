@@ -1,0 +1,110 @@
+@page
+@model YuktiraERP.Web.Pages.MB.MB52StockOverviewModel
+@{
+    ViewData["Title"] = "MB52 - Stock Overview";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-bar-chart me-2"></i>MB52 - Warehouse Stock Overview</h4>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-warning text-dark"><h6 class="mb-0">Filters</h6></div>
+    <div class="card-body">
+        <form method="get">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Material Code</label>
+                <input asp-for="Filter.MaterialCode" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Plant</label>
+                <input asp-for="Filter.Plant" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Storage Location</label>
+                <input asp-for="Filter.StorageLocation" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Group By</label>
+                <select asp-for="Filter.GroupBy" class="form-select">
+                    <option value="0">Material</option>
+                    <option value="1">Plant</option>
+                    <option value="2">Storage Location</option>
+                    <option value="3">Batch</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Batch</label>
+                <input asp-for="Filter.BatchNumber" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">
+                    <input asp-for="Filter.IncludeZeroStock" type="checkbox" /> Include Zero Stock
+                </label>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+                <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Stocks != null && Model.Stocks.Any())
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Stock Overview (@Model.Stocks.Count items)</h6></div>
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-sm table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Material</th>
+                        <th>Name</th>
+                        <th>Plant</th>
+                        <th>SLoc</th>
+                        <th>Unrestricted</th>
+                        <th>QI</th>
+                        <th>Blocked</th>
+                        <th>Total</th>
+                        <th>MAP</th>
+                        <th>Value</th>
+                        <th>UOM</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.Stocks)
+                    {
+                        <tr class="@(s.IsBelowMinStock ? "table-warning" : s.IsAboveMaxStock ? "table-danger" : "")">
+                            <td>@s.MaterialCode</td>
+                            <td>@s.MaterialName</td>
+                            <td>@s.Plant</td>
+                            <td>@s.StorageLocation</td>
+                            <td>@s.UnrestrictedQty</td>
+                            <td>@s.QualityInspectionQty</td>
+                            <td>@s.BlockedQty</td>
+                            <td><strong>@s.TotalQty</strong></td>
+                            <td>@s.UnitPrice.ToString("N2")</td>
+                            <td>@s.TotalValue.ToString("N2")</td>
+                            <td>@s.UOM</td>
+                            <td>
+                                @if (s.IsBelowMinStock) { <span class="badge bg-danger">Below Min</span> }
+                                else if (s.IsAboveMaxStock) { <span class="badge bg-warning">Above Max</span> }
+                                else { <span class="badge bg-success">OK</span> }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (Model.Stocks != null)
+{
+    <div class="alert alert-info">No stock found matching criteria.</div>
+}
+</div>
+</div>

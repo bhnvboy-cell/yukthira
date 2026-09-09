@@ -165,6 +165,10 @@ public static class InfrastructureRegistration
         services.AddScoped<IPricingEngineService, PricingEngineService>();
         services.AddScoped<ISalesBillingService, SalesBillingService>();
         services.AddScoped<IPipelineDiagnosticService, PipelineDiagnosticService>();
+        services.AddScoped<IInventoryMovementService, InventoryMovementService>();
+        services.AddScoped<IStockReservationService, StockReservationService>();
+        services.AddScoped<IInventoryReportingService, InventoryReportingService>();
+        services.AddScoped<IInventoryValuationService, InventoryValuationService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<ITransactionSequenceService, TransactionSequenceService>();
         services.AddScoped<CacheService>();

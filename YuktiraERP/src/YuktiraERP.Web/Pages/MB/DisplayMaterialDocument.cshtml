@@ -1,0 +1,62 @@
+@page
+@model YuktiraERP.Web.Pages.MB.DisplayMaterialDocumentModel
+@{
+    ViewData["Title"] = "MB03 - Material Document";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-file-earmark-text me-2"></i>MB03 - Display Material Document</h4>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger py-2">@Model.Error</div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-info text-white"><h6 class="mb-0">Search Document</h6></div>
+    <div class="card-body">
+        <form method="get">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <label class="form-label">Document Number</label>
+                <input asp-for="DocumentNumber" class="form-control" placeholder="Enter material document number" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Document != null)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Document Details</h6></div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"><strong>Document Number:</strong> @Model.Document.DocumentNumber</div>
+                <div class="col-md-4"><strong>Posting Date:</strong> @Model.Document.PostingDate.ToString("dd/MM/yyyy")</div>
+                <div class="col-md-4"><strong>Movement Type:</strong> @Model.Document.MovementType - @Model.Document.MovementTypeDescription</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-4"><strong>Material:</strong> @Model.Document.MaterialCode - @Model.Document.MaterialName</div>
+                <div class="col-md-4"><strong>Plant:</strong> @Model.Document.Plant</div>
+                <div class="col-md-4"><strong>SLoc:</strong> @Model.Document.StorageLocation</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-4"><strong>Quantity:</strong> @Model.Document.Quantity @Model.Document.UOM</div>
+                <div class="col-md-4"><strong>Unit Price:</strong> @Model.Document.UnitPrice.ToString("N2")</div>
+                <div class="col-md-4"><strong>Total Value:</strong> @Model.Document.TotalValue.ToString("N2")</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-4"><strong>Batch:</strong> @(Model.Document.BatchNumber ?? "-")</div>
+                <div class="col-md-4"><strong>Stock Bucket:</strong> @Model.Document.StockBucket</div>
+                <div class="col-md-4"><strong>Posted By:</strong> @(Model.Document.PostedBy ?? "-")</div>
+            </div>
+        </div>
+    </div>
+}
+<a href="/MB/Index" class="btn btn-secondary">Back</a>
+</div>
+</div>

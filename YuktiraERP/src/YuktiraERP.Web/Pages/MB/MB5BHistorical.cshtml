@@ -1,0 +1,86 @@
+@page
+@model YuktiraERP.Web.Pages.MB.MB5BHistoricalModel
+@{
+    ViewData["Title"] = "MB5B - Historical Stock Values";
+}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<h4 class="mb-3"><i class="bi bi-calendar-range me-2"></i>MB5B - Historical Stock Values</h4>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-warning text-dark"><h6 class="mb-0">Filters</h6></div>
+    <div class="card-body">
+        <form method="get">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Material Code</label>
+                <input asp-for="MaterialCode" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Plant</label>
+                <input asp-for="Plant" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">From Date</label>
+                <input asp-for="FromDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">To Date</label>
+                <input asp-for="ToDate" type="date" class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
+                <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Data != null)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-success text-white"><h6 class="mb-0">Historical Stock - @Model.Data.MaterialCode</h6></div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3"><strong>Opening Qty:</strong> @Model.Data.OpeningQuantity</div>
+                <div class="col-md-3"><strong>Closing Qty:</strong> @Model.Data.ClosingQuantity</div>
+                <div class="col-md-3"><strong>Receipts:</strong> @Model.Data.ReceiptQuantity</div>
+                <div class="col-md-3"><strong>Issues:</strong> @Model.Data.IssueQuantity</div>
+            </div>
+
+            @if (Model.Data.DailyMovements.Any())
+            {
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Mvt Type</th>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Value</th>
+                            <th>Running Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model.Data.DailyMovements)
+                        {
+                            <tr>
+                                <td>@m.Date.ToString("dd/MM/yyyy")</td>
+                                <td>@m.MovementType</td>
+                                <td>@m.Description</td>
+                                <td>@m.Quantity</td>
+                                <td>@m.Value.ToString("N2")</td>
+                                <td>@m.RunningBalance</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+</div>
+</div>
