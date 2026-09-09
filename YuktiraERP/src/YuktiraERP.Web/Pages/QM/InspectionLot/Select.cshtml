@@ -1,0 +1,367 @@
+@page
+@model YuktiraERP.Web.Pages.QM.InspectionLot.SelectModel
+@{
+    ViewData["Title"] = "QA32 - Inspection Lot Selection";
+    var f = Model.Filter;
+}
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+
+<style>
+    .qa32-wrapper { max-width: 1400px; margin: 0 auto; }
+    .qa32-toolbar {
+        display: flex; justify-content: space-between; align-items: center;
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        color: #fff; padding: 12px 20px; border-radius: 6px 6px 0 0; flex-wrap: wrap; gap: 8px;
+    }
+    .qa32-toolbar h3 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .qa32-toolbar .badge { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; }
+    .qa32-toolbar .actions { display: flex; gap: 6px; }
+    .qa32-toolbar .btn-toolbar {
+        background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+        color: #fff; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 0.82rem;
+        transition: background 0.2s;
+    }
+    .qa32-toolbar .btn-toolbar:hover { background: rgba(255,255,255,0.3); }
+    .qa32-toolbar .btn-toolbar.active { background: #4caf50; border-color: #4caf50; }
+    .qa32-filter-card {
+        background: #fff; border: 1px solid #e0e0e0; border-top: none;
+        border-radius: 0 0 6px 6px; padding: 20px; margin-bottom: 16px;
+    }
+    .qa32-section-title {
+        font-size: 0.85rem; font-weight: 700; color: #1a237e; text-transform: uppercase;
+        letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 6px;
+        border-bottom: 2px solid #e8eaf6;
+    }
+    .qa32-field-row {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;
+    }
+    .qa32-field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .qa32-field-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .qa32-field label {
+        display: block; font-size: 0.75rem; font-weight: 600; color: #555;
+        margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .qa32-field label .lbl-sub { font-weight: 400; color: #888; text-transform: none; }
+    .qa32-field input, .qa32-field select {
+        width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px;
+        font-size: 0.85rem; background: #fafafa; transition: border-color 0.2s;
+    }
+    .qa32-field input:focus, .qa32-field select:focus {
+        outline: none; border-color: #3f51b5; background: #fff;
+    }
+    .qa32-field-pair {
+        display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: end;
+    }
+    .qa32-field-pair .sep { padding-bottom: 8px; color: #999; font-size: 0.8rem; }
+    .qa32-radio-group { display: flex; gap: 16px; margin-top: 4px; }
+    .qa32-radio-group label { font-size: 0.82rem; font-weight: 500; color: #333; cursor: pointer; display: flex; align-items: center; gap: 5px; text-transform: none; }
+    .qa32-radio-group input[type="radio"] { width: auto; accent-color: #3f51b5; }
+    .qa32-list-settings {
+        background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+    .qa32-list-settings .qa32-field-row { margin-bottom: 0; }
+    .qa32-results-card {
+        background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;
+    }
+    .qa32-results-header {
+        background: #e8eaf6; padding: 10px 16px; display: flex; justify-content: space-between;
+        align-items: center; border-bottom: 1px solid #c5cae9;
+    }
+    .qa32-results-header h4 { margin: 0; font-size: 0.9rem; color: #1a237e; }
+    .qa32-results-header .count { font-size: 0.8rem; color: #666; }
+    .qa32-table-wrap { overflow-x: auto; }
+    .qa32-table {
+        width: 100%; border-collapse: collapse; font-size: 0.82rem;
+    }
+    .qa32-table thead th {
+        background: #f5f5f5; padding: 8px 12px; text-align: left; font-weight: 600;
+        color: #555; border-bottom: 2px solid #ddd; white-space: nowrap; position: sticky; top: 0;
+    }
+    .qa32-table tbody td {
+        padding: 7px 12px; border-bottom: 1px solid #eee; white-space: nowrap;
+    }
+    .qa32-table tbody tr:hover { background: #e8eaf6; }
+    .qa32-table tbody tr.selected { background: #c5cae9; }
+    .qa32-status {
+        display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem;
+        font-weight: 600; text-transform: uppercase;
+    }
+    .qa32-status.created { background: #e3f2fd; color: #1565c0; }
+    .qa32-status.testing { background: #fff3e0; color: #e65100; }
+    .qa32-status.completed { background: #e8f5e9; color: #2e7d32; }
+    .qa32-status.ud-made { background: #f3e5f5; color: #7b1fa2; }
+    .qa32-status.closed { background: #eceff1; color: #455a64; }
+    .qa32-ud-badge { font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .qa32-ud-badge.yes { background: #c8e6c9; color: #2e7d32; }
+    .qa32-ud-badge.no { background: #ffcdd2; color: #c62828; }
+    .qa32-action-btn {
+        padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; background: #fff;
+        cursor: pointer; font-size: 0.75rem; text-decoration: none; color: #333;
+    }
+    .qa32-action-btn:hover { background: #e8eaf6; border-color: #3f51b5; }
+    .qa32-empty {
+        text-align: center; padding: 40px 20px; color: #999;
+    }
+    .qa32-empty i { font-size: 2rem; display: block; margin-bottom: 10px; }
+    @@media print {
+        .qa32-toolbar, .qa32-filter-card, .qa32-list-settings, .qa32-action-btn { display: none !important; }
+        .qa32-results-card { border: none; }
+        .qa32-table thead th { background: #f0f0f0 !important; }
+    }
+</style>
+
+<div class="qa32-wrapper">
+    <form method="post" id="qa32Form">
+        <div class="qa32-toolbar">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <h3><i class="bi bi-clipboard-data me-2"></i>Inspection Lot Selection</h3>
+                <span class="badge">QA32</span>
+            </div>
+            <div class="actions">
+                <button type="submit" asp-page-handler="" class="btn-toolbar" title="Execute search (F8)">
+                    <i class="bi bi-play-fill me-1"></i>Execute
+                </button>
+                <button type="submit" asp-page-handler="Clear" class="btn-toolbar" title="Clear all filters">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                </button>
+                <button type="button" class="btn-toolbar" onclick="window.print()" title="Print (Ctrl+P)">
+                    <i class="bi bi-printer me-1"></i>Print
+                </button>
+                <button type="button" class="btn-toolbar" title="Download">
+                    <i class="bi bi-download me-1"></i>Export
+                </button>
+            </div>
+        </div>
+
+        <div class="qa32-filter-card">
+            <div class="qa32-section-title"><i class="bi bi-funnel me-1"></i>Selection Criteria</div>
+
+            <div class="qa32-section-title" style="margin-top:8px;font-size:0.78rem;color:#666;">
+                <i class="bi bi-calendar3 me-1"></i>Date Ranges
+            </div>
+            <div class="qa32-field-row cols-3">
+                <div class="qa32-field">
+                    <label>Lot Created</label>
+                    <div class="qa32-field-pair">
+                        <input asp-for="Filter.LotCreatedFrom" type="date" />
+                        <span class="sep">to</span>
+                        <input asp-for="Filter.LotCreatedTo" type="date" />
+                    </div>
+                </div>
+                <div class="qa32-field">
+                    <label>Insp. Start Date</label>
+                    <div class="qa32-field-pair">
+                        <input asp-for="Filter.InspStartDateFrom" type="date" />
+                        <span class="sep">to</span>
+                        <input asp-for="Filter.InspStartDateTo" type="date" />
+                    </div>
+                </div>
+                <div class="qa32-field">
+                    <label>End of Inspection</label>
+                    <div class="qa32-field-pair">
+                        <input asp-for="Filter.EndOfInspFrom" type="date" />
+                        <span class="sep">to</span>
+                        <input asp-for="Filter.EndOfInspTo" type="date" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="qa32-section-title" style="margin-top:14px;font-size:0.78rem;color:#666;">
+                <i class="bi bi-box-seam me-1"></i>Master Data
+            </div>
+            <div class="qa32-field-row cols-3">
+                <div class="qa32-field">
+                    <label>Plant <span class="lbl-sub">(From / To)</span></label>
+                    <div class="qa32-field-pair">
+                        <input asp-for="Filter.PlantFrom" placeholder="From" maxlength="4" />
+                        <span class="sep">to</span>
+                        <input asp-for="Filter.PlantTo" placeholder="To" maxlength="4" />
+                    </div>
+                </div>
+                <div class="qa32-field">
+                    <label>Inspection Lot Origin</label>
+                    <select asp-for="Filter.InspLotOrigin">
+                        <option value="">-- All Origins --</option>
+                        <option value="01">01 - Goods Receipt Insp.</option>
+                        <option value="02">02 - Production / In-Process</option>
+                        <option value="03">03 - Final Inspection</option>
+                        <option value="04">04 - Source Inspection</option>
+                        <option value="05">05 - Stock Transfer Insp.</option>
+                        <option value="06">06 - Production Completion</option>
+                        <option value="08">08 - Network Activity</option>
+                    </select>
+                </div>
+                <div class="qa32-field">
+                    <label>Material Code <span class="lbl-sub">(From / To)</span></label>
+                    <div class="qa32-field-pair">
+                        <input asp-for="Filter.MaterialCodeFrom" placeholder="From" />
+                        <span class="sep">to</span>
+                        <input asp-for="Filter.MaterialCodeTo" placeholder="To" />
+                    </div>
+                </div>
+            </div>
+            <div class="qa32-field-row cols-4">
+                <div class="qa32-field">
+                    <label>Batch Number</label>
+                    <input asp-for="Filter.BatchNumber" placeholder="Exact match" />
+                </div>
+                <div class="qa32-field">
+                    <label>Material Class</label>
+                    <input asp-for="Filter.MaterialClass" placeholder="Contains" />
+                </div>
+                <div class="qa32-field">
+                    <label>Assigned Inspector</label>
+                    <input asp-for="Filter.RefFieldMonitor" placeholder="Inspector ID" />
+                </div>
+                <div class="qa32-field">
+                    <label>Max Hits</label>
+                    <input asp-for="Filter.MaxHits" type="number" min="1" max="500" />
+                </div>
+            </div>
+        </div>
+
+        <div class="qa32-list-settings">
+            <div class="qa32-section-title" style="margin-bottom:10px;"><i class="bi bi-gear me-1"></i>List Settings</div>
+            <div class="qa32-field-row">
+                <div class="qa32-field">
+                    <label>Usage Decision Status</label>
+                    <div class="qa32-radio-group">
+                        <label><input type="radio" asp-for="Filter.UsageDecisionFilter" value="AllLots" /> All Lots</label>
+                        <label><input type="radio" asp-for="Filter.UsageDecisionFilter" value="WithoutUsageDecision" /> Without UD</label>
+                        <label><input type="radio" asp-for="Filter.UsageDecisionFilter" value="WithUsageDecision" /> With UD</label>
+                    </div>
+                </div>
+                <div class="qa32-field">
+                    <label>Layout</label>
+                    <select asp-for="Filter.Layout">
+                        <option value="">Default</option>
+                        <option value="standard">Standard</option>
+                        <option value="detailed">Detailed</option>
+                        <option value="compact">Compact</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.HasSearched && Model.Results != null)
+    {
+        <div class="qa32-results-card">
+            <div class="qa32-results-header">
+                <h4><i class="bi bi-table me-1"></i>Inspection Lot Overview</h4>
+                <span class="count">
+                    @Model.Results.ReturnedCount of @Model.Results.TotalCount shown
+                    @if (Model.Results.HasMore) { <text>(limited by Max Hits: @Model.Results.MaxHits)</text> }
+                </span>
+            </div>
+            <div class="qa32-table-wrap">
+                @if (Model.Results.Results.Count == 0)
+                {
+                    <div class="qa32-empty">
+                        <i class="bi bi-inbox"></i>
+                        <p>No inspection lots match the selected criteria.</p>
+                        <p style="font-size:0.8rem;">Adjust filters and execute again.</p>
+                    </div>
+                }
+                else
+                {
+                    <table class="qa32-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px"><input type="checkbox" id="selectAll" onclick="toggleAll(this)" /></th>
+                                <th>Lot #</th>
+                                <th>Material</th>
+                                <th>Plant</th>
+                                <th>Origin</th>
+                                <th>Batch</th>
+                                <th>Qty</th>
+                                <th>UOM</th>
+                                <th>Inspector</th>
+                                <th>Plan</th>
+                                <th>Sample</th>
+                                <th>Inspected</th>
+                                <th>Status</th>
+                                <th>UD Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lot in Model.Results.Results)
+                            {
+                                <tr>
+                                    <td><input type="checkbox" class="lot-cb" value="@lot.Id" /></td>
+                                    <td><strong>@lot.LotNumber</strong></td>
+                                    <td>@lot.MaterialCode<br /><small class="text-muted">@lot.MaterialName</small></td>
+                                    <td>@lot.Plant</td>
+                                    <td>@lot.InspectionType</td>
+                                    <td>@lot.BatchNumber</td>
+                                    <td>@lot.Quantity</td>
+                                    <td>@lot.BaseUOM</td>
+                                    <td>@lot.AssignedInspector</td>
+                                    <td>@lot.InspectionPlanID</td>
+                                    <td>@lot.SampleSize</td>
+                                    <td>@lot.Inspected</td>
+                                    <td>
+                                        @{
+                                            var statusClass = lot.Status.ToLower() switch
+                                            {
+                                                "created" => "created",
+                                                "in testing" => "testing",
+                                                "completed" => "completed",
+                                                "ud made" => "ud-made",
+                                                "closed" => "closed",
+                                                _ => "created"
+                                            };
+                                        }
+                                        <span class="qa32-status @statusClass">@lot.Status</span>
+                                    </td>
+                                    <td>
+                                        @if (lot.HasUsageDecision)
+                                        {
+                                            <span class="qa32-ud-badge yes">@lot.UDCode</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="qa32-ud-badge no">No UD</span>
+                                        }
+                                    </td>
+                                    <td>@lot.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="/QM/InspectionLot/Display?id=@lot.Id" class="qa32-action-btn" title="Display lot">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="/QM/InspectionLot/Edit?id=@lot.Id" class="qa32-action-btn" title="Edit lot">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="/QM/UsageDecision/Create?lotNumber=@lot.LotNumber" class="qa32-action-btn" title="Record Usage Decision"
+                                               style="@(lot.HasUsageDecision ? "opacity:0.4;pointer-events:none;" : "")">
+                                                <i class="bi bi-check2-circle"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function toggleAll(src) {
+            document.querySelectorAll('.lot-cb').forEach(cb => cb.checked = src.checked);
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F8') {
+                e.preventDefault();
+                document.getElementById('qa32Form').submit();
+            }
+        });
+    </script>
+}

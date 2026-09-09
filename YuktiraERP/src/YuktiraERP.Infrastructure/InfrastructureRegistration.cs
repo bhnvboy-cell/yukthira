@@ -134,6 +134,7 @@ public static class InfrastructureRegistration
         services.AddScoped<ITCodeCustomizationService, TCodeCustomizationService>();
         services.AddScoped<IBatchService, BatchService>();
         services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IStockOverviewService, StockOverviewService>();
         services.AddScoped<IGoodsMovementService, GoodsMovementService>();
         services.AddScoped<YuktiraERP.Core.Interfaces.IMovementTypeEngineService, MovementTypeEngineService>();
         services.AddScoped<YuktiraERP.Infrastructure.Services.IMovementTypeEngineService, MovementTypeEngineService>();
@@ -148,6 +149,7 @@ public static class InfrastructureRegistration
         services.AddScoped<YuktiraERP.Infrastructure.Services.IInspectionResultService, InspectionResultService>();
         services.AddScoped<IQMMasterDataService, QMMasterDataService>();
         services.AddScoped<IQMInspectionConfigService, QMInspectionConfigService>();
+        services.AddScoped<IQualityManagementService, QualityManagementService>();
         services.AddScoped<ICustomerComplaintReturnService, CustomerComplaintReturnService>();
         services.AddScoped<ISoxComplianceService, SoxComplianceService>();
         services.AddScoped<IUniversalJournalService, UniversalJournalService>();

@@ -82,6 +82,17 @@ public class GoodsMovementService : IGoodsMovementService
             Status = "Posted"
         };
         _db.StockMovements.Add(movement);
+
+        var stockItem = await _db.StockItems.FirstOrDefaultAsync(s =>
+            s.MaterialName == materialName);
+        if (stockItem != null)
+        {
+            var deduct = Math.Min(quantity, stockItem.Quantity);
+            stockItem.Quantity -= deduct;
+            stockItem.Value -= deduct * material.Price;
+            stockItem.UpdatedAt = DateTime.UtcNow;
+        }
+
         await _db.SaveChangesAsync();
 
         return new GoodsMovementResult
@@ -138,6 +149,38 @@ public class GoodsMovementService : IGoodsMovementService
             Status = "Posted"
         };
         _db.StockMovements.Add(movement);
+
+        var bin = string.IsNullOrWhiteSpace(storageLocation) ? "A-01" : storageLocation;
+        var lot = string.IsNullOrWhiteSpace(batchNo) ? $"LOT-{DateTime.UtcNow:yyyyMMdd}" : batchNo;
+        var tenantId = await _db.StockItems
+            .Where(s => s.MaterialName == materialName)
+            .Select(s => s.TenantId)
+            .FirstOrDefaultAsync();
+        if (tenantId == Guid.Empty) tenantId = material.Id;
+        var existingStock = await _db.StockItems.FirstOrDefaultAsync(s =>
+            s.MaterialName == materialName && s.Bin == bin && s.Lot == lot && s.TenantId == tenantId);
+        if (existingStock != null)
+        {
+            existingStock.Quantity += quantity;
+            existingStock.Value += quantity * material.Price;
+            existingStock.UpdatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            _db.StockItems.Add(new StockItemEntity
+            {
+                TenantId = material.Id,
+                Bin = bin,
+                MaterialName = materialName,
+                Lot = lot,
+                Quantity = quantity,
+                UOM = material.UOM,
+                Value = quantity * material.Price,
+                MinStock = 0,
+                MaxStock = 0
+            });
+        }
+
         await _db.SaveChangesAsync();
 
         return new GoodsMovementResult

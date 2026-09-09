@@ -1,21 +1,303 @@
 @page
 @model YuktiraERP.Web.Pages.MM.StockOverviewModel
-@using YuktiraERP.Infrastructure.Data.Entities
-@{ ViewData["Title"] = "Stock Overview"; }
-<div class="d-flex justify-content-between align-items-center mb-3">
-<h2><i class="bi bi-box-seam me-2"></i>Stock Overview</h2>
-</div>
-<div class="card"><div class="card-body">
-<div class="table-responsive">
-<table class="table table-hover table-sm datatable">
-<thead><tr><th>Bin</th><th>Material</th><th>Lot</th><th>Quantity</th><th>UOM</th><th>Value</th><th>Min Stock</th><th>Max Stock</th></tr></thead>
-<tbody>
-@foreach (var s in Model.StockItems)
-{
-<tr>
-<td>@s.Bin</td><td>@s.MaterialName</td><td>@s.Lot</td><td>@s.Quantity</td><td>@s.UOM</td><td>@s.Value.ToString("C2")</td>
-<td>@s.MinStock</td><td>@s.MaxStock</td>
-</tr>
+@{
+    ViewData["Title"] = "MMBE - Stock Overview: Basic List";
+    var r = Model.Result;
 }
-</tbody></table>
-</div></div></div>
+
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+
+<style>
+    .mmbe-header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #fff; padding: 20px 24px; border-radius: 8px; margin-bottom: 16px; }
+    .mmbe-header h2 { margin: 0 0 4px 0; font-size: 18px; font-weight: 600; }
+    .mmbe-header p { margin: 0; font-size: 12px; opacity: 0.7; }
+    .mmbe-filter { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+    .mmbe-filter .filter-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; align-items: end; }
+    .mmbe-filter label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 4px; display: block; }
+    .mmbe-filter input, .mmbe-filter select { font-size: 13px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; }
+    .mmbe-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .mmbe-toolbar button { font-size: 12px; padding: 6px 14px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+    .mmbe-toolbar button:hover { background: #f1f5f9; }
+    .mmbe-toolbar .btn-primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+    .mmbe-toolbar .btn-primary:hover { background: #4338ca; }
+    .mmbe-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .mmbe-kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 14px; text-align: center; }
+    .mmbe-kpi .kpi-val { font-size: 20px; font-weight: 700; color: #1e293b; }
+    .mmbe-kpi .kpi-label { font-size: 10px; text-transform: uppercase; color: #64748b; margin-top: 2px; }
+    .mmbe-kpi.green { border-left: 3px solid #22c55e; }
+    .mmbe-kpi.blue { border-left: 3px solid #3b82f6; }
+    .mmbe-kpi.amber { border-left: 3px solid #f59e0b; }
+    .mmbe-kpi.purple { border-left: 3px solid #8b5cf6; }
+
+    .mmbe-tree { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .mmbe-tree th { background: #1e293b; color: #fff; padding: 8px 10px; text-align: right; font-weight: 600; font-size: 11px; text-transform: uppercase; position: sticky; top: 0; z-index: 2; white-space: nowrap; }
+    .mmbe-tree th:first-child { text-align: left; min-width: 320px; position: sticky; left: 0; z-index: 3; }
+    .mmbe-tree td { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; text-align: right; white-space: nowrap; }
+    .mmbe-tree td:first-child { text-align: left; position: sticky; left: 0; background: inherit; z-index: 1; }
+    .mmbe-tree tr:hover td { background: #f8fafc; }
+    .mmbe-tree tr.level-client td:first-child { font-weight: 700; background: #f0f9ff; }
+    .mmbe-tree tr.level-plant td:first-child { font-weight: 600; background: #f0fdf4; padding-left: 24px; }
+    .mmbe-tree tr.level-sl td:first-child { font-weight: 500; background: #fffbeb; padding-left: 44px; }
+    .mmbe-tree tr.level-batch td:first-child { font-weight: 400; padding-left: 64px; }
+    .mmbe-tree .toggle { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px; }
+    .mmbe-tree .toggle i { font-size: 10px; transition: transform 0.15s; width: 14px; text-align: center; }
+    .mmbe-tree .toggle.collapsed i { transform: rotate(-90deg); }
+    .mmbe-tree .badge { font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; font-weight: 600; }
+    .mmbe-tree .badge-plant { background: #dcfce7; color: #166534; }
+    .mmbe-tree .badge-sl { background: #fef3c7; color: #92400e; }
+    .mmbe-tree .badge-batch { background: #e0e7ff; color: #3730a3; }
+    .mmbe-tree .zero { color: #cbd5e1; }
+    .mmbe-tree .total-col { font-weight: 700; color: #1e293b; }
+    .mmbe-tree tr.subtotal td { background: #f8fafc; font-weight: 600; border-top: 2px solid #e2e8f0; }
+
+    .mmbe-tree-wrapper { max-height: calc(100vh - 380px); overflow: auto; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; }
+</style>
+
+<div class="mmbe-header">
+    <h2><i class="bi bi-box-seam me-2"></i>Stock Overview: Basic List</h2>
+    <p>TCode MMBE | Multi-Level Hierarchical Inventory Balances</p>
+</div>
+
+<form method="post" id="mmbeForm">
+    <div class="mmbe-filter">
+        <div class="filter-row">
+            <div>
+                <label>Material Code / Name</label>
+                <input asp-for="Filter.MaterialCode" class="form-control" placeholder="e.g. RAW-01 or Paracetamol" />
+            </div>
+            <div>
+                <label>Plant</label>
+                <input asp-for="Filter.PlantId" class="form-control" placeholder="e.g. 1701" />
+            </div>
+            <div>
+                <label>Storage Location</label>
+                <input asp-for="Filter.StorageLocationId" class="form-control" placeholder="e.g. SL-02" />
+            </div>
+            <div>
+                <label>Batch Number</label>
+                <input asp-for="Filter.BatchNumber" class="form-control" placeholder="e.g. BATCH-PARA-2026-001" />
+            </div>
+            <div>
+                <label>&nbsp;</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input asp-for="Filter.IncludeZeroStocks" type="checkbox" style="width:16px;height:16px;" />
+                    <label for="Filter_IncludeZeroStocks" style="text-transform:none;font-size:12px;color:#334155;">Include Zero Stocks</label>
+                </div>
+            </div>
+            <div>
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-primary" style="font-size:12px;padding:6px 16px;">
+                    <i class="bi bi-search"></i> Execute (F8)
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="mmbe-toolbar">
+    <button onclick="window.location.href='/MM/StockOverview'" title="New Selection"><i class="bi bi-arrow-clockwise"></i> New Selection</button>
+    <button onclick="expandAll()" title="Expand All"><i class="bi bi-expand"></i> Expand All</button>
+    <button onclick="collapseAll()" title="Collapse All"><i class="bi bi-arrows-collapse"></i> Collapse All</button>
+    <button onclick="exportCSV()" title="Export CSV"><i class="bi bi-download"></i> Export</button>
+</div>
+
+<div class="mmbe-kpis">
+    <div class="mmbe-kpi green">
+        <div class="kpi-val">@r.GrandTotalQuantity.ToString("N2")</div>
+        <div class="kpi-label">Total Quantity</div>
+    </div>
+    <div class="mmbe-kpi blue">
+        <div class="kpi-val">@r.TotalMaterials</div>
+        <div class="kpi-label">Materials</div>
+    </div>
+    <div class="mmbe-kpi amber">
+        <div class="kpi-val">@r.TotalStorageLocations</div>
+        <div class="kpi-label">Storage Locations</div>
+    </div>
+    <div class="mmbe-kpi purple">
+        <div class="kpi-val">@r.TotalBatches</div>
+        <div class="kpi-label">Batches</div>
+    </div>
+</div>
+
+<div class="mmbe-tree-wrapper">
+    <table class="mmbe-tree" id="mmbeTree">
+        <thead>
+            <tr>
+                <th>Level / Entity</th>
+                <th>Unrestricted Use</th>
+                <th>Qual. Inspection</th>
+                <th>Reserved</th>
+                <th>Receipt Resv.</th>
+                <th>Sched. Delivery</th>
+                <th>Returns</th>
+                <th>Blocked</th>
+                <th>Transfer (Plant)</th>
+                <th>Transfer (SL)</th>
+                <th>Total Qty</th>
+                <th>Unit Price</th>
+                <th>Total Value</th>
+            </tr>
+        </thead>
+        <tbody id="mmbeBody">
+            @foreach (var node in r.Nodes)
+            {
+                var levelClass = node.Level switch
+                {
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Client => "level-client",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Plant => "level-plant",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.StorageLocation => "level-sl",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Batch => "level-batch",
+                    _ => ""
+                };
+                var badgeClass = node.Level switch
+                {
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Plant => "badge-plant",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.StorageLocation => "badge-sl",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Batch => "badge-batch",
+                    _ => ""
+                };
+                var badgeText = node.Level switch
+                {
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Plant => "PLANT",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.StorageLocation => "SLOC",
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Batch => "BATCH",
+                    _ => ""
+                };
+                var indent = node.Level switch
+                {
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Client => 0,
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Plant => 1,
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.StorageLocation => 2,
+                    YuktiraERP.Core.Dtos.StockOverviewLevel.Batch => 3,
+                    _ => 0
+                };
+                var toggleIcon = node.HasChildren ? (node.IsExpanded ? "bi-chevron-down" : "bi-chevron-right") : "";
+                var toggleClass = node.HasChildren ? (node.IsExpanded ? "" : "collapsed") : "";
+                var parentId = node.ParentNodeId ?? "";
+                var hiddenClass = "";
+                if (!string.IsNullOrEmpty(parentId))
+                {
+                    var parentNode = r.Nodes.FirstOrDefault(n => n.Id.ToString() == parentId);
+                    if (parentNode != null && !parentNode.IsExpanded && parentNode.Level != YuktiraERP.Core.Dtos.StockOverviewLevel.Client)
+                    {
+                        hiddenClass = "hidden-row";
+                    }
+                }
+                var fmt = (decimal v) => v == 0 ? "-" : v.ToString("N2");
+
+                <tr class="@levelClass @hiddenClass" data-id="@node.Id" data-parent="@parentId" data-level="@((int)node.Level)" data-expanded="@(node.IsExpanded ? "true" : "false")">
+                    <td>
+                        <span class="toggle @toggleClass" onclick="toggleNode('@node.Id')" data-id="@node.Id">
+                            @if (node.HasChildren)
+                            {
+                                <i class="bi @toggleIcon"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-dash" style="opacity:0.3"></i>
+                            }
+                            <span>@node.EntityCode — @node.EntityName</span>
+                            @if (!string.IsNullOrEmpty(badgeText))
+                            {
+                                <span class="badge @badgeClass">@badgeText</span>
+                            }
+                            @if (!string.IsNullOrEmpty(node.MaterialType))
+                            {
+                                <span class="badge" style="background:#f1f5f9;color:#475569;">@node.MaterialType</span>
+                            }
+                            @if (!string.IsNullOrEmpty(node.UOM) && node.Level == YuktiraERP.Core.Dtos.StockOverviewLevel.Client)
+                            {
+                                <span style="font-size:10px;color:#94a3b8;margin-left:4px;">@node.UOM</span>
+                            }
+                        </span>
+                    </td>
+                    <td class="@(node.UnrestrictedUse == 0 ? "zero" : "")">@fmt(node.UnrestrictedUse)</td>
+                    <td class="@(node.QualityInspection == 0 ? "zero" : "")">@fmt(node.QualityInspection)</td>
+                    <td class="@(node.Reserved == 0 ? "zero" : "")">@fmt(node.Reserved)</td>
+                    <td class="@(node.ReceiptReserved == 0 ? "zero" : "")">@fmt(node.ReceiptReserved)</td>
+                    <td class="@(node.ScheduledForDelivery == 0 ? "zero" : "")">@fmt(node.ScheduledForDelivery)</td>
+                    <td class="@(node.Returns == 0 ? "zero" : "")">@fmt(node.Returns)</td>
+                    <td class="@(node.Blocked == 0 ? "zero" : "")">@fmt(node.Blocked)</td>
+                    <td class="@(node.TransferStockPlant == 0 ? "zero" : "")">@fmt(node.TransferStockPlant)</td>
+                    <td class="@(node.TransferStockSL == 0 ? "zero" : "")">@fmt(node.TransferStockSL)</td>
+                    <td class="total-col">@node.TotalStock.ToString("N2")</td>
+                    <td>@(node.UnitPrice > 0 ? node.UnitPrice.ToString("C2") : "-")</td>
+                    <td class="total-col">@(node.TotalValue > 0 ? node.TotalValue.ToString("C2") : "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function toggleNode(id) {
+        var row = document.querySelector('tr[data-id="' + id + '"]');
+        if (!row) return;
+        var isExpanded = row.getAttribute('data-expanded') === 'true';
+        row.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+
+        var icon = row.querySelector('.toggle i');
+        if (icon) {
+            icon.className = isExpanded ? 'bi bi-chevron-right' : 'bi bi-chevron-down';
+        }
+        var toggle = row.querySelector('.toggle');
+        if (toggle) toggle.classList.toggle('collapsed', isExpanded);
+
+        var children = document.querySelectorAll('tr[data-parent="' + id + '"]');
+        children.forEach(function(child) {
+            child.style.display = isExpanded ? 'none' : '';
+        });
+    }
+
+    function expandAll() {
+        document.querySelectorAll('tr[data-expanded="false"]').forEach(function(row) {
+            var id = row.getAttribute('data-id');
+            row.setAttribute('data-expanded', 'true');
+            var icon = row.querySelector('.toggle i');
+            if (icon) icon.className = 'bi bi-chevron-down';
+            var toggle = row.querySelector('.toggle');
+            if (toggle) toggle.classList.remove('collapsed');
+            document.querySelectorAll('tr[data-parent="' + id + '"]').forEach(function(c) {
+                c.style.display = '';
+            });
+        });
+    }
+
+    function collapseAll() {
+        document.querySelectorAll('tr[data-level!="3"][data-expanded="true"]').forEach(function(row) {
+            var id = row.getAttribute('data-id');
+            row.setAttribute('data-expanded', 'false');
+            var icon = row.querySelector('.toggle i');
+            if (icon) icon.className = 'bi bi-chevron-right';
+            var toggle = row.querySelector('.toggle');
+            if (toggle) toggle.classList.add('collapsed');
+            document.querySelectorAll('tr[data-parent="' + id + '"]').forEach(function(c) {
+                c.style.display = 'none';
+            });
+        });
+    }
+
+    function exportCSV() {
+        var table = document.getElementById('mmbeTree');
+        var rows = [];
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            if (row.style.display === 'none') continue;
+            var cols = [];
+            for (var j = 0; j < row.cells.length; j++) {
+                cols.push('"' + row.cells[j].textContent.trim().replace(/"/g, '""') + '"');
+            }
+            rows.push(cols.join(','));
+        }
+        var blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'MMBE_StockOverview_' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.click();
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F8') { e.preventDefault(); document.getElementById('mmbeForm').submit(); }
+    });
+</script>

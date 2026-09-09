@@ -485,10 +485,48 @@ namespace YuktiraERP.Infrastructure.Services
                         }
                         else
                         {
-                            // Default behavior based on QuantityUpdate flag: if not explicitly no-change, treat as no change for unknown categories
                             _logger.LogInformation("Unknown category {Cat} for movement {Mvt}, no stock change applied", mvtType.Category, request.MovementType);
                         }
                         material.UpdatedAt = DateTime.UtcNow;
+
+                        var bin = string.IsNullOrEmpty(docLine.StorageLocation) ? "A-01" : docLine.StorageLocation;
+                        var lot = string.IsNullOrEmpty(line.BatchNo) ? $"LOT-{DateTime.UtcNow:yyyyMMdd}" : line.BatchNo;
+                        var stockItem = await _context.StockItems.FirstOrDefaultAsync(s =>
+                            s.MaterialName == material.Name && s.Bin == bin && s.Lot == lot && s.TenantId == request.TenantId);
+                        if (IsIncreasingCategory(mvtType.Category, request.MovementType))
+                        {
+                            if (stockItem != null)
+                            {
+                                stockItem.Quantity += line.Quantity;
+                                stockItem.Value += line.Quantity * material.Price;
+                                stockItem.UpdatedAt = DateTime.UtcNow;
+                            }
+                            else
+                            {
+                                _context.StockItems.Add(new StockItemEntity
+                                {
+                                    TenantId = request.TenantId,
+                                    Bin = bin,
+                                    MaterialName = material.Name,
+                                    Lot = lot,
+                                    Quantity = line.Quantity,
+                                    UOM = material.UOM,
+                                    Value = line.Quantity * material.Price,
+                                    MinStock = 0,
+                                    MaxStock = 0
+                                });
+                            }
+                        }
+                        else if (IsDecreasingCategory(mvtType.Category, request.MovementType))
+                        {
+                            if (stockItem != null)
+                            {
+                                var deduct = Math.Min(line.Quantity, stockItem.Quantity);
+                                stockItem.Quantity -= deduct;
+                                stockItem.Value -= deduct * material.Price;
+                                stockItem.UpdatedAt = DateTime.UtcNow;
+                            }
+                        }
                     }
                     else
                     {

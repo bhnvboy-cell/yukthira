@@ -243,16 +243,80 @@ public class DataSeeder
         var tenant = await _db.Set<TenantEntity>().FirstOrDefaultAsync();
         if (tenant == null) return;
 
-        if (!await _db.Set<CurrencyEntity>().AnyAsync(c => c.TenantId == tenant.Id))
+        var existing = await _db.Set<CurrencyEntity>()
+            .Where(c => c.TenantId == tenant.Id)
+            .Select(c => c.Code)
+            .ToListAsync();
+        var existingSet = new HashSet<string>(existing);
+
+        var allCurrencies = new List<(string Code, string Name, string Symbol, bool IsBase, int Decimals)>
         {
-            var currencies = new List<CurrencyEntity>
+            ("USD", "US Dollar",                  "$",    true,  2),
+            ("EUR", "Euro",                        "\u20AC", false, 2),
+            ("GBP", "British Pound",              "\u00A3", false, 2),
+            ("JPY", "Japanese Yen",               "\u00A5", false, 0),
+            ("CHF", "Swiss Franc",                "CHF",    false, 2),
+            ("CAD", "Canadian Dollar",            "CA$",    false, 2),
+            ("AUD", "Australian Dollar",          "A$",     false, 2),
+            ("NZD", "New Zealand Dollar",         "NZ$",    false, 2),
+            ("SGD", "Singapore Dollar",           "S$",     false, 2),
+            ("HKD", "Hong Kong Dollar",           "HK$",    false, 2),
+            ("INR", "Indian Rupee",               "\u20B9", false, 2),
+            ("CNY", "Chinese Yuan",               "\u00A5", false, 2),
+            ("KRW", "South Korean Won",           "\u20A9", false, 0),
+            ("SEK", "Swedish Krona",              "kr",     false, 2),
+            ("NOK", "Norwegian Krone",            "kr",     false, 2),
+            ("DKK", "Danish Krone",               "kr",     false, 2),
+            ("PLN", "Polish Zloty",               "z\u0142", false, 2),
+            ("CZK", "Czech Koruna",               "K\u010D", false, 2),
+            ("HUF", "Hungarian Forint",           "Ft",     false, 0),
+            ("RUB", "Russian Ruble",              "\u20BD", false, 2),
+            ("BRL", "Brazilian Real",             "R$",     false, 2),
+            ("MXN", "Mexican Peso",               "MX$",    false, 2),
+            ("ZAR", "South African Rand",         "R",      false, 2),
+            ("TRY", "Turkish Lira",               "\u20BA", false, 2),
+            ("AED", "UAE Dirham",                 "AED",    false, 2),
+            ("SAR", "Saudi Riyal",                "SAR",    false, 2),
+            ("THB", "Thai Baht",                  "\u0E3F", false, 2),
+            ("MYR", "Malaysian Ringgit",          "RM",     false, 2),
+            ("PHP", "Philippine Peso",            "\u20B1", false, 2),
+            ("IDR", "Indonesian Rupiah",          "Rp",     false, 0),
+            ("VND", "Vietnamese Dong",            "\u20AB", false, 0),
+            ("PKR", "Pakistani Rupee",            "\u20A8", false, 2),
+            ("BDT", "Bangladeshi Taka",           "\u09F3", false, 2),
+            ("LKR", "Sri Lankan Rupee",           "Rs",     false, 2),
+            ("NGN", "Nigerian Naira",             "\u20A6", false, 2),
+            ("EGP", "Egyptian Pound",             "E\u00A3", false, 2),
+            ("KES", "Kenyan Shilling",            "KSh",    false, 2),
+            ("GHS", "Ghanaian Cedi",              "GH\u20B5", false, 2),
+            ("MAD", "Moroccan Dirham",            "MAD",    false, 2),
+            ("ILS", "Israeli Shekel",             "\u20AA", false, 2),
+            ("CLP", "Chilean Peso",               "CL$",    false, 0),
+            ("COP", "Colombian Peso",             "COL$",   false, 2),
+            ("PEN", "Peruvian Sol",               "S/",     false, 2),
+            ("ARS", "Argentine Peso",             "AR$",    false, 2),
+            ("UAH", "Ukrainian Hryvnia",          "\u20B4", false, 2),
+            ("RON", "Romanian Leu",               "lei",    false, 2),
+            ("BGN", "Bulgarian Lev",              "lev",    false, 2),
+            ("HRK", "Croatian Kuna",              "kn",     false, 2),
+            ("ISK", "Icelandic Krona",            "kr",     false, 0),
+        };
+
+        var toAdd = new List<CurrencyEntity>();
+        foreach (var (code, name, symbol, isBase, decimals) in allCurrencies)
+        {
+            if (existingSet.Contains(code)) continue;
+            toAdd.Add(new CurrencyEntity
             {
-                new() { TenantId = tenant.Id, Code = "USD", Name = "US Dollar", Symbol = "$", IsBase = true, DecimalPlaces = 2, IsActive = true },
-                new() { TenantId = tenant.Id, Code = "EUR", Name = "Euro", Symbol = "€", IsBase = false, DecimalPlaces = 2, IsActive = true },
-                new() { TenantId = tenant.Id, Code = "INR", Name = "Indian Rupee", Symbol = "₹", IsBase = false, DecimalPlaces = 2, IsActive = true },
-                new() { TenantId = tenant.Id, Code = "GBP", Name = "British Pound", Symbol = "£", IsBase = false, DecimalPlaces = 2, IsActive = true },
-            };
-            await _db.Set<CurrencyEntity>().AddRangeAsync(currencies);
+                TenantId = tenant.Id, Code = code, Name = name,
+                Symbol = symbol, IsBase = isBase,
+                DecimalPlaces = decimals, IsActive = true
+            });
+        }
+
+        if (toAdd.Count > 0)
+        {
+            await _db.Set<CurrencyEntity>().AddRangeAsync(toAdd);
             await _db.SaveChangesAsync();
         }
     }

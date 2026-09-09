@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using YuktiraERP.Core.Dtos;
 using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data.Entities;
 
@@ -14,6 +15,7 @@ public class QualityController : ControllerBase
     private readonly IRepository<InspectionPlanEntity, Guid> _plans;
     private readonly IRepository<InspectionResultEntity, Guid> _results;
     private readonly IRepository<UsageDecisionEntity, Guid> _decisions;
+    private readonly IQualityManagementService _qmService;
     private readonly ITenantContext _tenant;
 
     public QualityController(
@@ -21,13 +23,24 @@ public class QualityController : ControllerBase
         IRepository<InspectionPlanEntity, Guid> plans,
         IRepository<InspectionResultEntity, Guid> results,
         IRepository<UsageDecisionEntity, Guid> decisions,
+        IQualityManagementService qmService,
         ITenantContext tenant)
     {
         _lots = lots;
         _plans = plans;
         _results = results;
         _decisions = decisions;
+        _qmService = qmService;
         _tenant = tenant;
+    }
+
+    [HttpPost("inspection-lots/select")]
+    public async Task<IActionResult> SelectInspectionLots([FromBody] InspectionLotSelectionFilterDto filter)
+    {
+        if (filter.MaxHits <= 0) filter.MaxHits = 100;
+        if (filter.MaxHits > 500) filter.MaxHits = 500;
+        var result = await _qmService.GetSelectedInspectionLotsAsync(filter, _tenant.TenantId);
+        return Ok(result);
     }
 
     [HttpGet("lots")] public async Task<IActionResult> GetLots() => Ok(new { data = await _lots.GetAllAsync(), tenantId = _tenant.TenantId });

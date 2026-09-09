@@ -33,7 +33,8 @@ public class TransactionCodeService : ITransactionCodeService
         // QM - Quality Management
         ["QE01"] = "/Transactions/Engine/QE01", ["QE02"] = "/QM/InspectionLot/Edit", ["QE03"] = "/QM/InspectionLot/Display",
         ["QE51N"] = "/Transactions/Engine/QE51N", ["QS01"] = "/QM/InspectionPlan/Create", ["QS02"] = "/QM/InspectionPlan/Edit",
-        ["QA01"] = "/Transactions/Engine/QA01", ["QUD"] = "/QM/UsageDecision/Create",
+        ["QA01"] = "/Transactions/Engine/QA01", ["QA32"] = "/QM/InspectionLot/Select",
+        ["QA33"] = "/QM/InspectionLot/Display", ["QUD"] = "/QM/UsageDecision/Create",
         ["QM01"] = "/Transactions/Engine/QM01", ["QM02"] = "/Transactions/Engine/QM02", ["QM03"] = "/Transactions/Engine/QM03",
         ["QM11"] = "/Transactions/Engine/QM11", ["QM12"] = "/Transactions/Engine/QM12",
         ["ZQM1"] = "/Transactions/Engine/ZQM1", ["1FM"] = "/Transactions/Engine/1FM",
@@ -448,6 +449,7 @@ public class TransactionCodeService : ITransactionCodeService
                     "QE01" => "Create Inspection Lot", "QE02" => "Change Inspection Lot",
                     "QE03" => "Display Inspection Lot", "QS01" => "Create Inspection Plan",
                     "QS02" => "Change Inspection Plan",                     "QA01" => "Create Inspection Lot",
+                    "QA32" => "Inspection Lot Selection", "QA33" => "Display Inspection Lot",
                     "QUD" => "Usage Decision", "LT01" => "Create Transfer", "LT02" => "Change Transfer",
                     "LT03" => "Display Transfer", "LS01" => "Create Storage Location",
                     "LS02" => "Change Storage Location",
@@ -601,7 +603,7 @@ public class TransactionCodeService : ITransactionCodeService
         "ME21N" or "ME22N" or "ME23N" or "MIGO" or "MIRO" or "MB1A" or "MB1C" or
         "VA01" or "VA02" or "VA03" or "VL01N" or "VL02N" or "VF01" or
         "CO01" or "CO02" or "CO03" or "CO11N" or
-        "QE01" or "QE02" or "QE03" or "QA01" or "QUD" or
+        "QE01" or "QE02" or "QE03" or "QA01" or "QA32" or "QA33" or "QUD" or
         "LT01" or "LT02" or "LT03" or
         "FB50" or "FB60" or "FB70" or "F-03" or "F-28" or "F-53" or
         "PR01" or
