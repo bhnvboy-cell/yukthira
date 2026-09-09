@@ -103,6 +103,14 @@
     </div>
     <link rel="stylesheet" href="~/css/tcode-engine.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/enterprise-form.css" asp-append-version="true" />
+    <script>
+        window.YuktiraConfig = {
+            tenantId: '@(Context.Items["TenantId"] ?? "")',
+            currencyCode: '@(Context.Items["TenantCurrencyCode"] ?? "INR")',
+            currencySymbol: '@(Context.Items["TenantCurrencySymbol"] ?? "₹")',
+            locale: '@(System.Globalization.CultureInfo.CurrentCulture.Name)'
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>

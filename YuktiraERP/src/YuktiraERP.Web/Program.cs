@@ -103,6 +103,7 @@ using (var scope = app.Services.CreateScope())
 app.UseSecurityHeaders();
 app.UseSerilogRequestLogging();
 app.UseMiddleware<TenantMiddleware>();
+app.UseMiddleware<TenantCultureMiddleware>();
 app.UseRequestLocalization();
 app.UseStaticFiles();
 app.UseRouting();
