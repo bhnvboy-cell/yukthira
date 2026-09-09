@@ -164,6 +164,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IAiPredictiveService, AiPredictiveService>();
         services.AddScoped<IPricingEngineService, PricingEngineService>();
         services.AddScoped<ISalesBillingService, SalesBillingService>();
+        services.AddScoped<IPipelineDiagnosticService, PipelineDiagnosticService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<ITransactionSequenceService, TransactionSequenceService>();
         services.AddScoped<CacheService>();

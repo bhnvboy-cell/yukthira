@@ -1,0 +1,327 @@
+@page
+@model YuktiraERP.Web.Pages.Quality.PipelineDiagnosticModel
+@{
+    ViewData["Title"] = "E2E Pipeline Diagnostic Engine";
+}
+
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+
+<style>
+    .pipe-header { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); color: #fff; padding: 24px; border-radius: 8px; margin-bottom: 20px; }
+    .pipe-header h2 { margin: 0 0 4px 0; font-size: 20px; font-weight: 700; }
+    .pipe-header p { margin: 0; font-size: 12px; opacity: 0.7; }
+    .section-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .section-card h5 { margin: 0 0 16px 0; font-size: 14px; font-weight: 600; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .form-group label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 4px; display: block; }
+    .form-group input { font-size: 13px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; box-sizing: border-box; }
+    .btn { font-size: 12px; padding: 10px 20px; border-radius: 4px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .summary-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; text-align: center; }
+    .summary-card .label { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+    .summary-card .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+    .summary-card .value.passed { color: #16a34a; }
+    .summary-card .value.failed { color: #dc2626; }
+    .summary-card .value.warning { color: #d97706; }
+    .summary-card .value.info { color: #2563eb; }
+    .pipeline-flow { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 16px 0; margin-bottom: 16px; }
+    .pipe-node { flex-shrink: 0; text-align: center; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 2px solid; min-width: 90px; }
+    .pipe-node.passed { background: #dcfce7; border-color: #16a34a; color: #166534; }
+    .pipe-node.failed { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+    .pipe-node.warning { background: #fffbeb; border-color: #d97706; color: #92400e; }
+    .pipe-node.skipped { background: #f1f5f9; border-color: #94a3b8; color: #64748b; }
+    .pipe-node.pending { background: #f8fafc; border-color: #cbd5e1; color: #94a3b8; }
+    .pipe-arrow { flex-shrink: 0; color: #94a3b8; font-size: 16px; padding: 0 4px; }
+    .step-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+    .step-header { display: flex; align-items: center; padding: 12px 16px; gap: 12px; cursor: pointer; }
+    .step-header:hover { background: #f8fafc; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .step-num.passed { background: #16a34a; }
+    .step-num.failed { background: #dc2626; }
+    .step-num.warning { background: #d97706; }
+    .step-num.skipped { background: #94a3b8; }
+    .step-num.pending { background: #cbd5e1; }
+    .step-name { font-size: 13px; font-weight: 600; color: #1e293b; flex: 1; }
+    .step-status { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 3px; text-transform: uppercase; }
+    .step-status.passed { background: #dcfce7; color: #166534; }
+    .step-status.failed { background: #fef2f2; color: #991b1b; }
+    .step-status.warning { background: #fffbeb; color: #92400e; }
+    .step-status.skipped { background: #f1f5f9; color: #64748b; }
+    .step-status.pending { background: #f8fafc; color: #94a3b8; }
+    .step-duration { font-size: 11px; color: #94a3b8; }
+    .step-body { display: none; padding: 12px 16px; border-top: 1px solid #f1f5f9; background: #fafbfc; }
+    .step-body.open { display: block; }
+    .check-list { list-style: none; padding: 0; margin: 0; }
+    .check-list li { font-size: 12px; padding: 3px 0; color: #475569; font-family: 'Cascadia Code', 'Consolas', monospace; }
+    .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: #991b1b; }
+    .resolution-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: #1e40af; }
+    .trace-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; font-size: 12px; }
+    .trace-item .label { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+    .trace-item .value { font-size: 13px; font-weight: 600; color: #1e293b; margin-top: 2px; }
+    .rec-list { list-style: none; padding: 0; margin: 0; }
+    .rec-list li { font-size: 12px; padding: 6px 0; color: #475569; border-bottom: 1px solid #f1f5f9; }
+    .rec-list li:last-child { border-bottom: none; }
+    .rec-list li::before { content: "→ "; color: #2563eb; font-weight: 600; }
+    .overall-passed { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+    .overall-failed { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+    .overall-warning { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+</style>
+
+<div class="pipe-header">
+    <h2><i class="bi bi-activity"></i> E2E Pipeline Diagnostic Engine</h2>
+    <p>Automated end-to-end verification: PO → GR(101) → Inspection Lot → UD → Quality Release(321) → Delivery(601) → Billing(VF01) → FI Ledger(FB03)</p>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" style="padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:13px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b;">
+        <i class="bi bi-exclamation-triangle me-2"></i>@Model.ErrorMessage
+    </div>
+}
+
+<form method="post">
+    <div class="section-card">
+        <h5><i class="bi bi-funnel me-2"></i>Pipeline Parameters</h5>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Material Code</label>
+                <input asp-for="Request.MaterialCode" placeholder="e.g. RM-001" />
+            </div>
+            <div class="form-group">
+                <label>Batch Number</label>
+                <input asp-for="Request.BatchNumber" placeholder="e.g. BATCH-001" />
+            </div>
+            <div class="form-group">
+                <label>Purchase Order #</label>
+                <input asp-for="Request.PurchaseOrderNumber" placeholder="e.g. PO-2026-001" />
+            </div>
+            <div class="form-group">
+                <label>Sales Order #</label>
+                <input asp-for="Request.SalesOrderNumber" placeholder="e.g. SO-2026-001" />
+            </div>
+            <div class="form-group" style="display:flex; align-items:end;">
+                <button type="submit" asp-page-handler="Execute" class="btn btn-primary" id="runBtn">
+                    <i class="bi bi-play-fill"></i> Run Full Pipeline
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Result != null)
+{
+    <div class="section-card">
+        <h5><i class="bi bi-clipboard-check me-2"></i>Diagnostic Summary</h5>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Overall</div>
+                <div class="value @(Model.Result.OverallStatus.ToString().ToLower())">
+                    @Model.Result.OverallStatus
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Total Steps</div>
+                <div class="value info">@Model.Result.TotalSteps</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Passed</div>
+                <div class="value passed">@Model.Result.PassedSteps</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Failed</div>
+                <div class="value failed">@Model.Result.FailedSteps</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Warnings</div>
+                <div class="value warning">@Model.Result.WarningSteps</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Duration</div>
+                <div class="value info">@Model.Result.TotalDurationMs ms</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h5><i class="bi bi-diagram-3 me-2"></i>Pipeline Flow</h5>
+        <div class="pipeline-flow">
+            @foreach (var step in Model.Result.Steps)
+            {
+                <div class="pipe-node @step.Status.ToString().ToLower()">
+                    <div>@step.StepNumber</div>
+                    <div style="font-size:9px; margin-top:2px;">@step.StepName.Split(' ').First()</div>
+                </div>
+                @if (step.StepNumber < Model.Result.TotalSteps)
+                {
+                    <div class="pipe-arrow">→</div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h5><i class="bi bi-list-check me-2"></i>Step-by-Step Verification</h5>
+        @foreach (var step in Model.Result.Steps)
+        {
+            <div class="step-card">
+                <div class="step-header" onclick="this.nextElementSibling.classList.toggle('open')">
+                    <div class="step-num @step.Status.ToString().ToLower()">@step.StepNumber</div>
+                    <div class="step-name">@step.StepName</div>
+                    <span class="step-status @step.Status.ToString().ToLower()">@step.Status</span>
+                    <span class="step-duration">@step.DurationMs ms</span>
+                    <i class="bi bi-chevron-down" style="color:#94a3b8; font-size:12px;"></i>
+                </div>
+                <div class="step-body">
+                    <p style="font-size:12px; color:#64748b; margin:0 0 8px 0;">@step.Description</p>
+                    @if (step.DocumentNumber != null)
+                    {
+                        <p style="font-size:12px; margin:0 0 4px 0;"><strong>Document:</strong> @step.DocumentNumber</p>
+                    }
+                    @if (step.ValidationChecks.Any())
+                    {
+                        <ul class="check-list">
+                            @foreach (var check in step.ValidationChecks)
+                            {
+                                <li>@check</li>
+                            }
+                        </ul>
+                    }
+                    @if (!string.IsNullOrEmpty(step.ErrorMessage))
+                    {
+                        <div class="error-box"><i class="bi bi-exclamation-circle me-1"></i>@step.ErrorMessage</div>
+                    }
+                    @if (!string.IsNullOrEmpty(step.Resolution))
+                    {
+                        <div class="resolution-box"><i class="bi bi-lightbulb me-1"></i>@step.Resolution</div>
+                    }
+                    @if (!string.IsNullOrEmpty(step.Details) && string.IsNullOrEmpty(step.ErrorMessage))
+                    {
+                        <p style="font-size:12px; color:#16a34a; margin:8px 0 0 0;"><i class="bi bi-check-circle me-1"></i>@step.Details</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.Result.Traceability != null)
+    {
+        <div class="section-card">
+            <h5><i class="bi bi-link-45deg me-2"></i>Document Traceability</h5>
+            <div class="trace-grid">
+                @if (Model.Result.Traceability.PurchaseOrderNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Purchase Order</div>
+                        <div class="value">@Model.Result.Traceability.PurchaseOrderNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.GoodsReceiptNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Goods Receipt</div>
+                        <div class="value">@Model.Result.Traceability.GoodsReceiptNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.InspectionLotNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Inspection Lot</div>
+                        <div class="value">@Model.Result.Traceability.InspectionLotNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.UsageDecisionId != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Usage Decision</div>
+                        <div class="value">@Model.Result.Traceability.UsageDecisionId</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.SalesOrderNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Sales Order</div>
+                        <div class="value">@Model.Result.Traceability.SalesOrderNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.DeliveryNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Delivery</div>
+                        <div class="value">@Model.Result.Traceability.DeliveryNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.BillingDocumentNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">Billing Document</div>
+                        <div class="value">@Model.Result.Traceability.BillingDocumentNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.FiJournalDocumentNumber != null)
+                {
+                    <div class="trace-item">
+                        <div class="label">FI Journal</div>
+                        <div class="value">@Model.Result.Traceability.FiJournalDocumentNumber</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.TotalInvoiceAmount.HasValue)
+                {
+                    <div class="trace-item">
+                        <div class="label">Invoice Total</div>
+                        <div class="value">@Model.Result.Traceability.TotalInvoiceAmount.Value.ToString("C")</div>
+                    </div>
+                }
+                @if (Model.Result.Traceability.TotalFiPostedAmount.HasValue)
+                {
+                    <div class="trace-item">
+                        <div class="label">FI Posted Total</div>
+                        <div class="value">@Model.Result.Traceability.TotalFiPostedAmount.Value.ToString("C")</div>
+                    </div>
+                }
+                <div class="trace-item">
+                    <div class="label">FI Balanced</div>
+                    <div class="value" style="color: @(Model.Result.Traceability.IsBalanced ? "#16a34a" : "#dc2626")">
+                        @(Model.Result.Traceability.IsBalanced ? "YES ✓" : "NO ✗")
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Result.CriticalIssues.Any())
+    {
+        <div class="section-card" style="border-color: #fecaca;">
+            <h5 style="color: #991b1b;"><i class="bi bi-exclamation-octagon me-2"></i>Critical Issues (@Model.Result.CriticalIssues.Count)</h5>
+            <ul class="rec-list">
+                @foreach (var issue in Model.Result.CriticalIssues)
+                {
+                    <li style="color: #991b1b;">@issue</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.Result.Recommendations.Any())
+    {
+        <div class="section-card" style="border-color: #bfdbfe;">
+            <h5 style="color: #1e40af;"><i class="bi bi-lightbulb me-2"></i>Recommendations (@Model.Result.Recommendations.Count)</h5>
+            <ul class="rec-list">
+                @foreach (var rec in Model.Result.Recommendations)
+                {
+                    <li>@rec</li>
+                }
+            </ul>
+        </div>
+    }
+}
+
+<script>
+    document.getElementById('runBtn')?.addEventListener('click', function() {
+        this.disabled = true;
+        this.innerHTML = '<i class="bi bi-hourglass-split"></i> Running Pipeline...';
+        setTimeout(() => { this.disabled = false; this.innerHTML = '<i class="bi bi-play-fill"></i> Run Full Pipeline'; }, 5000);
+    });
+</script>
