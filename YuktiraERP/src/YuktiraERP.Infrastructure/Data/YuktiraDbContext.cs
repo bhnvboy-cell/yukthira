@@ -252,6 +252,10 @@ public class YuktiraDbContext : DbContext
     // Bank Statement Import
     public DbSet<BankStatementEntity> BankStatements => Set<BankStatementEntity>();
     public DbSet<BankStatementLineEntity> BankStatementLines => Set<BankStatementLineEntity>();
+    // Phase 4.1: Pricing Engine & Billing-to-FI
+    public DbSet<PricingConditionEntity> PricingConditions => Set<PricingConditionEntity>();
+    public DbSet<PricingConditionStepEntity> PricingConditionSteps => Set<PricingConditionStepEntity>();
+    public DbSet<BillingDocumentLineEntity> BillingDocumentLines => Set<BillingDocumentLineEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

@@ -1654,3 +1654,66 @@ public class ComplaintWorkflowStepEntity : EntityBase
     public bool IsRequired { get; set; } = true;
     public bool IsAutomated { get; set; } = false;
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Phase 4.1: Pricing Calculation Engine & Billing-to-FI Integration
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class PricingConditionEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string ConditionType { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Category { get; set; } = "BasePrice";
+    public string CalculationType { get; set; } = "Fixed";
+    public decimal Rate { get; set; }
+    public decimal Amount { get; set; }
+    public decimal PerUnit { get; set; } = 1;
+    public string Currency { get; set; } = "INR";
+    public bool IsPercentage { get; set; }
+    public decimal? PercentageValue { get; set; }
+    public int SequenceNumber { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string ValidFrom { get; set; } = "";
+    public string ValidTo { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string MaterialGroup { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string Description { get; set; } = "";
+}
+
+public class PricingConditionStepEntity : EntityBase
+{
+    public Guid ConditionId { get; set; }
+    public int SequenceNumber { get; set; }
+    public string ConditionType { get; set; } = "";
+    public string ConditionName { get; set; } = "";
+    public string Category { get; set; } = "BasePrice";
+    public string CalculationType { get; set; } = "Fixed";
+    public decimal Rate { get; set; }
+    public decimal Amount { get; set; }
+    public decimal PerUnit { get; set; } = 1;
+    public string Currency { get; set; } = "INR";
+    public bool IsPercentage { get; set; }
+    public decimal? PercentageValue { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string Description { get; set; } = "";
+}
+
+public class BillingDocumentLineEntity : EntityBase
+{
+    public Guid BillingDocumentId { get; set; }
+    public int LineNumber { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string UOM { get; set; } = "EA";
+    public decimal UnitPrice { get; set; }
+    public decimal LineAmount { get; set; }
+    public decimal Discount { get; set; }
+    public decimal NetAmount { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal GrossAmount { get; set; }
+    public string TaxCode { get; set; } = "";
+    public string Status { get; set; } = "Active";
+}

@@ -162,6 +162,8 @@ public static class InfrastructureRegistration
         services.AddScoped<ILocalizationTaxService, LocalizationTaxService>();
         services.AddScoped<IAiDocumentOcrService, AiDocumentOcrService>();
         services.AddScoped<IAiPredictiveService, AiPredictiveService>();
+        services.AddScoped<IPricingEngineService, PricingEngineService>();
+        services.AddScoped<ISalesBillingService, SalesBillingService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<ITransactionSequenceService, TransactionSequenceService>();
         services.AddScoped<CacheService>();
