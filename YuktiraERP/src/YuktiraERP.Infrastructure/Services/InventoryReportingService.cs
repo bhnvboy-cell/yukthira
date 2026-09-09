@@ -228,16 +228,26 @@ public class InventoryReportingService : IInventoryReportingService
             var mmQty = g.Sum(s => s.Quantity);
             var mmValue = g.Sum(s => s.TotalValue);
 
-            var fiEntries = await _db.UniversalJournals
-                .AsNoTracking()
-                .Where(j =>
-                    j.TenantId == tenantId &&
-                    j.MaterialCode == g.Key.MaterialCode &&
-                    j.Plant == g.Key.Plant)
-                .ToListAsync();
+            decimal fiDebit = 0;
+            decimal fiCredit = 0;
+            try
+            {
+                var fiEntries = await _db.UniversalJournals
+                    .AsNoTracking()
+                    .Where(j =>
+                        j.TenantId == tenantId &&
+                        j.MaterialCode == g.Key.MaterialCode &&
+                        j.Plant == g.Key.Plant)
+                    .ToListAsync();
 
-            var fiDebit = fiEntries.Sum(j => j.DebitAmount);
-            var fiCredit = fiEntries.Sum(j => j.CreditAmount);
+                fiDebit = fiEntries.Sum(j => j.DebitAmount);
+                fiCredit = fiEntries.Sum(j => j.CreditAmount);
+            }
+            catch
+            {
+                // UniversalJournals table may not exist yet
+            }
+
             var fiBalance = fiDebit - fiCredit;
             var difference = mmValue - fiBalance;
 

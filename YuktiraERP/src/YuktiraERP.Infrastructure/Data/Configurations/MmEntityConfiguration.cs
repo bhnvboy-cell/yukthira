@@ -60,3 +60,60 @@ public class InvoiceVerificationEntityConfiguration : IEntityTypeConfiguration<I
         builder.ToTable("invoice_verifications", "yuktira_mm");
     }
 }
+
+public class MaterialDocumentHeaderEntityConfiguration : IEntityTypeConfiguration<MaterialDocumentHeaderEntity>
+{
+    public void Configure(EntityTypeBuilder<MaterialDocumentHeaderEntity> builder)
+    {
+        builder.ToTable("material_document_headers", "yuktira_mm");
+        builder.Ignore(e => e.Xmin);
+        builder.HasIndex(e => new { e.TenantId, e.DocumentNumber }).IsUnique();
+        builder.HasIndex(e => e.PostingDate);
+    }
+}
+
+public class MaterialDocumentItemEntityConfiguration : IEntityTypeConfiguration<MaterialDocumentItemEntity>
+{
+    public void Configure(EntityTypeBuilder<MaterialDocumentItemEntity> builder)
+    {
+        builder.ToTable("material_document_items", "yuktira_mm");
+        builder.HasIndex(e => e.MaterialDocumentHeaderId);
+        builder.HasIndex(e => new { e.TenantId, e.MaterialCode });
+    }
+}
+
+public class StockMovementHistoryEntityConfiguration : IEntityTypeConfiguration<StockMovementHistoryEntity>
+{
+    public void Configure(EntityTypeBuilder<StockMovementHistoryEntity> builder)
+    {
+        builder.ToTable("stock_movement_history", "yuktira_mm");
+        builder.HasIndex(e => new { e.TenantId, e.MaterialCode });
+    }
+}
+
+public class StockReservationHeaderEntityConfiguration : IEntityTypeConfiguration<StockReservationHeaderEntity>
+{
+    public void Configure(EntityTypeBuilder<StockReservationHeaderEntity> builder)
+    {
+        builder.ToTable("stock_reservation_headers", "yuktira_mm");
+        builder.HasIndex(e => new { e.TenantId, e.ReservationNumber }).IsUnique();
+    }
+}
+
+public class StockReservationItemEntityConfiguration : IEntityTypeConfiguration<StockReservationItemEntity>
+{
+    public void Configure(EntityTypeBuilder<StockReservationItemEntity> builder)
+    {
+        builder.ToTable("stock_reservation_items", "yuktira_mm");
+        builder.HasIndex(e => e.ReservationHeaderId);
+    }
+}
+
+public class InventoryValuationLedgerEntityConfiguration : IEntityTypeConfiguration<InventoryValuationLedgerEntity>
+{
+    public void Configure(EntityTypeBuilder<InventoryValuationLedgerEntity> builder)
+    {
+        builder.ToTable("inventory_valuation_ledger", "yuktira_mm");
+        builder.HasIndex(e => new { e.TenantId, e.MaterialCode, e.ValuationDate });
+    }
+}

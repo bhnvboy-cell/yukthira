@@ -102,6 +102,7 @@ public class StockBalanceEntityConfiguration : IEntityTypeConfiguration<StockBal
     public void Configure(EntityTypeBuilder<StockBalanceEntity> builder)
     {
         builder.ToTable("stock_balances", "yuktira_mm");
+        builder.Ignore(s => s.Xmin);
         builder.Property(s => s.Quantity).HasColumnType("decimal(18,4)");
         builder.Property(s => s.UnitPrice).HasColumnType("decimal(18,4)");
         builder.Property(s => s.TotalValue).HasColumnType("decimal(18,2)");

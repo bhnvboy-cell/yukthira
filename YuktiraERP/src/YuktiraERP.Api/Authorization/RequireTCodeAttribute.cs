@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using YuktiraERP.Core.Interfaces;
@@ -17,10 +18,15 @@ public class RequireTCodeAttribute : Attribute, IAsyncActionFilter
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var transactionCodeService = context.HttpContext.RequestServices.GetRequiredService<ITransactionCodeService>();
-        var tenantContext = context.HttpContext.RequestServices.GetRequiredService<ITenantContext>();
 
-        var userId = context.HttpContext.User.Identity?.Name ?? "anonymous";
-        var hasAccess = await transactionCodeService.ValidateAccessAsync(TCode, null, null);
+        var userIdClaim = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                       ?? context.HttpContext.User.FindFirst("sub")?.Value;
+        var roleClaim = context.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value ?? context.HttpContext.User.FindFirst("role")?.Value;
+
+        Guid? userId = null;
+        if (Guid.TryParse(userIdClaim, out var parsed)) userId = parsed;
+
+        var hasAccess = await transactionCodeService.ValidateAccessAsync(TCode, userId, roleClaim);
 
         if (!hasAccess)
         {
