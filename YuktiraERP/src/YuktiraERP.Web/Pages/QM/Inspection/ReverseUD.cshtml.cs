@@ -6,6 +6,7 @@ using YuktiraERP.Core.Interfaces;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
 using YuktiraERP.Infrastructure.Services;
+using YuktiraERP.Core.Dtos;
 
 namespace YuktiraERP.Web.Pages.QM.Inspection;
 

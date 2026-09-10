@@ -46,6 +46,11 @@ public class YuktiraDbContext : DbContext
     public DbSet<QMMasterDataEntity> QMMasterDatas => Set<QMMasterDataEntity>();
     public DbSet<QMInspectionConfigEntity> QMInspectionConfigs => Set<QMInspectionConfigEntity>();
     public DbSet<CertificateOfAnalysisEntity> CertificatesOfAnalysis => Set<CertificateOfAnalysisEntity>();
+    public DbSet<NonConformanceEntity> NonConformances => Set<NonConformanceEntity>();
+    public DbSet<CAPAEntity> Capas => Set<CAPAEntity>();
+    public DbSet<HandlingUnitEntity> HandlingUnits => Set<HandlingUnitEntity>();
+    public DbSet<LabAnalysisEntity> LabAnalyses => Set<LabAnalysisEntity>();
+    public DbSet<CoaGenerationLogEntity> CoaGenerationLogs => Set<CoaGenerationLogEntity>();
     // WM
     public DbSet<WarehouseTransferEntity> WarehouseTransfers => Set<WarehouseTransferEntity>();
     public DbSet<StorageLocationEntity> StorageLocations => Set<StorageLocationEntity>();

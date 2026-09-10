@@ -305,6 +305,146 @@ public class InspectionLotAuditEntity : EntityBase
     public string Notes { get; set; } = "";
 }
 
+// ZQM-07: Non-Conformance Entity
+public class NonConformanceEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string NCNumber { get; set; } = "";
+    public string NCType { get; set; } = "Defect";
+    public string Severity { get; set; } = "Minor";
+    public string Status { get; set; } = "Open";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string InspectionLotNumber { get; set; } = "";
+    public string DefectCodeGroup { get; set; } = "";
+    public string DefectCode { get; set; } = "";
+    public string DefectDescription { get; set; } = "";
+    public string RootCauseCategory { get; set; } = "";
+    public string RootCauseDescription { get; set; } = "";
+    public string DetectedBy { get; set; } = "";
+    public DateTime DetectedAt { get; set; } = DateTime.UtcNow;
+    public string VendorCode { get; set; } = "";
+    public decimal AffectedQuantity { get; set; }
+    public decimal EstimatedCost { get; set; }
+    public string ContainmentAction { get; set; } = "";
+    public bool IsContainmentActive { get; set; }
+    public DateTime? ContainmentExpiry { get; set; }
+    public string Priority { get; set; } = "Medium";
+    public string AssignedTo { get; set; } = "";
+    public DateTime? DueDate { get; set; }
+    public DateTime? ClosedAt { get; set; }
+    public string ClosedBy { get; set; } = "";
+    public string ClosureNotes { get; set; } = "";
+}
+
+// ZQM-07: CAPA Entity
+public class CAPAEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CPNumber { get; set; } = "";
+    public string CPType { get; set; } = "Corrective";
+    public string Status { get; set; } = "Draft";
+    public string NonConformanceId { get; set; } = "";
+    public string NCNumber { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string RootCauseCategory { get; set; } = "";
+    public string RootCauseAnalysis { get; set; } = "";
+    public string CorrectiveAction { get; set; } = "";
+    public string PreventiveAction { get; set; } = "";
+    public string ResponsiblePerson { get; set; } = "";
+    public DateTime? PlannedCompletionDate { get; set; }
+    public DateTime? ActualCompletionDate { get; set; }
+    public string VerificationMethod { get; set; } = "";
+    public string VerifiedBy { get; set; } = "";
+    public DateTime? VerifiedAt { get; set; }
+    public bool EffectivenessConfirmed { get; set; }
+    public string EffectivenessNotes { get; set; } = "";
+    public string VendorPenaltyAmount { get; set; } = "";
+    public string VendorPenaltyType { get; set; } = "";
+}
+
+// ZQM-05: Handling Unit Entity
+public class HandlingUnitEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string HUNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string StorageLocation { get; set; } = "";
+    public string WarehouseNumber { get; set; } = "";
+    public string PackagingMaterial { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string BaseUOM { get; set; } = "EA";
+    public decimal GrossWeight { get; set; }
+    public decimal NetWeight { get; set; }
+    public string WeightUOM { get; set; } = "KG";
+    public decimal Volume { get; set; }
+    public string VolumeUOM { get; set; } = "L";
+    public string PackageType { get; set; } = "Standard";
+    public string Status { get; set; } = "Created";
+    public string InspectionLotNumber { get; set; } = "";
+    public string QualityStatus { get; set; } = "";
+    public DateTime? PackedAt { get; set; }
+    public string PackedBy { get; set; } = "";
+    public DateTime? ReleasedAt { get; set; }
+    public string ReleasedBy { get; set; } = "";
+    public string DeliveryNoteNumber { get; set; } = "";
+    public string ShipmentNumber { get; set; } = "";
+}
+
+// ZQM-08: Lab Analysis Entity
+public class LabAnalysisEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string AnalysisNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string MaterialName { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string InspectionLotNumber { get; set; } = "";
+    public string CalculationType { get; set; } = "";
+    public decimal RawValue { get; set; }
+    public string InputUnit { get; set; } = "";
+    public decimal ConvertedValue { get; set; }
+    public string OutputUnit { get; set; } = "";
+    public decimal LSL { get; set; }
+    public decimal USL { get; set; }
+    public bool IsWithinSpec { get; set; }
+    public string Evaluation { get; set; } = "";
+    public string Formula { get; set; } = "";
+    public string AnalyzedBy { get; set; } = "";
+    public DateTime AnalyzedAt { get; set; } = DateTime.UtcNow;
+    public string Method { get; set; } = "";
+    public string InstrumentId { get; set; } = "";
+    public string Notes { get; set; } = "";
+}
+
+// ZQM-09: CoA Generation Log Entity
+public class CoaGenerationLogEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CertificateNumber { get; set; } = "";
+    public string InspectionLotNumber { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string BatchNumber { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public int TotalCharacteristics { get; set; }
+    public int PassedCharacteristics { get; set; }
+    public int FailedCharacteristics { get; set; }
+    public string OverallResult { get; set; } = "";
+    public string GeneratedBy { get; set; } = "";
+    public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
+    public string Status { get; set; } = "Issued";
+    public string DeliveryNoteNumber { get; set; } = "";
+    public string MovementDocumentNumber { get; set; } = "";
+}
+
 // WM
 public class WarehouseTransferEntity : EntityBase { public string TransferId { get; set; } = ""; public DateTime Date { get; set; } public string MaterialName { get; set; } = ""; public string FromBin { get; set; } = ""; public string ToBin { get; set; } = ""; public decimal Quantity { get; set; } public string Status { get; set; } = "Pending"; }
 public class StorageLocationEntity : EntityBase { public string Code { get; set; } = ""; public string Name { get; set; } = ""; public string Type { get; set; } = "General"; public decimal Capacity { get; set; } public string Status { get; set; } = "Active"; }

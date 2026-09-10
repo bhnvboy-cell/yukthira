@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using YuktiraERP.Core.Dtos;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
 
@@ -309,20 +310,4 @@ public class InspectionResultService : IInspectionResultService
 
         return result;
     }
-}
-
-public class UDReversalResult
-{
-    public bool Success { get; set; }
-    public List<string> Errors { get; set; } = new();
-    public string InspectionLotNumber { get; set; } = "";
-    public string PreviousStatus { get; set; } = "";
-    public string NewStatus { get; set; } = "";
-    public string PreviousUDCode { get; set; } = "";
-    public string StockMovementType { get; set; } = "";
-    public decimal StockQuantityMoved { get; set; }
-    public string StockFromType { get; set; } = "";
-    public string StockToType { get; set; } = "";
-    public Guid AuditId { get; set; }
-    public DateTime ReversalTimestamp { get; set; }
 }

@@ -118,3 +118,58 @@ public class InspectionLotAuditEntityConfiguration : IEntityTypeConfiguration<In
         builder.HasOne<InspectionLotEntity>().WithMany().HasForeignKey(a => a.InspectionLotId);
     }
 }
+
+public class NonConformanceEntityConfiguration : IEntityTypeConfiguration<NonConformanceEntity>
+{
+    public void Configure(EntityTypeBuilder<NonConformanceEntity> builder)
+    {
+        builder.ToTable("non_conformances", "yuktira_qm");
+        builder.HasIndex(e => e.NCNumber).IsUnique();
+        builder.Property(e => e.AffectedQuantity).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.EstimatedCost).HasColumnType("decimal(18,2)");
+    }
+}
+
+public class CAPAEntityConfiguration : IEntityTypeConfiguration<CAPAEntity>
+{
+    public void Configure(EntityTypeBuilder<CAPAEntity> builder)
+    {
+        builder.ToTable("capas", "yuktira_qm");
+        builder.HasIndex(e => e.CPNumber).IsUnique();
+    }
+}
+
+public class HandlingUnitEntityConfiguration : IEntityTypeConfiguration<HandlingUnitEntity>
+{
+    public void Configure(EntityTypeBuilder<HandlingUnitEntity> builder)
+    {
+        builder.ToTable("handling_units", "yuktira_qm");
+        builder.HasIndex(e => e.HUNumber).IsUnique();
+        builder.Property(e => e.Quantity).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.GrossWeight).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.NetWeight).HasColumnType("decimal(18,4)");
+        builder.Property(e => e.Volume).HasColumnType("decimal(18,4)");
+    }
+}
+
+public class LabAnalysisEntityConfiguration : IEntityTypeConfiguration<LabAnalysisEntity>
+{
+    public void Configure(EntityTypeBuilder<LabAnalysisEntity> builder)
+    {
+        builder.ToTable("lab_analyses", "yuktira_qm");
+        builder.HasIndex(e => e.AnalysisNumber).IsUnique();
+        builder.Property(e => e.RawValue).HasColumnType("decimal(18,6)");
+        builder.Property(e => e.ConvertedValue).HasColumnType("decimal(18,6)");
+        builder.Property(e => e.LSL).HasColumnType("decimal(18,6)");
+        builder.Property(e => e.USL).HasColumnType("decimal(18,6)");
+    }
+}
+
+public class CoaGenerationLogEntityConfiguration : IEntityTypeConfiguration<CoaGenerationLogEntity>
+{
+    public void Configure(EntityTypeBuilder<CoaGenerationLogEntity> builder)
+    {
+        builder.ToTable("coa_generation_logs", "yuktira_qm");
+        builder.HasIndex(e => e.CertificateNumber).IsUnique();
+    }
+}

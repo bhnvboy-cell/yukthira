@@ -175,6 +175,17 @@ public static class InfrastructureRegistration
         services.AddHostedService<IntegrationQueueBackgroundService>();
         services.AddHostedService<MrpSchedulerBackgroundService>();
 
+        services.AddScoped<IZqmAutoLotGeneratorService, ZqmAutoLotGeneratorService>();
+        services.AddScoped<IZqmResultsWorkbenchService, ZqmResultsWorkbenchService>();
+        services.AddScoped<IZqmUsageDecisionEngineService, ZqmUsageDecisionEngineService>();
+        services.AddScoped<IZqmUdReversalEngineService, ZqmUdReversalEngineService>();
+        services.AddScoped<IZqmHandlingUnitService, ZqmHandlingUnitService>();
+        services.AddScoped<IZqmQaWorklistService, ZqmQaWorklistService>();
+        services.AddScoped<IZqmNonConformanceService, ZqmNonConformanceService>();
+        services.AddScoped<IZqmLabCalculatorService, ZqmLabCalculatorService>();
+        services.AddScoped<IZqmCoaGeneratorService, ZqmCoaGeneratorService>();
+        services.AddScoped<IZqmPipelineDiagnosticService, ZqmPipelineDiagnosticService>();
+
         RegisterRepositories(services);
 
         services.AddScoped<DataSeeder>();
