@@ -35,6 +35,16 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Register(QM11());
         Register(QM12());
         Register(ZQM1());
+        Register(ZQM01());
+        Register(ZQM02());
+        Register(ZQM03());
+        Register(ZQM04());
+        Register(ZQM05());
+        Register(ZQM06());
+        Register(ZQM07());
+        Register(ZQM08());
+        Register(ZQM09());
+        Register(ZQM10());
         Register(QM1FM());
         Register(QM2F9());
         Register(QM1E1());
@@ -3928,5 +3938,268 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             new() { Id = "cancel", Label = "Cancel", Icon = "bi-x-lg", Style = "outline", Handler = "back" },
         },
         TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM01() => new()
+    {
+        TCode = "ZQM01", Title = "Auto Inspection Lot Generator", Module = "QM", Icon = "bi-list-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "generate", Label = "Generate Lot", Icon = "bi-cpu", Style = "success", Handler = "generate", Confirm = true },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "general", Label = "General", Icon = "bi-gear", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "materialCode", Label = "Material", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80, Required = true, Editable = true },
+            new() { Key = "batchNumber", Label = "Batch", Type = "text", Width = 100, Editable = true },
+            new() { Key = "quantity", Label = "Qty", Type = "number", Width = 80, Required = true, Editable = true },
+            new() { Key = "movementType", Label = "Mvt Type", Type = "text", Width = 80, Required = true, Editable = true },
+            new() { Key = "vendorCode", Label = "Vendor", Type = "text", Width = 100, Editable = true },
+            new() { Key = "lotNumber", Label = "Lot #", Type = "text", Width = 140 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100 },
+        },
+        TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM02() => new()
+    {
+        TCode = "ZQM02", Title = "Results Recording Workbench", Module = "QM", Icon = "bi-clipboard-check",
+        ToolbarActions = new()
+        {
+            new() { Id = "record", Label = "Record Result", Icon = "bi-check-circle", Style = "success", Handler = "record" },
+            new() { Id = "complete", Label = "Complete", Icon = "bi-flag", Style = "primary", Handler = "complete" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "recording", Label = "Results Recording", Icon = "bi-pencil-square", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Lot #", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "characteristic", Label = "Characteristic", Type = "text", Width = 160, Required = true, Editable = true },
+            new() { Key = "micType", Label = "MIC Type", Type = "dropdown", Width = 100, Editable = true, Options = new() { new() { Value = "Quantitative", Label = "Quantitative" }, new() { Value = "Qualitative", Label = "Qualitative" } } },
+            new() { Key = "targetValue", Label = "Target", Type = "number", Width = 80, Editable = true },
+            new() { Key = "lsl", Label = "LSL", Type = "number", Width = 80, Editable = true },
+            new() { Key = "usl", Label = "USL", Type = "number", Width = 80, Editable = true },
+            new() { Key = "measuredValue", Label = "Measured", Type = "number", Width = 80, Required = true, Editable = true },
+            new() { Key = "evaluation", Label = "Result", Type = "status_badge", Width = 80 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = false, ShowExport = true, ShowAddRow = true, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM03() => new()
+    {
+        TCode = "ZQM03", Title = "Usage Decision Engine", Module = "QM", Icon = "bi-check2-square",
+        ToolbarActions = new()
+        {
+            new() { Id = "post", Label = "Post UD", Icon = "bi-send", Style = "primary", Handler = "post", Confirm = true },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "decision", Label = "Usage Decision", Icon = "bi-gear", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Lot #", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "udCode", Label = "UD Code", Type = "dropdown", Width = 100, Required = true, Editable = true, Options = new() { new() { Value = "Accepted", Label = "Accepted" }, new() { Value = "Rejected", Label = "Rejected" }, new() { Value = "Rework", Label = "Rework" }, new() { Value = "Scrap", Label = "Scrap" } } },
+            new() { Key = "unrestrictedQty", Label = "Unrestricted", Type = "number", Width = 100, Editable = true },
+            new() { Key = "blockedQty", Label = "Blocked", Type = "number", Width = 80, Editable = true },
+            new() { Key = "scrapQty", Label = "Scrap", Type = "number", Width = 80, Editable = true },
+            new() { Key = "qualityScore", Label = "Score", Type = "number", Width = 80 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM04() => new()
+    {
+        TCode = "ZQM04", Title = "UD Reversal Engine", Module = "QM", Icon = "bi-arrow-counterclockwise",
+        ToolbarActions = new()
+        {
+            new() { Id = "reverse", Label = "Reverse UD", Icon = "bi-arrow-counterclockwise", Style = "warning", Handler = "reverse", Confirm = true, ConfirmMessage = "Reverse this usage decision?" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "reversal", Label = "Reversal", Icon = "bi-arrow-left-right", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Lot #", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "previousUD", Label = "Current UD", Type = "text", Width = 100 },
+            new() { Key = "previousStatus", Label = "Current Status", Type = "text", Width = 120 },
+            new() { Key = "reversalReason", Label = "Reason", Type = "text", Width = 200, Required = true, Editable = true },
+            new() { Key = "movementType", Label = "Mvt Type", Type = "text", Width = 80, Editable = true },
+            new() { Key = "stockQtyMoved", Label = "Qty Moved", Type = "number", Width = 100 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = false, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM05() => new()
+    {
+        TCode = "ZQM05", Title = "Handling Unit & Packaging", Module = "QM", Icon = "bi-box-seam",
+        ToolbarActions = new()
+        {
+            new() { Id = "create", Label = "Create HU", Icon = "bi-plus-circle", Style = "success", Handler = "addRow" },
+            new() { Id = "release", Label = "Release to Queue", Icon = "bi-send", Style = "primary", Handler = "release" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "hu", Label = "Handling Units", Icon = "bi-box", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "huNumber", Label = "HU #", Type = "text", Width = 140 },
+            new() { Key = "materialCode", Label = "Material", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "batchNumber", Label = "Batch", Type = "text", Width = 100, Editable = true },
+            new() { Key = "quantity", Label = "Qty", Type = "number", Width = 80, Required = true, Editable = true },
+            new() { Key = "packageType", Label = "Package", Type = "dropdown", Width = 100, Editable = true, Options = new() { new() { Value = "Standard", Label = "Standard" }, new() { Value = "Pallet", Label = "Pallet" }, new() { Value = "Crate", Label = "Crate" } } },
+            new() { Key = "grossWeight", Label = "Gross Wt", Type = "number", Width = 80, Editable = true },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = true, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM06() => new()
+    {
+        TCode = "ZQM06", Title = "QA Inspection Selection", Module = "QM", Icon = "bi-funnel",
+        ToolbarActions = new()
+        {
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "worklist", Label = "Worklist", Icon = "bi-list-ul", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "lotNumber", Label = "Lot #", Type = "text", Width = 140 },
+            new() { Key = "materialCode", Label = "Material", Type = "text", Width = 120 },
+            new() { Key = "plant", Label = "Plant", Type = "text", Width = 80 },
+            new() { Key = "inspectionType", Label = "Insp Type", Type = "text", Width = 80 },
+            new() { Key = "sampleSize", Label = "Sample", Type = "number", Width = 70 },
+            new() { Key = "inspected", Label = "Tested", Type = "number", Width = 70 },
+            new() { Key = "assignedInspector", Label = "Inspector", Type = "text", Width = 100 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100 },
+            new() { Key = "udCode", Label = "UD", Type = "text", Width = 80 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM07() => new()
+    {
+        TCode = "ZQM07", Title = "Non-Conformance & CAPA", Module = "QM", Icon = "bi-exclamation-triangle",
+        ToolbarActions = new()
+        {
+            new() { Id = "createNC", Label = "Create NC", Icon = "bi-plus-circle", Style = "warning", Handler = "addRow" },
+            new() { Id = "createCapa", Label = "Create CAPA", Icon = "bi-plus-circle", Style = "success", Handler = "createCapa" },
+            new() { Id = "containment", Label = "Containment", Icon = "bi-shield-lock", Style = "danger", Handler = "containment" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "nc", Label = "Non-Conformances", Icon = "bi-bug", Active = true },
+            new() { Id = "capa", Label = "CAPAs", Icon = "bi-tools" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "ncNumber", Label = "NC #", Type = "text", Width = 120 },
+            new() { Key = "ncType", Label = "Type", Type = "text", Width = 80 },
+            new() { Key = "severity", Label = "Severity", Type = "status_badge", Width = 80 },
+            new() { Key = "materialCode", Label = "Material", Type = "text", Width = 100 },
+            new() { Key = "defectCode", Label = "Defect", Type = "text", Width = 100 },
+            new() { Key = "rootCauseCategory", Label = "Root Cause", Type = "text", Width = 120 },
+            new() { Key = "priority", Label = "Priority", Type = "status_badge", Width = 80 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM08() => new()
+    {
+        TCode = "ZQM08", Title = "Lab Calculator", Module = "QM", Icon = "bi-calculator",
+        ToolbarActions = new()
+        {
+            new() { Id = "calculate", Label = "Calculate", Icon = "bi-play-circle", Style = "primary", Handler = "calculate" },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new()
+        {
+            new() { Id = "calc", Label = "Calculation", Icon = "bi-calculator", Active = true },
+            new() { Id = "results", Label = "Results History", Icon = "bi-clock-history" },
+        },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "analysisNumber", Label = "Analysis #", Type = "text", Width = 140 },
+            new() { Key = "materialCode", Label = "Material", Type = "text", Width = 120, Required = true, Editable = true },
+            new() { Key = "batchNumber", Label = "Batch", Type = "text", Width = 100, Editable = true },
+            new() { Key = "calculationType", Label = "Calc Type", Type = "dropdown", Width = 120, Required = true, Editable = true, Options = new() { new() { Value = "MOISTURE_CONTENT", Label = "Moisture" }, new() { Value = "DRY_SUBSTANCE", Label = "Dry Substance" }, new() { Value = "STARCH_PURITY", Label = "Starch Purity" }, new() { Value = "GRAIN_DEFECT", Label = "Grain Defect" }, new() { Value = "BAUME_GRAVITY", Label = "Baume" }, new() { Value = "DE_VALUE", Label = "DE Value" } } },
+            new() { Key = "rawValue", Label = "Raw Value", Type = "number", Width = 100, Required = true, Editable = true },
+            new() { Key = "convertedValue", Label = "Result", Type = "number", Width = 100 },
+            new() { Key = "evaluation", Label = "Pass/Fail", Type = "status_badge", Width = 80 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM09() => new()
+    {
+        TCode = "ZQM09", Title = "Certificate of Analysis", Module = "QM", Icon = "bi-file-earmark-medical",
+        ToolbarActions = new()
+        {
+            new() { Id = "generate", Label = "Generate CoA", Icon = "bi-file-earmark-medical", Style = "success", Handler = "generate", Confirm = true },
+            new() { Id = "refresh", Label = "Refresh", Icon = "bi-arrow-clockwise", Style = "default", Handler = "refresh" },
+            new() { Id = "export", Label = "Export", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "coa", Label = "CoA Generation", Icon = "bi-file-earmark-medical", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "certificateNumber", Label = "CoA #", Type = "text", Width = 140 },
+            new() { Key = "inspectionLotNumber", Label = "Lot #", Type = "text", Width = 140, Required = true, Editable = true },
+            new() { Key = "materialCode", Label = "Material", Type = "text", Width = 120 },
+            new() { Key = "batchNumber", Label = "Batch", Type = "text", Width = 100 },
+            new() { Key = "customerName", Label = "Customer", Type = "text", Width = 150, Editable = true },
+            new() { Key = "totalCharacteristics", Label = "Total", Type = "number", Width = 60 },
+            new() { Key = "passedCharacteristics", Label = "Passed", Type = "number", Width = 60 },
+            new() { Key = "overallResult", Label = "Result", Type = "status_badge", Width = 80 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 80 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = true, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
+    };
+
+    private static TCodeLayoutConfig ZQM10() => new()
+    {
+        TCode = "ZQM10", Title = "Pipeline Diagnostic", Module = "QM", Icon = "bi-diagram-3",
+        ToolbarActions = new()
+        {
+            new() { Id = "trace", Label = "Run Full Trace", Icon = "bi-play-circle", Style = "primary", Handler = "trace" },
+            new() { Id = "export", Label = "Export Report", Icon = "bi-download", Style = "default", Handler = "export" },
+            new() { Id = "back", Label = "Back", Icon = "bi-arrow-left", Style = "secondary", Handler = "back" },
+        },
+        Tabs = new() { new() { Id = "trace", Label = "Pipeline Trace", Icon = "bi-diagram-3", Active = true } },
+        Columns = new()
+        {
+            new() { Key = "select", Label = "", Type = "checkbox", Width = 40, Fixed = true },
+            new() { Key = "stepName", Label = "Step", Type = "text", Width = 180 },
+            new() { Key = "stepCategory", Label = "Category", Type = "text", Width = 120 },
+            new() { Key = "status", Label = "Status", Type = "status_badge", Width = 100 },
+            new() { Key = "details", Label = "Details", Type = "text", Width = 250 },
+            new() { Key = "documentNumber", Label = "Document", Type = "text", Width = 120 },
+            new() { Key = "timestamp", Label = "Timestamp", Type = "date", Width = 140 },
+        },
+        TableToolbar = new() { ShowSearch = true, ShowFilter = false, ShowExport = true, ShowAddRow = false, ShowDeleteRow = false }
     };
 }

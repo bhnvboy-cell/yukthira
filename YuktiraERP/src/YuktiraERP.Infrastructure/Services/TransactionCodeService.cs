@@ -38,6 +38,11 @@ public class TransactionCodeService : ITransactionCodeService
         ["QM01"] = "/Transactions/Engine/QM01", ["QM02"] = "/Transactions/Engine/QM02", ["QM03"] = "/Transactions/Engine/QM03",
         ["QM11"] = "/Transactions/Engine/QM11", ["QM12"] = "/Transactions/Engine/QM12",
         ["ZQM1"] = "/Transactions/Engine/ZQM1", ["1FM"] = "/Transactions/Engine/1FM",
+        ["ZQM01"] = "/Transactions/Engine/ZQM01", ["ZQM02"] = "/Transactions/Engine/ZQM02",
+        ["ZQM03"] = "/Transactions/Engine/ZQM03", ["ZQM04"] = "/Transactions/Engine/ZQM04",
+        ["ZQM05"] = "/Transactions/Engine/ZQM05", ["ZQM06"] = "/Transactions/Engine/ZQM06",
+        ["ZQM07"] = "/Transactions/Engine/ZQM07", ["ZQM08"] = "/Transactions/Engine/ZQM08",
+        ["ZQM09"] = "/Transactions/Engine/ZQM09", ["ZQM10"] = "/Transactions/Engine/ZQM10",
         ["2F9"] = "/Transactions/Engine/2F9", ["1E1"] = "/Transactions/Engine/1E1",
         ["2QP"] = "/Transactions/Engine/2QP", ["2QN"] = "/Transactions/Engine/2QN",
         ["QMM"] = "/Transactions/Engine/QMM", ["1MP"] = "/Transactions/Engine/1MP",
@@ -482,6 +487,11 @@ public class TransactionCodeService : ITransactionCodeService
                     "QM03" => "Quality Notification Tasks", "QM11" => "Record Results: Overview",
                     "QM12" => "Usage Decision",
                     "ZQM1" => "QM Master Data Setup", "1FM" => "QM in Procurement",
+                    "ZQM01" => "Auto Inspection Lot Generator", "ZQM02" => "Results Recording Workbench",
+                    "ZQM03" => "Usage Decision Engine", "ZQM04" => "UD Reversal Engine",
+                    "ZQM05" => "Handling Unit & Packaging Release", "ZQM06" => "QA Inspection Selection Worklist",
+                    "ZQM07" => "Non-Conformance & CAPA Engine", "ZQM08" => "Lab Calculator",
+                    "ZQM09" => "Certificate of Analysis Generator", "ZQM10" => "Pipeline Diagnostic",
                     "2F9" => "Supplier Complaints", "1E1" => "QM in Production",
                     "2QP" => "Internal Problem Notification", "2QN" => "Manual Inspection",
                     "QMM" => "Recurring Batch Inspection", "1MP" => "Outbound Delivery Inspection",
@@ -613,6 +623,8 @@ public class TransactionCodeService : ITransactionCodeService
         "PM04" or "IW21" or "IW31" or "IW41" or "IW32" or
         "QM01" or "QM02" or "QM03" or "QM11" or "QM12" or "QE51N" or
         "ZQM1" or "1FM" or "2F9" or "1E1" or "2QP" or "2QN" or "QMM" or
+        "ZQM01" or "ZQM02" or "ZQM03" or "ZQM04" or "ZQM05" or "ZQM06" or
+        "ZQM07" or "ZQM08" or "ZQM09" or "ZQM10" or
         "1MP" or "BKR" or "2FA" or "CALIB" or
         "ME51N" or "ME28" or "MD61" or
         "ABZN" or "KB11N" or "QP01" or "QN01" or "QA11" or "QC21" or
