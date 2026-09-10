@@ -1,13 +1,13 @@
 <div align="center">
 
-# YuktiraERP v1.1.0
+# YuktiraERP v1.2.0
 
 ### Open-Source Enterprise Resource Planning
 
 **.NET 10 · PostgreSQL 18 · GraphQL · SignalR · AI/ML**
 
 [![Tests](https://img.shields.io/badge/tests-275%20passing-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-1.1.0-blue)]()
+[![Version](https://img.shields.io/badge/version-1.2.0-blue)]()
 [![License](https://img.shields.io/badge/license-open%20source-green)]()
 
 > **99%+ cost savings vs SAP S/4HANA · 90%+ vs Dynamics 365**
@@ -53,8 +53,9 @@ dotnet run --project src/YuktiraERP.Web --urls http://localhost:5001
 ┌─────────┼─────────────────┼───────────────────────┼─────────────┐
 │         ▼                 ▼                       ▼             │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │  ASP.NET Core 10 — Middleware Pipeline (17 stages)      │   │
-│  │  JWT Auth → CORS → Throttling → Tenant → Audit → ...   │   │
+│  │  ASP.NET Core 10 — Middleware Pipeline (18 stages)      │   │
+│  │  JWT Auth → CORS → Throttling → Tenant → Currency →    │   │
+│  │  Audit → Security → ...                                 │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │         │                                                        │
 │  ┌──────┴──────────────────────────────────────────────────┐    │
@@ -78,18 +79,26 @@ dotnet run --project src/YuktiraERP.Web --urls http://localhost:5001
 ```
 YuktiraERP/
 ├── src/
-│   ├── YuktiraERP.Core/              Domain models, interfaces, DTOs
+│   ├── YuktiraERP.Core/              Domain models, interfaces, DTOs (ZqmEnums, ZqmDtos)
 │   ├── YuktiraERP.Infrastructure/    Services, DB context, security
+│   │   ├── MultiTenant/              TenantCultureMiddleware, TenantMiddleware
+│   │   ├── Services/                 ZQM* (10 services), TransactionCode, TCodeLayout
+│   │   └── Data/Configurations/      QmEntityConfiguration, AllEntities
 │   ├── YuktiraERP.WorkflowEngine/    FSM-based workflow runtime
 │   ├── YuktiraERP.AIEngine/          OCR, predictive analytics
 │   ├── YuktiraERP.ExportEngine/      CSV, Excel, PDF generation
 │   ├── YuktiraERP.PluginSdk/         Plugin interfaces, hot-loading
 │   ├── YuktiraERP.Api/               REST + GraphQL + SignalR
+│   │   └── Controllers/Modules/      ZqmSuiteController, etc.
 │   ├── YuktiraERP.Web/               Razor Pages frontend
+│   │   ├── Pages/Shared/             _Layout.cshtml, _TopNavigation.cshtml
+│   │   └── wwwroot/
+│   │       ├── css/                  yuktira.css, enterprise-form.css, tcode-engine.css
+│   │       └── js/                   yuktira.js (YuktiraFormat), enterprise-form.js
 │   └── YuktiraERP.Tests/             275 unit/integration tests
 ├── database/
-│   └── scripts/                      SQL migration scripts
-└── report.md                         Development progress report
+│   └── scripts/                      SQL migration scripts (043_zqm_suite_tables.sql)
+└── README.md
 ```
 
 ---
@@ -105,6 +114,47 @@ YuktiraERP/
 | **Analytics** | BI · AI · PD |
 | **Compliance** | SX |
 | **System** | WF · APP · NOT · TCD · TCG · AUD · ADM · CST · INT · PLG · ME |
+
+---
+
+## New in v1.2.0
+
+### Quality Management Extensions (ZQM-01 → ZQM-10)
+
+| TCode | Module | Description |
+|-------|--------|-------------|
+| ZQM01 | Auto Inspection Lot Generator | Auto-create inspection lots on GR with configurable origins |
+| ZQM02 | Results Recording Workbench | ALV grid for mass results entry across inspection lots |
+| ZQM03 | Usage Decision Engine | Auto-score, auto-approve, CAB integration |
+| ZQM04 | UD Reversal Engine | Reverse completed UDs, stock reversion (322), audit trail |
+| ZQM05 | Handling Unit Management | Nesting, split, merge, weight/volume calc |
+| ZQM06 | QA Worklist Dashboard | Priority-sorted worklist with aging, overdue alerts |
+| ZQM07 | Non-Conformance Manager | NCR lifecycle, disposition, CAPA linkage |
+| ZQM08 | Lab Calculator | Mean, stddev, Cp, Cpk, OOT flagging |
+| ZQM09 | Certificate of Analysis Generator | Auto COA from results, PDF/HTML, digital signature |
+| ZQM10 | QM Pipeline Diagnostic | End-to-end QM flow validation engine |
+
+### Tenant-Aware Currency Formatting
+
+- **Middleware**: `TenantCultureMiddleware` resolves base currency per tenant from DB
+- **Base class**: `YuktiraPageModel` exposes `FormatCurrency()`, `ActiveCurrencySymbol`, `ActiveLocale`
+- **Client-side**: `YuktiraFormat.currency()`, `.number()`, `.percentage()`, `.date()` using `Intl.NumberFormat`
+- **Layout injection**: `window.YuktiraConfig` with tenant currency + locale
+- Zero manual `CultureInfo` setup — currency follows tenant automatically
+
+### Screen Zoom / Density Control
+
+- **5 zoom levels**: 80% Compact · 90% Dense · 100% Standard · 110% Large · 120% Extra Large
+- **Persistence**: `localStorage` — zoom level persists across sessions
+- **Engine**: CSS custom property `--erp-content-scale` + `fontSize` scaling
+- **Top header**: Redesigned 38px height, solid Go execute button (#1F497D) with `↵` shortcut badge
+
+### Top Header Layout Redesign
+
+- **Height**: 48px → 38px (high-density ERP standard)
+- **Go button**: Solid `#1F497D` with "Go" text + `↵` Enter shortcut badge
+- **Alignment**: Search bar, Go button, zoom widget, and utility icons in a single flex row
+- **Vertical rhythm**: Standardized across top bar → page title → action bar → data grid
 
 ---
 
@@ -174,6 +224,7 @@ PO ──► GR(101) ──► Inspection Lot ──► UD ──► Release(321
 | SD | `/api/sd/*` | Customer, SO, Delivery, Billing, VF03 Pricing |
 | PP | `/api/pp` | Production Order, BOM, Routing |
 | QM | `/api/qm` | Inspection Lot, Notification, Usage Decision, UD Reversal |
+| ZQM | `/api/zqm/*` | Auto Lot Gen, Results Workbench, UD Engine, HU, Lab Calc, COA, NCR, QA Worklist, Pipeline |
 | FI | `/api/fi/*` | GL, AP, AR, Tax, Currency, Bank, FB03 |
 | CO | `/api/co` | Cost Center, Profit Center, Internal Order |
 | PM | `/api/pm` | Equipment, Maintenance Order, Plan |
@@ -205,6 +256,18 @@ POST /api/mm/stock-overview/mmbe                  # Hierarchical stock view
 # Movement Types
 POST /api/mm/movement-types/post                  # Post movement with validation
 POST /api/mm/movement-types/validate              # Validate before posting
+
+# ZQM Suite (30+ endpoints)
+POST /api/zqm/auto-lot/generate                   # Auto-create inspection lots
+GET  /api/zqm/results-workbench                   # Results recording ALV
+POST /api/zqm/usage-decisions/score               # Auto-score UD
+POST /api/zqm/usage-decisions/reverse             # UD reversal engine
+POST /api/zqm/handling-units                      # HU create/split/merge
+GET  /api/zqm/qa-worklist                         # Priority worklist
+POST /api/zqm/non-conformances                    # NCR lifecycle
+POST /api/zqm/lab-calculator/cpk                  # Cp/Cpk calculation
+POST /api/zqm/coa/generate                        # COA generation
+POST /api/zqm/pipeline-diagnostic                 # QM flow validation
 ```
 
 ### GraphQL
@@ -241,6 +304,16 @@ query {
 | QM | `/QM/Inspection/QA33` | QA33 | Inspection results recording |
 | QM | `/QM/Inspection/ReverseUD` | ZQIC | UD Reversal & Stock Reversion |
 | QM | `/Quality/PipelineDiagnostic` | — | E2E Pipeline Diagnostic Engine |
+| QM | `/Transactions/Engine/ZQM01` | ZQM01 | Auto Inspection Lot Generator |
+| QM | `/Transactions/Engine/ZQM02` | ZQM02 | Results Recording Workbench |
+| QM | `/Transactions/Engine/ZQM03` | ZQM03 | Usage Decision Engine |
+| QM | `/Transactions/Engine/ZQM04` | ZQM04 | UD Reversal Engine |
+| QM | `/Transactions/Engine/ZQM05` | ZQM05 | Handling Unit Management |
+| QM | `/Transactions/Engine/ZQM06` | ZQM06 | QA Worklist Dashboard |
+| QM | `/Transactions/Engine/ZQM07` | ZQM07 | Non-Conformance Manager |
+| QM | `/Transactions/Engine/ZQM08` | ZQM08 | Lab Calculator |
+| QM | `/Transactions/Engine/ZQM09` | ZQM09 | COA Generator |
+| QM | `/Transactions/Engine/ZQM10` | ZQM10 | QM Pipeline Diagnostic |
 | SD | `/SD/Billing/VF03` | VF03 | Billing document pricing conditions |
 
 ---
@@ -332,6 +405,8 @@ SAP S/4HANA · SAP HANA · Oracle ERP · MES · LIMS
 - AI document OCR, predictive analytics
 - Pricing engine (13 tests)
 - E2E pipeline validation
+- ZQM suite (auto lot, results workbench, UD engine, HU, lab calc, COA, NCR, QA worklist, pipeline diagnostic)
+- Currency formatting middleware
 
 ```bash
 dotnet test src/YuktiraERP.Tests
@@ -379,7 +454,7 @@ Open Source — Free for commercial and personal use.
 
 <div align="center">
 
-**v1.1.0** · Built with ❤️ to democratize enterprise ERP
+**v1.2.0** · Built with ❤️ to democratize enterprise ERP
 
 [GitHub](https://github.com/bhnvboy-cell/yukthira)
 
