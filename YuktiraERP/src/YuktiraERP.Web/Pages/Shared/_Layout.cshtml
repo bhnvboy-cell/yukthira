@@ -62,11 +62,25 @@
                         <div class="top-bar-search">
                             <i class="bi bi-search" aria-hidden="true"></i>
                             <input type="text" id="globalSearch" placeholder="@L["SearchPlaceholder"]" autocomplete="off" aria-label="Search transactions">
-                            <button type="button" class="top-bar-search-btn" id="globalSearchBtn" title="Search" aria-label="Search"><i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="top-bar-search-btn" id="globalSearchBtn" title="Execute (Enter)" aria-label="Execute search"><span class="btn-go-text">Go</span><span class="btn-go-enter">&#x23CE;</span></button>
                             <div id="globalSearchResults" class="search-results" style="display:none" role="listbox" aria-label="Search results"></div>
                         </div>
                     </div>
                     <div class="top-bar-right">
+                        <div class="erp-zoom-control" id="erpZoomControl" role="group" aria-label="Screen zoom level">
+                            <button type="button" class="erp-zoom-trigger" id="erpZoomTrigger" title="Screen zoom" aria-haspopup="listbox" aria-expanded="false">
+                                <i class="bi bi-aspect-ratio" aria-hidden="true"></i>
+                                <span class="erp-zoom-label" id="erpZoomLabel">100%</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="erp-zoom-dropdown" id="erpZoomDropdown" role="listbox" aria-label="Select zoom level">
+                                <button type="button" class="erp-zoom-option" data-zoom="0.8" role="option">80%<span class="erp-zoom-tag">Compact</span></button>
+                                <button type="button" class="erp-zoom-option" data-zoom="0.9" role="option">90%<span class="erp-zoom-tag">Dense</span></button>
+                                <button type="button" class="erp-zoom-option" data-zoom="1.0" role="option">100%<span class="erp-zoom-tag">Standard</span></button>
+                                <button type="button" class="erp-zoom-option" data-zoom="1.1" role="option">110%<span class="erp-zoom-tag">Large</span></button>
+                                <button type="button" class="erp-zoom-option" data-zoom="1.2" role="option">120%<span class="erp-zoom-tag">Extra Large</span></button>
+                            </div>
+                        </div>
                         <button type="button" class="top-bar-icon" id="darkModeToggle" title="@L["ToggleDarkMode"]" aria-label="@L["ToggleDarkMode"]"><i class="bi bi-moon-stars"></i></button>
                         <a href="/Notifications" class="top-bar-icon" title="@L["Notifications"]" aria-label="@L["Notifications"]">
                             <i class="bi bi-bell" aria-hidden="true"></i>
@@ -85,7 +99,7 @@
                                 <option value="es" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "es")">ES</option>
                             </select>
                         </form>
-                        <a href="#" class="top-bar-icon" id="printBtn" title="@L["Print"]" aria-label="@L["Print"]"><i class="bi bi-printer" aria-hidden="true"></i></a>
+                        <a href="#" class="top-bar-icon" id="printBtn" title="@L["Print"] (Ctrl+P)" aria-label="@L["Print"]"><i class="bi bi-printer" aria-hidden="true"></i></a>
                         <a href="/Auth/Logout" class="top-bar-icon text-danger" title="@L["Logout"]" aria-label="@L["Logout"]"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </header>
@@ -272,6 +286,77 @@
         $(document).on('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'p' && !e.shiftKey) { e.preventDefault(); $('#printBtn').click(); }
         });
+
+        // ── Screen Zoom / Density Control ──
+        (function() {
+            var trigger = document.getElementById('erpZoomTrigger');
+            var dropdown = document.getElementById('erpZoomDropdown');
+            var label = document.getElementById('erpZoomLabel');
+            if (!trigger || !dropdown || !label) return;
+
+            var STORAGE_KEY = 'yuktira_grid_zoom';
+            var options = dropdown.querySelectorAll('.erp-zoom-option');
+
+            function applyZoom(scale) {
+                document.documentElement.style.setProperty('--erp-content-scale', scale);
+                document.documentElement.style.fontSize = (scale * 100) + '%';
+                label.textContent = Math.round(scale * 100) + '%';
+                options.forEach(function(opt) {
+                    opt.classList.toggle('erp-zoom-active', parseFloat(opt.dataset.zoom) === scale);
+                });
+            }
+
+            // Load saved zoom
+            var saved = parseFloat(localStorage.getItem(STORAGE_KEY));
+            if (!isNaN(saved) && saved >= 0.8 && saved <= 1.2) {
+                applyZoom(saved);
+            }
+
+            // Toggle dropdown
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isOpen = dropdown.classList.contains('erp-zoom-open');
+                dropdown.classList.toggle('erp-zoom-open', !isOpen);
+                trigger.setAttribute('aria-expanded', !isOpen);
+            });
+
+            // Select zoom level
+            options.forEach(function(opt) {
+                opt.addEventListener('click', function() {
+                    var scale = parseFloat(this.dataset.zoom);
+                    localStorage.setItem(STORAGE_KEY, scale);
+                    applyZoom(scale);
+                    dropdown.classList.remove('erp-zoom-open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            // Close on outside click
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.erp-zoom-control')) {
+                    dropdown.classList.remove('erp-zoom-open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Keyboard: arrow keys inside dropdown
+            trigger.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    dropdown.classList.add('erp-zoom-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    var items = Array.from(options);
+                    var activeIdx = items.findIndex(function(i) { return i.classList.contains('erp-zoom-active'); });
+                    var next = e.key === 'ArrowDown'
+                        ? (activeIdx < items.length - 1 ? activeIdx + 1 : 0)
+                        : (activeIdx > 0 ? activeIdx - 1 : items.length - 1);
+                    items[next].focus();
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('erp-zoom-open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        })();
 
         // ── Mobile sidebar drawer ──
         function openSidebar() {
