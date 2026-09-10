@@ -1,13 +1,13 @@
 <div align="center">
 
-# YuktiraERP v1.2.0
+# YuktiraERP v2.0.0
 
 ### Open-Source Enterprise Resource Planning
 
 **.NET 10 · PostgreSQL 18 · GraphQL · SignalR · AI/ML**
 
 [![Tests](https://img.shields.io/badge/tests-275%20passing-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-1.2.0-blue)]()
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)]()
 [![License](https://img.shields.io/badge/license-open%20source-green)]()
 
 > **99%+ cost savings vs SAP S/4HANA · 90%+ vs Dynamics 365**
@@ -79,13 +79,18 @@ dotnet run --project src/YuktiraERP.Web --urls http://localhost:5001
 ```
 YuktiraERP/
 ├── src/
-│   ├── YuktiraERP.Core/              Domain models, interfaces, DTOs (ZqmEnums, ZqmDtos)
+│   ├── YuktiraERP.Core/              Domain models, interfaces, DTOs
+│   │   ├── Interfaces/               IMlEngineServices, IOfflineSyncServices, IEDiServices, IEventStoreService
+│   │   ├── Dtos/                     MlEngineDtos, OfflineSyncDtos, EdiDtos, EventStoreDtos
+│   │   └── Enums/                    ZqmEnums, MlEngineEnums, OfflineSyncEnums, EdiEnums, EventStoreEnums
 │   ├── YuktiraERP.Infrastructure/    Services, DB context, security
 │   │   ├── MultiTenant/              TenantCultureMiddleware, TenantMiddleware
-│   │   ├── Services/                 ZQM* (10 services), TransactionCode, TCodeLayout
+│   │   ├── Services/                 ZQM* (10), QualityVisionInspectionEngine, NaturalLanguageQueryEngine,
+│   │   │                             OfflineQueueService, EdiAs2Handler, EventStoreService
+│   │   ├── Hubs/                     NotificationHub, YuktiraNotificationHub (mobile push)
 │   │   └── Data/Configurations/      QmEntityConfiguration, AllEntities
 │   ├── YuktiraERP.WorkflowEngine/    FSM-based workflow runtime
-│   ├── YuktiraERP.AIEngine/          OCR, predictive analytics
+│   ├── YuktiraERP.AIEngine/          OCR, predictive analytics (ML.NET ready)
 │   ├── YuktiraERP.ExportEngine/      CSV, Excel, PDF generation
 │   ├── YuktiraERP.PluginSdk/         Plugin interfaces, hot-loading
 │   ├── YuktiraERP.Api/               REST + GraphQL + SignalR
@@ -97,7 +102,7 @@ YuktiraERP/
 │   │       └── js/                   yuktira.js (YuktiraFormat), enterprise-form.js
 │   └── YuktiraERP.Tests/             275 unit/integration tests
 ├── database/
-│   └── scripts/                      SQL migration scripts (043_zqm_suite_tables.sql)
+│   └── scripts/                      043_zqm_suite.sql, 044_v2_roadmap_tables.sql
 └── README.md
 ```
 
@@ -117,7 +122,7 @@ YuktiraERP/
 
 ---
 
-## New in v1.2.0
+## Previous: v1.2.0 Features
 
 ### Quality Management Extensions (ZQM-01 → ZQM-10)
 
@@ -155,6 +160,79 @@ YuktiraERP/
 - **Go button**: Solid `#1F497D` with "Go" text + `↵` Enter shortcut badge
 - **Alignment**: Search bar, Go button, zoom widget, and utility icons in a single flex row
 - **Vertical rhythm**: Standardized across top bar → page title → action bar → data grid
+
+---
+
+## New in v2.0.0
+
+### ML.NET Predictive & Computer-Vision QC Engine
+
+| Component | Description |
+|-----------|-------------|
+| **QualityVisionInspectionEngine** | ML.NET image classification for surface/grain defect detection. Auto-flags non-conformance lots. |
+| **NaturalLanguageQueryEngine** | Parse plain-English queries ("Show overdue invoices for Client 1000") into parameterized EF Core LINQ with multi-tenant filters. |
+
+**Vision Inspection Pipeline:**
+```
+Image Input → Feature Extraction → Defect Classification → Severity Assessment → NCR Auto-Creation
+                                      │
+                                      ├── SurfaceScratch, Dent, Discoloration
+                                      ├── Crack, ForeignParticle, GrainDefect
+                                      ├── MoistureDamage, LabelMisalignment, SealFailure
+                                      └── Confidence Score → Pass/Warning/Minor/Major/Critical
+```
+
+**NL Query Engine Features:**
+- Entity detection: materials, vendors, customers, POs, SOs, inspection lots, stock, journals
+- Operations: Select, Count, Sum, Average, Filter, GroupBy, Sort
+- Filters: client number, status, plant, material, date ranges, overdue, today/week/month
+- Auto-suggestions for common queries
+
+### Mobile App Bridge & Offline Sync Engine
+
+| Component | Description |
+|-----------|-------------|
+| **OfflineQueueService** | Process batch transactions queued during offline warehouse/field operations. Conflict resolution (Server/Client/Merge/Manual), idempotency validation, atomic stock balance updates. |
+| **YuktiraNotificationHub** | SignalR hub for real-time mobile push: low stock alerts, production holds, quality non-conformance. |
+| **MobileNotificationService** | Push notification dispatch with priority routing by tenant/material/plant. |
+
+**Offline Transaction Types:** GR, GI, Stock Transfer, Physical Count, Inspection Result, Usage Decision
+
+**Conflict Resolution Strategies:**
+- **ServerWins** — Server state takes precedence
+- **ClientWins** — Client state overwrites server
+- **Merge** — Field-level merge with timestamp priority
+- **ManualReview** — Flag for human resolution
+
+### EDI B2B Transport Protocol Engine
+
+| Component | Description |
+|-----------|-------------|
+| **EdiAs2Handler** | AS2/AS4 message processing with S/MIME encryption, digital signatures, MIC validation, async MDN receipts. |
+| **EdiTransactionProcessor** | EDI 850 (Purchase Orders) and EDI 810 (Invoices) translation to ERP entities. |
+
+**Supported Protocols:** AS2, AS4, FTP, HTTPS
+**Security Levels:** None, Sign, Encrypt, SignAndEncrypt
+**Message Types:** EDI 850, 855, 810, 856, 997
+
+### CQRS & Event Sourcing Engine (v2.0 Architectural Parity)
+
+| Component | Description |
+|-----------|-------------|
+| **IEventStoreService** | Append domain events, retrieve by aggregate/type, replay with projections. Optimistic concurrency on version. |
+| **IEventProjectionService** | Project stock balances and material documents from event streams. Read model snapshots. |
+| **Event Store Table** | `yuktira_sys.domain_events` — AggregateId, AggregateType, EventType, EventData (JSONB), Version, Timestamp, TenantId |
+
+**Event Sourcing Flow:**
+```
+Domain Action → AppendEventAsync → Event Store (PostgreSQL JSONB)
+                                       │
+                                       ├── Version = latest + 1 (optimistic concurrency)
+                                       ├── ReplayEventsAsync → Read Model Projections
+                                       └── ReadModelSnapshots → MB51/MB52/MB5B reporting
+```
+
+**Supported Aggregates:** Material, StockBalance, PurchaseOrder, SalesOrder, GoodsReceipt, GoodsIssue, InspectionLot, UsageDecision, Vendor, Customer, JournalEntry, ProductionOrder
 
 ---
 
@@ -230,6 +308,11 @@ PO ──► GR(101) ──► Inspection Lot ──► UD ──► Release(321
 | PM | `/api/pm` | Equipment, Maintenance Order, Plan |
 | HR | `/api/hr` | Employee, Payroll, Attendance |
 | WM | `/api/wm` | Transfer, Storage Location, RF |
+| ML Vision | `/api/v2/vision/*` | Image Inspection, Defect Detection, Model Training |
+| NL Query | `/api/v2/nl-query/*` | Plain-English Query Execution |
+| Offline Sync | `/api/v2/offline/*` | Queue Processing, Conflict Resolution |
+| Event Store | `/api/v2/events/*` | CQRS Event Append, Replay, Projections |
+| Mobile Push | `/api/v2/notifications/*` | Real-time Push Alerts (Stock, Production, Quality) |
 | Pipeline | `/api/PipelineDiagnostic/*` | E2E Diagnostic Engine |
 
 ### New API Endpoints
@@ -268,6 +351,33 @@ POST /api/zqm/non-conformances                    # NCR lifecycle
 POST /api/zqm/lab-calculator/cpk                  # Cp/Cpk calculation
 POST /api/zqm/coa/generate                        # COA generation
 POST /api/zqm/pipeline-diagnostic                 # QM flow validation
+
+# V2.0: ML Vision Inspection
+POST /api/v2/vision/inspect                       # Single image defect detection
+POST /api/v2/vision/inspect/batch                 # Batch image inspection
+POST /api/v2/vision/model/train                   # Train ML.NET model
+POST /api/v2/vision/model/evaluate                # Evaluate model accuracy
+
+# V2.0: Natural Language Query
+POST /api/v2/nl-query/execute                     # Execute plain-English query
+GET  /api/v2/nl-query/suggestions                 # Query auto-suggestions
+
+# V2.0: Offline Sync
+POST /api/v2/offline/process                      # Process offline queue
+POST /api/v2/offline/resolve-conflict             # Resolve sync conflicts
+GET  /api/v2/offline/pending                      # Get pending transactions
+
+# V2.0: Event Sourcing
+POST /api/v2/events/append                        # Append domain event
+GET  /api/v2/events/{aggregateId}                 # Get events for aggregate
+GET  /api/v2/events/type/{eventType}              # Get events by type
+POST /api/v2/events/replay                        # Replay & project events
+GET  /api/v2/events/count                         # Get event count
+
+# V2.0: Mobile Push Notifications
+POST /api/v2/notifications/low-stock              # Low stock alert
+POST /api/v2/notifications/production-hold        # Production hold alert
+POST /api/v2/notifications/quality-ncr            # Quality NCR alert
 ```
 
 ### GraphQL
@@ -291,6 +401,7 @@ query {
 | Hub | URL | Events |
 |-----|-----|--------|
 | Notifications | `/hubs/notifications` | `ReceiveNotification` |
+| Mobile Push | `/hubs/mobile` | `ReceiveAlert` (low stock, production hold, quality NCR) |
 | Dashboard | `/hubs/dashboard` | `DashboardUpdate`, `StockChange`, `OrderUpdate`, `SoxViolation` |
 
 ---
@@ -407,6 +518,10 @@ SAP S/4HANA · SAP HANA · Oracle ERP · MES · LIMS
 - E2E pipeline validation
 - ZQM suite (auto lot, results workbench, UD engine, HU, lab calc, COA, NCR, QA worklist, pipeline diagnostic)
 - Currency formatting middleware
+- ML.NET vision inspection engine, NL query engine
+- Offline sync queue, conflict resolution, mobile notifications
+- EDI AS2/AS4 transport, S/MIME, MDN receipts
+- CQRS event store, projections, read model snapshots
 
 ```bash
 dotnet test src/YuktiraERP.Tests
@@ -432,6 +547,11 @@ dotnet test src/YuktiraERP.Tests
 | Plugin System | ✅ | ✅ | ✅ | ✅ |
 | Mobile RF | ✅ | ✅ | ✅ | ✅ |
 | AI/ML Built-in | ✅ | Limited | ✅ | ✅ |
+| ML Vision QC | ✅ | ✅ | Limited | ❌ |
+| NL Query Engine | ✅ | ❌ | ❌ | ❌ |
+| Offline Sync | ✅ | ✅ | ✅ | ✅ |
+| EDI B2B (AS2/AS4) | ✅ | ✅ | ✅ | ✅ |
+| CQRS Event Sourcing | ✅ | ✅ | ✅ | ❌ |
 | E2E Pipeline Diagnostic | ✅ | ❌ | ❌ | ❌ |
 | UD Reversal Engine | ✅ | ✅ | ✅ | ✅ |
 | **TCO (5 years)** | **$0** | **$2M-10M** | **$1M-5M** | **$500K-2M** |
@@ -454,7 +574,7 @@ Open Source — Free for commercial and personal use.
 
 <div align="center">
 
-**v1.2.0** · Built with ❤️ to democratize enterprise ERP
+**v2.0.0** · Built with ❤️ to democratize enterprise ERP
 
 [GitHub](https://github.com/bhnvboy-cell/yukthira)
 
