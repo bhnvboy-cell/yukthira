@@ -1,0 +1,109 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.PipelineDiagnosticModel
+@{ ViewData["Title"] = "ZQM10 - Pipeline Diagnostic"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+<style>
+    .pipe-visual{display:flex;align-items:center;gap:0;margin:20px 0;overflow-x:auto;padding:12px 0}
+    .pipe-step{flex:0 0 auto;text-align:center;padding:16px 20px;border:2px solid #e0e0e0;border-radius:8px;background:#fafafa;min-width:140px;transition:all 0.3s}
+    .pipe-step.pass{border-color:#4caf50;background:#e8f5e9}.pipe-step.fail{border-color:#f44336;background:#ffebee}.pipe-step.pending{border-color:#ff9800;background:#fff3e0}
+    .pipe-step .step-icon{font-size:1.4rem;margin-bottom:4px}.pipe-step .step-title{font-size:0.78rem;font-weight:700;color:#333}.pipe-step .step-status{font-size:0.68rem;margin-top:4px;font-weight:600}
+    .pipe-arrow{flex:0 0 auto;color:#bbb;font-size:1.1rem;padding:0 4px}.pipe-arrow.pass{color:#4caf50}
+    .zqm-detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:12px}
+    .zqm-detail-item{padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px}
+    .zqm-detail-item label{display:block;font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:2px}
+    .zqm-detail-item .val{font-size:0.88rem;font-weight:600;color:#333}
+</style>
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-diagram-3 me-2"></i>Pipeline Diagnostic</h3>
+            <span class="badge">ZQM10</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="traceFull()"><i class="bi bi-diagram-3 me-1"></i>Full Trace</button>
+            <button type="button" class="zqm-btn" onclick="validateStep('inspection')"><i class="bi bi-check-circle me-1"></i>Validate Insp</button>
+            <button type="button" class="zqm-btn" onclick="validateStep('results')"><i class="bi bi-check-circle me-1"></i>Validate Results</button>
+            <button type="button" class="zqm-btn" onclick="validateStep('ud')"><i class="bi bi-check-circle me-1"></i>Validate UD</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Lot Selection</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Inspection Lot Number</label><input id="pipe-lot" placeholder="e.g. IL-20260001" /></div>
+            <div class="zqm-field"><label>Material</label><div class="zqm-ro" id="pipeMaterial">-</div></div>
+            <div class="zqm-field"><label>Plant</label><div class="zqm-ro" id="pipePlant">-</div></div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-results" id="pipeSection" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-diagram-3 me-1"></i>Pipeline Status</h4><span class="count" id="pipeCount"></span></div>
+        <div style="padding:16px">
+            <div class="pipe-visual" id="pipeVisual"></div>
+            <div class="zqm-detail-grid" id="pipeDetails"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+var steps = [
+    { key:'inspection', title:'Inspection Lot', icon:'bi-clipboard-check' },
+    { key:'results', title:'Results', icon:'bi-clipboard-data' },
+    { key:'ud', title:'Usage Decision', icon:'bi-check2-circle' },
+    { key:'release', title:'QI Release', icon:'bi-unlock' },
+    { key:'coa', title:'Certificate', icon:'bi-file-earmark-check' }
+];
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+function renderPipeline(stepResults) {
+    var html = '';
+    steps.forEach(function(s, i) {
+        var st = stepResults[s.key] || 'pending';
+        var cls = st==='pass' ? 'pass' : st==='fail' ? 'fail' : 'pending';
+        var txt = st==='pass' ? 'PASS' : st==='fail' ? 'FAIL' : 'PENDING';
+        var clr = st==='pass' ? '#2e7d32' : st==='fail' ? '#c62828' : '#e65100';
+        html += '<div class="pipe-step '+cls+'"><div class="step-icon"><i class="bi '+s.icon+'"></i></div><div class="step-title">'+s.title+'</div><div class="step-status" style="color:'+clr+'">'+txt+'</div></div>';
+        if (i < steps.length - 1) html += '<div class="pipe-arrow '+(st==='pass'?'pass':'')+'"><i class="bi bi-arrow-right"></i></div>';
+    });
+    document.getElementById('pipeVisual').innerHTML = html;
+}
+async function traceFull() {
+    var lot = document.getElementById('pipe-lot').value;
+    if (!lot) { show('Enter a lot number', 'warning'); return; }
+    try {
+        var r = await fetch('/api/v1/zqm/pipeline/trace?lotNumber=' + encodeURIComponent(lot));
+        if (r.ok) {
+            var d = await r.json();
+            var sr = { inspection:d.inspectionLotValid?'pass':'fail', results:d.resultsValid?'pass':'fail', ud:d.udValid?'pass':'fail', release:d.releaseValid?'pass':'fail', coa:d.coaValid?'pass':'fail' };
+            renderPipeline(sr);
+            document.getElementById('pipeMaterial').textContent = d.materialCode || '-';
+            document.getElementById('pipePlant').textContent = d.plant || '-';
+            var pass = Object.values(sr).filter(function(v){return v==='pass'}).length;
+            document.getElementById('pipeCount').textContent = pass + '/' + steps.length + ' steps passed';
+            var dh = '<div class="zqm-detail-item"><label>Lot</label><div class="val">'+(d.lotNumber||lot)+'</div></div>';
+            dh += '<div class="zqm-detail-item"><label>Material</label><div class="val">'+(d.materialCode||'-')+'</div></div>';
+            dh += '<div class="zqm-detail-item"><label>Plant</label><div class="val">'+(d.plant||'-')+'</div></div>';
+            dh += '<div class="zqm-detail-item"><label>Overall</label><div class="val"><span class="zqm-badge '+(pass===steps.length?'passed':'failed')+'">'+(d.overallStatus||'-')+'</span></div></div>';
+            document.getElementById('pipeDetails').innerHTML = dh;
+            document.getElementById('pipeSection').style.display = '';
+        } else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+async function validateStep(step) {
+    var lot = document.getElementById('pipe-lot').value;
+    if (!lot) { show('Enter a lot number', 'warning'); return; }
+    try {
+        var r = await fetch('/api/v1/zqm/pipeline/validate-' + step + '/' + encodeURIComponent(lot));
+        if (r.ok) {
+            var d = await r.json();
+            var valid = d.valid || d.isValid || d.success || false;
+            show(step.toUpperCase() + ': ' + (valid ? 'PASSED' : 'FAILED') + ' - ' + (d.message || ''), valid ? 'success' : 'error');
+        } else { show(step.toUpperCase() + ' validation error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+</script>
+}

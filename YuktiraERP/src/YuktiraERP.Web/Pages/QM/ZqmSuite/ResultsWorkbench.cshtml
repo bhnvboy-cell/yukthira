@@ -1,0 +1,133 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.ResultsWorkbenchModel
+@{ ViewData["Title"] = "ZQM02 - Results Recording Workbench"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-clipboard-check me-2"></i>Results Recording Workbench</h3>
+            <span class="badge">ZQM02</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="loadLot()"><i class="bi bi-search me-1"></i>Load Lot</button>
+            <button type="button" class="zqm-btn" onclick="completeRecording()"><i class="bi bi-check-circle me-1"></i>Complete</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Lot Selection</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Inspection Lot Number</label><input id="lotNumber" placeholder="e.g. IL-20260001" /></div>
+            <div class="zqm-field"><label>Material</label><div class="zqm-ro" id="lotMaterial">-</div></div>
+            <div class="zqm-field"><label>Plant</label><div class="zqm-ro" id="lotPlant">-</div></div>
+        </div>
+        <div class="zqm-row cols-4">
+            <div class="zqm-field"><label>Batch</label><div class="zqm-ro" id="lotBatch">-</div></div>
+            <div class="zqm-field"><label>Status</label><div class="zqm-ro" id="lotStatus">-</div></div>
+            <div class="zqm-field"><label>Insp. Type</label><div class="zqm-ro" id="lotInspType">-</div></div>
+            <div class="zqm-field"><label>Sample Size</label><div class="zqm-ro" id="lotSampleSize">-</div></div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-results" id="resultsSection" style="display:none">
+        <div class="zqm-results-header">
+            <h4><i class="bi bi-table me-1"></i>Characteristic Results</h4>
+            <span class="count" id="resultCount"></span>
+        </div>
+        <div class="zqm-grid-bar">
+            <div class="info" id="recInfo">Results recorded: 0 | Pending: 0</div>
+            <div class="grid-actions">
+                <button class="g-btn primary" onclick="showRecordForm()"><i class="bi bi-plus"></i>Record Result</button>
+            </div>
+        </div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="resultsTable">
+                <thead><tr><th>Characteristic</th><th>Type</th><th>Target</th><th>LSL</th><th>USL</th><th>Unit</th><th>Measured</th><th>Evaluation</th><th>Status</th></tr></thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+        <div class="zqm-footer"><span id="footerInfo">-</span><div></div></div>
+    </div>
+
+    <div class="zqm-results" id="recordForm" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-pencil me-1"></i>Record New Result</h4></div>
+        <div style="padding:16px">
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Characteristic</label><select id="recChar"></select></div>
+                <div class="zqm-field"><label>Measured Value</label><input id="recValue" type="number" step="0.001" /></div>
+                <div class="zqm-field"><label>Inspector ID</label><input id="recInspector" value="superadmin" /></div>
+                <div class="zqm-field"><label>Notes</label><input id="recNotes" /></div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+                <button class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0" onclick="recordResult()"><i class="bi bi-check"></i>Save</button>
+                <button class="zqm-btn" style="background:#f5f5f5;color:#333;border:1px solid #ccc" onclick="document.getElementById('recordForm').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="zqm-empty" id="emptyState"><i class="bi bi-clipboard-data"></i><div>Enter a lot number and click Load Lot to begin</div></div>
+</div>
+
+@section Scripts {
+<script>
+var lotData = null;
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+async function loadLot() {
+    var lot = document.getElementById('lotNumber').value;
+    if (!lot) { show('Please enter a lot number', 'warning'); return; }
+    try {
+        var r = await fetch('/api/v1/zqm/workbench/' + encodeURIComponent(lot));
+        if (!r.ok) { show('Lot not found: ' + await r.text(), 'error'); return; }
+        lotData = await r.json();
+        document.getElementById('lotMaterial').textContent = lotData.materialCode || '-';
+        document.getElementById('lotPlant').textContent = lotData.plant || '-';
+        document.getElementById('lotBatch').textContent = lotData.batchNumber || '-';
+        document.getElementById('lotStatus').textContent = lotData.status || '-';
+        document.getElementById('lotInspType').textContent = lotData.inspectionType || '-';
+        document.getElementById('lotSampleSize').textContent = lotData.sampleSize || '-';
+        renderResults(lotData.characteristics || []);
+        document.getElementById('resultsSection').style.display = '';
+        document.getElementById('emptyState').style.display = 'none';
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+function renderResults(chars) {
+    var tbody = document.getElementById('resultsBody');
+    tbody.innerHTML = '';
+    var recorded = 0, pending = 0;
+    chars.forEach(function(c) {
+        var hasResult = c.measuredValue !== null && c.measuredValue !== undefined && c.measuredValue !== '';
+        if (hasResult) recorded++; else pending++;
+        var evalCls = c.evaluation === 'Pass' ? 'passed' : c.evaluation === 'Fail' ? 'failed' : 'info';
+        tbody.innerHTML += '<tr><td>' + (c.characteristic||'') + '</td><td>' + (c.type||'-') + '</td><td>' + (c.target||'-') + '</td><td>' + (c.lsl||'-') + '</td><td>' + (c.usl||'-') + '</td><td>' + (c.unit||'-') + '</td><td>' + (hasResult ? c.measuredValue : '-') + '</td><td><span class="zqm-badge ' + evalCls + '">' + (c.evaluation||'Pending') + '</span></td><td><span class="zqm-badge ' + (hasResult ? 'passed' : 'testing') + '">' + (hasResult ? 'Recorded' : 'Pending') + '</span></td></tr>';
+    });
+    document.getElementById('resultCount').textContent = recorded + ' of ' + chars.length + ' recorded';
+    document.getElementById('recInfo').textContent = 'Results recorded: ' + recorded + ' | Pending: ' + pending;
+    document.getElementById('footerInfo').textContent = 'Total characteristics: ' + chars.length;
+    var sel = document.getElementById('recChar');
+    sel.innerHTML = '';
+    chars.filter(function(c){return !c.measuredValue && c.measuredValue !== 0}).forEach(function(c){ sel.innerHTML += '<option>' + c.characteristic + '</option>'; });
+}
+function showRecordForm() { document.getElementById('recordForm').style.display = ''; }
+async function recordResult() {
+    var body = JSON.stringify({ lotNumber: document.getElementById('lotNumber').value, characteristic: document.getElementById('recChar').value, measuredValue: parseFloat(document.getElementById('recValue').value), inspectorId: document.getElementById('recInspector').value, notes: document.getElementById('recNotes').value });
+    try {
+        var r = await fetch('/api/v1/zqm/workbench/record', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body });
+        if (r.ok) { show('Result recorded successfully', 'success'); document.getElementById('recordForm').style.display = 'none'; loadLot(); }
+        else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+async function completeRecording() {
+    var lot = document.getElementById('lotNumber').value;
+    if (!lot) { show('Load a lot first', 'warning'); return; }
+    try {
+        var r = await fetch('/api/v1/zqm/workbench/complete/' + encodeURIComponent(lot) + '?userId=superadmin', { method: 'POST' });
+        if (r.ok) { show('Results recording completed', 'success'); loadLot(); }
+        else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+</script>
+}

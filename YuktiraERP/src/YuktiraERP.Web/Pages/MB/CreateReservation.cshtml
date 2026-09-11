@@ -1,120 +1,122 @@
 @page
 @model YuktiraERP.Web.Pages.MB.CreateReservationModel
-@{
-    ViewData["Title"] = "MB21 - Create Reservation";
-}
-<div class="row justify-content-center">
-<div class="col-lg-10">
-<h4 class="mb-3"><i class="bi bi-bookmark-plus me-2"></i>MB21 - Create Reservation</h4>
+@{ ViewData["Title"] = "MB21 - Create Reservation"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
-@if (!string.IsNullOrEmpty(Model.SuccessMessage))
-{
-    <div class="alert alert-success py-2">@Model.SuccessMessage</div>
-}
-@if (!string.IsNullOrEmpty(Model.Error))
-{
-    <div class="alert alert-danger py-2">@Model.Error</div>
-}
-
-<div class="card shadow-sm mb-3">
-    <div class="card-header bg-success text-white"><h6 class="mb-0">Reservation Header</h6></div>
-    <div class="card-body">
-        <form method="post">
-        <div class="row mb-2">
-            <div class="col-md-3">
-                <label class="form-label">Requirement Date</label>
-                <input asp-for="Reservation.RequirementDate" type="date" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Cost Center</label>
-                <input asp-for="Reservation.CostCenter" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Order Number</label>
-                <input asp-for="Reservation.OrderNumber" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Header Text</label>
-                <input asp-for="Reservation.HeaderText" class="form-control" />
-            </div>
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-bookmark-plus me-2"></i>MB21 - Create Reservation</h3>
+            <span class="badge">Manual</span>
         </div>
-
-        <h6>Reservation Lines</h6>
-        <table class="table table-bordered table-sm" id="lineItems">
-            <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>Material Code</th>
-                    <th>Material Name</th>
-                    <th>Plant</th>
-                    <th>SLoc</th>
-                    <th>Required Qty</th>
-                    <th>UOM</th>
-                    <th>Batch</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td><input name="Reservation.Lines[0].MaterialCode" class="form-control form-control-sm" /></td>
-                    <td><input name="Reservation.Lines[0].MaterialName" class="form-control form-control-sm" /></td>
-                    <td><input name="Reservation.Lines[0].Plant" class="form-control form-control-sm" value="1000" /></td>
-                    <td><input name="Reservation.Lines[0].StorageLocation" class="form-control form-control-sm" /></td>
-                    <td><input name="Reservation.Lines[0].RequiredQuantity" type="number" step="0.001" class="form-control form-control-sm" /></td>
-                    <td><input name="Reservation.Lines[0].UOM" class="form-control form-control-sm" value="EA" /></td>
-                    <td><input name="Reservation.Lines[0].BatchNumber" class="form-control form-control-sm" /></td>
-                    <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">X</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addLine()"><i class="bi bi-plus me-1"></i>Add Line</button>
-
-        <div class="mt-2">
-            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Create Reservation</button>
-            <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
+        <div class="actions">
+            <button type="submit" form="resForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Create Reservation</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('resForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
         </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-gear me-1"></i>Reservation Header</div>
+        <form method="post" id="resForm">
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Requirement Date</label><input asp-for="Reservation.RequirementDate" type="date" /></div>
+                <div class="zqm-field"><label>Cost Center</label><input asp-for="Reservation.CostCenter" placeholder="CC code" /></div>
+                <div class="zqm-field"><label>Order Number</label><input asp-for="Reservation.OrderNumber" /></div>
+                <div class="zqm-field"><label>Header Text</label><input asp-for="Reservation.HeaderText" /></div>
+            </div>
+
+            <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-table me-1"></i>Reservation Lines</div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table" id="lineItems">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th style="min-width:130px">Material Code</th>
+                            <th style="min-width:160px">Material Name</th>
+                            <th style="min-width:80px">Plant</th>
+                            <th style="min-width:80px">SLoc</th>
+                            <th style="min-width:100px">Required Qty</th>
+                            <th style="min-width:70px">UOM</th>
+                            <th style="min-width:100px">Batch</th>
+                            <th style="width:40px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><input name="Reservation.Lines[0].MaterialCode" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><input name="Reservation.Lines[0].MaterialName" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><input name="Reservation.Lines[0].Plant" value="1000" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><input name="Reservation.Lines[0].StorageLocation" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><input name="Reservation.Lines[0].RequiredQuantity" type="number" step="0.001" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><input name="Reservation.Lines[0].UOM" value="EA" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><input name="Reservation.Lines[0].BatchNumber" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
+                            <td><button type="button" class="zqm-act" style="color:#c62828;border-color:#ffcdd2" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top:8px">
+                <button type="button" class="zqm-btn" onclick="addLine()"><i class="bi bi-plus me-1"></i>Add Line</button>
+            </div>
         </form>
     </div>
-</div>
 
-@if (Model.Result != null)
-{
-    <div class="card shadow-sm mb-3">
-        <div class="card-header @(Model.Result.Success ? "bg-success" : "bg-danger") text-white"><h6 class="mb-0">Result</h6></div>
-        <div class="card-body">
-            @if (Model.Result.Success)
-            {
-                <p><strong>Reservation Number:</strong> @Model.Result.ReservationNumber</p>
-                <p><strong>Total Reserved:</strong> @Model.Result.TotalReservedQuantity</p>
-            }
-            else
-            {
-                <div class="text-danger">@foreach (var err in Model.Result.Errors) { <p>@err</p> }</div>
-            }
-            @foreach (var w in Model.Result.Warnings)
-            {
-                <div class="text-warning">@w</div>
-            }
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="zqm-alert success" style="display:block">@Model.SuccessMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="zqm-alert error" style="display:block">@Model.Error</div>
+    }
+
+    @if (Model.Result != null)
+    {
+        <div class="zqm-results" style="margin-top:0">
+            <div class="zqm-results-header"><h4><i class="bi bi-check-circle me-1"></i>Result</h4></div>
+            <div style="padding:16px">
+                @if (Model.Result.Success)
+                {
+                    <div class="zqm-row cols-2">
+                        <div style="padding:10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#2e7d32;text-transform:uppercase">Reservation Number</label><div style="font-size:1.1rem;font-weight:700;color:#1b5e20">@Model.Result.ReservationNumber</div></div>
+                        <div style="padding:10px;background:#e3f2fd;border:1px solid #90caf9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#1565c0;text-transform:uppercase">Total Reserved</label><div style="font-size:1.1rem;font-weight:700;color:#0d47a1">@Model.Result.TotalReservedQuantity</div></div>
+                    </div>
+                    @if (Model.Result.Warnings != null && Model.Result.Warnings.Any())
+                    {
+                        <div style="margin-top:12px;padding:10px 14px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:4px;font-size:0.85rem;color:#e65100">
+                            @foreach (var w in Model.Result.Warnings) { <div><i class="bi bi-exclamation-triangle me-1"></i>@w</div> }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="padding:12px;background:#ffcdd2;border:1px solid #ef9a9a;border-radius:4px;color:#c62828;font-size:0.85rem">
+                        @foreach (var err in Model.Result.Errors) { <div>@err</div> }
+                    </div>
+                }
+            </div>
         </div>
-    </div>
-}
-</div>
+    }
 </div>
 
 <script>
 function addLine() {
     var tbody = document.querySelector('#lineItems tbody');
     var idx = tbody.rows.length;
-    var row = '<tr><td>' + (idx + 1) + '</td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].MaterialCode" class="form-control form-control-sm" /></td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].MaterialName" class="form-control form-control-sm" /></td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].Plant" class="form-control form-control-sm" value="1000" /></td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].StorageLocation" class="form-control form-control-sm" /></td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].RequiredQuantity" type="number" step="0.001" class="form-control form-control-sm" /></td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].UOM" class="form-control form-control-sm" value="EA" /></td>' +
-        '<td><input name="Reservation.Lines[' + idx + '].BatchNumber" class="form-control form-control-sm" /></td>' +
-        '<td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest(\'tr\').remove()">X</button></td></tr>';
+    var s = 'padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem;width:100%';
+    var row = '<tr><td>' + (idx+1) + '</td>' +
+        '<td><input name="Reservation.Lines['+idx+'].MaterialCode" style="'+s+'" /></td>' +
+        '<td><input name="Reservation.Lines['+idx+'].MaterialName" style="'+s+'" /></td>' +
+        '<td><input name="Reservation.Lines['+idx+'].Plant" value="1000" style="'+s+'" /></td>' +
+        '<td><input name="Reservation.Lines['+idx+'].StorageLocation" style="'+s+'" /></td>' +
+        '<td><input name="Reservation.Lines['+idx+'].RequiredQuantity" type="number" step="0.001" style="'+s+'" /></td>' +
+        '<td><input name="Reservation.Lines['+idx+'].UOM" value="EA" style="'+s+'" /></td>' +
+        '<td><input name="Reservation.Lines['+idx+'].BatchNumber" style="'+s+'" /></td>' +
+        '<td><button type="button" class="zqm-act" style="color:#c62828;border-color:#ffcdd2" onclick="this.closest(\'tr\').remove()"><i class="bi bi-x"></i></button></td></tr>';
     tbody.insertAdjacentHTML('beforeend', row);
 }
 </script>

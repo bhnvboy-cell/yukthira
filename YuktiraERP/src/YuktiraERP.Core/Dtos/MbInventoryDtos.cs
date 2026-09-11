@@ -34,6 +34,8 @@ public class PostGoodsMovementLineDto
     public string? GLAccount { get; set; }
     public string? SpecialStockIndicator { get; set; }
     public string? ItemText { get; set; }
+    public string? ToPlant { get; set; }
+    public string? ToStorageLocation { get; set; }
 }
 
 public class PostGoodsMovementResultDto

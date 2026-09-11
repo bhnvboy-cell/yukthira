@@ -1,28 +1,58 @@
-@page
+@page "{id:Guid}"
 @model YuktiraERP.Web.Pages.QM.InspectionLot.EditModel
 @{ ViewData["Title"] = "Edit Inspection Lot"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Inspection Lot</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="Lot.Id" />
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Lot.LotNumber" class="form-label"></label><input asp-for="Lot.LotNumber" class="form-control" /><span asp-validation-for="Lot.LotNumber" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="Lot.MaterialName" class="form-label"></label><input asp-for="Lot.MaterialName" class="form-control" /><span asp-validation-for="Lot.MaterialName" class="text-danger small"></span></div>
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-clipboard-check me-2"></i>Edit Inspection Lot</h3><span class="badge">QM</span></div>
+    <form method="post">
+        <input type="hidden" asp-for="Lot.Id" />
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-material')"><i class="bi bi-box tab-icon"></i> Material & Plant</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-inspection')"><i class="bi bi-search tab-icon"></i> Inspection</button>
+        </div>
+        <div class="ent-form-panel active" id="tab-general">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Lot Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Lot Number</label><input asp-for="Lot.LotNumber" class="ent-input" readonly /></div>
+                    <div class="ent-field"><label>Inspection Type</label><select asp-for="Lot.InspectionType" class="ent-select"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option></select></div>
+                    <div class="ent-field"><label>Status</label><select asp-for="Lot.Status" class="ent-select"><option>Created</option><option>In Testing</option><option>UD Made</option><option>Closed</option></select></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" id="tab-material">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-box"></i> Material & Plant Data</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Material Code</label><input asp-for="Lot.MaterialCode" class="ent-input" /></div>
+                    <div class="ent-field"><label>Material Name</label><input asp-for="Lot.MaterialName" class="ent-input" /></div>
+                    <div class="ent-field"><label>Plant</label><select asp-for="Lot.Plant" class="ent-select"><option>1000</option><option>2000</option><option>3000</option></select></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Storage Location</label><input asp-for="Lot.StorageLocation" class="ent-input" /></div>
+                    <div class="ent-field"><label>Batch Number</label><input asp-for="Lot.BatchNumber" class="ent-input" /></div>
+                    <div class="ent-field"><label>Base UOM</label><input asp-for="Lot.BaseUOM" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" id="tab-inspection">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-search"></i> Inspection Data</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Quantity</label><input asp-for="Lot.Quantity" class="ent-input" /></div>
+                    <div class="ent-field"><label>Sample Size</label><input asp-for="Lot.SampleSize" class="ent-input" /></div>
+                    <div class="ent-field"><label>Inspector</label><input asp-for="Lot.AssignedInspector" class="ent-input" /></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Inspected Qty</label><input asp-for="Lot.Inspected" class="ent-input" /></div>
+                    <div class="ent-field"><label>Passed Qty</label><input asp-for="Lot.Passed" class="ent-input" /></div>
+                    <div class="ent-field"><label>Failed Qty</label><input asp-for="Lot.Failed" class="ent-input" /></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Reference Order</label><input asp-for="Lot.ReferenceOrderNumber" class="ent-input" /></div>
+                    <div class="ent-field"><label>Inspection Plan ID</label><input asp-for="Lot.InspectionPlanID" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Lot.Quantity" class="form-label"></label><input asp-for="Lot.Quantity" class="form-control" /><span asp-validation-for="Lot.Quantity" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="Lot.Inspected" class="form-label"></label><input asp-for="Lot.Inspected" class="form-control" /><span asp-validation-for="Lot.Inspected" class="text-danger small"></span></div>
-</div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Lot.Passed" class="form-label"></label><input asp-for="Lot.Passed" class="form-control" /><span asp-validation-for="Lot.Passed" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="Lot.Failed" class="form-label"></label><input asp-for="Lot.Failed" class="form-control" /><span asp-validation-for="Lot.Failed" class="text-danger small"></span></div>
-</div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Lot.Status" class="form-label"></label><input asp-for="Lot.Status" class="form-control" /><span asp-validation-for="Lot.Status" class="text-danger small"></span></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/QM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

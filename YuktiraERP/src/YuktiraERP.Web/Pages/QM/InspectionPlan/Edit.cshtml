@@ -1,25 +1,42 @@
-@page
+@page "{id:Guid}"
 @model YuktiraERP.Web.Pages.QM.InspectionPlan.EditModel
 @{ ViewData["Title"] = "Edit Inspection Plan"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Inspection Plan</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="Plan.Id" />
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Plan.PlanId" class="form-label"></label><input asp-for="Plan.PlanId" class="form-control" /><span asp-validation-for="Plan.PlanId" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="Plan.MaterialName" class="form-label"></label><input asp-for="Plan.MaterialName" class="form-control" /><span asp-validation-for="Plan.MaterialName" class="text-danger small"></span></div>
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-journal-text me-2"></i>Edit Inspection Plan</h3><span class="badge">QM</span></div>
+    <form method="post">
+        <input type="hidden" asp-for="Plan.Id" />
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-chars')"><i class="bi bi-list-check tab-icon"></i> Characteristics</button>
+        </div>
+        <div class="ent-form-panel active" id="tab-general">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Plan Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Plan ID</label><input asp-for="Plan.PlanId" class="ent-input" readonly /></div>
+                    <div class="ent-field"><label>Material Name</label><input asp-for="Plan.MaterialName" class="ent-input" /></div>
+                    <div class="ent-field"><label>Status</label><select asp-for="Plan.Status" class="ent-select"><option>Active</option><option>Inactive</option><option>Draft</option></select></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Characteristic</label><input asp-for="Plan.Characteristic" class="ent-input" /></div>
+                    <div class="ent-field"><label>Method</label><input asp-for="Plan.Method" class="ent-input" /></div>
+                    <div class="ent-field"><label>Frequency</label><select asp-for="Plan.Frequency" class="ent-select"><option>Every Lot</option><option>Every 5th Lot</option><option>Every 10th Lot</option><option>Daily</option><option>Weekly</option><option>Monthly</option></select></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Control Key</label><input asp-for="Plan.ControlKey" class="ent-input" /></div>
+                    <div class="ent-field"><label>Sampling Procedure</label><input asp-for="Plan.SamplingProcedure" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" id="tab-chars">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-list-check"></i> Validity</div>
+                <div class="ent-field-grid ent-grid-2">
+                    <div class="ent-field"><label>Validity Start</label><input asp-for="Plan.ValidityStart" type="date" class="ent-input" /></div>
+                    <div class="ent-field"><label>Validity End</label><input asp-for="Plan.ValidityEnd" type="date" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+    </form>
 </div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Plan.Characteristic" class="form-label"></label><input asp-for="Plan.Characteristic" class="form-control" /><span asp-validation-for="Plan.Characteristic" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="Plan.Method" class="form-label"></label><input asp-for="Plan.Method" class="form-control" /><span asp-validation-for="Plan.Method" class="text-danger small"></span></div>
-</div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Plan.Frequency" class="form-label"></label><input asp-for="Plan.Frequency" class="form-control" /><span asp-validation-for="Plan.Frequency" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="Plan.Status" class="form-label"></label><input asp-for="Plan.Status" class="form-control" /><span asp-validation-for="Plan.Status" class="text-danger small"></span></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/QM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

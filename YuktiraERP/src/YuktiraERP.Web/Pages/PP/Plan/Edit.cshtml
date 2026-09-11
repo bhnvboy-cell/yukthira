@@ -1,15 +1,36 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.Plan.EditModel
-@{ ViewData["Title"] = "Edit ProductionPlan"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit ProductionPlan</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="Plan.Id" />
-<div class="row mb-3"><div class="col-md-6"><label asp-for="Plan.PlanId" class="form-label"></label><input asp-for="Plan.PlanId" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Plan.ProductName" class="form-label"></label><input asp-for="Plan.ProductName" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Plan.Quantity" class="form-label"></label><input asp-for="Plan.Quantity" class="form-control" type="number" step="0.01" /></div><div class="col-md-6"><label asp-for="Plan.StartDate" class="form-label"></label><input asp-for="Plan.StartDate" class="form-control" type="datetime-local" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Plan.EndDate" class="form-label"></label><input asp-for="Plan.EndDate" class="form-control" type="datetime-local" /></div><div class="col-md-6"><label asp-for="Plan.Status" class="form-label"></label><input asp-for="Plan.Status" class="form-control" type="text" /></div></div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a href="/PP/Plan/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@{ ViewData["Title"] = "Edit Production Plan"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-pencil me-2"></i>Edit Production Plan</h3>
+            <span class="badge">@Model.Plan.PlanId</span>
+        </div>
+        <div class="actions">
+            <button type="submit" form="editForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Update</button>
+            <a asp-page="/PP/Plan/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-calendar-range me-1"></i>Plan Data</div>
+        <form method="post" id="editForm">
+            <input type="hidden" asp-for="Plan.Id" />
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Plan ID</label><input asp-for="Plan.PlanId" /></div>
+                <div class="zqm-field"><label>Product Name</label><input asp-for="Plan.ProductName" /></div>
+                <div class="zqm-field"><label>Quantity</label><input asp-for="Plan.Quantity" type="number" step="1" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Start Date</label><input asp-for="Plan.StartDate" type="date" /></div>
+                <div class="zqm-field"><label>End Date</label><input asp-for="Plan.EndDate" type="date" /></div>
+                <div class="zqm-field"><label>Status</label><select asp-for="Plan.Status"><option value="Planned">Planned</option><option value="Released">Released</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option></select></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,15 +1,44 @@
-﻿@page
+﻿@page "{id:Guid}"
 @model YuktiraERP.Web.Pages.QM.UsageDecision.EditModel
-@{ ViewData["Title"] = "Edit UsageDecision"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit UsageDecision</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="Decision.Id" />
-<div class="row mb-3"><div class="col-md-6"><label asp-for="Decision.DecisionId" class="form-label"></label><input asp-for="Decision.DecisionId" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Decision.LotNumber" class="form-label"></label><input asp-for="Decision.LotNumber" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Decision.MaterialName" class="form-label"></label><input asp-for="Decision.MaterialName" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Decision.Decision" class="form-label"></label><input asp-for="Decision.Decision" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Decision.Notes" class="form-label"></label><input asp-for="Decision.Notes" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Decision.DecisionDate" class="form-label"></label><input asp-for="Decision.DecisionDate" class="form-control" type="datetime-local" /></div></div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a href="/QM/UsageDecision/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+@{ ViewData["Title"] = "Edit Usage Decision"; }
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-check2-circle me-2"></i>Edit Usage Decision</h3><span class="badge">QM</span></div>
+    <form method="post">
+        <input type="hidden" asp-for="Decision.Id" />
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-ref')"><i class="bi bi-link tab-icon"></i> Lot Reference</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-decision')"><i class="bi bi-gavel tab-icon"></i> Decision & Stock</button>
+        </div>
+        <div class="ent-form-panel active" id="tab-ref">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-link"></i> Reference Data</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Decision ID</label><input asp-for="Decision.DecisionId" class="ent-input" readonly /></div>
+                    <div class="ent-field"><label>Lot Number</label><input asp-for="Decision.LotNumber" class="ent-input" /></div>
+                    <div class="ent-field"><label>Material</label><input asp-for="Decision.MaterialName" class="ent-input" /></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Inspector ID</label><input asp-for="Decision.InspectorID" class="ent-input" /></div>
+                    <div class="ent-field"><label>Decision Date</label><input asp-for="Decision.DecisionDate" type="date" class="ent-input" /></div>
+                    <div class="ent-field"><label>Quality Score</label><input asp-for="Decision.QualityScore" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" id="tab-decision">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-gavel"></i> Decision Details</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>UD Code</label><select asp-for="Decision.UDCode" class="ent-select"><option>Accepted</option><option>Accepted with Deviation</option><option>Rejected</option><option>Rework</option><option>Scrap</option></select></div>
+                    <div class="ent-field"><label>Decision</label><input asp-for="Decision.Decision" class="ent-input" /></div>
+                    <div class="ent-field"><label>Notes</label><textarea asp-for="Decision.Notes" class="ent-input" rows="2"></textarea></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Unrestricted Stock</label><input asp-for="Decision.UnrestrictedStock" class="ent-input" /></div>
+                    <div class="ent-field"><label>Blocked Stock</label><input asp-for="Decision.BlockedStock" class="ent-input" /></div>
+                    <div class="ent-field"><label>Scrap Quantity</label><input asp-for="Decision.ScrapQuantity" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+    </form>
+</div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }
-

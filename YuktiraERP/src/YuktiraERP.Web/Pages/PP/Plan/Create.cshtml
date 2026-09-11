@@ -1,21 +1,36 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.Plan.CreateModel
 @{ ViewData["Title"] = "Create Production Plan"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Production Plan</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Plan.ProductName" class="form-label"></label><input asp-for="Plan.ProductName" class="form-control" /><span asp-validation-for="Plan.ProductName" class="text-danger small"></span></div>
-<div class="col-md-3"><label asp-for="Plan.Quantity" class="form-label"></label><input asp-for="Plan.Quantity" class="form-control" /></div>
-<div class="col-md-3"><label asp-for="Plan.Status" class="form-label"></label><select asp-for="Plan.Status" class="form-select"><option>Planned</option><option>Released</option><option>In Progress</option><option>Completed</option></select></div>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-calendar-range me-2"></i>Create Production Plan</h3>
+            <span class="badge">New</span>
+        </div>
+        <div class="actions">
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-save me-1"></i>Save Plan</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
+            <a asp-page="/PP/Plan/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-calendar-range me-1"></i>Production Plan Data</div>
+        <form method="post" id="createForm">
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Plan ID</label><input asp-for="Plan.PlanId" placeholder="e.g., PLAN-001" /></div>
+                <div class="zqm-field"><label>Product Name <span style="color:#c62828">*</span></label><input asp-for="Plan.ProductName" placeholder="Material or product name" /><span asp-validation-for="Plan.ProductName" style="color:#c62828;font-size:0.72rem"></span></div>
+                <div class="zqm-field"><label>Quantity <span style="color:#c62828">*</span></label><input asp-for="Plan.Quantity" type="number" min="1" step="1" /><span asp-validation-for="Plan.Quantity" style="color:#c62828;font-size:0.72rem"></span></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Start Date</label><input asp-for="Plan.StartDate" type="date" /></div>
+                <div class="zqm-field"><label>End Date</label><input asp-for="Plan.EndDate" type="date" /></div>
+                <div class="zqm-field"><label>Status</label><select asp-for="Plan.Status"><option value="Planned">Planned</option><option value="Released">Released</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option></select></div>
+            </div>
+        </form>
+    </div>
 </div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="Plan.StartDate" class="form-label"></label><input asp-for="Plan.StartDate" class="form-control" type="date" /></div>
-<div class="col-md-6"><label asp-for="Plan.EndDate" class="form-label"></label><input asp-for="Plan.EndDate" class="form-control" type="date" /></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/PP/Plan/List" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

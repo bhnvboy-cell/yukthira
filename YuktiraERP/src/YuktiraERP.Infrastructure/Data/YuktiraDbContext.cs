@@ -271,6 +271,29 @@ public class YuktiraDbContext : DbContext
     public DbSet<StockReservationHeaderEntity> StockReservationHeaders => Set<StockReservationHeaderEntity>();
     public DbSet<StockReservationItemEntity> StockReservationItems => Set<StockReservationItemEntity>();
     public DbSet<InventoryValuationLedgerEntity> InventoryValuationLedger => Set<InventoryValuationLedgerEntity>();
+    // V2.0: Event Sourcing & CQRS
+    public DbSet<DomainEventEntity> DomainEvents => Set<DomainEventEntity>();
+    public DbSet<ReadModelSnapshotEntity> ReadModelSnapshots => Set<ReadModelSnapshotEntity>();
+    // V2.0: EDI Transport
+    public DbSet<EdiTransmissionEntity> EdiTransmissions => Set<EdiTransmissionEntity>();
+    public DbSet<MdnReceiptEntity> MdnReceipts => Set<MdnReceiptEntity>();
+    // Module Gap: SD
+    public DbSet<SchedulingAgreementEntity> SchedulingAgreements => Set<SchedulingAgreementEntity>();
+    public DbSet<ScheduleLineEntity> ScheduleLines => Set<ScheduleLineEntity>();
+    public DbSet<RevenueRecognitionScheduleEntity> RevenueRecognitionSchedules => Set<RevenueRecognitionScheduleEntity>();
+    // Module Gap: PP
+    public DbSet<KanbanBoardEntity> KanbanBoards => Set<KanbanBoardEntity>();
+    // Module Gap: FI
+    public DbSet<IntercompanyTransactionEntity> IntercompanyTransactions => Set<IntercompanyTransactionEntity>();
+    public DbSet<WithholdingTaxEntryEntity> WithholdingTaxEntries => Set<WithholdingTaxEntryEntity>();
+    public DbSet<PeriodCloseEntity> PeriodCloses => Set<PeriodCloseEntity>();
+    // Module Gap: CO
+    public DbSet<ProductCostEntity> ProductCosts => Set<ProductCostEntity>();
+    public DbSet<ProfitabilitySegmentEntity> ProfitabilitySegments => Set<ProfitabilitySegmentEntity>();
+    public DbSet<TransferPricingEntryEntity> TransferPricingEntries => Set<TransferPricingEntryEntity>();
+    // Module Gap: HR
+    public DbSet<BenefitsEnrollmentEntity> BenefitsEnrollments => Set<BenefitsEnrollmentEntity>();
+    public DbSet<SuccessionPlanEntity> SuccessionPlans => Set<SuccessionPlanEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

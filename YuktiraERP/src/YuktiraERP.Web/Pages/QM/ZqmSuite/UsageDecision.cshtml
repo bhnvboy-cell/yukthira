@@ -1,0 +1,111 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.UsageDecisionModel
+@{ ViewData["Title"] = "ZQM03 - Usage Decision Engine"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-gavel me-2"></i>Usage Decision Engine</h3>
+            <span class="badge">ZQM03</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="validateLot()"><i class="bi bi-search me-1"></i>Validate</button>
+            <button type="button" class="zqm-btn" onclick="postUD()"><i class="bi bi-check-circle me-1"></i>Post UD</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Lot Validation</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Inspection Lot Number</label><input id="lotNumber" placeholder="e.g. IL-20260001" /></div>
+            <div class="zqm-field"><label>Material</label><div class="zqm-ro" id="lotMaterial">-</div></div>
+            <div class="zqm-field"><label>Status</label><div class="zqm-ro" id="lotStatus">-</div></div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-results" id="udSection" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-gavel me-1"></i>Usage Decision</h4></div>
+        <div style="padding:16px">
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>UD Code</label><select id="udCode"><option>A - Accept</option><option>R - Reject</option><option>S - Scrap</option><option>W - Rework</option><option>L - Limited Use</option><option>U - Unrestricted</option></select></div>
+                <div class="zqm-field"><label>Quality Score Method</label><select id="scoreMethod"><option>Single</option><option>Weighted</option></select></div>
+                <div class="zqm-field"><label>Inspector</label><input id="udInspector" value="superadmin" /></div>
+                <div class="zqm-field"><label>Notes</label><input id="udNotes" /></div>
+            </div>
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Unrestricted Stock</label><input id="udUnrestricted" type="number" step="0.01" value="0" /></div>
+                <div class="zqm-field"><label>Blocked Stock</label><input id="udBlocked" type="number" step="0.01" value="0" /></div>
+                <div class="zqm-field"><label>Scrap Quantity</label><input id="udScrap" type="number" step="0.01" value="0" /></div>
+                <div class="zqm-field"><label>Rework Quantity</label><input id="udRework" type="number" step="0.01" value="0" /></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="zqm-results" id="resultSection" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-check2-circle me-1"></i>Decision Result</h4></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table"><thead><tr><th>Field</th><th>Value</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Decision ID</strong></td><td id="resDecisionId">-</td></tr>
+                    <tr><td><strong>Lot Number</strong></td><td id="resLotNumber">-</td></tr>
+                    <tr><td><strong>UD Code</strong></td><td id="resUDCode">-</td></tr>
+                    <tr><td><strong>Quality Score</strong></td><td id="resScore">-</td></tr>
+                    <tr><td><strong>Status</strong></td><td id="resStatus">-</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+async function validateLot() {
+    var lot = document.getElementById('lotNumber').value;
+    if (!lot) { show('Enter a lot number', 'warning'); return; }
+    try {
+        var r = await fetch('/api/v1/zqm/usage-decision/validate/' + encodeURIComponent(lot));
+        if (r.ok) {
+            var d = await r.json();
+            document.getElementById('lotMaterial').textContent = d.materialCode || d.materialName || '-';
+            document.getElementById('lotStatus').textContent = d.status || '-';
+            document.getElementById('udSection').style.display = '';
+            show('Lot validated. Ready for usage decision.', 'success');
+        } else { show('Validation failed: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+async function postUD() {
+    var lot = document.getElementById('lotNumber').value;
+    if (!lot) { show('Validate a lot first', 'warning'); return; }
+    var body = JSON.stringify({
+        lotNumber: lot,
+        udCode: document.getElementById('udCode').value.charAt(0),
+        qualityScoreMethod: document.getElementById('scoreMethod').value,
+        inspectorId: document.getElementById('udInspector').value,
+        unrestrictedStock: parseFloat(document.getElementById('udUnrestricted').value) || 0,
+        blockedStock: parseFloat(document.getElementById('udBlocked').value) || 0,
+        scrapQuantity: parseFloat(document.getElementById('udScrap').value) || 0,
+        reworkQuantity: parseFloat(document.getElementById('udRework').value) || 0,
+        notes: document.getElementById('udNotes').value,
+        userId: 'superadmin'
+    });
+    try {
+        var r = await fetch('/api/v1/zqm/usage-decision', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body });
+        if (r.ok) {
+            var d = await r.json();
+            document.getElementById('resDecisionId').textContent = d.decisionId || '-';
+            document.getElementById('resLotNumber').textContent = d.lotNumber || lot;
+            document.getElementById('resUDCode').textContent = d.udCode || '-';
+            document.getElementById('resScore').textContent = d.qualityScore || '-';
+            document.getElementById('resStatus').textContent = d.status || 'Posted';
+            document.getElementById('resultSection').style.display = '';
+            show('Usage decision posted successfully', 'success');
+        } else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+</script>
+}

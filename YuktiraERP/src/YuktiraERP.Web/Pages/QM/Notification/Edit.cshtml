@@ -1,0 +1,52 @@
+@page "{id:Guid}"
+@model YuktiraERP.Web.Pages.QM.Notification.EditModel
+@{ ViewData["Title"] = "Edit Quality Notification"; }
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-bell me-2"></i>Edit Quality Notification</h3><span class="badge">QM</span></div>
+    <form method="post">
+        <input type="hidden" asp-for="Notification.Id" />
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-defect')"><i class="bi bi-exclamation-triangle tab-icon"></i> Defect Details</button>
+        </div>
+        <div class="ent-form-panel active" id="tab-general">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Notification Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Notification #</label><input asp-for="Notification.NotificationNumber" class="ent-input" readonly /></div>
+                    <div class="ent-field"><label>Type</label><select asp-for="Notification.NotificationType" class="ent-select"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>Q5</option></select></div>
+                    <div class="ent-field"><label>Status</label><select asp-for="Notification.Status" class="ent-select"><option>NEW</option><option>IN_PROCESS</option><option>COMPLETED</option><option>CLOSED</option></select></div>
+                </div>
+                <div class="ent-field"><label>Description</label><textarea asp-for="Notification.Description" class="ent-input" rows="2"></textarea></div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Created By</label><input asp-for="Notification.CreatedBy" class="ent-input" /></div>
+                    <div class="ent-field"><label>Material Code</label><input asp-for="Notification.MaterialCode" class="ent-input" /></div>
+                    <div class="ent-field"><label>Plant</label><input asp-for="Notification.Plant" class="ent-input" /></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Batch Number</label><input asp-for="Notification.BatchNumber" class="ent-input" /></div>
+                    <div class="ent-field"><label>Reference Doc</label><input asp-for="Notification.ReferenceDocument" class="ent-input" /></div>
+                    <div class="ent-field"><label>Partner</label><input asp-for="Notification.PartnerName" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" id="tab-defect">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-exclamation-triangle"></i> Defect Information</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Defect Code</label><input asp-for="Notification.DefectCode" class="ent-input" /></div>
+                    <div class="ent-field"><label>Defect Type</label><input asp-for="Notification.DefectType" class="ent-input" /></div>
+                    <div class="ent-field"><label>Defect Location</label><input asp-for="Notification.DefectLocation" class="ent-input" /></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Priority</label><select asp-for="Notification.Priority" class="ent-select"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+                    <div class="ent-field"><label>Impact</label><select asp-for="Notification.Impact" class="ent-select"><option>None</option><option>Minor</option><option>Moderate</option><option>Major</option><option>Critical</option></select></div>
+                    <div class="ent-field"><label>Cause Code</label><input asp-for="Notification.CauseCode" class="ent-input" /></div>
+                </div>
+                <div class="ent-field"><label>Root Cause</label><textarea asp-for="Notification.RootCause" class="ent-input" rows="2"></textarea></div>
+                <div class="ent-field"><label>Long Text</label><textarea asp-for="Notification.LongText" class="ent-input" rows="3"></textarea></div>
+            </div>
+        </div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

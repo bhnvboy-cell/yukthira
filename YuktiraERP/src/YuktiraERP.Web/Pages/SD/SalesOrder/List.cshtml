@@ -1,26 +1,71 @@
 @page
 @model YuktiraERP.Web.Pages.SD.SalesOrder.ListModel
-@using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Sales Order List"; }
-<div class="d-flex justify-content-between align-items-center mb-3">
-<h2><i class="bi bi-file-text me-2"></i>Sales Orders</h2>
-<a asp-page="/SD/SalesOrder/Create" class="btn btn-primary"><i class="bi bi-plus me-1"></i>New Sales Order</a>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-file-text me-2"></i>Sales Order List</h3>
+            <span class="badge">@Model.Orders.Count records</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/SD/SalesOrder/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New Sales Order</a>
+            <a asp-page="/SD/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>SO Number</label><input id="searchNumber" placeholder="Filter by number..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Customer</label><input id="searchCustomer" placeholder="Filter by customer..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Status</label><select id="searchStatus" onchange="filterTable()"><option value="">All</option><option value="Draft">Draft</option><option value="Confirmed">Confirmed</option><option value="Pending">Pending</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>Sales Orders</h4><span class="count" id="resultCount">@Model.Orders.Count items</span></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="soTable">
+                <thead><tr><th>SO #</th><th>Customer</th><th>Date</th><th>Items</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var o in Model.Orders)
+                    {
+                        <tr data-number="@o.OrderNumber" data-customer="@o.CustomerName" data-status="@o.Status">
+                            <td style="font-weight:600;color:#1565c0">@o.OrderNumber</td>
+                            <td>@o.CustomerName</td>
+                            <td>@o.OrderDate.ToString("yyyy-MM-dd")</td>
+                            <td>@o.ItemCount</td>
+                            <td>@o.Amount.ToString("C2")</td>
+                            <td><span class="zqm-badge @(o.Status=="Completed"?"passed":o.Status=="Confirmed"||o.Status=="Pending"?"info":o.Status=="Cancelled"?"failed":"warning")">@o.Status</span></td>
+                            <td>
+                                <a asp-page="/SD/SalesOrder/Display" asp-route-id="@o.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                <a asp-page="/SD/SalesOrder/Edit" asp-route-id="@o.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Orders.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No sales orders found</div></td></tr> }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-<div class="card"><div class="card-body">
-<div class="table-responsive">
-<table class="table table-hover table-sm datatable">
-<thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Items</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
-<tbody>
-@foreach (var o in Model.Orders)
-{
-<tr>
-<td>@o.OrderNumber</td><td>@o.CustomerName</td><td>@o.OrderDate.ToString("d")</td><td>@o.ItemCount</td><td>@o.Amount.ToString("C2")</td>
-<td><span class="badge bg-@(o.Status=="Completed"?"success":o.Status=="Confirmed"?"primary":"secondary")">@o.Status</span></td>
-<td>
-<a asp-page="/SD/SalesOrder/Edit" asp-route-id="@o.Id" class="bi bi-pencil me-2 text-decoration-none text-warning"></a>
-<a asp-page="/SD/SalesOrder/Display" asp-route-id="@o.Id" class="bi bi-eye text-decoration-none text-info"></a>
-</td>
-</tr>
+
+<script>
+function filterTable() {
+    var num = document.getElementById('searchNumber').value.toLowerCase();
+    var cust = document.getElementById('searchCustomer').value.toLowerCase();
+    var status = document.getElementById('searchStatus').value;
+    var rows = document.querySelectorAll('#soTable tbody tr[data-number]');
+    var count = 0;
+    rows.forEach(function(r) {
+        var match = (!num || r.dataset.number.toLowerCase().indexOf(num) > -1) &&
+                    (!cust || r.dataset.customer.toLowerCase().indexOf(cust) > -1) &&
+                    (!status || r.dataset.status === status);
+        r.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' items';
 }
-</tbody></table>
-</div></div></div>
+</script>

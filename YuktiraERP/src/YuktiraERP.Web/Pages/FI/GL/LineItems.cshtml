@@ -2,19 +2,73 @@
 @model YuktiraERP.Web.Pages.FI.GL.LineItemsModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "GL Line Items (FAGLL03)"; }
-<h2><i class="bi bi-list-columns me-2"></i>G/L Line Items</h2>
-<div class="card mt-3"><div class="card-body">
-<div class="table-responsive">
-<table class="table table-hover table-sm datatable">
-<thead><tr><th>Doc #</th><th>Date</th><th>Account</th><th>Account Name</th><th>Debit</th><th>Credit</th><th>Reference</th><th>Period</th><th>Posted</th></tr></thead>
-<tbody>
-@foreach (var e in Model.Entries)
-{
-<tr>
-<td>@e.DocumentNumber</td><td>@e.EntryDate.ToString("d")</td><td>@e.AccountCode</td><td>@e.AccountName</td>
-<td>@e.Debit.ToString("C2")</td><td>@e.Credit.ToString("C2")</td><td>@e.Reference</td><td>@e.Period</td>
-<td><span class="badge bg-@(e.IsPosted?"success":"secondary")">@(e.IsPosted?"Posted":"Draft")</span></td>
-</tr>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-list-columns me-2"></i>G/L Line Items</h3>
+            <span class="badge">FAGLL03</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/FI/GL/Display" class="zqm-btn"><i class="bi bi-book me-1"></i>GL Account Display</a>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-row cols-4">
+            <div class="zqm-field"><label>Document #</label><input id="searchDoc" placeholder="Filter by doc #" oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Account</label><input id="searchAccount" placeholder="Filter by account..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Period</label><input id="searchPeriod" placeholder="Filter by period..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Posted</label><select id="searchPosted" onchange="filterTable()"><option value="">All</option><option value="true">Posted</option><option value="false">Draft</option></select></div>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>GL Posting Line Items</h4><span class="count" id="resultCount">@Model.Entries.Count items</span></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="glTable">
+                <thead><tr><th>Doc #</th><th>Date</th><th>Account</th><th>Account Name</th><th>Debit</th><th>Credit</th><th>Reference</th><th>Period</th><th>Posted</th></tr></thead>
+                <tbody>
+                    @foreach (var e in Model.Entries)
+                    {
+                        <tr data-doc="@e.DocumentNumber" data-account="@e.AccountCode" data-period="@e.Period" data-posted="@e.IsPosted.ToString().ToLower()">
+                            <td style="font-weight:600;color:#1565c0">@e.DocumentNumber</td>
+                            <td>@e.EntryDate.ToString("yyyy-MM-dd")</td>
+                            <td>@e.AccountCode</td>
+                            <td>@e.AccountName</td>
+                            <td>@e.Debit.ToString("C2")</td>
+                            <td>@e.Credit.ToString("C2")</td>
+                            <td>@e.Reference</td>
+                            <td>@e.Period</td>
+                            <td><span class="zqm-badge @(e.IsPosted?"passed":"info")">@(e.IsPosted?"Posted":"Draft")</span></td>
+                        </tr>
+                    }
+                    @if (!Model.Entries.Any()) { <tr><td colspan="9" class="zqm-empty"><i class="bi bi-inbox"></i><div>No GL line items found</div></td></tr> }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterTable() {
+    var doc = document.getElementById('searchDoc').value.toLowerCase();
+    var account = document.getElementById('searchAccount').value.toLowerCase();
+    var period = document.getElementById('searchPeriod').value.toLowerCase();
+    var posted = document.getElementById('searchPosted').value;
+    var rows = document.querySelectorAll('#glTable tbody tr[data-doc]');
+    var count = 0;
+    rows.forEach(function(r) {
+        var match = (!doc || r.dataset.doc.toLowerCase().indexOf(doc) > -1) &&
+                    (!account || r.dataset.account.toLowerCase().indexOf(account) > -1) &&
+                    (!period || r.dataset.period.toLowerCase().indexOf(period) > -1) &&
+                    (!posted || r.dataset.posted === posted);
+        r.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' items';
 }
-</tbody></table>
-</div></div></div>
+</script>

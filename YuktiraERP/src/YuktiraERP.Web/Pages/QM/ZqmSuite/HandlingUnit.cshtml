@@ -1,0 +1,117 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.HandlingUnitModel
+@{ ViewData["Title"] = "ZQM05 - Handling Unit Manager"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-box-seam me-2"></i>Handling Unit Manager</h3>
+            <span class="badge">ZQM05</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="createHU()"><i class="bi bi-plus-circle me-1"></i>Create HU</button>
+            <button type="button" class="zqm-btn" onclick="releaseHU()"><i class="bi bi-box-arrow-right me-1"></i>Release</button>
+            <button type="button" class="zqm-btn" onclick="searchHU()"><i class="bi bi-search me-1"></i>Search</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-tabs">
+            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-create')"><i class="bi bi-plus-circle"></i> Create</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-release')"><i class="bi bi-box-arrow-right"></i> Release</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-search')"><i class="bi bi-search"></i> Search</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-queue')"><i class="bi bi-list-task"></i> Packaging Queue</button>
+        </div>
+
+        <div class="zqm-tab-panel active" id="tab-create">
+            <div style="padding:16px">
+                <div class="zqm-row cols-4">
+                    <div class="zqm-field"><label>Inspection Lot #</label><input id="hu-lot" placeholder="e.g. IL-20260001" /></div>
+                    <div class="zqm-field"><label>HU Type</label><select id="hu-type"><option>Pallet</option><option>Carton</option><option>Drum</option><option>IBC</option><option>Bag</option><option>Silo</option></select></div>
+                    <div class="zqm-field"><label>Material Code</label><input id="hu-material" /></div>
+                    <div class="zqm-field"><label>Batch #</label><input id="hu-batch" /></div>
+                </div>
+                <div class="zqm-row cols-4">
+                    <div class="zqm-field"><label>Quantity</label><input id="hu-qty" type="number" step="0.01" /></div>
+                    <div class="zqm-field"><label>UOM</label><select id="uom"><option>KG</option><option>L</option><option>EA</option><option>CS</option><option>PL</option></select></div>
+                    <div class="zqm-field"><label>Plant</label><select id="hu-plant"><option>1000</option><option>2000</option><option>3000</option></select></div>
+                    <div class="zqm-field"><label>Warehouse #</label><input id="hu-warehouse" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="zqm-tab-panel" id="tab-release">
+            <div style="padding:16px">
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>HU ID</label><input id="hu-release-id" placeholder="Enter HU ID to release" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="zqm-tab-panel" id="tab-search">
+            <div style="padding:16px">
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Inspection Lot #</label><input id="hu-search-lot" /></div>
+                    <div class="zqm-field"><label>Warehouse #</label><input id="hu-search-wh" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="zqm-tab-panel" id="tab-queue">
+            <div style="padding:16px">
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Warehouse #</label><input id="hu-queue-wh" /></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-results" id="resultsSection" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-table me-1"></i>Results</h4><span class="count" id="resultCount"></span></div>
+        <div class="zqm-table-wrap"><table class="zqm-table" id="huTable"><thead id="huHead"></thead><tbody id="huBody"></tbody></table></div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+function switchTab(btn, id) {
+    btn.closest('.zqm-filter').querySelectorAll('.zqm-tab-btn').forEach(function(t){t.classList.remove('active')});
+    btn.classList.add('active');
+    btn.closest('.zqm-filter').querySelectorAll('.zqm-tab-panel').forEach(function(p){p.classList.remove('active');p.style.display='none'});
+    var p = document.getElementById(id); if(p){p.classList.add('active');p.style.display='';}
+}
+async function api(url, opts) { try { var r = await fetch(url, Object.assign({headers:{'Content-Type':'application/json'}}, opts||{})); return {ok:r.ok, data:r.ok ? await r.json().catch(()=>({})) : await r.text()}; } catch(e) { return {ok:false, data:e.message}; } }
+function renderTable(head, rows) {
+    document.getElementById('huHead').innerHTML = '<tr>' + head.map(function(h){return '<th>'+h+'</th>'}).join('') + '</tr>';
+    document.getElementById('huBody').innerHTML = rows.map(function(r){return '<tr>' + r.map(function(c){return '<td>'+c+'</td>'}).join('') + '</tr>'}).join('');
+    document.getElementById('resultsSection').style.display = '';
+    document.getElementById('resultCount').textContent = rows.length + ' records';
+}
+async function createHU() {
+    var body = JSON.stringify({ inspectionLotNumber:document.getElementById('hu-lot').value, huType:document.getElementById('hu-type').value, materialCode:document.getElementById('hu-material').value, batchNumber:document.getElementById('hu-batch').value, quantity:parseFloat(document.getElementById('hu-qty').value)||0, uom:document.getElementById('uom').value, plant:document.getElementById('hu-plant').value, warehouseNumber:document.getElementById('hu-warehouse').value });
+    var r = await api('/api/v1/zqm/handling-unit', {method:'POST', body:body});
+    show(r.ok ? 'HU created: ' + JSON.stringify(r.data) : 'Error: ' + r.data, r.ok ? 'success' : 'error');
+}
+async function releaseHU() {
+    var id = document.getElementById('hu-release-id').value;
+    var r = await api('/api/v1/zqm/handling-unit/release/' + encodeURIComponent(id), {method:'POST'});
+    show(r.ok ? 'HU released successfully' : 'Error: ' + r.data, r.ok ? 'success' : 'error');
+}
+async function searchHU() {
+    var lot = document.getElementById('hu-search-lot').value;
+    var r = await api('/api/v1/zqm/handling-unit/lot/' + encodeURIComponent(lot));
+    if (r.ok && Array.isArray(r.data) && r.data.length) {
+        renderTable(['HU ID','Type','Material','Batch','Qty','UOM','Status'], r.data.map(function(u){return [u.id||u.huId||'',u.huType||'',u.materialCode||'',u.batchNumber||'',u.quantity||0,u.uom||'',u.status||'']}));
+    } else { show('No HUs found', 'info'); document.getElementById('resultsSection').style.display='none'; }
+}
+async function loadQueue() {
+    var wh = document.getElementById('hu-queue-wh').value;
+    var r = await api('/api/v1/zqm/handling-unit/queue/' + encodeURIComponent(wh));
+    if (r.ok && Array.isArray(r.data) && r.data.length) {
+        renderTable(['HU ID','Type','Material','Lot','Qty','Status'], r.data.map(function(u){return [u.id||u.huId||'',u.huType||'',u.materialCode||'',u.inspectionLotNumber||'',u.quantity||0,u.status||'']}));
+    } else { show('No items in queue', 'info'); document.getElementById('resultsSection').style.display='none'; }
+}
+</script>
+}

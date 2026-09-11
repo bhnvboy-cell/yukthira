@@ -1,44 +1,156 @@
 @page
 @model YuktiraERP.Web.Pages.FI.IndexModel
 @using YuktiraERP.Infrastructure.Data.Entities
-@{
-    ViewData["Title"] = "Finance";
-    var entries = Model.JournalEntries;
-    var assets = Model.FixedAssets;
-}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-calculator me-2"></i>Finance</h2>
-    <div><a asp-page="/FI/Ledger/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Journal Entry</a></div>
-</div>
-<ul class="nav nav-tabs mb-3">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#gl">General Ledger</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#ap">Accounts Payable</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#ar">Accounts Receivable</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#assets">Fixed Assets</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#reports">Financial Reports</a></li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane fade show active" id="gl">
-        <div class="card"><div class="card-body">
-            <table class="table table-hover table-sm">
-                <thead><tr><th>Date</th><th>Document</th><th>Account</th><th>Debit</th><th>Credit</th><th>Reference</th><th>Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var e in entries)
-                    {
-                        <tr>
-                            <td>@e.EntryDate.ToString("d")</td><td>@e.DocumentNumber</td><td>@e.Account</td>
-                            <td>@(e.Debit.HasValue ? e.Debit.Value.ToString("C2") : "--")</td>
-                            <td>@(e.Credit.HasValue ? e.Credit.Value.ToString("C2") : "--")</td>
-                            <td>@e.Reference</td>
-                            <td><i class="bi bi-eye"></i></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div></div>
+@{ ViewData["Title"] = "Finance"; var entries = Model.JournalEntries; var assets = Model.FixedAssets; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+<style>
+    .fi-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+    .fi-kpi{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+    .fi-kpi:hover{border-color:#3f51b5;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
+    .fi-kpi .kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0}
+    .fi-kpi .kpi-info .kpi-value{font-size:1.4rem;font-weight:700;color:#1a237e}
+    .fi-kpi .kpi-info .kpi-label{font-size:0.72rem;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.3px}
+    .fi-kpi .kpi-info .kpi-sub{font-size:0.72rem;color:#999}
+    .kpi-blue{background:linear-gradient(135deg,#1565c0,#1976d2)}
+    .kpi-teal{background:linear-gradient(135deg,#00695c,#00897b)}
+    .kpi-amber{background:linear-gradient(135deg,#f57f17,#fbc02d)}
+    .kpi-green{background:linear-gradient(135deg,#2e7d32,#388e3c)}
+    .kpi-purple{background:linear-gradient(135deg,#7b1fa2,#9c27b0)}
+</style>
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-calculator me-2"></i>Finance</h3>
+            <span class="badge">FI Module</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/FI/Ledger/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New Journal Entry</a>
+            <a asp-page="/FI/AR/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New AR Invoice</a>
+            <a asp-page="/FI/AP/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New AP Invoice</a>
+            <a asp-page="/FI/FixedAsset/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New Asset</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+        </div>
     </div>
-    <div class="tab-pane fade" id="ap"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/FI/AP/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New AP Entry</a></div><p class="text-muted">Vendor invoice processing, payment runs, aging analysis, and dunning.</p></div></div></div>
-    <div class="tab-pane fade" id="ar"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/FI/AR/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New AR Entry</a></div><p class="text-muted">Customer invoices, incoming payments, credit management, and aging reports.</p></div></div></div>
-    <div class="tab-pane fade" id="assets"><div class="card"><div class="card-body"><div class="mb-2"><a asp-page="/FI/FixedAsset/Create" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> New Asset</a></div><table class="table table-hover table-sm"><thead><tr><th>Code</th><th>Name</th><th>Category</th><th>Purchase Date</th><th>Cost</th><th>Life (Yrs)</th><th>Status</th><th>Actions</th></tr></thead><tbody>@foreach(var a in assets){<tr><td>@a.AssetCode</td><td>@a.AssetName</td><td>@a.Category</td><td>@a.PurchaseDate.ToString("d")</td><td>@a.Cost.ToString("C0")</td><td>@a.UsefulLifeYears</td><td><span class="badge @(a.Status=="Active"?"bg-success":"bg-warning")">@a.Status</span></td><td><i class="bi bi-pencil"></i></td></tr>}</tbody></table></div></div></div>
-    <div class="tab-pane fade" id="reports"><div class="card"><div class="card-body"><p class="text-muted">Trial balance, P&L statement, balance sheet, cash flow, and custom financial reports.</p></div></div></div>
+
+    <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-bottom:none">
+        <div class="fi-kpi-grid">
+            <div class="fi-kpi"><div class="kpi-icon kpi-blue"><i class="bi bi-bank"></i></div><div class="kpi-info"><div class="kpi-value">@entries.Count</div><div class="kpi-label">GL Entries</div><div class="kpi-sub">Journal records</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-teal"><i class="bi bi-arrow-up-circle"></i></div><div class="kpi-info"><div class="kpi-value">@(entries.Where(e=>e.Debit.HasValue).Sum(e=>e.Debit!.Value).ToString("C0"))</div><div class="kpi-label">Total Debit</div><div class="kpi-sub">Debit balance</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-amber"><i class="bi bi-arrow-down-circle"></i></div><div class="kpi-info"><div class="kpi-value">@(entries.Where(e=>e.Credit.HasValue).Sum(e=>e.Credit!.Value).ToString("C0"))</div><div class="kpi-label">Total Credit</div><div class="kpi-sub">Credit balance</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-green"><i class="bi bi-pc-display"></i></div><div class="kpi-info"><div class="kpi-value">@assets.Count</div><div class="kpi-label">Fixed Assets</div><div class="kpi-sub">Asset records</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-purple"><i class="bi bi-cash-stack"></i></div><div class="kpi-info"><div class="kpi-value">@(assets.Where(a=>a.Status=="Active").Sum(a=>a.Cost).ToString("C0"))</div><div class="kpi-label">Asset Value</div><div class="kpi-sub">Acquisition cost</div></div></div>
+        </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px;overflow:hidden">
+        <div class="zqm-tabs" id="fiTabs">
+            <button class="zqm-tab-btn active" data-tab="tab-gl"><i class="bi bi-journal-text me-1"></i>General Ledger <span class="zqm-badge info" style="margin-left:4px">@entries.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-ar"><i class="bi bi-arrow-up-right me-1"></i>Accounts Receivable</button>
+            <button class="zqm-tab-btn" data-tab="tab-ap"><i class="bi bi-arrow-down-left me-1"></i>Accounts Payable</button>
+            <button class="zqm-tab-btn" data-tab="tab-assets"><i class="bi bi-pc-display me-1"></i>Fixed Assets <span class="zqm-badge info" style="margin-left:4px">@assets.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-reports"><i class="bi bi-file-earmark-bar-graph me-1"></i>Financial Reports</button>
+        </div>
+
+        <!-- GL Tab -->
+        <div class="zqm-tab-panel active" id="tab-gl">
+            <div class="zqm-results-header"><h4>General Ledger Entries</h4><div><a asp-page="/FI/Ledger/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New Entry</a> <a asp-page="/FI/Ledger/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a> <a asp-page="/FI/GL/LineItems" class="zqm-btn"><i class="bi bi-list-columns me-1"></i>Line Items</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Date</th><th>Document #</th><th>Account</th><th>Debit</th><th>Credit</th><th>Reference</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var e in entries)
+                        {
+                            <tr>
+                                <td>@e.EntryDate.ToString("yyyy-MM-dd")</td>
+                                <td style="font-weight:600;color:#1565c0">@e.DocumentNumber</td>
+                                <td>@e.Account</td>
+                                <td>@(e.Debit.HasValue ? e.Debit.Value.ToString("C2") : "--")</td>
+                                <td>@(e.Credit.HasValue ? e.Credit.Value.ToString("C2") : "--")</td>
+                                <td>@e.Reference</td>
+                                <td><a asp-page="/FI/Ledger/Display" asp-route-id="@e.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a></td>
+                            </tr>
+                        }
+                        @if (!entries.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No journal entries found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AR Tab -->
+        <div class="zqm-tab-panel" id="tab-ar">
+            <div class="zqm-results-header"><h4>Accounts Receivable</h4><div><a asp-page="/FI/AR/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New AR Entry</a> <a asp-page="/FI/AR/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a> <a asp-page="/FI/AR/InvoiceCreate" class="zqm-btn"><i class="bi bi-receipt me-1"></i>Quick Invoice</a> <a asp-page="/FI/AR/Payment" class="zqm-btn"><i class="bi bi-credit-card me-1"></i>Record Payment</a></div></div>
+            <div style="padding:20px;color:#666;font-size:0.88rem">
+                <i class="bi bi-info-circle me-1"></i>Customer invoices, incoming payments, credit management, and aging reports. Use the buttons above to create or manage AR documents.
+            </div>
+        </div>
+
+        <!-- AP Tab -->
+        <div class="zqm-tab-panel" id="tab-ap">
+            <div class="zqm-results-header"><h4>Accounts Payable</h4><div><a asp-page="/FI/AP/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New AP Entry</a> <a asp-page="/FI/AP/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a> <a asp-page="/FI/AP/InvoiceCreate" class="zqm-btn"><i class="bi bi-receipt me-1"></i>Quick Invoice</a> <a asp-page="/FI/AP/Payment" class="zqm-btn"><i class="bi bi-credit-card me-1"></i>Record Payment</a></div></div>
+            <div style="padding:20px;color:#666;font-size:0.88rem">
+                <i class="bi bi-info-circle me-1"></i>Vendor invoice processing, payment runs, aging analysis, and dunning. Use the buttons above to create or manage AP documents.
+            </div>
+        </div>
+
+        <!-- Fixed Assets Tab -->
+        <div class="zqm-tab-panel" id="tab-assets">
+            <div class="zqm-results-header"><h4>Fixed Assets</h4><div><a asp-page="/FI/FixedAsset/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New Asset</a> <a asp-page="/FI/FixedAsset/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Asset Code</th><th>Name</th><th>Category</th><th>Purchase Date</th><th>Cost</th><th>Life (Yrs)</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var a in assets)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@a.AssetCode</td>
+                                <td>@a.AssetName</td>
+                                <td>@a.Category</td>
+                                <td>@a.PurchaseDate.ToString("yyyy-MM-dd")</td>
+                                <td>@a.Cost.ToString("C0")</td>
+                                <td>@a.UsefulLifeYears</td>
+                                <td><span class="zqm-badge @(a.Status=="Active"?"passed":"warning")">@a.Status</span></td>
+                                <td><a asp-page="/FI/FixedAsset/Display" asp-route-id="@a.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/FI/FixedAsset/Edit" asp-route-id="@a.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!assets.Any()) { <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No fixed assets found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div class="zqm-tab-panel" id="tab-reports">
+            <div class="zqm-results-header"><h4>Financial Reports</h4></div>
+            <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+                <a asp-page="/FI/Reports/BalanceSheet" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
+                    <i class="bi bi-file-earmark-bar-graph" style="font-size:1.5rem;color:#1a237e"></i>
+                    <div><div style="font-weight:600;font-size:0.88rem">Balance Sheet</div><div style="font-size:0.75rem;color:#888">F.01 — Period snapshot</div></div>
+                </a>
+                <a asp-page="/FI/Reports/ProfitLoss" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
+                    <i class="bi bi-graph-up" style="font-size:1.5rem;color:#2e7d32"></i>
+                    <div><div style="font-weight:600;font-size:0.88rem">Profit & Loss</div><div style="font-size:0.75rem;color:#888">F.02 — Income statement</div></div>
+                </a>
+                <a asp-page="/FI/GL/Display" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
+                    <i class="bi bi-book" style="font-size:1.5rem;color:#f57f17"></i>
+                    <div><div style="font-weight:600;font-size:0.88rem">GL Account Display</div><div style="font-size:0.75rem;color:#888">FS10N — Account balance</div></div>
+                </a>
+                <a asp-page="/FI/GL/LineItems" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
+                    <i class="bi bi-list-columns" style="font-size:1.5rem;color:#7b1fa2"></i>
+                    <div><div style="font-weight:600;font-size:0.88rem">GL Line Items</div><div style="font-size:0.75rem;color:#888">FAGLL03 — Posting items</div></div>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.querySelectorAll('#fiTabs .zqm-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#fiTabs .zqm-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.zqm-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+});
+</script>

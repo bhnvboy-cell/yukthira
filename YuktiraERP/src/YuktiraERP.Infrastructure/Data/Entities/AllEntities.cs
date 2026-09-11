@@ -2067,3 +2067,217 @@ public class InventoryValuationLedgerEntity : EntityBase
     public string PriceControl { get; set; } = "V";
     public string Status { get; set; } = "Active";
 }
+
+// ══════════════════════════════════════════════════════
+// V2.0 EVENT SOURCING & CQRS ENTITIES
+// ══════════════════════════════════════════════════════
+
+public class DomainEventEntity : EntityBase
+{
+    public Guid AggregateId { get; set; }
+    public YuktiraERP.Core.Enums.AggregateType AggregateType { get; set; }
+    public string EventType { get; set; } = string.Empty;
+    public string EventData { get; set; } = string.Empty;
+    public int Version { get; set; }
+    public DateTime Timestamp { get; set; }
+    public Guid TenantId { get; set; }
+    public string? UserId { get; set; }
+}
+
+public class ReadModelSnapshotEntity : EntityBase
+{
+    public string ModelName { get; set; } = string.Empty;
+    public Guid TenantId { get; set; }
+    public string ModelData { get; set; } = string.Empty;
+    public int Version { get; set; }
+    public DateTime Timestamp { get; set; }
+    public YuktiraERP.Core.Enums.ProjectionStatus Status { get; set; }
+}
+
+// ══════════════════════════════════════════════════════
+// V2.0 EDI TRANSPORT ENTITIES
+// ══════════════════════════════════════════════════════
+
+public class EdiTransmissionEntity : EntityBase
+{
+    public YuktiraERP.Core.Enums.EdiMessageType MessageType { get; set; }
+    public YuktiraERP.Core.Enums.EdiTransportProtocol Protocol { get; set; }
+    public YuktiraERP.Core.Enums.EdiTransactionStatus Status { get; set; }
+    public string SenderId { get; set; } = string.Empty;
+    public string ReceiverId { get; set; } = string.Empty;
+    public string? RawPayload { get; set; }
+    public string? AcknowledgmentId { get; set; }
+    public string? ErrorMessage { get; set; }
+    public Guid TenantId { get; set; }
+}
+
+public class MdnReceiptEntity : EntityBase
+{
+    public string OriginalMessageId { get; set; } = string.Empty;
+    public YuktiraERP.Core.Enums.MdnStatus Status { get; set; }
+    public string? MicValue { get; set; }
+    public string? MdnPayload { get; set; }
+    public string? ErrorMessage { get; set; }
+    public Guid TenantId { get; set; }
+}
+
+// ══════════════════════════════════════════════════════
+// MODULE GAP ENTITIES: SD, PP, WM, FI, CO, HR
+// ══════════════════════════════════════════════════════
+
+public class SchedulingAgreementEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string AgreementNumber { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public decimal TotalQuantity { get; set; }
+    public DateTime ValidFrom { get; set; }
+    public DateTime ValidTo { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class ScheduleLineEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid SchedulingAgreementId { get; set; }
+    public DateTime DeliveryDate { get; set; }
+    public decimal Quantity { get; set; }
+    public string Status { get; set; } = "Open";
+    public decimal DeliveredQuantity { get; set; }
+}
+
+public class RevenueRecognitionScheduleEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string BillingDocumentNumber { get; set; } = "";
+    public string CustomerCode { get; set; } = "";
+    public decimal TotalAmount { get; set; }
+    public decimal RecognizedAmount { get; set; }
+    public decimal DeferredAmount { get; set; }
+    public DateTime ServiceStartDate { get; set; }
+    public DateTime ServiceEndDate { get; set; }
+    public string RecognitionMethod { get; set; } = "StraightLine";
+    public string Status { get; set; } = "Pending";
+}
+
+public class KanbanBoardEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string Plant { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string BinCode { get; set; } = "";
+    public string Status { get; set; } = "InProcess";
+    public decimal CurrentQuantity { get; set; }
+    public decimal TargetQuantity { get; set; }
+    public string? AssignedProductionOrder { get; set; }
+}
+
+public class IntercompanyTransactionEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string TransactionType { get; set; } = "";
+    public string SendingCompanyCode { get; set; } = "";
+    public string ReceivingCompanyCode { get; set; } = "";
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = "INR";
+    public decimal ExchangeRate { get; set; } = 1.0m;
+    public string? SendingDocumentNumber { get; set; }
+    public string? ReceivingDocumentNumber { get; set; }
+    public string Status { get; set; } = "Posted";
+}
+
+public class WithholdingTaxEntryEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string VendorCode { get; set; } = "";
+    public string TaxCode { get; set; } = "";
+    public string TaxType { get; set; } = "";
+    public decimal GrossAmount { get; set; }
+    public decimal TaxRate { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal NetAmount { get; set; }
+    public string? TaxCertificateNumber { get; set; }
+}
+
+public class ProductCostEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string Plant { get; set; } = "";
+    public string CostingType { get; set; } = "Standard";
+    public decimal MaterialCost { get; set; }
+    public decimal LaborCost { get; set; }
+    public decimal OverheadCost { get; set; }
+    public decimal TotalCost { get; set; }
+    public decimal CostPerUnit { get; set; }
+    public DateTime CostingDate { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class ProfitabilitySegmentEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string OperatingConcern { get; set; } = "";
+    public string SegmentName { get; set; } = "";
+    public string SegmentValue { get; set; } = "";
+    public decimal Revenue { get; set; }
+    public decimal Costs { get; set; }
+    public decimal Margin { get; set; }
+    public decimal MarginPercent { get; set; }
+    public DateTime AnalysisDate { get; set; }
+}
+
+public class TransferPricingEntryEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string MaterialCode { get; set; } = "";
+    public string SendingCompanyCode { get; set; } = "";
+    public string ReceivingCompanyCode { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public decimal CostBase { get; set; }
+    public decimal MarkupPercent { get; set; }
+    public decimal MarkupAmount { get; set; }
+    public decimal TransferPrice { get; set; }
+    public string PricingMethod { get; set; } = "CostPlus";
+}
+
+public class BenefitsEnrollmentEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string EmployeeCode { get; set; } = "";
+    public string BenefitType { get; set; } = "";
+    public string PlanCode { get; set; } = "";
+    public decimal EmployeeContribution { get; set; }
+    public decimal EmployerContribution { get; set; }
+    public decimal TotalPremium { get; set; }
+    public DateTime EffectiveDate { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class SuccessionPlanEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string PositionCode { get; set; } = "";
+    public string CurrentIncumbentCode { get; set; } = "";
+    public string CandidateEmployeeCode { get; set; } = "";
+    public string CandidateName { get; set; } = "";
+    public string Readiness { get; set; } = "NotReady";
+    public string? DevelopmentPlan { get; set; }
+    public int PerformanceRating { get; set; }
+    public string? RiskOfLoss { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class PeriodCloseEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CompanyCode { get; set; } = "";
+    public int FiscalYear { get; set; }
+    public int Period { get; set; }
+    public string Status { get; set; } = "Open";
+    public int OpenItemsCount { get; set; }
+    public decimal UnpostedAmount { get; set; }
+    public DateTime? ClosedAt { get; set; }
+    public string? ClosedBy { get; set; }
+}

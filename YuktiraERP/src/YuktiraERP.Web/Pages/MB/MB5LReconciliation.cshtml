@@ -1,81 +1,82 @@
 @page
 @model YuktiraERP.Web.Pages.MB.MB5LReconciliationModel
-@{
-    ViewData["Title"] = "MB5L - MM/FI Reconciliation";
-}
-<div class="row justify-content-center">
-<div class="col-lg-10">
-<h4 class="mb-3"><i class="bi bi-balance me-2"></i>MB5L - MM/FI Reconciliation</h4>
+@{ ViewData["Title"] = "MB5L - MM/FI Reconciliation"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
-<div class="card shadow-sm mb-3">
-    <div class="card-header bg-warning text-dark"><h6 class="mb-0">Filters</h6></div>
-    <div class="card-body">
-        <form method="get">
-        <div class="row mb-2">
-            <div class="col-md-4">
-                <label class="form-label">Material Code</label>
-                <input asp-for="MaterialCode" class="form-control" />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Plant</label>
-                <input asp-for="Plant" class="form-control" />
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
-                <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
-            </div>
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-balance me-2"></i>MB5L - MM/FI Reconciliation</h3>
+            <span class="badge">Report</span>
         </div>
+        <div class="actions">
+            <button type="submit" form="mb5lForm" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filters</div>
+        <form method="get" id="mb5lForm">
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Material Code</label><input asp-for="MaterialCode" placeholder="Optional" /></div>
+                <div class="zqm-field"><label>Plant</label><input asp-for="Plant" placeholder="Optional" /></div>
+                <div></div>
+            </div>
         </form>
     </div>
-</div>
 
-@if (Model.Data != null && Model.Data.Any())
-{
-    <div class="card shadow-sm mb-3">
-        <div class="card-header bg-success text-white"><h6 class="mb-0">Reconciliation Results (@Model.Data.Count items)</h6></div>
-        <div class="card-body table-responsive">
-            <table class="table table-bordered table-sm">
-                <thead class="table-light">
-                    <tr>
-                        <th>Material</th>
-                        <th>Plant</th>
-                        <th>SLoc</th>
-                        <th>MM Qty</th>
-                        <th>MM Value</th>
-                        <th>FI Debit</th>
-                        <th>FI Credit</th>
-                        <th>FI Balance</th>
-                        <th>Difference</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var r in Model.Data)
-                    {
-                        <tr class="@(r.IsReconciled ? "" : "table-danger")">
-                            <td>@r.MaterialCode</td>
-                            <td>@r.Plant</td>
-                            <td>@r.StorageLocation</td>
-                            <td>@r.MmStockQuantity</td>
-                            <td>@r.MmStockValue.ToString("N2")</td>
-                            <td>@r.FiGlDebit.ToString("N2")</td>
-                            <td>@r.FiGlCredit.ToString("N2")</td>
-                            <td>@r.FiGlBalance.ToString("N2")</td>
-                            <td>@r.Difference.ToString("N2")</td>
-                            <td>
-                                @if (r.IsReconciled) { <span class="badge bg-success">Reconciled</span> }
-                                else { <span class="badge bg-danger">Discrepancy</span> }
-                            </td>
+    @if (Model.Data != null && Model.Data.Any())
+    {
+        <div class="zqm-results">
+            <div class="zqm-results-header">
+                <h4><i class="bi bi-balance me-1"></i>Reconciliation Results</h4>
+                <span class="count">@Model.Data.Count items</span>
+            </div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Plant</th>
+                            <th>SLoc</th>
+                            <th>MM Qty</th>
+                            <th>MM Value</th>
+                            <th>FI Debit</th>
+                            <th>FI Credit</th>
+                            <th>FI Balance</th>
+                            <th>Difference</th>
+                            <th>Status</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Data)
+                        {
+                            <tr>
+                                <td style="font-weight:600">@r.MaterialCode</td>
+                                <td>@r.Plant</td>
+                                <td>@r.StorageLocation</td>
+                                <td>@r.MmStockQuantity</td>
+                                <td>@r.MmStockValue.ToString("N2")</td>
+                                <td>@r.FiGlDebit.ToString("N2")</td>
+                                <td>@r.FiGlCredit.ToString("N2")</td>
+                                <td style="font-weight:600">@r.FiGlBalance.ToString("N2")</td>
+                                <td style="font-weight:700;color:@(r.IsReconciled ? "#2e7d32" : "#c62828")">@r.Difference.ToString("N2")</td>
+                                <td>
+                                    @if (r.IsReconciled) { <span class="zqm-badge passed">Reconciled</span> }
+                                    else { <span class="zqm-badge failed">Discrepancy</span> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-}
-else if (Model.Data != null)
-{
-    <div class="alert alert-info">No data found matching criteria.</div>
-}
-</div>
+    }
+    else if (Model.Data != null)
+    {
+        <div class="zqm-results">
+            <div class="zqm-empty"><i class="bi bi-inbox"></i><div>No data found matching criteria.</div></div>
+        </div>
+    }
 </div>

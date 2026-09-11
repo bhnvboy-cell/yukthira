@@ -1,25 +1,46 @@
 @page
 @model YuktiraERP.Web.Pages.PP.ProductionOrder.EditModel
 @{ ViewData["Title"] = "Edit Production Order"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Production Order</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="ProdOrder.Id" />
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="ProdOrder.OrderNumber" class="form-label"></label><input asp-for="ProdOrder.OrderNumber" class="form-control" /><span asp-validation-for="ProdOrder.OrderNumber" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="ProdOrder.ProductName" class="form-label"></label><input asp-for="ProdOrder.ProductName" class="form-control" /><span asp-validation-for="ProdOrder.ProductName" class="text-danger small"></span></div>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-pencil me-2"></i>Edit Production Order</h3>
+            <span class="badge">@Model.ProdOrder.OrderNumber</span>
+        </div>
+        <div class="actions">
+            <button type="submit" form="editForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Update</button>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-gear me-1"></i>Production Order Data</div>
+        <form method="post" id="editForm">
+            <input type="hidden" asp-for="ProdOrder.Id" />
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Order Number</label><input asp-for="ProdOrder.OrderNumber" /></div>
+                <div class="zqm-field"><label>Product Name</label><input asp-for="ProdOrder.ProductName" /></div>
+                <div class="zqm-field"><label>Material Code</label><input asp-for="ProdOrder.MaterialCode" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Quantity</label><input asp-for="ProdOrder.Quantity" type="number" step="1" /></div>
+                <div class="zqm-field"><label>Start Date</label><input asp-for="ProdOrder.StartDate" type="date" /></div>
+                <div class="zqm-field"><label>End Date</label><input asp-for="ProdOrder.EndDate" type="date" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Status</label><select asp-for="ProdOrder.Status"><option value="PLANNED">PLANNED</option><option value="RELEASED">RELEASED</option><option value="IN_PROGRESS">IN_PROGRESS</option><option value="COMPLETED">COMPLETED</option><option value="TECO">TECO</option><option value="CANCELLED">CANCELLED</option></select></div>
+                <div class="zqm-field"><label>Plant</label><input asp-for="ProdOrder.Plant" /></div>
+                <div class="zqm-field"><label>Storage Location</label><input asp-for="ProdOrder.StorageLocation" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Base UOM</label><input asp-for="ProdOrder.BaseUOM" /></div>
+                <div class="zqm-field"><label>Order Type</label><input asp-for="ProdOrder.OrderType" /></div>
+                <div class="zqm-field"><label>Planned Cost</label><input asp-for="ProdOrder.PlannedCost" type="number" step="0.01" /></div>
+            </div>
+        </form>
+    </div>
 </div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="ProdOrder.Quantity" class="form-label"></label><input asp-for="ProdOrder.Quantity" class="form-control" /><span asp-validation-for="ProdOrder.Quantity" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="ProdOrder.StartDate" class="form-label"></label><input asp-for="ProdOrder.StartDate" class="form-control" /><span asp-validation-for="ProdOrder.StartDate" class="text-danger small"></span></div>
-</div>
-<div class="row mb-3">
-<div class="col-md-6"><label asp-for="ProdOrder.EndDate" class="form-label"></label><input asp-for="ProdOrder.EndDate" class="form-control" /><span asp-validation-for="ProdOrder.EndDate" class="text-danger small"></span></div>
-<div class="col-md-6"><label asp-for="ProdOrder.Status" class="form-label"></label><input asp-for="ProdOrder.Status" class="form-control" /><span asp-validation-for="ProdOrder.Status" class="text-danger small"></span></div>
-</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

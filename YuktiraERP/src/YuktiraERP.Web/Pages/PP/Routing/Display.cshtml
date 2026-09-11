@@ -1,16 +1,53 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.Routing.DisplayModel
-@using YuktiraERP.Infrastructure.Data.Entities
-@{ ViewData["Title"] = "ProductionRouting Details"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>ProductionRouting Details</h5></div>
-<div class="card-body">
-<dl class="row mb-0"><dt class="col-sm-4">RoutingId</dt><dd class="col-sm-8">@(Model.Routing.RoutingId)</dd><dt class="col-sm-4">ProductName</dt><dd class="col-sm-8">@(Model.Routing.ProductName)</dd><dt class="col-sm-4">OperationNo</dt><dd class="col-sm-8">@(Model.Routing.OperationNo)</dd><dt class="col-sm-4">WorkCenter</dt><dd class="col-sm-8">@(Model.Routing.WorkCenter)</dd><dt class="col-sm-4">SetupTimeHrs</dt><dd class="col-sm-8">@(Model.Routing.SetupTimeHrs)</dd><dt class="col-sm-4">RunTimeHrs</dt><dd class="col-sm-8">@(Model.Routing.RunTimeHrs)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Routing.Status)</dd></dl>
-</div>
-<div class="card-footer">
-<a href="/PP/Routing/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
-<a href="/PP/Routing/Edit?id=@(Model.Routing.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
-</div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@{ ViewData["Title"] = "Production Routing Details"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-eye me-2"></i>Production Routing Details</h3>
+            <span class="badge">@Model.Routing.RoutingId</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/PP/Routing/Edit" asp-route-id="@Model.Routing.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><i class="bi bi-pencil me-1"></i>Edit</a>
+            <a asp-page="/PP/Routing/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>Routing Information</h4></div>
+        <div style="padding:16px">
+            <div class="zqm-section-title"><i class="bi bi-info-circle me-1"></i>Routing Header</div>
+            <div class="zqm-row cols-3">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Routing ID</label><div class="zqm-ro" style="font-weight:600;color:#1565c0">@Model.Routing.RoutingId</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Routing Group</label><div class="zqm-ro">@Model.Routing.RoutingGroup</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Group Counter</label><div class="zqm-ro">@Model.Routing.RoutingGroupCounter</div></div>
+            </div>
+            <div class="zqm-row cols-3" style="margin-top:8px">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Product Name</label><div class="zqm-ro" style="font-weight:600">@Model.Routing.ProductName</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Control Key</label><div class="zqm-ro">@Model.Routing.ControlKey</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Status</label><div class="zqm-ro"><span class="zqm-badge @(Model.Routing.Status=="Active"?"passed":"warning")">@Model.Routing.Status</span></div></div>
+            </div>
+            <div class="zqm-section-title" style="margin-top:16px"><i class="bi bi-gear me-1"></i>Operation</div>
+            <div class="zqm-row cols-3">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Operation No</label><div class="zqm-ro" style="font-weight:600">@Model.Routing.OperationNo</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Operation Description</label><div class="zqm-ro">@Model.Routing.OperationDescription</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Work Center</label><div class="zqm-ro" style="font-weight:600">@Model.Routing.WorkCenter</div></div>
+            </div>
+            <div class="zqm-section-title" style="margin-top:16px"><i class="bi bi-clock me-1"></i>Standard Times</div>
+            <div class="zqm-row cols-3">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Setup Time (hrs)</label><div class="zqm-ro">@Model.Routing.SetupTimeHrs</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Machine Time (hrs)</label><div class="zqm-ro">@Model.Routing.MachineTimeHrs</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Labor Time (hrs)</label><div class="zqm-ro">@Model.Routing.LaborTimeHrs</div></div>
+            </div>
+            <div class="zqm-row cols-3" style="margin-top:8px">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Run Time (hrs)</label><div class="zqm-ro">@Model.Routing.RunTimeHrs</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Queue Time (hrs)</label><div class="zqm-ro">@Model.Routing.QueueTimeHrs</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Scrap %</label><div class="zqm-ro">@Model.Routing.ScrapPercent%</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

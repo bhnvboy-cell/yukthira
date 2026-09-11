@@ -1,15 +1,36 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.SD.Delivery.EditModel
 @{ ViewData["Title"] = "Edit Delivery"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Delivery</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="Delivery.Id" />
-<div class="row mb-3"><div class="col-md-6"><label asp-for="Delivery.DeliveryNumber" class="form-label"></label><input asp-for="Delivery.DeliveryNumber" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Delivery.Date" class="form-label"></label><input asp-for="Delivery.Date" class="form-control" type="datetime-local" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Delivery.SoNumber" class="form-label"></label><input asp-for="Delivery.SoNumber" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="Delivery.CustomerName" class="form-label"></label><input asp-for="Delivery.CustomerName" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="Delivery.Status" class="form-label"></label><input asp-for="Delivery.Status" class="form-control" type="text" /></div><div class="col-md-6"></div></div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a href="/SD/Delivery/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-pencil me-2"></i>Edit Delivery</h3>
+            <span class="badge">@Model.Delivery.DeliveryNumber</span>
+        </div>
+        <div class="actions">
+            <button type="submit" form="editForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Update</button>
+            <a asp-page="/SD/Delivery/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-truck me-1"></i>Delivery Data</div>
+        <form method="post" id="editForm">
+            <input type="hidden" asp-for="Delivery.Id" />
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Delivery Number</label><input asp-for="Delivery.DeliveryNumber" /></div>
+                <div class="zqm-field"><label>SO Number</label><input asp-for="Delivery.SoNumber" /></div>
+                <div class="zqm-field"><label>Date</label><input asp-for="Delivery.Date" type="datetime-local" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Customer Name</label><input asp-for="Delivery.CustomerName" /></div>
+                <div class="zqm-field"><label>Status</label><select asp-for="Delivery.Status"><option value="Picked">Picked</option><option value="Packed">Packed</option><option value="Shipped">Shipped</option><option value="Delivered">Delivered</option></select></div>
+                <div></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

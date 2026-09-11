@@ -1,0 +1,118 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.AutoLotGeneratorModel
+@{ ViewData["Title"] = "ZQM01 - Auto Inspection Lot Generator"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <form method="post" id="zqmForm">
+        <div class="zqm-toolbar">
+            <div style="display:flex;align-items:center;gap:10px">
+                <h3><i class="bi bi-clipboard-plus me-2"></i>Auto Inspection Lot Generator</h3>
+                <span class="badge">ZQM01</span>
+            </div>
+            <div class="actions">
+                <button type="button" class="zqm-btn" onclick="generateLot()" title="Generate Lot"><i class="bi bi-gear-fill me-1"></i>Generate</button>
+                <button type="button" class="zqm-btn" onclick="resetForm()" title="Clear all fields"><i class="bi bi-x-circle me-1"></i>Clear</button>
+                <button type="button" class="zqm-btn" onclick="window.print()" title="Print"><i class="bi bi-printer me-1"></i>Print</button>
+                <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back" title="Back to QM"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            </div>
+        </div>
+
+        <div class="zqm-filter">
+            <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Material & Source Data</div>
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Material Code <span class="sub">(required)</span></label><input id="materialCode" required placeholder="e.g. RAW-001" /></div>
+                <div class="zqm-field"><label>Material Name</label><input id="materialName" /></div>
+                <div class="zqm-field"><label>Plant</label><select id="plant"><option value="1000">1000 - Manufacturing</option><option value="2000">2000 - Warehouse</option><option value="3000">3000 - Quality</option></select></div>
+                <div class="zqm-field"><label>Storage Location</label><input id="storageLocation" /></div>
+            </div>
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Batch Number</label><input id="batchNumber" /></div>
+                <div class="zqm-field"><label>Quantity <span class="sub">(required)</span></label><input id="quantity" type="number" step="0.01" required /></div>
+                <div class="zqm-field"><label>Base UOM</label><select id="baseUOM"><option value="EA">EA</option><option value="KG">KG</option><option value="L">L</option><option value="M">M</option></select></div>
+                <div class="zqm-field"><label>Movement Type</label><select id="movementType"><option value="101">101 - GR for PO</option><option value="103">103 - GR PO (latest)</option><option value="301">301 - Transfer Posting</option><option value="501">501 - GR w/o PO</option></select></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Purchase Order #</label><input id="poNumber" /></div>
+                <div class="zqm-field"><label>Vendor Code</label><input id="vendorCode" /></div>
+                <div class="zqm-field"><label>Customer Code</label><input id="customerCode" /></div>
+            </div>
+        </div>
+
+        <div class="zqm-results">
+            <div class="zqm-results-header">
+                <h4><i class="bi bi-clipboard-data me-1"></i>Generated Inspection Lot</h4>
+                <span class="count" id="resultCount"></span>
+            </div>
+            <div id="alertBox" class="zqm-alert"></div>
+            <div class="zqm-table-wrap" id="resultArea" style="display:none">
+                <table class="zqm-table">
+                    <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Lot Number</strong></td><td id="resLotNumber">-</td></tr>
+                        <tr><td><strong>Inspection Type</strong></td><td id="resInspType">-</td></tr>
+                        <tr><td><strong>Origin</strong></td><td id="resOrigin">-</td></tr>
+                        <tr><td><strong>Sample Size</strong></td><td id="resSampleSize">-</td></tr>
+                        <tr><td><strong>Assigned Inspector</strong></td><td id="resInspector">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="zqm-empty" id="emptyState"><i class="bi bi-clipboard-plus"></i><div>Fill in material data and click Generate to create an inspection lot</div></div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+function show(msg, type) {
+    var el = document.getElementById('alertBox');
+    el.style.display = 'block';
+    el.className = 'zqm-alert ' + type;
+    el.textContent = msg;
+}
+async function generateLot() {
+    var data = {
+        materialCode: document.getElementById('materialCode').value,
+        materialName: document.getElementById('materialName').value,
+        plant: document.getElementById('plant').value,
+        storageLocation: document.getElementById('storageLocation').value,
+        batchNumber: document.getElementById('batchNumber').value,
+        quantity: parseFloat(document.getElementById('quantity').value) || 0,
+        baseUOM: document.getElementById('baseUOM').value,
+        movementType: parseInt(document.getElementById('movementType').value) || 101,
+        purchaseOrderNumber: document.getElementById('poNumber').value,
+        vendorCode: document.getElementById('vendorCode').value,
+        customerCode: document.getElementById('customerCode').value,
+        userId: 'superadmin'
+    };
+    try {
+        var r = await fetch('/api/v1/zqm/lot/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        var result = await r.json();
+        if (result.success) {
+            document.getElementById('resLotNumber').textContent = result.lotNumber;
+            document.getElementById('resInspType').textContent = result.inspectionType;
+            document.getElementById('resOrigin').textContent = result.origin;
+            document.getElementById('resSampleSize').textContent = result.sampleSize;
+            document.getElementById('resInspector').textContent = result.assignedInspector;
+            document.getElementById('resultArea').style.display = '';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultCount').textContent = 'Generated successfully';
+            show('Inspection lot ' + result.lotNumber + ' created successfully', 'success');
+        } else {
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('emptyState').style.display = '';
+            show('Error: ' + (result.errors || ['Unknown error']).join(', '), 'error');
+        }
+    } catch (e) {
+        show('API call failed: ' + e.message, 'error');
+    }
+}
+function resetForm() {
+    document.getElementById('zqmForm').reset();
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('emptyState').style.display = '';
+    document.getElementById('alertBox').style.display = 'none';
+    document.getElementById('resultCount').textContent = '';
+}
+</script>
+}

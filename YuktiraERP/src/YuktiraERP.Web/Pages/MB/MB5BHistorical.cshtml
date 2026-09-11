@@ -1,86 +1,80 @@
 @page
 @model YuktiraERP.Web.Pages.MB.MB5BHistoricalModel
-@{
-    ViewData["Title"] = "MB5B - Historical Stock Values";
-}
-<div class="row justify-content-center">
-<div class="col-lg-10">
-<h4 class="mb-3"><i class="bi bi-calendar-range me-2"></i>MB5B - Historical Stock Values</h4>
+@{ ViewData["Title"] = "MB5B - Historical Stock Values"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
-<div class="card shadow-sm mb-3">
-    <div class="card-header bg-warning text-dark"><h6 class="mb-0">Filters</h6></div>
-    <div class="card-body">
-        <form method="get">
-        <div class="row mb-2">
-            <div class="col-md-3">
-                <label class="form-label">Material Code</label>
-                <input asp-for="MaterialCode" class="form-control" required />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Plant</label>
-                <input asp-for="Plant" class="form-control" required />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">From Date</label>
-                <input asp-for="FromDate" type="date" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">To Date</label>
-                <input asp-for="ToDate" type="date" class="form-control" />
-            </div>
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-calendar-range me-2"></i>MB5B - Historical Stock Values</h3>
+            <span class="badge">Report</span>
         </div>
-        <div class="row mb-2">
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
-                <a href="/MB/Index" class="btn btn-secondary ms-2">Back</a>
-            </div>
+        <div class="actions">
+            <button type="submit" form="mb5bForm" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
         </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filters</div>
+        <form method="get" id="mb5bForm">
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Material Code <span class="sub">(required)</span></label><input asp-for="MaterialCode" required /></div>
+                <div class="zqm-field"><label>Plant <span class="sub">(required)</span></label><input asp-for="Plant" required /></div>
+                <div class="zqm-field"><label>From Date</label><input asp-for="FromDate" type="date" /></div>
+                <div class="zqm-field"><label>To Date</label><input asp-for="ToDate" type="date" /></div>
+            </div>
         </form>
     </div>
-</div>
 
-@if (Model.Data != null)
-{
-    <div class="card shadow-sm mb-3">
-        <div class="card-header bg-success text-white"><h6 class="mb-0">Historical Stock - @Model.Data.MaterialCode</h6></div>
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-3"><strong>Opening Qty:</strong> @Model.Data.OpeningQuantity</div>
-                <div class="col-md-3"><strong>Closing Qty:</strong> @Model.Data.ClosingQuantity</div>
-                <div class="col-md-3"><strong>Receipts:</strong> @Model.Data.ReceiptQuantity</div>
-                <div class="col-md-3"><strong>Issues:</strong> @Model.Data.IssueQuantity</div>
+    @if (Model.Data != null)
+    {
+        <div class="zqm-results">
+            <div class="zqm-results-header">
+                <h4><i class="bi bi-calendar-range me-1"></i>Historical Stock - @Model.Data.MaterialCode @Model.Data.Plant</h4>
+                <span class="count">@Model.Data.DailyMovements.Count movements</span>
             </div>
+            <div style="padding:16px">
+                <div class="zqm-section-title"><i class="bi bi-graph-up me-1"></i>Summary</div>
+                <div class="zqm-row cols-4">
+                    <div style="padding:10px;background:#e3f2fd;border:1px solid #90caf9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#1565c0;text-transform:uppercase">Opening Qty</label><div style="font-size:1rem;font-weight:700;color:#0d47a1">@Model.Data.OpeningQuantity</div></div>
+                    <div style="padding:10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#2e7d32;text-transform:uppercase">Receipts</label><div style="font-size:1rem;font-weight:700;color:#1b5e20">@Model.Data.ReceiptQuantity</div></div>
+                    <div style="padding:10px;background:#ffcdd2;border:1px solid #ef9a9a;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#c62828;text-transform:uppercase">Issues</label><div style="font-size:1rem;font-weight:700;color:#b71c1c">@Model.Data.IssueQuantity</div></div>
+                    <div style="padding:10px;background:#f3e5f5;border:1px solid #ce93d8;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#7b1fa2;text-transform:uppercase">Closing Qty</label><div style="font-size:1rem;font-weight:700;color:#4a148c">@Model.Data.ClosingQuantity</div></div>
+                </div>
 
-            @if (Model.Data.DailyMovements.Any())
-            {
-                <table class="table table-bordered table-sm">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Date</th>
-                            <th>Mvt Type</th>
-                            <th>Description</th>
-                            <th>Qty</th>
-                            <th>Value</th>
-                            <th>Running Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var m in Model.Data.DailyMovements)
-                        {
-                            <tr>
-                                <td>@m.Date.ToString("dd/MM/yyyy")</td>
-                                <td>@m.MovementType</td>
-                                <td>@m.Description</td>
-                                <td>@m.Quantity</td>
-                                <td>@m.Value.ToString("N2")</td>
-                                <td>@m.RunningBalance</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
+                @if (Model.Data.DailyMovements.Any())
+                {
+                    <div class="zqm-section-title" style="margin-top:16px"><i class="bi bi-table me-1"></i>Daily Movements</div>
+                    <div class="zqm-table-wrap">
+                        <table class="zqm-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Mvt Type</th>
+                                    <th>Description</th>
+                                    <th>Qty</th>
+                                    <th>Value</th>
+                                    <th>Running Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in Model.Data.DailyMovements)
+                                {
+                                    <tr>
+                                        <td>@m.Date.ToString("dd/MM/yyyy")</td>
+                                        <td><span class="zqm-badge info">@m.MovementType</span></td>
+                                        <td>@m.Description</td>
+                                        <td>@m.Quantity</td>
+                                        <td>@m.Value.ToString("N2")</td>
+                                        <td style="font-weight:600">@m.RunningBalance</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
         </div>
-    </div>
-}
-</div>
+    }
 </div>

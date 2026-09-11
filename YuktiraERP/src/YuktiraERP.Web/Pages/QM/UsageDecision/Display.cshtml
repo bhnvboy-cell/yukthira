@@ -1,16 +1,42 @@
-﻿@page
+﻿@page "{id:Guid}"
 @model YuktiraERP.Web.Pages.QM.UsageDecision.DisplayModel
-@using YuktiraERP.Infrastructure.Data.Entities
-@{ ViewData["Title"] = "UsageDecision Details"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>UsageDecision Details</h5></div>
-<div class="card-body">
-<dl class="row mb-0"><dt class="col-sm-4">DecisionId</dt><dd class="col-sm-8">@(Model.Decision.DecisionId)</dd><dt class="col-sm-4">LotNumber</dt><dd class="col-sm-8">@(Model.Decision.LotNumber)</dd><dt class="col-sm-4">MaterialName</dt><dd class="col-sm-8">@(Model.Decision.MaterialName)</dd><dt class="col-sm-4">Decision</dt><dd class="col-sm-8">@(Model.Decision.Decision)</dd><dt class="col-sm-4">Notes</dt><dd class="col-sm-8">@(Model.Decision.Notes)</dd><dt class="col-sm-4">DecisionDate</dt><dd class="col-sm-8">@(Model.Decision.DecisionDate)</dd></dl>
+@{ ViewData["Title"] = "Usage Decision Details"; }
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-check2-circle me-2"></i>Usage Decision Details</h3><span class="badge">QM</span></div>
+    <div class="ent-form-tabs">
+        <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-ref')"><i class="bi bi-link tab-icon"></i> Reference</button>
+        <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-decision')"><i class="bi bi-gavel tab-icon"></i> Decision</button>
+    </div>
+    <div class="ent-form-panel active" id="tab-ref">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-link"></i> Reference Data</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Decision ID</label><div class="ent-readonly">@Model.Decision.DecisionId</div></div>
+                <div class="ent-field"><label>Lot Number</label><div class="ent-readonly">@Model.Decision.LotNumber</div></div>
+                <div class="ent-field"><label>Material</label><div class="ent-readonly">@Model.Decision.MaterialName</div></div>
+            </div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Inspector</label><div class="ent-readonly">@Model.Decision.InspectorID</div></div>
+                <div class="ent-field"><label>Decision Date</label><div class="ent-readonly">@Model.Decision.DecisionDate.ToString("dd MMM yyyy")</div></div>
+                <div class="ent-field"><label>Quality Score</label><div class="ent-readonly">@Model.Decision.QualityScore</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-panel" id="tab-decision">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-gavel"></i> Decision Details</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>UD Code</label><div class="ent-readonly"><span class="qm-badge @(Model.Decision.UDCode=="Accepted"?"success":Model.Decision.UDCode=="Rejected"?"rejected":"warning")">@Model.Decision.UDCode</span></div></div>
+                <div class="ent-field"><label>Decision</label><div class="ent-readonly">@Model.Decision.Decision</div></div>
+            </div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Unrestricted</label><div class="ent-readonly">@Model.Decision.UnrestrictedStock</div></div>
+                <div class="ent-field"><label>Blocked</label><div class="ent-readonly">@Model.Decision.BlockedStock</div></div>
+                <div class="ent-field"><label>Scrap</label><div class="ent-readonly">@Model.Decision.ScrapQuantity</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-actions">
+        <a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
+        <a asp-page="/QM/UsageDecision/Edit" asp-route-id="@Model.Decision.Id" class="ent-btn ent-btn-primary"><i class="bi bi-pencil me-1"></i> Edit</a>
+    </div>
 </div>
-<div class="card-footer">
-<a href="/QM/UsageDecision/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
-<a href="/QM/UsageDecision/Edit?id=@(Model.Decision.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
-</div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
-

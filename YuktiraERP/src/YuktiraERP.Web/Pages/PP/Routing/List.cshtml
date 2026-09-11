@@ -1,37 +1,82 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.Routing.ListModel
-@{ ViewData["Title"] = "ProductionRouting List"; }
-<div class="container-fluid py-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-list-ul me-2"></i>ProductionRouting Records</h2>
-        <a href="/PP/Routing/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i>New ProductionRouting</a>
+@{ ViewData["Title"] = "Production Routings"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-diagram-3 me-2"></i>Production Routings</h3>
+            <span class="badge">@Model.Items.Count records</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/PP/Routing/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New Routing</a>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
     </div>
-    <div class="card shadow-sm">
-        <div class="card-body p-0" style="overflow-x:auto">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light"><tr><th>RoutingId</th><th>ProductName</th><th>OperationNo</th><th>WorkCenter</th><th>SetupTimeHrs</th><th style="width:160px">Actions</th></tr></thead>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Routing ID</label><input id="searchRoutingId" placeholder="Filter by routing ID..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Product</label><input id="searchProduct" placeholder="Filter by product..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Work Center</label><input id="searchWC" placeholder="Filter by work center..." oninput="filterTable()" /></div>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>Routings</h4><span class="count" id="resultCount">@Model.Items.Count items</span></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="rtTable">
+                <thead>
+                    <tr><th>Routing ID</th><th>Group</th><th>Product</th><th>Op #</th><th>Description</th><th>Work Center</th><th>Setup (hrs)</th><th>Machine (hrs)</th><th>Labor (hrs)</th><th>Scrap %</th><th>Status</th><th>Actions</th></tr>
+                </thead>
                 <tbody>
-                    @if (Model.Items.Count == 0) {
-                        <tr><td colspan="8" class="text-center text-muted py-4">No records found</td></tr>
-                    }
-                    @foreach (var item in Model.Items) {
-                        <tr>
-                            <td>@item.RoutingId</td><td>@item.ProductName</td><td>@item.OperationNo</td><td>@item.WorkCenter</td><td>@item.SetupTimeHrs</td>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr data-rid="@item.RoutingId" data-product="@item.ProductName" data-wc="@item.WorkCenter">
+                            <td style="font-weight:600;color:#1565c0">@item.RoutingId</td>
+                            <td>@item.RoutingGroup</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.OperationNo</td>
+                            <td>@item.OperationDescription</td>
+                            <td>@item.WorkCenter</td>
+                            <td>@item.SetupTimeHrs</td>
+                            <td>@item.MachineTimeHrs</td>
+                            <td>@item.LaborTimeHrs</td>
+                            <td>@item.ScrapPercent%</td>
+                            <td><span class="zqm-badge @(item.Status=="Active"?"passed":"warning")">@item.Status</span></td>
                             <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="/PP/Routing/Display?id=@item.Id" class="btn btn-outline-info" title="View"><i class="bi bi-eye"></i></a>
-                                    <a href="/PP/Routing/Edit?id=@item.Id" class="btn btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
-                                    <form method="post" asp-page-handler="Delete" style="display:inline" onsubmit="return confirm('Delete this record?')">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </div>
+                                <a asp-page="/PP/Routing/Display" asp-route-id="@item.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                <a asp-page="/PP/Routing/Edit" asp-route-id="@item.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <form method="post" asp-page-handler="Delete" style="display:inline" onsubmit="return confirm('Delete this routing?')">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="zqm-act" title="Delete" style="color:#c62828"><i class="bi bi-trash"></i></button>
+                                </form>
                             </td>
                         </tr>
                     }
+                    @if (!Model.Items.Any()) { <tr><td colspan="12" class="zqm-empty"><i class="bi bi-diagram-3"></i><div>No routings found</div></td></tr> }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
+<script>
+function filterTable() {
+    var rid = document.getElementById('searchRoutingId').value.toLowerCase();
+    var prod = document.getElementById('searchProduct').value.toLowerCase();
+    var wc = document.getElementById('searchWC').value.toLowerCase();
+    var rows = document.querySelectorAll('#rtTable tbody tr[data-rid]');
+    var count = 0;
+    rows.forEach(function(r) {
+        var match = (!rid || r.dataset.rid.toLowerCase().indexOf(rid) > -1) &&
+                    (!prod || r.dataset.product.toLowerCase().indexOf(prod) > -1) &&
+                    (!wc || r.dataset.wc.toLowerCase().indexOf(wc) > -1);
+        r.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' items';
+}
+</script>

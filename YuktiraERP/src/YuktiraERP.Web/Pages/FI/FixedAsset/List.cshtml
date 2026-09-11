@@ -1,31 +1,56 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.FI.FixedAsset.ListModel
-@{ ViewData["Title"] = "FixedAsset List"; }
-<div class="container-fluid py-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-list-ul me-2"></i>FixedAsset Records</h2>
-        <a href="/FI/FixedAsset/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i>New FixedAsset</a>
+@{ ViewData["Title"] = "Fixed Asset List"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-list-ul me-2"></i>Fixed Assets</h3>
+            <span class="badge">@Model.Items.Count records</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/FI/FixedAsset/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New Asset</a>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
     </div>
-    <div class="card shadow-sm">
-        <div class="card-body p-0" style="overflow-x:auto">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light"><tr><th>AssetCode</th><th>AssetName</th><th>Category</th><th>PurchaseDate</th><th>Cost</th><th style="width:160px">Actions</th></tr></thead>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Asset Code</label><input id="searchCode" placeholder="Filter by code..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Asset Name</label><input id="searchName" placeholder="Filter by name..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Category</label><select id="searchCategory" onchange="filterTable()"><option value="">All</option><option value="Equipment">Equipment</option><option value="Machinery">Machinery</option><option value="Vehicles">Vehicles</option><option value="Property">Property</option><option value="IT">IT Equipment</option><option value="Furniture">Furniture</option></select></div>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>Fixed Asset Register</h4><span class="count" id="resultCount">@Model.Items.Count items</span></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="assetTable">
+                <thead><tr><th>Asset Code</th><th>Name</th><th>Category</th><th>Purchase Date</th><th>Cost</th><th>Life (Yrs)</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody>
-                    @if (Model.Items.Count == 0) {
-                        <tr><td colspan="9" class="text-center text-muted py-4">No records found</td></tr>
+                    @if (Model.Items.Count == 0)
+                    {
+                        <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No fixed assets found</div></td></tr>
                     }
-                    @foreach (var item in Model.Items) {
-                        <tr>
-                            <td>@item.AssetCode</td><td>@item.AssetName</td><td>@item.Category</td><td>@item.PurchaseDate</td><td>@item.Cost</td>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr data-code="@item.AssetCode" data-name="@item.AssetName" data-category="@item.Category">
+                            <td style="font-weight:600;color:#1565c0">@item.AssetCode</td>
+                            <td>@item.AssetName</td>
+                            <td>@item.Category</td>
+                            <td>@item.PurchaseDate.ToString("yyyy-MM-dd")</td>
+                            <td>@item.Cost.ToString("C0")</td>
+                            <td>@item.UsefulLifeYears</td>
+                            <td><span class="zqm-badge @(item.Status=="Active"?"passed":"warning")">@item.Status</span></td>
                             <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="/FI/FixedAsset/Display?id=@item.Id" class="btn btn-outline-info" title="View"><i class="bi bi-eye"></i></a>
-                                    <a href="/FI/FixedAsset/Edit?id=@item.Id" class="btn btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
-                                    <form method="post" asp-page-handler="Delete" style="display:inline" onsubmit="return confirm('Delete this record?')">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </div>
+                                <a asp-page="/FI/FixedAsset/Display" asp-route-id="@item.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                <a asp-page="/FI/FixedAsset/Edit" asp-route-id="@item.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <form method="post" asp-page-handler="Delete" style="display:inline" onsubmit="return confirm('Delete this asset?')">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="zqm-act" title="Delete"><i class="bi bi-trash"></i></button>
+                                </form>
                             </td>
                         </tr>
                     }
@@ -35,3 +60,20 @@
     </div>
 </div>
 
+<script>
+function filterTable() {
+    var code = document.getElementById('searchCode').value.toLowerCase();
+    var name = document.getElementById('searchName').value.toLowerCase();
+    var category = document.getElementById('searchCategory').value;
+    var rows = document.querySelectorAll('#assetTable tbody tr[data-code]');
+    var count = 0;
+    rows.forEach(function(r) {
+        var match = (!code || r.dataset.code.toLowerCase().indexOf(code) > -1) &&
+                    (!name || r.dataset.name.toLowerCase().indexOf(name) > -1) &&
+                    (!category || r.dataset.category === category);
+        r.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' items';
+}
+</script>

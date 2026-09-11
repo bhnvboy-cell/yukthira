@@ -1,16 +1,35 @@
 @page
 @model YuktiraERP.Web.Pages.FI.AP.InvoiceCreateModel
 @{ ViewData["Title"] = "AP Invoice (FB60)"; }
-<div class="row justify-content-center"><div class="col-lg-6">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-receipt me-2"></i>AP Invoice</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="mb-3"><label asp-for="Entry.VendorName" class="form-label"></label><input asp-for="Entry.VendorName" class="form-control" /></div>
-<div class="mb-3"><label asp-for="Entry.Amount" class="form-label"></label><input asp-for="Entry.Amount" class="form-control" type="number" step="0.01" /></div>
-<div class="mb-3"><label asp-for="Entry.PaidAmount" class="form-label">Paid Amount</label><input asp-for="Entry.PaidAmount" class="form-control" type="number" step="0.01" /></div>
-<div class="mb-3"><label asp-for="Entry.Date" class="form-label"></label><input asp-for="Entry.Date" class="form-control" type="date" /></div>
-<div class="mb-3"><label asp-for="Entry.Status" class="form-label"></label><select asp-for="Entry.Status" class="form-select"><option>Open</option><option>Paid</option><option>Cancelled</option></select></div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Post</button><a asp-page="/FI/Index" class="btn btn-outline-secondary">Cancel</a></div>
-</form>
-</div></div>
-</div></div>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-receipt me-2"></i>AP Invoice</h3>
+            <span class="badge">FB60 — Quick</span>
+        </div>
+        <div class="actions">
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Post Invoice</button>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <form method="post" id="createForm">
+            <div class="zqm-section-title"><i class="bi bi-receipt me-1"></i>Invoice Details</div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Vendor Name <span style="color:#c62828">*</span></label><input asp-for="Entry.VendorName" required /></div>
+                <div class="zqm-field"><label>Amount <span style="color:#c62828">*</span></label><input asp-for="Entry.Amount" type="number" step="0.01" min="0" required /></div>
+                <div class="zqm-field"><label>Paid Amount</label><input asp-for="Entry.PaidAmount" type="number" step="0.01" value="0" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Invoice Date <span style="color:#c62828">*</span></label><input asp-for="Entry.Date" type="date" required /></div>
+                <div class="zqm-field"><label>Status</label><select asp-for="Entry.Status"><option value="Open">Open</option><option value="Paid">Paid</option><option value="Cancelled">Cancelled</option></select></div>
+                <div></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

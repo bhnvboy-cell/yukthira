@@ -2,24 +2,52 @@
 @model YuktiraERP.Web.Pages.FI.GL.DisplayModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "GL Account Display (FS10N)"; }
-<h2><i class="bi bi-book me-2"></i>G/L Account Display</h2>
-<form method="get" class="row g-3 mb-3">
-<div class="col-auto"><select name="AccountCode" class="form-select">
-<option value="">-- Select Account --</option>
-@foreach (var a in Model.Accounts) { <option value="@a.AccountCode" selected="@(a.AccountCode==Model.AccountCode)">@a.AccountCode - @a.AccountName</option> }
-</select></div>
-<div class="col-auto"><button type="submit" class="btn btn-primary">Display</button></div>
-</form>
-@if (Model.Account != null)
-{
-<div class="card"><div class="card-body">
-<dl class="row">
-<dt class="col-sm-3">Account Code</dt><dd class="col-sm-9">@Model.Account.AccountCode</dd>
-<dt class="col-sm-3">Account Name</dt><dd class="col-sm-9">@Model.Account.AccountName</dd>
-<dt class="col-sm-3">Type</dt><dd class="col-sm-9">@Model.Account.Type</dd>
-<dt class="col-sm-3">Category</dt><dd class="col-sm-9">@Model.Account.Category</dd>
-<dt class="col-sm-3">Balance</dt><dd class="col-sm-9">@Model.Account.Balance.ToString("C2")</dd>
-<dt class="col-sm-3">Active</dt><dd class="col-sm-9">@(Model.Account.IsActive ? "Yes" : "No")</dd>
-</dl>
-</div></div>
-}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-book me-2"></i>G/L Account Display</h3>
+            <span class="badge">FS10N</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/FI/GL/LineItems" class="zqm-btn"><i class="bi bi-list-columns me-1"></i>Line Items</a>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <form method="get">
+            <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Select Account</div>
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Account Code</label><select name="AccountCode"><option value="">-- Select Account --</option>@foreach (var a in Model.Accounts) { <option value="@a.AccountCode" selected="@(a.AccountCode==Model.AccountCode)">@a.AccountCode - @a.AccountName</option> }</select></div>
+                <div class="zqm-field" style="display:flex;align-items:flex-end"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0;height:34px"><i class="bi bi-search me-1"></i>Display</button></div>
+                <div></div><div></div>
+            </div>
+        </form>
+    </div>
+
+    @if (Model.Account != null)
+    {
+        <div class="zqm-results">
+            <div class="zqm-results-header"><h4>Account Details — @Model.Account.AccountCode</h4><span class="zqm-badge @(Model.Account.IsActive?"passed":"closed")">@(Model.Account.IsActive?"Active":"Inactive")</span></div>
+            <div style="padding:16px">
+                <div class="zqm-row cols-3">
+                    <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Account Code</label><div class="zqm-ro" style="font-weight:600;color:#1565c0">@Model.Account.AccountCode</div></div>
+                    <div style="grid-column:span 2"><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Account Name</label><div class="zqm-ro" style="font-weight:600">@Model.Account.AccountName</div></div>
+                </div>
+                <div class="zqm-row cols-3" style="margin-top:8px">
+                    <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Type</label><div class="zqm-ro">@Model.Account.Type</div></div>
+                    <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Category</label><div class="zqm-ro">@Model.Account.Category</div></div>
+                    <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Balance</label><div class="zqm-ro" style="font-weight:600;font-size:1rem">@Model.Account.Balance.ToString("C2")</div></div>
+                </div>
+                <div class="zqm-row cols-3" style="margin-top:8px">
+                    <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Active</label><div class="zqm-ro"><span class="zqm-badge @(Model.Account.IsActive?"passed":"closed")">@(Model.Account.IsActive?"Yes":"No")</span></div></div>
+                    <div></div><div></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

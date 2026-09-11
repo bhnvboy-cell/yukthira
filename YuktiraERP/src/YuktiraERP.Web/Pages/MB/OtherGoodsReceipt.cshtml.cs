@@ -43,6 +43,7 @@ public class OtherGoodsReceiptModel : PageModel
             MovementType = MovementType,
             PostingDate = Request.PostingDate,
             DocumentDate = Request.DocumentDate,
+            Reference = Request.Reference,
             Lines = Request.Lines.Select(l => new PostGoodsMovementLineDto
             {
                 MaterialCode = l.MaterialCode,
@@ -71,6 +72,7 @@ public class OtherGoodsReceiptModel : PageModel
         public string DocumentDate { get; set; } = DateTime.UtcNow.ToString("yyyy-MM-dd");
         public string Plant { get; set; } = "1000";
         public string StorageLocation { get; set; } = "";
+        public string? Reference { get; set; }
         public List<OtherReceiptLineRequest> Lines { get; set; } = new();
     }
 

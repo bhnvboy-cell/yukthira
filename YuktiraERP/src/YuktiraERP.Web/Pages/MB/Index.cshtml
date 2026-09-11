@@ -1,53 +1,71 @@
 @page
 @model YuktiraERP.Web.Pages.MB.IndexModel
-@{
-    ViewData["Title"] = "MB - Inventory Transactions";
-}
-<div class="row justify-content-center">
-<div class="col-lg-10">
-<h4 class="mb-3"><i class="bi bi-box-seam me-2"></i>MB - Inventory Transaction Suite</h4>
+@{ ViewData["Title"] = "MB - Inventory Transaction Suite"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+<style>
+    .mb-group{margin-bottom:16px}
+    .mb-group-title{font-size:0.82rem;font-weight:700;color:#1a237e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #e8eaf6;display:flex;align-items:center;gap:6px}
+    .mb-group-title i{font-size:0.9rem}
+    .mb-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+    .mb-card{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;color:#333;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+    .mb-card:hover{border-color:#3f51b5;background:#e8eaf6;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,0.1)}
+    .mb-card .icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;flex-shrink:0}
+    .mb-card .info{flex:1}
+    .mb-card .info .tc{font-size:0.72rem;font-weight:700;color:#1a237e;text-transform:uppercase}
+    .mb-card .info .desc{font-size:0.82rem;font-weight:600;color:#333}
+    .icon-blue{background:linear-gradient(135deg,#1565c0,#1976d2)}
+    .icon-green{background:linear-gradient(135deg,#2e7d32,#388e3c)}
+    .icon-teal{background:linear-gradient(135deg,#00695c,#00897b)}
+    .icon-amber{background:linear-gradient(135deg,#f57f17,#fbc02d)}
+</style>
 
-<div class="row g-3">
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-primary text-white"><h6 class="mb-0">Goods Movements</h6></div>
-            <div class="card-body">
-                <a href="/MB/PostGoodsReceipt" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-arrow-down-circle me-1"></i>MB01 - Goods Receipt</a>
-                <a href="/MB/PostGoodsIssue" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-arrow-up-circle me-1"></i>MB1A - Goods Issue</a>
-                <a href="/MB/TransferPosting" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-arrow-left-right me-1"></i>MB1B - Transfer Posting</a>
-                <a href="/MB/OtherGoodsReceipt" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-plus-circle me-1"></i>MB1C - Other Goods Receipt</a>
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-box-seam me-2"></i>MB - Inventory Transaction Suite</h3>
+            <span class="badge">SAP ECC</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/MB/MB51Report" class="zqm-btn"><i class="bi bi-list-ul me-1"></i>MB51</a>
+            <a asp-page="/MB/MB52StockOverview" class="zqm-btn"><i class="bi bi-bar-chart me-1"></i>MB52</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+        </div>
+    </div>
+
+    <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px">
+        <div class="mb-group">
+            <div class="mb-group-title"><i class="bi bi-arrow-down-circle" style="color:#1565c0"></i>Goods Movements</div>
+            <div class="mb-card-grid">
+                <a href="/MB/PostGoodsReceipt" class="mb-card"><div class="icon icon-blue"><i class="bi bi-arrow-down-circle"></i></div><div class="info"><div class="tc">MB01</div><div class="desc">Goods Receipt (PO)</div></div></a>
+                <a href="/MB/PostGoodsIssue" class="mb-card"><div class="icon icon-blue"><i class="bi bi-arrow-up-circle"></i></div><div class="info"><div class="tc">MB1A</div><div class="desc">Goods Issue</div></div></a>
+                <a href="/MB/TransferPosting" class="mb-card"><div class="icon icon-blue"><i class="bi bi-arrow-left-right"></i></div><div class="info"><div class="tc">MB1B</div><div class="desc">Transfer Posting</div></div></a>
+                <a href="/MB/OtherGoodsReceipt" class="mb-card"><div class="icon icon-blue"><i class="bi bi-plus-circle"></i></div><div class="info"><div class="tc">MB1C</div><div class="desc">Other Goods Receipt</div></div></a>
+            </div>
+        </div>
+
+        <div class="mb-group">
+            <div class="mb-group-title"><i class="bi bi-bookmark-plus" style="color:#2e7d32"></i>Reservations</div>
+            <div class="mb-card-grid">
+                <a href="/MB/CreateReservation" class="mb-card"><div class="icon icon-green"><i class="bi bi-bookmark-plus"></i></div><div class="info"><div class="tc">MB21</div><div class="desc">Create Reservation</div></div></a>
+                <a href="/MB/DisplayReservation" class="mb-card"><div class="icon icon-green"><i class="bi bi-bookmark"></i></div><div class="info"><div class="tc">MB23/24</div><div class="desc">Display Reservation</div></div></a>
+            </div>
+        </div>
+
+        <div class="mb-group">
+            <div class="mb-group-title"><i class="bi bi-file-earmark-text" style="color:#00695c"></i>Document Display</div>
+            <div class="mb-card-grid">
+                <a href="/MB/DisplayMaterialDocument" class="mb-card"><div class="icon icon-teal"><i class="bi bi-file-earmark-text"></i></div><div class="info"><div class="tc">MB03</div><div class="desc">Material Document</div></div></a>
+            </div>
+        </div>
+
+        <div class="mb-group">
+            <div class="mb-group-title"><i class="bi bi-bar-chart-line" style="color:#f57f17"></i>Reports</div>
+            <div class="mb-card-grid">
+                <a href="/MB/MB51Report" class="mb-card"><div class="icon icon-amber"><i class="bi bi-list-ul"></i></div><div class="info"><div class="tc">MB51</div><div class="desc">Material Document List</div></div></a>
+                <a href="/MB/MB52StockOverview" class="mb-card"><div class="icon icon-amber"><i class="bi bi-bar-chart"></i></div><div class="info"><div class="tc">MB52</div><div class="desc">Stock Overview</div></div></a>
+                <a href="/MB/MB5BHistorical" class="mb-card"><div class="icon icon-amber"><i class="bi bi-calendar-range"></i></div><div class="info"><div class="tc">MB5B</div><div class="desc">Historical Stock</div></div></a>
+                <a href="/MB/MB5LReconciliation" class="mb-card"><div class="icon icon-amber"><i class="bi bi-balance"></i></div><div class="info"><div class="tc">MB5L</div><div class="desc">MM/FI Reconciliation</div></div></a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-success text-white"><h6 class="mb-0">Reservations</h6></div>
-            <div class="card-body">
-                <a href="/MB/CreateReservation" class="btn btn-outline-success w-100 mb-2"><i class="bi bi-bookmark-plus me-1"></i>MB21 - Create Reservation</a>
-                <a href="/MB/DisplayReservation" class="btn btn-outline-success w-100 mb-2"><i class="bi bi-bookmark me-1"></i>MB23/24 - Display/Change</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-info text-white"><h6 class="mb-0">Document Display</h6></div>
-            <div class="card-body">
-                <a href="/MB/DisplayMaterialDocument" class="btn btn-outline-info w-100 mb-2"><i class="bi bi-file-earmark-text me-1"></i>MB03 - Material Document</a>
-                <a href="/MB/DisplayReservation" class="btn btn-outline-info w-100 mb-2"><i class="bi bi-file-earmark-text me-1"></i>MB23 - Display Reservation</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-warning text-dark"><h6 class="mb-0">Reports</h6></div>
-            <div class="card-body">
-                <a href="/MB/MB51Report" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-list-ul me-1"></i>MB51 - Document List</a>
-                <a href="/MB/MB52StockOverview" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-bar-chart me-1"></i>MB52 - Stock Overview</a>
-                <a href="/MB/MB5BHistorical" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-calendar-range me-1"></i>MB5B - Historical Stock</a>
-                <a href="/MB/MB5LReconciliation" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-balance me-1"></i>MB5L - MM/FI Reconciliation</a>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
 </div>

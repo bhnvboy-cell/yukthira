@@ -1,0 +1,83 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.QaWorklistModel
+@{ ViewData["Title"] = "ZQM06 - QA Worklist"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-list-task me-2"></i>QA Worklist</h3>
+            <span class="badge">ZQM06</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="loadWorklist()"><i class="bi bi-play-fill me-1"></i>Execute</button>
+            <button type="button" class="zqm-btn" onclick="exportWorklist()"><i class="bi bi-download me-1"></i>Export</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Selection Criteria</div>
+        <div class="zqm-row cols-4">
+            <div class="zqm-field"><label>Plant</label><select id="wl-plant"><option value="">All Plants</option><option>1000</option><option>2000</option><option>3000</option></select></div>
+            <div class="zqm-field"><label>Inspector</label><input id="wl-inspector" placeholder="Inspector ID" /></div>
+            <div class="zqm-field"><label>Task Type</label><select id="wl-type"><option value="">All Types</option><option>Pending Inspection</option><option>Overdue UD</option><option>Supervisor Review</option><option>Sample Collection</option><option>Results Recording</option></select></div>
+            <div class="zqm-field"><label>Status</label><select id="wl-status"><option value="">All Statuses</option><option>OPEN</option><option>IN_PROGRESS</option><option>OVERDUE</option></select></div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-results" id="resultsSection" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-table me-1"></i>Worklist</h4><span class="count" id="resultCount"></span></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="wlTable">
+                <thead><tr><th style="width:40px"><input type="checkbox" class="zqm-chk" id="wl-select-all" /></select></th><th>Task ID</th><th>Type</th><th>Lot #</th><th>Material</th><th>Plant</th><th>Inspector</th><th>Due Date</th><th>Priority</th><th>Status</th></tr></thead>
+                <tbody id="wlBody"></tbody>
+            </table>
+        </div>
+        <div class="zqm-footer"><span id="wlFooter">-</span><div></div></div>
+    </div>
+
+    <div class="zqm-empty" id="emptyState"><i class="bi bi-list-task"></i><div>Set filters and click Execute to load worklist</div></div>
+</div>
+
+@section Scripts {
+<script>
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+async function loadWorklist() {
+    var body = JSON.stringify({ plant:document.getElementById('wl-plant').value, inspector:document.getElementById('wl-inspector').value, taskType:document.getElementById('wl-type').value, status:document.getElementById('wl-status').value });
+    try {
+        var r = await fetch('/api/v1/zqm/worklist', { method:'POST', headers:{'Content-Type':'application/json'}, body:body });
+        if (r.ok) {
+            var data = await r.json();
+            if (Array.isArray(data) && data.length) {
+                var tbody = document.getElementById('wlBody');
+                tbody.innerHTML = '';
+                data.forEach(function(t) {
+                    var prCls = (t.priority==='High'||t.priority==='Critical') ? 'danger' : t.priority==='Medium' ? 'warning' : 'info';
+                    var stCls = t.status==='OVERDUE' ? 'overdue' : t.status==='IN_PROGRESS' ? 'in-progress' : t.status==='COMPLETED' ? 'completed' : 'open';
+                    tbody.innerHTML += '<tr><td><input type="checkbox" class="zqm-chk row-check" /></td><td><strong>'+(t.taskId||t.id||'')+'</strong></td><td>'+(t.taskType||t.type||'')+'</td><td>'+(t.lotNumber||'')+'</td><td>'+(t.materialCode||'')+'</td><td>'+(t.plant||'')+'</td><td>'+(t.inspector||'')+'</td><td>'+(t.dueDate||'')+'</td><td><span class="zqm-badge '+prCls+'">'+(t.priority||'')+'</span></td><td><span class="zqm-badge '+stCls+'">'+(t.status||'')+'</span></td></tr>';
+                });
+                document.getElementById('resultCount').textContent = data.length + ' tasks';
+                document.getElementById('wlFooter').textContent = 'Total: ' + data.length + ' tasks';
+                document.getElementById('resultsSection').style.display = '';
+                document.getElementById('emptyState').style.display = 'none';
+            } else { show('No tasks found', 'info'); }
+        } else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+function exportWorklist() {
+    var table = document.getElementById('wlTable');
+    if (!table) return;
+    var csv = [];
+    table.querySelectorAll('tr').forEach(function(tr) {
+        var row = [];
+        tr.querySelectorAll('th,td').forEach(function(cell) { if(!cell.querySelector('input')) row.push('"'+cell.textContent.trim().replace(/"/g,'""')+'"'); });
+        csv.push(row.join(','));
+    });
+    var blob = new Blob([csv.join('\n')], {type:'text/csv'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'qa-worklist.csv'; a.click();
+}
+</script>
+}

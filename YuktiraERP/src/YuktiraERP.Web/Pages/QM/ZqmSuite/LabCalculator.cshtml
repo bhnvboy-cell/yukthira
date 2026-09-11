@@ -1,0 +1,126 @@
+@page
+@model YuktiraERP.Web.Pages.QM.ZqmSuite.LabCalculatorModel
+@{ ViewData["Title"] = "ZQM08 - Lab Calculator"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-calculator me-2"></i>Lab Calculator</h3>
+            <span class="badge">ZQM08</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="calculate()"><i class="bi bi-play-fill me-1"></i>Calculate</button>
+            <button type="button" class="zqm-btn" onclick="loadHistory()"><i class="bi bi-clock-history me-1"></i>History</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-tabs">
+            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-calc')"><i class="bi bi-calculator"></i> Calculate</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-history')"><i class="bi bi-clock-history"></i> Analysis History</button>
+        </div>
+
+        <div class="zqm-tab-panel active" id="tab-calc">
+            <div style="padding:16px">
+                <div class="zqm-row cols-4">
+                    <div class="zqm-field"><label>Material</label><input id="calc-material" /></div>
+                    <div class="zqm-field"><label>Batch</label><input id="calc-batch" /></div>
+                    <div class="zqm-field"><label>Plant</label><select id="calc-plant"><option>1000</option><option>2000</option><option>3000</option></select></div>
+                    <div class="zqm-field"><label>Lot #</label><input id="calc-lot" /></div>
+                </div>
+                <div class="zqm-row cols-4">
+                    <div class="zqm-field"><label>Calculation Type</label><select id="calc-type"><option>Moisture</option><option>Dry Substance</option><option>Starch Purity</option><option>Grain Defect</option><option>Baume Gravity</option><option>DE Value</option></select></div>
+                    <div class="zqm-field"><label>Raw Value</label><input id="calc-raw" type="number" step="0.001" /></div>
+                    <div class="zqm-field"><label>Input Unit</label><select id="calc-unit"><option>%</option><option>g/L</option><option>°Brix</option><option>°Bé</option><option>mg/kg</option></select></div>
+                    <div class="zqm-field"><label>Method</label><input id="calc-method" placeholder="e.g. Karl Fischer" /></div>
+                </div>
+                <div class="zqm-row cols-4">
+                    <div class="zqm-field"><label>LSL</label><input id="calc-lsl" type="number" step="0.001" /></div>
+                    <div class="zqm-field"><label>USL</label><input id="calc-usl" type="number" step="0.001" /></div>
+                    <div class="zqm-field"><label>Analyzed By</label><input id="calc-analyst" value="superadmin" /></div>
+                    <div class="zqm-field"><label>Notes</label><input id="calc-notes" /></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="zqm-tab-panel" id="tab-history">
+            <div style="padding:16px">
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Lot Number</label><input id="hist-lot" /></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-results" id="calcResult" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-check-circle me-1"></i>Calculation Result</h4></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table"><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+                <tr><td><strong>Analysis #</strong></td><td id="resAnalysisId">-</td></tr>
+                <tr><td><strong>Converted Value</strong></td><td id="resConverted">-</td></tr>
+                <tr><td><strong>Unit</strong></td><td id="resUnit">-</td></tr>
+                <tr><td><strong>Within Spec</strong></td><td id="resSpec">-</td></tr>
+                <tr><td><strong>Evaluation</strong></td><td id="resEval">-</td></tr>
+                <tr><td><strong>Formula</strong></td><td id="resFormula">-</td></tr>
+            </tbody></table>
+        </div>
+    </div>
+
+    <div class="zqm-results" id="histSection" style="display:none">
+        <div class="zqm-results-header"><h4><i class="bi bi-clock-history me-1"></i>Analysis History</h4><span class="count" id="histCount"></span></div>
+        <div class="zqm-table-wrap"><table class="zqm-table"><thead><tr><th>Analysis #</th><th>Type</th><th>Raw</th><th>Converted</th><th>Unit</th><th>Spec?</th><th>Evaluation</th><th>Analyzed</th></tr></thead><tbody id="histBody"></tbody></table></div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+function switchTab(btn, id) {
+    btn.closest('.zqm-filter').querySelectorAll('.zqm-tab-btn').forEach(function(t){t.classList.remove('active')});
+    btn.classList.add('active');
+    btn.closest('.zqm-filter').querySelectorAll('.zqm-tab-panel').forEach(function(p){p.classList.remove('active');p.style.display='none'});
+    var p = document.getElementById(id); if(p){p.classList.add('active');p.style.display='';}
+}
+async function calculate() {
+    var body = JSON.stringify({ materialCode:document.getElementById('calc-material').value, batchNumber:document.getElementById('calc-batch').value, plant:document.getElementById('calc-plant').value, lotNumber:document.getElementById('calc-lot').value, calculationType:document.getElementById('calc-type').value, rawValue:parseFloat(document.getElementById('calc-raw').value)||0, inputUnit:document.getElementById('calc-unit').value, lsl:parseFloat(document.getElementById('calc-lsl').value)||0, usl:parseFloat(document.getElementById('calc-usl').value)||0, method:document.getElementById('calc-method').value, analyzedBy:document.getElementById('calc-analyst').value, notes:document.getElementById('calc-notes').value });
+    try {
+        var r = await fetch('/api/v1/zqm/lab/calculate', { method:'POST', headers:{'Content-Type':'application/json'}, body:body });
+        if (r.ok) {
+            var d = await r.json();
+            document.getElementById('resAnalysisId').textContent = d.analysisNumber || d.id || '-';
+            document.getElementById('resConverted').textContent = d.convertedValue || d.result || '-';
+            document.getElementById('resUnit').textContent = d.outputUnit || d.unit || '-';
+            document.getElementById('resSpec').innerHTML = (d.withinSpec !== undefined ? (d.withinSpec ? '<span class="zqm-badge passed">YES</span>' : '<span class="zqm-badge failed">NO</span>') : '-');
+            document.getElementById('resEval').innerHTML = '<span class="zqm-badge '+(d.evaluation==='Pass'||d.evaluation==='Within Spec'?'passed':'failed')+'">'+(d.evaluation||'-')+'</span>';
+            document.getElementById('resFormula').textContent = d.formula || '-';
+            document.getElementById('calcResult').style.display = '';
+            show('Calculation completed', 'success');
+        } else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+async function loadHistory() {
+    var lot = document.getElementById('hist-lot').value;
+    if (!lot) { show('Enter a lot number', 'warning'); return; }
+    try {
+        var r = await fetch('/api/v1/zqm/lab/results/' + encodeURIComponent(lot));
+        if (r.ok) {
+            var data = await r.json();
+            if (Array.isArray(data) && data.length) {
+                var tbody = document.getElementById('histBody');
+                tbody.innerHTML = '';
+                data.forEach(function(a) {
+                    var evalCls = a.evaluation==='Pass'||a.evaluation==='Within Spec' ? 'passed' : 'failed';
+                    tbody.innerHTML += '<tr><td><strong>'+(a.analysisNumber||a.id||'')+'</strong></td><td>'+(a.calculationType||a.type||'')+'</td><td>'+(a.rawValue||'')+'</td><td>'+(a.convertedValue||a.result||'')+'</td><td>'+(a.outputUnit||a.unit||'')+'</td><td>'+(a.withinSpec!==undefined?(a.withinSpec?'Yes':'No'):'-')+'</td><td><span class="zqm-badge '+evalCls+'">'+(a.evaluation||'')+'</span></td><td>'+(a.analyzedAt||a.analyzedBy||'')+'</td></tr>';
+                });
+                document.getElementById('histCount').textContent = data.length + ' analyses';
+                document.getElementById('histSection').style.display = '';
+            } else { show('No analysis history found', 'info'); }
+        } else { show('Error: ' + await r.text(), 'error'); }
+    } catch (e) { show('Error: ' + e.message, 'error'); }
+}
+</script>
+}

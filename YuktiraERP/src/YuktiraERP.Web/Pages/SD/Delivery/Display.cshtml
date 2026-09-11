@@ -1,16 +1,35 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.SD.Delivery.DisplayModel
-@using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Delivery Details"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Delivery Details</h5></div>
-<div class="card-body">
-<dl class="row mb-0"><dt class="col-sm-4">DeliveryNumber</dt><dd class="col-sm-8">@(Model.Delivery.DeliveryNumber)</dd><dt class="col-sm-4">Date</dt><dd class="col-sm-8">@(Model.Delivery.Date)</dd><dt class="col-sm-4">SoNumber</dt><dd class="col-sm-8">@(Model.Delivery.SoNumber)</dd><dt class="col-sm-4">CustomerName</dt><dd class="col-sm-8">@(Model.Delivery.CustomerName)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Delivery.Status)</dd></dl>
-</div>
-<div class="card-footer">
-<a href="/SD/Delivery/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
-<a href="/SD/Delivery/Edit?id=@(Model.Delivery.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
-</div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-eye me-2"></i>Delivery Details</h3>
+            <span class="badge">@Model.Delivery.DeliveryNumber</span>
+        </div>
+        <div class="actions">
+            <a href="/SD/Delivery/Edit?id=@Model.Delivery.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><i class="bi bi-pencil me-1"></i>Edit</a>
+            <a asp-page="/SD/Delivery/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>Delivery Information</h4></div>
+        <div style="padding:16px">
+            <div class="zqm-row cols-3">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Delivery Number</label><div class="zqm-ro" style="font-weight:600;color:#1565c0">@Model.Delivery.DeliveryNumber</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">SO Reference</label><div class="zqm-ro" style="font-weight:600">@Model.Delivery.SoNumber</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Date</label><div class="zqm-ro">@Model.Delivery.Date.ToString("yyyy-MM-dd")</div></div>
+            </div>
+            <div class="zqm-row cols-3" style="margin-top:8px">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Customer</label><div class="zqm-ro" style="font-weight:600">@Model.Delivery.CustomerName</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Status</label><div class="zqm-ro"><span class="zqm-badge @(Model.Delivery.Status=="Delivered"?"passed":Model.Delivery.Status=="Shipped"?"info":"warning")">@Model.Delivery.Status</span></div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

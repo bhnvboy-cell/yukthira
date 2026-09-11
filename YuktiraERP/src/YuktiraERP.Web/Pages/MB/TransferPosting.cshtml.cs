@@ -55,6 +55,8 @@ public class TransferPostingModel : PageModel
                 MaterialName = l.MaterialName,
                 Plant = Request.Plant,
                 StorageLocation = Request.StorageLocation,
+                ToPlant = ToPlant,
+                ToStorageLocation = ToStorageLocation,
                 Quantity = l.Quantity,
                 UOM = l.UOM,
                 BatchNumber = l.BatchNumber

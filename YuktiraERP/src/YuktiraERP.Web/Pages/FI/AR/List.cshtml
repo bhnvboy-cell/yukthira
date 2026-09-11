@@ -2,18 +2,69 @@
 @model YuktiraERP.Web.Pages.FI.AR.ListModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "AR Customer Line Items (FBL5N)"; }
-<h2><i class="bi bi-journal-text me-2"></i>AR Customer Line Items</h2>
-<div class="card mt-3"><div class="card-body">
-<table class="table table-hover table-sm datatable">
-<thead><tr><th>Document #</th><th>Date</th><th>Customer</th><th>Amount</th><th>Received</th><th>Status</th></tr></thead>
-<tbody>
-@foreach (var e in Model.Entries)
-{
-<tr>
-<td>@e.DocumentNumber</td><td>@e.Date.ToString("d")</td><td>@e.CustomerName</td>
-<td>@e.Amount.ToString("C2")</td><td>@e.ReceivedAmount.ToString("C2")</td>
-<td><span class="badge bg-@(e.Status=="Paid"?"success":"warning")">@e.Status</span></td>
-</tr>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-journal-text me-2"></i>AR Customer Line Items</h3>
+            <span class="badge">@Model.Entries.Count records</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/FI/AR/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New AR Entry</a>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Document #</label><input id="searchDoc" placeholder="Filter by doc #" oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Customer</label><input id="searchCustomer" placeholder="Filter by customer..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Status</label><select id="searchStatus" onchange="filterTable()"><option value="">All</option><option value="Open">Open</option><option value="Paid">Paid</option><option value="Partially Received">Partially Received</option></select></div>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>AR Line Items</h4><span class="count" id="resultCount">@Model.Entries.Count items</span></div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="arTable">
+                <thead><tr><th>Document #</th><th>Date</th><th>Customer</th><th>Amount</th><th>Received</th><th>Balance</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var e in Model.Entries)
+                    {
+                        var balance = e.Amount - e.ReceivedAmount;
+                        <tr data-doc="@e.DocumentNumber" data-customer="@e.CustomerName" data-status="@e.Status">
+                            <td style="font-weight:600;color:#1565c0">@e.DocumentNumber</td>
+                            <td>@e.Date.ToString("yyyy-MM-dd")</td>
+                            <td>@e.CustomerName</td>
+                            <td>@e.Amount.ToString("C2")</td>
+                            <td>@e.ReceivedAmount.ToString("C2")</td>
+                            <td style="font-weight:600;color:@(balance > 0 ? "#c62828" : "#2e7d32")">@balance.ToString("C2")</td>
+                            <td><span class="zqm-badge @(e.Status=="Paid"?"passed":e.Status=="Open"?"info":"warning")">@e.Status</span></td>
+                        </tr>
+                    }
+                    @if (!Model.Entries.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No AR entries found</div></td></tr> }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterTable() {
+    var doc = document.getElementById('searchDoc').value.toLowerCase();
+    var customer = document.getElementById('searchCustomer').value.toLowerCase();
+    var status = document.getElementById('searchStatus').value;
+    var rows = document.querySelectorAll('#arTable tbody tr[data-doc]');
+    var count = 0;
+    rows.forEach(function(r) {
+        var match = (!doc || r.dataset.doc.toLowerCase().indexOf(doc) > -1) &&
+                    (!customer || r.dataset.customer.toLowerCase().indexOf(customer) > -1) &&
+                    (!status || r.dataset.status === status);
+        r.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' items';
 }
-</tbody></table>
-</div></div></div>
+</script>

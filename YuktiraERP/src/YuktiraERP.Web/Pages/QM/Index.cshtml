@@ -2,450 +2,421 @@
 @model YuktiraERP.Web.Pages.QM.IndexModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{
-    ViewData["Title"] = "Quality Management";
+    ViewData["Title"] = "Quality Management - QM Dashboard";
 }
-<div class="module-root" data-module-root="qm">
-    <div class="module-header">
-        <div class="module-header-left">
-            <h2><i class="bi bi-clipboard-check me-2"></i>Quality Management</h2>
-            <span class="module-badge">QM</span>
-        </div>
-        <div class="module-header-right">
-            <a asp-page="/QM/InspectionLot/Create" class="btn btn-primary module-action-btn" data-action-tab="lots"><i class="bi bi-plus-circle me-1"></i> Create Inspection Lot</a>
-            <a asp-page="/QM/InspectionResult/Create" class="btn btn-primary module-action-btn" data-action-tab="results" style="display:none"><i class="bi bi-plus-circle me-1"></i> Record Results</a>
-            <a asp-page="/QM/UsageDecision/Create" class="btn btn-primary module-action-btn" data-action-tab="decisions" style="display:none"><i class="bi bi-plus-circle me-1"></i> Make Usage Decision</a>
-            <a asp-page="/QM/Notification/Create" class="btn btn-primary module-action-btn" data-action-tab="notifications" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Notification</a>
-            <a asp-page="/QM/InspectionPlan/Create" class="btn btn-primary module-action-btn" data-action-tab="plans" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Inspection Plan</a>
-            <a asp-page="/QM/COA/Create" class="btn btn-primary module-action-btn" data-action-tab="coa" style="display:none"><i class="bi bi-plus-circle me-1"></i> Issue Certificate</a>
+
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+
+<style>
+    .qm-root{max-width:1600px;margin:0 auto;padding:0 0.5rem}
+    .qm-toolbar{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#0d47a1 0%,#1565c0 50%,#1976d2 100%);color:#fff;padding:14px 24px;border-radius:8px 8px 0 0;flex-wrap:wrap;gap:8px;box-shadow:0 2px 8px rgba(13,71,161,0.3)}
+    .qm-toolbar h2{margin:0;font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:8px}
+    .qm-toolbar .badge{background:rgba(255,255,255,0.2);padding:3px 12px;border-radius:12px;font-size:0.75rem;font-weight:600}
+    .qm-toolbar .actions{display:flex;gap:6px;flex-wrap:wrap}
+    .qm-toolbar .btn-tb{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:7px 16px;border-radius:4px;cursor:pointer;font-size:0.82rem;font-weight:500;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+    .qm-toolbar .btn-tb:hover{background:rgba(255,255,255,0.3);transform:translateY(-1px)}
+    .qm-toolbar .btn-tb.active{background:#4caf50;border-color:#4caf50}
+    .qm-kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#e0e0e0;border:1px solid #e0e0e0;border-top:none}
+    .qm-kpi-item{background:#fff;padding:14px 16px;text-align:center;transition:background 0.2s}
+    .qm-kpi-item:hover{background:#f5f7ff}
+    .qm-kpi-item .kpi-icon{font-size:1.4rem;margin-bottom:4px}
+    .qm-kpi-item .kpi-icon.blue{color:#1565c0}.qm-kpi-item .kpi-icon.amber{color:#f57c00}
+    .qm-kpi-item .kpi-icon.green{color:#2e7d32}.qm-kpi-item .kpi-icon.teal{color:#00897b}
+    .qm-kpi-item .kpi-icon.red{color:#c62828}
+    .qm-kpi-item .kpi-value{font-size:1.5rem;font-weight:700;color:#1a237e;line-height:1.2}
+    .qm-kpi-item .kpi-label{font-size:0.7rem;color:#777;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+    .qm-tabs{display:flex;gap:0;background:#f5f5f5;border:1px solid #e0e0e0;border-top:none;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .qm-tab{padding:10px 18px;font-size:0.82rem;font-weight:600;color:#666;background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+    .qm-tab:hover{color:#1565c0;background:#e8eaf6}
+    .qm-tab.active{color:#0d47a1;border-bottom-color:#0d47a1;background:#fff}
+    .qm-tab .tab-count{background:#e0e0e0;color:#555;padding:1px 7px;border-radius:10px;font-size:0.7rem;font-weight:700}
+    .qm-tab.active .tab-count{background:#0d47a1;color:#fff}
+    .qm-panel{display:none;border:1px solid #e0e0e0;border-top:none;background:#fff}
+    .qm-panel.active{display:block}
+    .qm-grid-toolbar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#fafafa;border-bottom:1px solid #e0e0e0;flex-wrap:wrap;gap:8px}
+    .qm-grid-toolbar .search-box{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #ccc;border-radius:4px;padding:0 10px}
+    .qm-grid-toolbar .search-box i{color:#888;font-size:0.85rem}
+    .qm-grid-toolbar .search-box input{border:none;outline:none;padding:7px 0;font-size:0.85rem;width:250px}
+    .qm-grid-toolbar .search-box input:focus{box-shadow:none}
+    .qm-grid-actions{display:flex;gap:4px}
+    .qm-grid-actions .btn-g{padding:6px 12px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:0.78rem;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;text-decoration:none;color:#333}
+    .qm-grid-actions .btn-g:hover{background:#e3f2fd;border-color:#90caf9}
+    .qm-grid-actions .btn-g.primary{background:#1565c0;color:#fff;border-color:#1565c0}
+    .qm-grid-actions .btn-g.primary:hover{background:#0d47a1}
+    .qm-grid-actions .btn-g.danger{background:#c62828;color:#fff;border-color:#c62828}
+    .qm-grid-actions .btn-g.danger:hover{background:#b71c1c}
+    .qm-grid-actions .btn-g.success{background:#2e7d32;color:#fff;border-color:#2e7d32}
+    .qm-grid-actions .btn-g.success:hover{background:#1b5e20}
+    .qm-grid-info{font-size:0.78rem;color:#666}
+    .qm-table-wrap{overflow-x:auto;max-height:calc(100vh - 380px);overflow-y:auto}
+    .qm-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+    .qm-table thead{position:sticky;top:0;z-index:2}
+    .qm-table thead th{background:#f5f5f5;padding:8px 12px;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #ddd;white-space:nowrap;cursor:pointer;user-select:none;position:relative}
+    .qm-table thead th:hover{background:#e8eaf6}
+    .qm-table thead th .sort-icon{color:#bbb;margin-left:4px;font-size:0.7rem}
+    .qm-table thead th.sorted .sort-icon{color:#1565c0}
+    .qm-table tbody td{padding:7px 12px;border-bottom:1px solid #eee;white-space:nowrap}
+    .qm-table tbody tr{transition:background 0.15s}
+    .qm-table tbody tr:hover{background:#e8eaf6}
+    .qm-table tbody tr.selected{background:#bbdefb}
+    .qm-table tbody tr:nth-child(even){background:#fafafa}
+    .qm-table tbody tr:nth-child(even):hover{background:#e8eaf6}
+    .qm-table tbody tr:nth-child(even).selected{background:#bbdefb}
+    .qm-chk{width:16px;height:16px;accent-color:#1565c0;cursor:pointer}
+    .qm-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:600;text-transform:uppercase}
+    .qm-badge.created{background:#e3f2fd;color:#1565c0}.qm-badge.testing{background:#fff3e0;color:#e65100}
+    .qm-badge.completed,.qm-badge.passed{background:#e8f5e9;color:#2e7d32}
+    .qm-badge.ud-made,.qm-badge.purple{background:#f3e5f5;color:#7b1fa2}
+    .qm-badge.closed{background:#eceff1;color:#455a64}.qm-badge.rejected,.qm-badge.failed{background:#ffcdd2;color:#c62828}
+    .qm-badge.new,.qm-badge.info{background:#e3f2fd;color:#1565c0}.qm-badge.warning{background:#fff3e0;color:#e65100}
+    .qm-badge.success{background:#e8f5e9;color:#2e7d32}.qm-badge.danger{background:#ffcdd2;color:#c62828}
+    .qm-act{padding:3px 6px;border:1px solid #ccc;border-radius:3px;background:#fff;cursor:pointer;font-size:0.75rem;text-decoration:none;color:#555;display:inline-flex;align-items:center;transition:all 0.2s}
+    .qm-act:hover{background:#e3f2fd;border-color:#90caf9;color:#1565c0}
+    .qm-empty{text-align:center;padding:48px 20px;color:#999}
+    .qm-empty i{font-size:2.5rem;margin-bottom:12px;display:block}
+    .qm-empty div{font-size:0.9rem}
+    .qm-footer{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#fafafa;border-top:1px solid #e0e0e0;font-size:0.78rem;color:#666}
+    .zqm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:20px}
+    .zqm-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;transition:all 0.3s;cursor:pointer;text-decoration:none;color:inherit;position:relative;overflow:hidden}
+    .zqm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1565c0,#42a5f5)}
+    .zqm-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.12);border-color:#90caf9}
+    .zqm-card .zqm-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px}
+    .zqm-card .zqm-icon.blue{background:#e3f2fd;color:#1565c0}
+    .zqm-card .zqm-icon.green{background:#e8f5e9;color:#2e7d32}
+    .zqm-card .zqm-icon.amber{background:#fff3e0;color:#f57c00}
+    .zqm-card .zqm-icon.red{background:#ffcdd2;color:#c62828}
+    .zqm-card .zqm-icon.teal{background:#e0f2f1;color:#00897b}
+    .zqm-card .zqm-icon.purple{background:#f3e5f5;color:#7b1fa2}
+    .zqm-card h5{margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#1a237e}
+    .zqm-card .zqm-code{font-size:0.72rem;color:#1565c0;font-weight:600;margin-bottom:4px}
+    .zqm-card p{margin:0;font-size:0.82rem;color:#666;line-height:1.4}
+    .zqm-card .zqm-status{position:absolute;top:12px;right:12px;font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:600}
+    .zqm-card .zqm-status.ready{background:#e8f5e9;color:#2e7d32}
+</style>
+
+<div class="qm-root" data-module-root="qm">
+    <!-- ═══ TOOLBAR ═══ -->
+    <div class="qm-toolbar">
+        <h2><i class="bi bi-clipboard-check"></i> Quality Management <span class="badge">QM</span></h2>
+        <div class="actions">
+            <a asp-page="/QM/InspectionLot/Select" class="btn-tb"><i class="bi bi-search"></i> QA32 Selection</a>
+            <a asp-page="/QM/InspectionLot/Create" class="btn-tb"><i class="bi bi-plus-circle"></i> New Inspection Lot</a>
+            <a asp-page="/QM/Inspection/ReverseUD" class="btn-tb"><i class="bi bi-arrow-counterclockwise"></i> UD Reversal</a>
         </div>
     </div>
 
-    <div class="module-kpi-grid">
-        <div class="module-kpi-card">
-            <div class="module-kpi-icon blue"><i class="bi bi-clipboard-data"></i></div>
-            <div class="module-kpi-info">
-                <div class="module-kpi-value">@Model.InspectionLots.Count</div>
-                <div class="module-kpi-label">Total Inspection Lots</div>
-            </div>
-        </div>
-        <div class="module-kpi-card">
-            <div class="module-kpi-icon amber"><i class="bi bi-hourglass-split"></i></div>
-            <div class="module-kpi-info">
-                <div class="module-kpi-value">@Model.PendingTestingCount</div>
-                <div class="module-kpi-label">Pending Testing</div>
-            </div>
-        </div>
-        <div class="module-kpi-card">
-            <div class="module-kpi-icon green"><i class="bi bi-check-circle"></i></div>
-            <div class="module-kpi-info">
-                <div class="module-kpi-value">@(Model.FirstPassYield)%</div>
-                <div class="module-kpi-label">First-Pass Yield</div>
-            </div>
-        </div>
-        <div class="module-kpi-card">
-            <div class="module-kpi-icon teal"><i class="bi bi-check2-square"></i></div>
-            <div class="module-kpi-info">
-                <div class="module-kpi-value">@Model.UDsTodayCount</div>
-                <div class="module-kpi-label">UDs Made Today</div>
-            </div>
-        </div>
-        <div class="module-kpi-card">
-            <div class="module-kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div>
-            <div class="module-kpi-info">
-                <div class="module-kpi-value">@Model.OOSAlertCount</div>
-                <div class="module-kpi-label">Out-of-Spec Alerts</div>
-            </div>
-        </div>
+    <!-- ═══ KPI BAR ═══ -->
+    <div class="qm-kpi-bar">
+        <div class="qm-kpi-item"><div class="kpi-icon blue"><i class="bi bi-clipboard-data"></i></div><div class="kpi-value">@Model.InspectionLots.Count</div><div class="kpi-label">Inspection Lots</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon amber"><i class="bi bi-hourglass-split"></i></div><div class="kpi-value">@Model.PendingTestingCount</div><div class="kpi-label">Pending Testing</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon green"><i class="bi bi-check-circle"></i></div><div class="kpi-value">@(Model.FirstPassYield)%</div><div class="kpi-label">First-Pass Yield</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon teal"><i class="bi bi-check2-square"></i></div><div class="kpi-value">@Model.UDsTodayCount</div><div class="kpi-label">UDs Today</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div><div class="kpi-value">@Model.OOSAlertCount</div><div class="kpi-label">Out-of-Spec</div></div>
     </div>
 
-    <div class="module-tabs" id="qmTabs">
-        <button type="button" class="module-tab active" data-tab="lots"><i class="bi bi-clipboard-check"></i> Inspection Lots <span class="tab-count">@Model.InspectionLots.Count</span></button>
-        <button type="button" class="module-tab" data-tab="results"><i class="bi bi-clipboard-data"></i> Results Recording <span class="tab-count">@Model.InspectionResults.Count</span></button>
-        <button type="button" class="module-tab" data-tab="decisions"><i class="bi bi-check2-circle"></i> Usage Decisions <span class="tab-count">@Model.UsageDecisions.Count</span></button>
-        <button type="button" class="module-tab" data-tab="notifications"><i class="bi bi-bell"></i> Quality Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
-        <button type="button" class="module-tab" data-tab="plans"><i class="bi bi-journal-text"></i> Inspection Plans <span class="tab-count">@Model.InspectionPlans.Count</span></button>
-        <button type="button" class="module-tab" data-tab="coa"><i class="bi bi-file-earmark-check"></i> Certificate of Analysis <span class="tab-count">@Model.Certificates.Count</span></button>
+    <!-- ═══ TABS ═══ -->
+    <div class="qm-tabs" id="qmTabs">
+        <button type="button" class="qm-tab active" data-tab="lots"><i class="bi bi-clipboard-check"></i> Inspection Lots <span class="tab-count">@Model.InspectionLots.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="results"><i class="bi bi-clipboard-data"></i> Results <span class="tab-count">@Model.InspectionResults.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="decisions"><i class="bi bi-check2-circle"></i> Usage Decisions <span class="tab-count">@Model.UsageDecisions.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="notifications"><i class="bi bi-bell"></i> Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="plans"><i class="bi bi-journal-text"></i> Inspection Plans <span class="tab-count">@Model.InspectionPlans.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="coa"><i class="bi bi-file-earmark-check"></i> Certificates <span class="tab-count">@Model.Certificates.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="zqm"><i class="bi bi-gear-wide-connected"></i> ZQM Suite</button>
     </div>
 
     <!-- ═══ TAB: Inspection Lots ═══ -->
-    <div class="module-tab-panel active" data-panel="lots">
-        <div class="sheet-view-container">
-            <div class="sheet-toolbar">
-                <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search inspection lots..." class="sheet-search-input" /></div>
-                </div>
-                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
-            </div>
-            <div class="sheet-table-wrap">
-                <table class="sheet-table">
-                    <thead>
-                        <tr>
-                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
-                            <th>Lot #</th>
-                            <th>Material Code</th>
-                            <th>Batch #</th>
-                            <th>Inspection Type</th>
-                            <th>Lot Qty</th>
-                            <th>Sample Qty</th>
-                            <th>Inspector</th>
-                            <th>Status</th>
-                            <th class="actions-col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.InspectionLots.Any())
-                        {
-                            @foreach (var l in Model.InspectionLots)
-                            {
-                                <tr>
-                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
-                                    <td><strong>@l.LotNumber</strong></td>
-                                    <td>@l.MaterialCode</td>
-                                    <td>@l.BatchNumber</td>
-                                    <td><span class="status-badge info">@l.InspectionType</span></td>
-                                    <td>@l.Quantity @l.BaseUOM</td>
-                                    <td>@l.SampleSize</td>
-                                    <td>@l.AssignedInspector</td>
-                                    <td><span class="status-badge @(l.Status=="Created"?"info":l.Status=="In Testing"?"warning":l.Status=="UD Made"?"purple":l.Status=="Closed"?"success":"danger")">@l.Status</span></td>
-                                    <td class="actions-col">
-                                        <div class="action-btns">
-                                            <a asp-page="/QM/InspectionLot/Edit" asp-route-id="@l.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/QM/InspectionLot/Display" asp-route-id="@l.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-clipboard-check"></i><div>No inspection lots found</div></td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="sheet-pagination">
-                <div class="sheet-pagination-info">Showing @Model.InspectionLots.Count lots</div>
-                <div class="sheet-pagination-controls"></div>
+    <div class="qm-panel active" data-panel="lots">
+        <div class="qm-grid-toolbar">
+            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search lots by material, batch, inspector..." class="grid-search" data-target="lots" /></div>
+            <div class="qm-grid-actions">
+                <span class="qm-grid-info" id="lots-info">Showing @Model.InspectionLots.Count records</span>
+                <a asp-page="/QM/InspectionLot/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
+                <button class="btn-g" onclick="exportGrid('lots')"><i class="bi bi-download"></i> Export</button>
+                <button class="btn-g danger" id="lots-delete-selected" style="display:none"><i class="bi bi-trash"></i> Delete Selected</button>
             </div>
         </div>
+        <div class="qm-table-wrap">
+            <table class="qm-table" id="grid-lots">
+                <thead><tr>
+                    <th style="width:40px"><input type="checkbox" class="qm-chk select-all" data-grid="lots" /></th>
+                    <th>Lot #</th><th>Material Code</th><th>Batch #</th><th>Inspection Type</th>
+                    <th>Lot Qty</th><th>Sample Qty</th><th>Inspector</th><th>Status</th><th style="width:100px">Actions</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var l in Model.InspectionLots)
+                    {
+                        <tr data-grid-row="lots">
+                            <td><input type="checkbox" class="qm-chk row-check" data-grid="lots" /></td>
+                            <td><strong>@l.LotNumber</strong></td><td>@l.MaterialCode</td><td>@l.BatchNumber</td>
+                            <td><span class="qm-badge info">@l.InspectionType</span></td>
+                            <td>@l.Quantity @l.BaseUOM</td><td>@l.SampleSize</td><td>@l.AssignedInspector</td>
+                            <td><span class="qm-badge @(l.Status=="Created"?"created":l.Status=="In Testing"?"testing":l.Status=="UD Made"?"ud-made":l.Status=="Closed"?"closed":"info")">@l.Status</span></td>
+                            <td><a asp-page="/QM/InspectionLot/Edit" asp-route-id="@l.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a> <a asp-page="/QM/InspectionLot/Display" asp-route-id="@l.Id" class="qm-act" title="View"><i class="bi bi-eye"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="qm-footer"><span id="lots-footer-info">Total: @Model.InspectionLots.Count lots</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Results Recording ═══ -->
-    <div class="module-tab-panel" data-panel="results" style="display:none">
-        <div class="sheet-view-container">
-            <div class="sheet-toolbar">
-                <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search results..." class="sheet-search-input" /></div>
-                </div>
-                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
-            </div>
-            <div class="sheet-table-wrap">
-                <table class="sheet-table">
-                    <thead>
-                        <tr>
-                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
-                            <th>Result ID</th>
-                            <th>Lot #</th>
-                            <th>Batch #</th>
-                            <th>Characteristic</th>
-                            <th>Target Min</th>
-                            <th>Target Max</th>
-                            <th>Measured</th>
-                            <th>Unit</th>
-                            <th>Evaluation</th>
-                            <th>Status</th>
-                            <th class="actions-col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.InspectionResults.Any())
-                        {
-                            @foreach (var r in Model.InspectionResults)
-                            {
-                                <tr>
-                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
-                                    <td><strong>@r.ResultId</strong></td>
-                                    <td>@r.LotNumber</td>
-                                    <td>@r.BatchNumber</td>
-                                    <td>@r.Characteristic</td>
-                                    <td>@r.TargetMin</td>
-                                    <td>@r.TargetMax</td>
-                                    <td>@r.MeasuredValue @r.Unit</td>
-                                    <td>@r.Unit</td>
-                                    <td><span class="status-badge @(r.Evaluation=="Pass"?"success":"danger")">@r.Evaluation</span></td>
-                                    <td><span class="status-badge @(r.Status=="Passed"?"success":"danger")">@r.Status</span></td>
-                                    <td class="actions-col">
-                                        <div class="action-btns">
-                                            <a asp-page="/QM/InspectionResult/Edit" asp-route-id="@r.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/QM/InspectionResult/Display" asp-route-id="@r.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="12" class="sheet-empty"><i class="bi bi-clipboard-data"></i><div>No results recorded</div></td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="sheet-pagination">
-                <div class="sheet-pagination-info">Showing @Model.InspectionResults.Count results</div>
-                <div class="sheet-pagination-controls"></div>
+    <!-- ═══ TAB: Results ═══ -->
+    <div class="qm-panel" data-panel="results" style="display:none">
+        <div class="qm-grid-toolbar">
+            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search results by lot, characteristic..." class="grid-search" data-target="results" /></div>
+            <div class="qm-grid-actions">
+                <span class="qm-grid-info" id="results-info">Showing @Model.InspectionResults.Count records</span>
+                <a asp-page="/QM/InspectionResult/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
+                <button class="btn-g" onclick="exportGrid('results')"><i class="bi bi-download"></i> Export</button>
             </div>
         </div>
+        <div class="qm-table-wrap">
+            <table class="qm-table" id="grid-results">
+                <thead><tr>
+                    <th style="width:40px"><input type="checkbox" class="qm-chk select-all" data-grid="results" /></th>
+                    <th>Result ID</th><th>Lot #</th><th>Batch #</th><th>Characteristic</th>
+                    <th>Target Min</th><th>Target Max</th><th>Measured</th><th>Unit</th><th>Evaluation</th><th>Status</th>
+                    <th style="width:80px">Actions</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var r in Model.InspectionResults)
+                    {
+                        <tr data-grid-row="results">
+                            <td><input type="checkbox" class="qm-chk row-check" data-grid="results" /></td>
+                            <td><strong>@r.ResultId</strong></td><td>@r.LotNumber</td><td>@r.BatchNumber</td>
+                            <td>@r.Characteristic</td><td>@r.TargetMin</td><td>@r.TargetMax</td>
+                            <td>@r.MeasuredValue @r.Unit</td><td>@r.Unit</td>
+                            <td><span class="qm-badge @(r.Evaluation=="Pass"?"passed":"rejected")">@r.Evaluation</span></td>
+                            <td><span class="qm-badge @(r.Status=="Passed"?"passed":"rejected")">@r.Status</span></td>
+                            <td><a asp-page="/QM/InspectionResult/Edit" asp-route-id="@r.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="qm-footer"><span>Total: @Model.InspectionResults.Count results</span><div></div></div>
     </div>
 
     <!-- ═══ TAB: Usage Decisions ═══ -->
-    <div class="module-tab-panel" data-panel="decisions" style="display:none">
-        <div class="sheet-view-container">
-            <div class="sheet-toolbar">
-                <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search decisions..." class="sheet-search-input" /></div>
-                </div>
-                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
-            </div>
-            <div class="sheet-table-wrap">
-                <table class="sheet-table">
-                    <thead>
-                        <tr>
-                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
-                            <th>Decision ID</th>
-                            <th>Lot #</th>
-                            <th>Material</th>
-                            <th>UD Code</th>
-                            <th>Quality Score</th>
-                            <th>Unrestricted</th>
-                            <th>Blocked</th>
-                            <th>Scrap</th>
-                            <th>Inspector</th>
-                            <th>Date</th>
-                            <th class="actions-col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.UsageDecisions.Any())
-                        {
-                            @foreach (var d in Model.UsageDecisions)
-                            {
-                                <tr>
-                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
-                                    <td><strong>@d.DecisionId</strong></td>
-                                    <td>@d.LotNumber</td>
-                                    <td>@d.MaterialName</td>
-                                    <td><span class="status-badge @(d.UDCode=="Accepted"?"success":d.UDCode=="Rejected"?"danger":"warning")">@d.UDCode</span></td>
-                                    <td>@d.QualityScore</td>
-                                    <td>@d.UnrestrictedStock</td>
-                                    <td>@d.BlockedStock</td>
-                                    <td>@d.ScrapQuantity</td>
-                                    <td>@d.InspectorID</td>
-                                    <td>@d.DecisionDate.ToString("dd MMM yyyy")</td>
-                                    <td class="actions-col">
-                                        <div class="action-btns">
-                                            <a asp-page="/QM/UsageDecision/Edit" asp-route-id="@d.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/QM/UsageDecision/Display" asp-route-id="@d.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="12" class="sheet-empty"><i class="bi bi-check2-circle"></i><div>No usage decisions found</div></td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="sheet-pagination">
-                <div class="sheet-pagination-info">Showing @Model.UsageDecisions.Count decisions</div>
-                <div class="sheet-pagination-controls"></div>
+    <div class="qm-panel" data-panel="decisions" style="display:none">
+        <div class="qm-grid-toolbar">
+            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search decisions by lot, material..." class="grid-search" data-target="decisions" /></div>
+            <div class="qm-grid-actions">
+                <span class="qm-grid-info" id="decisions-info">Showing @Model.UsageDecisions.Count records</span>
+                <a asp-page="/QM/UsageDecision/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
+                <button class="btn-g" onclick="exportGrid('decisions')"><i class="bi bi-download"></i> Export</button>
             </div>
         </div>
+        <div class="qm-table-wrap">
+            <table class="qm-table" id="grid-decisions">
+                <thead><tr>
+                    <th style="width:40px"><input type="checkbox" class="qm-chk select-all" data-grid="decisions" /></th>
+                    <th>Decision ID</th><th>Lot #</th><th>Material</th><th>UD Code</th><th>Quality Score</th>
+                    <th>Unrestricted</th><th>Blocked</th><th>Scrap</th><th>Inspector</th><th>Date</th>
+                    <th style="width:80px">Actions</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var d in Model.UsageDecisions)
+                    {
+                        <tr data-grid-row="decisions">
+                            <td><input type="checkbox" class="qm-chk row-check" data-grid="decisions" /></td>
+                            <td><strong>@d.DecisionId</strong></td><td>@d.LotNumber</td><td>@d.MaterialName</td>
+                            <td><span class="qm-badge @(d.UDCode=="Accepted"?"success":d.UDCode=="Rejected"?"rejected":"warning")">@d.UDCode</span></td>
+                            <td>@d.QualityScore</td><td>@d.UnrestrictedStock</td><td>@d.BlockedStock</td><td>@d.ScrapQuantity</td>
+                            <td>@d.InspectorID</td><td>@d.DecisionDate.ToString("dd MMM yyyy")</td>
+                            <td><a asp-page="/QM/UsageDecision/Edit" asp-route-id="@d.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="qm-footer"><span>Total: @Model.UsageDecisions.Count decisions</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Quality Notifications ═══ -->
-    <div class="module-tab-panel" data-panel="notifications" style="display:none">
-        <div class="sheet-view-container">
-            <div class="sheet-toolbar">
-                <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search notifications..." class="sheet-search-input" /></div>
-                </div>
-                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
-            </div>
-            <div class="sheet-table-wrap">
-                <table class="sheet-table">
-                    <thead>
-                        <tr>
-                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
-                            <th>Notification #</th>
-                            <th>Type</th>
-                            <th>Description</th>
-                            <th>Material</th>
-                            <th>Plant</th>
-                            <th>Defect Code</th>
-                            <th>Priority</th>
-                            <th>Status</th>
-                            <th class="actions-col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Notifications.Any())
-                        {
-                            @foreach (var n in Model.Notifications)
-                            {
-                                <tr>
-                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
-                                    <td><strong>@n.NotificationNumber</strong></td>
-                                    <td><span class="status-badge info">@n.NotificationType</span></td>
-                                    <td>@n.Description</td>
-                                    <td>@n.MaterialCode</td>
-                                    <td>@n.Plant</td>
-                                    <td>@n.DefectCode</td>
-                                    <td><span class="status-badge @(n.Priority=="High"||n.Priority=="Critical"?"danger":n.Priority=="Medium"?"warning":"info")">@n.Priority</span></td>
-                                    <td><span class="status-badge @(n.Status=="NEW"?"info":n.Status=="IN_PROCESS"?"warning":n.Status=="COMPLETED"?"success":"info")">@n.Status</span></td>
-                                    <td class="actions-col">
-                                        <div class="action-btns">
-                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-bell"></i><div>No quality notifications found</div></td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="sheet-pagination">
-                <div class="sheet-pagination-info">Showing @Model.Notifications.Count notifications</div>
-                <div class="sheet-pagination-controls"></div>
+    <!-- ═══ TAB: Notifications ═══ -->
+    <div class="qm-panel" data-panel="notifications" style="display:none">
+        <div class="qm-grid-toolbar">
+            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search notifications..." class="grid-search" data-target="notifications" /></div>
+            <div class="qm-grid-actions">
+                <span class="qm-grid-info" id="notifications-info">Showing @Model.Notifications.Count records</span>
+                <a asp-page="/QM/Notification/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
+                <button class="btn-g" onclick="exportGrid('notifications')"><i class="bi bi-download"></i> Export</button>
             </div>
         </div>
+        <div class="qm-table-wrap">
+            <table class="qm-table" id="grid-notifications">
+                <thead><tr>
+                    <th style="width:40px"><input type="checkbox" class="qm-chk select-all" data-grid="notifications" /></th>
+                    <th>Notification #</th><th>Type</th><th>Description</th><th>Material</th><th>Plant</th>
+                    <th>Defect Code</th><th>Priority</th><th>Status</th><th style="width:80px">Actions</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var n in Model.Notifications)
+                    {
+                        <tr data-grid-row="notifications">
+                            <td><input type="checkbox" class="qm-chk row-check" data-grid="notifications" /></td>
+                            <td><strong>@n.NotificationNumber</strong></td>
+                            <td><span class="qm-badge info">@n.NotificationType</span></td><td>@n.Description</td>
+                            <td>@n.MaterialCode</td><td>@n.Plant</td><td>@n.DefectCode</td>
+                            <td><span class="qm-badge @(n.Priority=="High"||n.Priority=="Critical"?"danger":n.Priority=="Medium"?"warning":"info")">@n.Priority</span></td>
+                            <td><span class="qm-badge @(n.Status=="NEW"?"info":n.Status=="IN_PROCESS"?"warning":"success")">@n.Status</span></td>
+                            <td><a asp-page="/QM/Notification/Edit" asp-route-id="@n.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="qm-footer"><span>Total: @Model.Notifications.Count notifications</span><div></div></div>
     </div>
 
     <!-- ═══ TAB: Inspection Plans ═══ -->
-    <div class="module-tab-panel" data-panel="plans" style="display:none">
-        <div class="sheet-view-container">
-            <div class="sheet-toolbar">
-                <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search plans..." class="sheet-search-input" /></div>
-                </div>
-                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
-            </div>
-            <div class="sheet-table-wrap">
-                <table class="sheet-table">
-                    <thead>
-                        <tr>
-                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
-                            <th>Plan ID</th>
-                            <th>Material</th>
-                            <th>Characteristic</th>
-                            <th>Method</th>
-                            <th>Frequency</th>
-                            <th>Status</th>
-                            <th class="actions-col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.InspectionPlans.Any())
-                        {
-                            @foreach (var p in Model.InspectionPlans)
-                            {
-                                <tr>
-                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
-                                    <td><strong>@p.PlanId</strong></td>
-                                    <td>@p.MaterialName</td>
-                                    <td>@p.Characteristic</td>
-                                    <td>@p.Method</td>
-                                    <td>@p.Frequency</td>
-                                    <td><span class="status-badge @(p.Status=="Active"?"success":"warning")">@p.Status</span></td>
-                                    <td class="actions-col">
-                                        <div class="action-btns">
-                                            <a asp-page="/QM/InspectionPlan/Edit" asp-route-id="@p.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/QM/InspectionPlan/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-journal-text"></i><div>No inspection plans found</div></td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="sheet-pagination">
-                <div class="sheet-pagination-info">Showing @Model.InspectionPlans.Count plans</div>
-                <div class="sheet-pagination-controls"></div>
+    <div class="qm-panel" data-panel="plans" style="display:none">
+        <div class="qm-grid-toolbar">
+            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search plans by material..." class="grid-search" data-target="plans" /></div>
+            <div class="qm-grid-actions">
+                <span class="qm-grid-info" id="plans-info">Showing @Model.InspectionPlans.Count records</span>
+                <a asp-page="/QM/InspectionPlan/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
+                <button class="btn-g" onclick="exportGrid('plans')"><i class="bi bi-download"></i> Export</button>
             </div>
         </div>
+        <div class="qm-table-wrap">
+            <table class="qm-table" id="grid-plans">
+                <thead><tr>
+                    <th style="width:40px"><input type="checkbox" class="qm-chk select-all" data-grid="plans" /></th>
+                    <th>Plan ID</th><th>Material</th><th>Characteristic</th><th>Method</th><th>Frequency</th><th>Status</th>
+                    <th style="width:80px">Actions</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var p in Model.InspectionPlans)
+                    {
+                        <tr data-grid-row="plans">
+                            <td><input type="checkbox" class="qm-chk row-check" data-grid="plans" /></td>
+                            <td><strong>@p.PlanId</strong></td><td>@p.MaterialName</td><td>@p.Characteristic</td>
+                            <td>@p.Method</td><td>@p.Frequency</td>
+                            <td><span class="qm-badge @(p.Status=="Active"?"success":"warning")">@p.Status</span></td>
+                            <td><a asp-page="/QM/InspectionPlan/Edit" asp-route-id="@p.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="qm-footer"><span>Total: @Model.InspectionPlans.Count plans</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Certificate of Analysis ═══ -->
-    <div class="module-tab-panel" data-panel="coa" style="display:none">
-        <div class="sheet-view-container">
-            <div class="sheet-toolbar">
-                <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search COAs..." class="sheet-search-input" /></div>
-                </div>
-                <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
+    <!-- ═══ TAB: Certificates ═══ -->
+    <div class="qm-panel" data-panel="coa" style="display:none">
+        <div class="qm-grid-toolbar">
+            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search certificates by customer..." class="grid-search" data-target="coa" /></div>
+            <div class="qm-grid-actions">
+                <span class="qm-grid-info" id="coa-info">Showing @Model.Certificates.Count records</span>
+                <a asp-page="/QM/COA/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
+                <button class="btn-g" onclick="exportGrid('coa')"><i class="bi bi-download"></i> Export</button>
             </div>
-            <div class="sheet-table-wrap">
-                <table class="sheet-table">
-                    <thead>
-                        <tr>
-                            <th class="chk-col"><input type="checkbox" class="form-check-input select-all" /></th>
-                            <th>COA #</th>
-                            <th>Inspection Lot</th>
-                            <th>Material Code</th>
-                            <th>Batch #</th>
-                            <th>Customer</th>
-                            <th>Result</th>
-                            <th>Issued By</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th class="actions-col">Actions</th>
+        </div>
+        <div class="qm-table-wrap">
+            <table class="qm-table" id="grid-coa">
+                <thead><tr>
+                    <th style="width:40px"><input type="checkbox" class="qm-chk select-all" data-grid="coa" /></th>
+                    <th>COA #</th><th>Inspection Lot</th><th>Material</th><th>Batch #</th><th>Customer</th>
+                    <th>Result</th><th>Issued By</th><th>Date</th><th>Status</th><th style="width:80px">Actions</th>
+                </tr></thead>
+                <tbody>
+                    @foreach (var c in Model.Certificates)
+                    {
+                        <tr data-grid-row="coa">
+                            <td><input type="checkbox" class="qm-chk row-check" data-grid="coa" /></td>
+                            <td><strong>@c.COANumber</strong></td><td>@c.InspectionLotNumber</td><td>@c.MaterialCode</td>
+                            <td>@c.BatchNumber</td><td>@c.CustomerName</td>
+                            <td><span class="qm-badge @(c.OverallResult=="Passed"?"success":"rejected")">@c.OverallResult</span></td>
+                            <td>@c.IssuedBy</td><td>@c.IssueDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="qm-badge @(c.Status=="Issued"?"success":"warning")">@c.Status</span></td>
+                            <td><a asp-page="/QM/COA/Edit" asp-route-id="@c.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Certificates.Any())
-                        {
-                            @foreach (var c in Model.Certificates)
-                            {
-                                <tr>
-                                    <td class="chk-col"><input type="checkbox" class="form-check-input row-check" /></td>
-                                    <td><strong>@c.COANumber</strong></td>
-                                    <td>@c.InspectionLotNumber</td>
-                                    <td>@c.MaterialCode</td>
-                                    <td>@c.BatchNumber</td>
-                                    <td>@c.CustomerName</td>
-                                    <td><span class="status-badge @(c.OverallResult=="Passed"?"success":"danger")">@c.OverallResult</span></td>
-                                    <td>@c.IssuedBy</td>
-                                    <td>@c.IssueDate.ToString("dd MMM yyyy")</td>
-                                    <td><span class="status-badge @(c.Status=="Issued"?"success":"warning")">@c.Status</span></td>
-                                    <td class="actions-col">
-                                        <div class="action-btns">
-                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="11" class="sheet-empty"><i class="bi bi-file-earmark-check"></i><div>No certificates of analysis found</div></td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div class="sheet-pagination">
-                <div class="sheet-pagination-info">Showing @Model.Certificates.Count COAs</div>
-                <div class="sheet-pagination-controls"></div>
-            </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="qm-footer"><span>Total: @Model.Certificates.Count certificates</span><div></div></div>
+    </div>
+
+    <!-- ═══ TAB: ZQM Suite ═══ -->
+    <div class="qm-panel" data-panel="zqm" style="display:none">
+        <div style="padding:20px;background:#fafafa;border-bottom:1px solid #e0e0e0">
+            <h4 style="margin:0 0 4px;color:#0d47a1"><i class="bi bi-gear-wide-connected me-2"></i>ZQM Transaction Suite</h4>
+            <p style="margin:0;font-size:0.85rem;color:#666">Advanced quality management backend services with frontend UI</p>
+        </div>
+        <div class="zqm-grid">
+            <a asp-page="/QM/ZqmSuite/AutoLotGenerator" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon blue"><i class="bi bi-clipboard-plus"></i></div>
+                <div class="zqm-code">ZQM01</div>
+                <h5>Auto Inspection Lot Generator</h5>
+                <p>Generate inspection lots automatically from GR/PO movements with intelligent type detection</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/ResultsWorkbench" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon green"><i class="bi bi-clipboard-check"></i></div>
+                <div class="zqm-code">ZQM02</div>
+                <h5>Results Recording Workbench</h5>
+                <p>Record characteristic results with spec evaluation and tolerance checking</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/UsageDecision" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon amber"><i class="bi bi-gavel"></i></div>
+                <div class="zqm-code">ZQM03</div>
+                <h5>Usage Decision Engine</h5>
+                <p>Post usage decisions with automatic stock movements and quality scoring</p>
+            </a>
+            <a asp-page="/QM/Inspection/ReverseUD" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon red"><i class="bi bi-arrow-counterclockwise"></i></div>
+                <div class="zqm-code">ZQM04</div>
+                <h5>UD Reversal Engine</h5>
+                <p>Reverse usage decisions with stock reversal (Mvt 322) and audit trail</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/HandlingUnit" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon teal"><i class="bi bi-box-seam"></i></div>
+                <div class="zqm-code">ZQM05</div>
+                <h5>Handling Unit Manager</h5>
+                <p>Create, manage and release handling units for quality inspection packaging</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/QaWorklist" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon purple"><i class="bi bi-list-task"></i></div>
+                <div class="zqm-code">ZQM06</div>
+                <h5>QA Worklist</h5>
+                <p>Central worklist for QA tasks: pending lots, overdue inspections, supervisor reviews</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/NonConformanceCapa" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="zqm-code">ZQM07</div>
+                <h5>Non-Conformance & CAPA</h5>
+                <p>Create NC reports, CAPAs, containment actions with root cause analysis</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/LabCalculator" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon blue"><i class="bi bi-calculator"></i></div>
+                <div class="zqm-code">ZQM08</div>
+                <h5>Lab Calculator</h5>
+                <p>Moisture, DE value, Baume gravity, starch purity, grain defect calculations</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/CertificateOfAnalysis" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon green"><i class="bi bi-file-earmark-medical"></i></div>
+                <div class="zqm-code">ZQM09</div>
+                <h5>Certificate of Analysis</h5>
+                <p>Generate CoA with pass/fail per characteristic and customer delivery docs</p>
+            </a>
+            <a asp-page="/QM/ZqmSuite/PipelineDiagnostic" class="zqm-card">
+                <span class="zqm-status ready">ACTIVE</span>
+                <div class="zqm-icon amber"><i class="bi bi-diagram-3"></i></div>
+                <div class="zqm-code">ZQM10</div>
+                <h5>Pipeline Diagnostic</h5>
+                <p>Full QM pipeline trace: Inspection Lot -> Results -> UD -> Release -> CoA</p>
+            </a>
         </div>
     </div>
 </div>
@@ -455,5 +426,76 @@
 }
 
 @section Scripts {
-    <script src="~/js/module-layout.js" asp-append-version="true"></script>
+    <script>
+    (function(){
+        var root = document.querySelector('[data-module-root="qm"]');
+        if(!root) return;
+
+        root.querySelectorAll('.qm-tab').forEach(function(tab){
+            tab.addEventListener('click', function(){
+                var key = this.getAttribute('data-tab');
+                root.querySelectorAll('.qm-tab').forEach(function(t){t.classList.remove('active')});
+                this.classList.add('active');
+                root.querySelectorAll('.qm-panel').forEach(function(p){
+                    p.style.display = p.getAttribute('data-panel')===key?'':'none';
+                    p.classList.toggle('active', p.getAttribute('data-panel')===key);
+                });
+            });
+        });
+
+        root.querySelectorAll('.select-all').forEach(function(cb){
+            cb.addEventListener('change', function(){
+                var grid = this.getAttribute('data-grid');
+                var cbs = root.querySelectorAll('.row-check[data-grid="'+grid+'"]');
+                cbs.forEach(function(c){c.checked = cb.checked});
+                updateInfo(grid);
+            });
+        });
+        root.querySelectorAll('.row-check').forEach(function(cb){
+            cb.addEventListener('change', function(){
+                updateInfo(this.getAttribute('data-grid'));
+            });
+        });
+
+        function updateInfo(grid){
+            var cbs = root.querySelectorAll('.row-check[data-grid="'+grid+'"]');
+            var checked = Array.from(cbs).filter(function(c){return c.checked}).length;
+            var info = document.getElementById(grid+'-info');
+            if(info) info.textContent = checked>0?checked+' of '+cbs.length+' selected':cbs.length+' records';
+            var del = document.getElementById(grid+'-delete-selected');
+            if(del) del.style.display = checked>0?'inline-flex':'none';
+        }
+
+        root.querySelectorAll('.grid-search').forEach(function(input){
+            input.addEventListener('input', function(){
+                var panel = this.closest('.qm-panel');
+                if(!panel) return;
+                var q = this.value.toLowerCase();
+                panel.querySelectorAll('tbody tr').forEach(function(tr){
+                    if(tr.querySelector('th')) return;
+                    tr.style.display = tr.textContent.toLowerCase().indexOf(q)===-1?'none':'';
+                });
+            });
+        });
+
+        window.exportGrid = function(grid){
+            var table = document.getElementById('grid-'+grid);
+            if(!table) return;
+            var csv = [];
+            table.querySelectorAll('tr').forEach(function(tr){
+                var row = [];
+                tr.querySelectorAll('th,td').forEach(function(cell){
+                    if(cell.querySelector('input[type=checkbox]')) return;
+                    row.push('"'+cell.textContent.trim().replace(/"/g,'""')+'"');
+                });
+                csv.push(row.join(','));
+            });
+            var blob = new Blob([csv.join('\n')],{type:'text/csv'});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'qm-'+grid+'-export.csv';
+            a.click();
+        };
+    })();
+    </script>
 }

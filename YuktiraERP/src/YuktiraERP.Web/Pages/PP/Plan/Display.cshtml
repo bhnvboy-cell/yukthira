@@ -1,16 +1,35 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.Plan.DisplayModel
-@using YuktiraERP.Infrastructure.Data.Entities
-@{ ViewData["Title"] = "ProductionPlan Details"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>ProductionPlan Details</h5></div>
-<div class="card-body">
-<dl class="row mb-0"><dt class="col-sm-4">PlanId</dt><dd class="col-sm-8">@(Model.Plan.PlanId)</dd><dt class="col-sm-4">ProductName</dt><dd class="col-sm-8">@(Model.Plan.ProductName)</dd><dt class="col-sm-4">Quantity</dt><dd class="col-sm-8">@(Model.Plan.Quantity)</dd><dt class="col-sm-4">StartDate</dt><dd class="col-sm-8">@(Model.Plan.StartDate)</dd><dt class="col-sm-4">EndDate</dt><dd class="col-sm-8">@(Model.Plan.EndDate)</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.Plan.Status)</dd></dl>
-</div>
-<div class="card-footer">
-<a href="/PP/Plan/List" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
-<a href="/PP/Plan/Edit?id=@(Model.Plan.Id)" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
-</div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@{ ViewData["Title"] = "Production Plan Details"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-eye me-2"></i>Production Plan Details</h3>
+            <span class="badge">@Model.Plan.PlanId</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/PP/Plan/Edit" asp-route-id="@Model.Plan.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><i class="bi bi-pencil me-1"></i>Edit</a>
+            <a asp-page="/PP/Plan/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header"><h4>Plan Information</h4></div>
+        <div style="padding:16px">
+            <div class="zqm-row cols-3">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Plan ID</label><div class="zqm-ro" style="font-weight:600;color:#1565c0">@Model.Plan.PlanId</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Product Name</label><div class="zqm-ro" style="font-weight:600">@Model.Plan.ProductName</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Quantity</label><div class="zqm-ro" style="font-weight:600">@Model.Plan.Quantity</div></div>
+            </div>
+            <div class="zqm-row cols-3" style="margin-top:8px">
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Start Date</label><div class="zqm-ro">@Model.Plan.StartDate.ToString("dd MMM yyyy")</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">End Date</label><div class="zqm-ro">@Model.Plan.EndDate.ToString("dd MMM yyyy")</div></div>
+                <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Status</label><div class="zqm-ro"><span class="zqm-badge @(Model.Plan.Status=="Completed"?"passed":Model.Plan.Status=="Released"?"info":Model.Plan.Status=="In Progress"?"warning":"created")">@Model.Plan.Status</span></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

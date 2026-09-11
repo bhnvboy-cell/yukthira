@@ -1,0 +1,45 @@
+@page "{id:Guid}"
+@model YuktiraERP.Web.Pages.QM.COA.EditModel
+@{ ViewData["Title"] = "Edit Certificate of Analysis"; }
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-file-earmark-check me-2"></i>Edit Certificate of Analysis</h3><span class="badge">QM</span></div>
+    <form method="post">
+        <input type="hidden" asp-for="Certificate.Id" />
+        <div class="ent-form-tabs">
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-customer')"><i class="bi bi-person tab-icon"></i> Customer & Issuance</button>
+        </div>
+        <div class="ent-form-panel active" id="tab-general">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Certificate Identification</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>COA #</label><input asp-for="Certificate.COANumber" class="ent-input" readonly /></div>
+                    <div class="ent-field"><label>Inspection Lot #</label><input asp-for="Certificate.InspectionLotNumber" class="ent-input" /></div>
+                    <div class="ent-field"><label>Status</label><select asp-for="Certificate.Status" class="ent-select"><option>Issued</option><option>Draft</option><option>Revoked</option></select></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Material Code</label><input asp-for="Certificate.MaterialCode" class="ent-input" /></div>
+                    <div class="ent-field"><label>Material Name</label><input asp-for="Certificate.MaterialName" class="ent-input" /></div>
+                    <div class="ent-field"><label>Batch #</label><input asp-for="Certificate.BatchNumber" class="ent-input" /></div>
+                </div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Plant</label><input asp-for="Certificate.Plant" class="ent-input" /></div>
+                    <div class="ent-field"><label>Overall Result</label><select asp-for="Certificate.OverallResult" class="ent-select"><option>Passed</option><option>Failed</option><option>Conditional</option></select></div>
+                    <div class="ent-field"><label>Remarks</label><input asp-for="Certificate.Remarks" class="ent-input" /></div>
+                </div>
+            </div>
+        </div>
+        <div class="ent-form-panel" id="tab-customer">
+            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-person"></i> Customer & Issuance</div>
+                <div class="ent-field-grid ent-grid-3">
+                    <div class="ent-field"><label>Customer Name</label><input asp-for="Certificate.CustomerName" class="ent-input" /></div>
+                    <div class="ent-field"><label>Customer PO #</label><input asp-for="Certificate.CustomerPO" class="ent-input" /></div>
+                    <div class="ent-field"><label>Issued By</label><input asp-for="Certificate.IssuedBy" class="ent-input" /></div>
+                </div>
+                <div class="ent-field"><label>Issue Date</label><input asp-for="Certificate.IssueDate" type="date" class="ent-input" /></div>
+            </div>
+        </div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

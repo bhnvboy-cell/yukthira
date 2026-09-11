@@ -1,23 +1,48 @@
-@page
+@page "{id:Guid}"
 @model YuktiraERP.Web.Pages.QM.InspectionLot.DisplayModel
-@using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Inspection Lot Details"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Inspection Lot Details</h5></div>
-<div class="card-body">
-<dl class="row mb-0">
-<dt class="col-sm-4">LotNumber</dt><dd class="col-sm-8">@Model.Lot.LotNumber</dd>
-<dt class="col-sm-4">MaterialName</dt><dd class="col-sm-8">@Model.Lot.MaterialName</dd>
-<dt class="col-sm-4">Quantity</dt><dd class="col-sm-8">@Model.Lot.Quantity</dd>
-<dt class="col-sm-4">Inspected</dt><dd class="col-sm-8">@Model.Lot.Inspected</dd>
-<dt class="col-sm-4">Passed</dt><dd class="col-sm-8">@Model.Lot.Passed</dd>
-<dt class="col-sm-4">Failed</dt><dd class="col-sm-8">@Model.Lot.Failed</dd>
-<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.Lot.Status</dd>
-</dl>
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-clipboard-check me-2"></i>Inspection Lot Details</h3><span class="badge">QM</span></div>
+    <div class="ent-form-tabs">
+        <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General</button>
+        <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-material')"><i class="bi bi-box tab-icon"></i> Material & Plant</button>
+        <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-inspection')"><i class="bi bi-search tab-icon"></i> Inspection</button>
+    </div>
+    <div class="ent-form-panel active" id="tab-general">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Lot Identification</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Lot Number</label><div class="ent-readonly">@Model.Lot.LotNumber</div></div>
+                <div class="ent-field"><label>Inspection Type</label><div class="ent-readonly"><span class="qm-badge info">@Model.Lot.InspectionType</span></div></div>
+                <div class="ent-field"><label>Status</label><div class="ent-readonly"><span class="qm-badge @(Model.Lot.Status=="Created"?"created":Model.Lot.Status=="In Testing"?"testing":Model.Lot.Status=="UD Made"?"ud-made":"closed")">@Model.Lot.Status</span></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-panel" id="tab-material">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-box"></i> Material & Plant</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Material Code</label><div class="ent-readonly">@Model.Lot.MaterialCode</div></div>
+                <div class="ent-field"><label>Material Name</label><div class="ent-readonly">@Model.Lot.MaterialName</div></div>
+                <div class="ent-field"><label>Plant</label><div class="ent-readonly">@Model.Lot.Plant</div></div>
+            </div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Storage Location</label><div class="ent-readonly">@Model.Lot.StorageLocation</div></div>
+                <div class="ent-field"><label>Batch Number</label><div class="ent-readonly">@Model.Lot.BatchNumber</div></div>
+                <div class="ent-field"><label>Base UOM</label><div class="ent-readonly">@Model.Lot.BaseUOM</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-panel" id="tab-inspection">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-search"></i> Inspection Data</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Quantity</label><div class="ent-readonly">@Model.Lot.Quantity</div></div>
+                <div class="ent-field"><label>Sample Size</label><div class="ent-readonly">@Model.Lot.SampleSize</div></div>
+                <div class="ent-field"><label>Inspector</label><div class="ent-readonly">@Model.Lot.AssignedInspector</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-actions">
+        <a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
+        <a asp-page="/QM/InspectionLot/Edit" asp-route-id="@Model.Lot.Id" class="ent-btn ent-btn-primary"><i class="bi bi-pencil me-1"></i> Edit</a>
+    </div>
 </div>
-<div class="card-footer">
-<a asp-page="/QM/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
-<a asp-page="/QM/InspectionLot/Edit" asp-route-id="@Model.Lot.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
-</div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }

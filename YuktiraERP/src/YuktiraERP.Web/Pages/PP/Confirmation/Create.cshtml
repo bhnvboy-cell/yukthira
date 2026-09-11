@@ -1,131 +1,81 @@
 @page
 @model YuktiraERP.Web.Pages.PP.Confirmation.CreateModel
 @{ ViewData["Title"] = "Confirm Production Order"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
-<div class="ent-form-wrapper">
-    <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-check2-square"></i></div>
-        <div class="banner-info">
-            <h5>Confirm Production Order</h5>
-            <span>CO11N — Order Confirmation (SAP PP)</span>
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-check2-square me-2"></i>Confirm Production Order</h3>
+            <span class="badge">CO11N</span>
         </div>
-        <div class="banner-meta">
-            Plant: 1000<br />Auto-numbered
+        <div class="actions">
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Confirm Production</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
         </div>
     </div>
 
-    <form method="post">
-        <input type="hidden" asp-for="Confirmation.Status" value="Confirmed" />
+    <div class="zqm-filter">
+        <form method="post" id="createForm">
+            <input type="hidden" asp-for="Confirmation.Status" value="Confirmed" />
 
-        <div class="ent-form-tabs">
-            <button type="button" class="ent-form-tab active" data-tab="order">
-                <i class="bi bi-gear tab-icon"></i> Order & Operation
-            </button>
-            <button type="button" class="ent-form-tab" data-tab="quantities">
-                <i class="bi bi-speedometer tab-icon"></i> Quantities
-            </button>
-            <button type="button" class="ent-form-tab" data-tab="times">
-                <i class="bi bi-clock tab-icon"></i> Actual Times
-            </button>
-        </div>
+            <div class="zqm-tabs" id="confTabs">
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-order"><i class="bi bi-gear me-1"></i>Order & Operation</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-quantities"><i class="bi bi-speedometer me-1"></i>Quantities</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-times"><i class="bi bi-clock me-1"></i>Actual Times</button>
+            </div>
 
-        <!-- ═══ TAB: Order & Operation ═══ -->
-        <div class="ent-form-panel active" data-panel="order">
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-gear"></i><h6>Production Order Reference</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Confirmation Number</label>
-                        <input class="form-control" value="Auto-generated" readonly style="background:#f8fafc" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Production Order # <span class="required">*</span></label>
-                        <select asp-for="Confirmation.ProductionOrderNumber" asp-items="Model.OrderOptions" class="form-select">
-                            <option value="">-- Select Production Order --</option>
-                        </select>
-                        <span asp-validation-for="Confirmation.ProductionOrderNumber" class="text-danger"></span>
-                    </div>
-                    <div class="ent-field">
-                        <label>Operation Number</label>
-                        <input asp-for="Confirmation.OperationNumber" class="form-control" type="number" min="10" step="10" value="10" />
-                    </div>
+            <!-- Tab: Order & Operation -->
+            <div class="zqm-tab-panel active" id="tab-order" style="padding-top:12px">
+                <div class="zqm-section-title"><i class="bi bi-gear me-1"></i>Production Order Reference</div>
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Confirmation Number</label><input value="Auto-generated" readonly style="background:#f0f0f0" /></div>
+                    <div class="zqm-field"><label>Production Order # <span style="color:#c62828">*</span></label><select asp-for="Confirmation.ProductionOrderNumber" asp-items="Model.OrderOptions"><option value="">-- Select Production Order --</option></select><span asp-validation-for="Confirmation.ProductionOrderNumber" style="color:#c62828;font-size:0.72rem"></span></div>
+                    <div class="zqm-field"><label>Operation Number</label><input asp-for="Confirmation.OperationNumber" type="number" min="10" step="10" value="10" /></div>
+                </div>
+                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-building me-1"></i>Work Center</div>
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Work Center</label><input asp-for="Confirmation.WorkCenter" placeholder="e.g., WC-01" /></div>
+                    <div class="zqm-field"><label>Confirmed By</label><input asp-for="Confirmation.ConfirmedBy" placeholder="Operator name" /></div>
+                    <div class="zqm-field"><label>Confirmation Date</label><input asp-for="Confirmation.ConfirmationDate" type="date" /></div>
                 </div>
             </div>
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Work Center</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Work Center</label>
-                        <input asp-for="Confirmation.WorkCenter" class="form-control" placeholder="e.g., WC-01" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Confirmed By</label>
-                        <input asp-for="Confirmation.ConfirmedBy" class="form-control" placeholder="Operator name" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Confirmation Date</label>
-                        <input asp-for="Confirmation.ConfirmationDate" class="form-control" type="date" />
-                    </div>
+
+            <!-- Tab: Quantities -->
+            <div class="zqm-tab-panel" id="tab-quantities" style="padding-top:12px">
+                <div class="zqm-section-title"><i class="bi bi-speedometer me-1"></i>Yield & Scrap</div>
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Yield Quantity <span style="color:#c62828">*</span></label><input asp-for="Confirmation.YieldQuantity" type="number" min="0" step="1" /><span asp-validation-for="Confirmation.YieldQuantity" style="color:#c62828;font-size:0.72rem"></span></div>
+                    <div class="zqm-field"><label>Scrap Quantity</label><input asp-for="Confirmation.ScrapQuantity" type="number" min="0" step="1" value="0" /></div>
+                    <div class="zqm-field"><label>Backflush Goods Issue</label><div style="padding-top:4px"><input asp-for="Confirmation.BackflushGoodsIssue" type="checkbox" style="width:1.2rem;height:1.2rem;margin-right:0.5rem;accent-color:#3f51b5" /><label style="font-size:0.83rem;cursor:pointer">Auto-deduct components from inventory</label></div></div>
                 </div>
             </div>
-        </div>
 
-        <!-- ═══ TAB: Quantities ═══ -->
-        <div class="ent-form-panel" data-panel="quantities">
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-speedometer"></i><h6>Yield & Scrap</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Yield Quantity <span class="required">*</span></label>
-                        <input asp-for="Confirmation.YieldQuantity" class="form-control" type="number" min="0" step="1" />
-                        <span asp-validation-for="Confirmation.YieldQuantity" class="text-danger"></span>
-                    </div>
-                    <div class="ent-field">
-                        <label>Scrap Quantity</label>
-                        <input asp-for="Confirmation.ScrapQuantity" class="form-control" type="number" min="0" step="1" value="0" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Backflush Goods Issue</label>
-                        <div style="padding-top:0.5rem">
-                            <input asp-for="Confirmation.BackflushGoodsIssue" type="checkbox" class="form-check-input" style="width:1.2rem;height:1.2rem;margin-right:0.5rem" />
-                            <label class="form-check-label" for="Confirmation_BackflushGoodsIssue" style="font-size:0.9rem">Auto-deduct components from inventory</label>
-                        </div>
-                    </div>
+            <!-- Tab: Actual Times -->
+            <div class="zqm-tab-panel" id="tab-times" style="padding-top:12px">
+                <div class="zqm-section-title"><i class="bi bi-clock me-1"></i>Actual Activity Times</div>
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Actual Setup Time (hrs)</label><input asp-for="Confirmation.ActualSetupTime" type="number" min="0" step="0.1" value="0" /></div>
+                    <div class="zqm-field"><label>Actual Machine Time (hrs)</label><input asp-for="Confirmation.ActualMachineTime" type="number" min="0" step="0.1" value="0" /></div>
+                    <div class="zqm-field"><label>Actual Labor Time (hrs)</label><input asp-for="Confirmation.ActualLaborTime" type="number" min="0" step="0.1" value="0" /></div>
                 </div>
             </div>
-        </div>
-
-        <!-- ═══ TAB: Actual Times ═══ -->
-        <div class="ent-form-panel" data-panel="times">
-            <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-clock"></i><h6>Actual Activity Times</h6></div>
-                <div class="ent-field-grid cols-3">
-                    <div class="ent-field">
-                        <label>Actual Setup Time (hrs)</label>
-                        <input asp-for="Confirmation.ActualSetupTime" class="form-control" type="number" min="0" step="0.1" value="0" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Actual Machine Time (hrs)</label>
-                        <input asp-for="Confirmation.ActualMachineTime" class="form-control" type="number" min="0" step="0.1" value="0" />
-                    </div>
-                    <div class="ent-field">
-                        <label>Actual Labor Time (hrs)</label>
-                        <input asp-for="Confirmation.ActualLaborTime" class="form-control" type="number" min="0" step="0.1" value="0" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ent-form-footer">
-            <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>Confirmation auto-numbered
-            </div>
-            <div class="footer-actions">
-                <a asp-page="/PP/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Confirm Production</button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+    document.querySelectorAll('.zqm-tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var tab = this.getAttribute('data-tab');
+            document.querySelectorAll('.zqm-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.zqm-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+            this.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        });
+    });
+    </script>
+}

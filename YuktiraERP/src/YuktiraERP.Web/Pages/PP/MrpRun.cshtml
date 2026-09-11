@@ -1,75 +1,81 @@
 @page
 @model YuktiraERP.Web.Pages.PP.MrpRunModel
 @{ ViewData["Title"] = "MRP Run (MD01)"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-cpu me-2"></i>MRP Run</h5></div>
-<div class="card-body">
-<form method="post">
-<div class="row mb-3">
-<div class="col-md-4">
-<label asp-for="ProductName" class="form-label">Material Filter (optional)</label>
-<input asp-for="ProductName" class="form-control" placeholder="Filter by material name" />
-</div>
-<div class="col-md-3">
-<label asp-for="HorizonDays" class="form-label">Planning Horizon (Days)</label>
-<input asp-for="HorizonDays" class="form-control" type="number" min="1" max="365" />
-</div>
-<div class="col-md-3">
-<label asp-for="ServiceLevel" class="form-label">Service Level (%)</label>
-<input asp-for="ServiceLevel" class="form-control" type="number" min="0.5" max="1" step="0.01" />
-</div>
-<div class="col-md-2 d-flex align-items-end">
-<button type="submit" class="btn btn-primary w-100"><i class="bi bi-play me-1"></i>Run MRP</button>
-</div>
-</div>
-</form>
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
-@if (!string.IsNullOrEmpty(Model.Result))
-{
-<div class="alert @(Model.Result.Contains("failed") ? "alert-danger" : "alert-success") mt-3">@Model.Result</div>
-}
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-cpu me-2"></i>MRP Run (MD01)</h3>
+            <span class="badge">Material Requirements Planning</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/PP/Mrp" class="zqm-btn"><i class="bi bi-cpu me-1"></i>MRP & Capacity</a>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
 
-@if (Model.Suggestions.Any())
-{
-<h6 class="mt-4"><i class="bi bi-list-check me-1"></i>MRP Suggestions</h6>
-<div class="table-responsive">
-<table class="table table-sm table-striped">
-<thead class="table-dark"><tr><th>Material</th><th>Type</th><th>Current Stock</th><th>Demand</th><th>Shortage</th><th>Suggested Qty</th></tr></thead>
-<tbody>
-@foreach (var s in Model.Suggestions)
-{
-<tr>
-<td>@s.MaterialName</td>
-<td><span class="badge @(s.SuggestionType == "PURCHASE" ? "bg-info" : "bg-warning")">@s.SuggestionType</span></td>
-<td>@s.CurrentStock</td>
-<td>@s.TotalDemand</td>
-<td>@s.ShortageQty</td>
-<td><strong>@s.SuggestedQty</strong></td>
-</tr>
-}
-</tbody></table>
-</div>
-}
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-play-circle me-1"></i>MRP Parameters</div>
+        <form method="post">
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Material Filter <span style="font-weight:400;color:#888;text-transform:none">(optional)</span></label><input asp-for="ProductName" placeholder="Filter by material name" /></div>
+                <div class="zqm-field"><label>Planning Horizon (Days)</label><input asp-for="HorizonDays" type="number" min="1" max="365" /></div>
+                <div class="zqm-field"><label>Service Level (%)</label><input asp-for="ServiceLevel" type="number" min="0.5" max="1" step="0.01" /></div>
+                <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-play me-1"></i>Run MRP</button></div>
+            </div>
+        </form>
+    </div>
 
-@if (Model.Exceptions.Any())
-{
-<h6 class="mt-4"><i class="bi bi-exclamation-triangle me-1"></i>Exceptions</h6>
-<div class="table-responsive">
-<table class="table table-sm table-hover">
-<thead class="table-warning"><tr><th>Material</th><th>Type</th><th>Severity</th><th>Message</th><th>Suggested Action</th></tr></thead>
-<tbody>
-@foreach (var e in Model.Exceptions)
-{
-<tr>
-<td>@e.MaterialName</td>
-<td>@e.ExceptionType</td>
-<td><span class="badge @(e.Severity == "Error" ? "bg-danger" : "bg-warning")">@e.Severity</span></td>
-<td>@e.Message</td>
-<td>@e.SuggestedAction</td>
-</tr>
-}
-</tbody></table>
+    <div class="zqm-results">
+        @if (!string.IsNullOrEmpty(Model.Result))
+        {
+            <div class="zqm-alert @(Model.Result.Contains("failed") ? "error" : "success")" style="display:block"><i class="bi bi-info-circle me-1"></i>@Model.Result</div>
+        }
+
+        @if (Model.Suggestions.Any())
+        {
+            <div class="zqm-results-header"><h4>MRP Suggestions</h4><span class="count">@Model.Suggestions.Count items</span></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Material</th><th>Type</th><th>Current Stock</th><th>Demand</th><th>Shortage</th><th>Suggested Qty</th></tr></thead>
+                    <tbody>
+                        @foreach (var s in Model.Suggestions)
+                        {
+                            <tr>
+                                <td style="font-weight:600">@s.MaterialName</td>
+                                <td><span class="zqm-badge @(s.SuggestionType=="PURCHASE"?"info":"passed")">@s.SuggestionType</span></td>
+                                <td>@s.CurrentStock</td>
+                                <td>@s.TotalDemand</td>
+                                <td style="color:@(s.ShortageQty>0?"#c62828":"#2e7d32");font-weight:700">@s.ShortageQty</td>
+                                <td style="font-weight:700">@s.SuggestedQty</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (Model.Exceptions.Any())
+        {
+            <div style="padding:12px 16px"><div class="zqm-section-title" style="color:#e65100;border-bottom-color:#ffe0b2"><i class="bi bi-exclamation-triangle me-1"></i>Exceptions</div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Material</th><th>Type</th><th>Severity</th><th>Message</th><th>Suggested Action</th></tr></thead>
+                    <tbody>
+                        @foreach (var e in Model.Exceptions)
+                        {
+                            <tr style="background:#fff8e1">
+                                <td style="font-weight:600">@e.MaterialName</td>
+                                <td>@e.ExceptionType</td>
+                                <td><span class="zqm-badge @(e.Severity=="Error"?"failed":"warning")">@e.Severity</span></td>
+                                <td>@e.Message</td>
+                                <td>@e.SuggestedAction</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 </div>
-}
-</div></div>
-</div></div>

@@ -1,62 +1,69 @@
 @page
 @model YuktiraERP.Web.Pages.MB.DisplayMaterialDocumentModel
-@{
-    ViewData["Title"] = "MB03 - Material Document";
-}
-<div class="row justify-content-center">
-<div class="col-lg-10">
-<h4 class="mb-3"><i class="bi bi-file-earmark-text me-2"></i>MB03 - Display Material Document</h4>
+@{ ViewData["Title"] = "MB03 - Material Document"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
-@if (!string.IsNullOrEmpty(Model.Error))
-{
-    <div class="alert alert-danger py-2">@Model.Error</div>
-}
-
-<div class="card shadow-sm mb-3">
-    <div class="card-header bg-info text-white"><h6 class="mb-0">Search Document</h6></div>
-    <div class="card-body">
-        <form method="get">
-        <div class="row mb-2">
-            <div class="col-md-6">
-                <label class="form-label">Document Number</label>
-                <input asp-for="DocumentNumber" class="form-control" placeholder="Enter material document number" />
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button>
-            </div>
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-file-earmark-text me-2"></i>MB03 - Display Material Document</h3>
+            <span class="badge">Display</span>
         </div>
+        <div class="actions">
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-search me-1"></i>Search Document</div>
+        <form method="get">
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Document Number</label><input asp-for="DocumentNumber" placeholder="Enter material document number" /></div>
+                <div class="zqm-field" style="display:flex;align-items:end;gap:8px">
+                    <button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
+                </div>
+                <div></div>
+            </div>
         </form>
     </div>
-</div>
 
-@if (Model.Document != null)
-{
-    <div class="card shadow-sm mb-3">
-        <div class="card-header bg-success text-white"><h6 class="mb-0">Document Details</h6></div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4"><strong>Document Number:</strong> @Model.Document.DocumentNumber</div>
-                <div class="col-md-4"><strong>Posting Date:</strong> @Model.Document.PostingDate.ToString("dd/MM/yyyy")</div>
-                <div class="col-md-4"><strong>Movement Type:</strong> @Model.Document.MovementType - @Model.Document.MovementTypeDescription</div>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="zqm-alert error" style="display:block">@Model.Error</div>
+    }
+
+    @if (Model.Document != null)
+    {
+        <div class="zqm-results">
+            <div class="zqm-results-header">
+                <h4><i class="bi bi-file-earmark-text me-1"></i>Document @Model.Document.DocumentNumber</h4>
+                <span class="zqm-badge info">@Model.Document.MovementType - @Model.Document.MovementTypeDescription</span>
             </div>
-            <div class="row mt-2">
-                <div class="col-md-4"><strong>Material:</strong> @Model.Document.MaterialCode - @Model.Document.MaterialName</div>
-                <div class="col-md-4"><strong>Plant:</strong> @Model.Document.Plant</div>
-                <div class="col-md-4"><strong>SLoc:</strong> @Model.Document.StorageLocation</div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-md-4"><strong>Quantity:</strong> @Model.Document.Quantity @Model.Document.UOM</div>
-                <div class="col-md-4"><strong>Unit Price:</strong> @Model.Document.UnitPrice.ToString("N2")</div>
-                <div class="col-md-4"><strong>Total Value:</strong> @Model.Document.TotalValue.ToString("N2")</div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-md-4"><strong>Batch:</strong> @(Model.Document.BatchNumber ?? "-")</div>
-                <div class="col-md-4"><strong>Stock Bucket:</strong> @Model.Document.StockBucket</div>
-                <div class="col-md-4"><strong>Posted By:</strong> @(Model.Document.PostedBy ?? "-")</div>
+            <div style="padding:16px">
+                <div class="zqm-section-title"><i class="bi bi-info-circle me-1"></i>Document Details</div>
+                <div class="zqm-row cols-3">
+                    <div style="padding:10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#2e7d32;text-transform:uppercase">Document Number</label><div style="font-size:1rem;font-weight:700;color:#1b5e20">@Model.Document.DocumentNumber</div></div>
+                    <div style="padding:10px;background:#e3f2fd;border:1px solid #90caf9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#1565c0;text-transform:uppercase">Posting Date</label><div style="font-size:1rem;font-weight:700;color:#0d47a1">@Model.Document.PostingDate.ToString("dd/MM/yyyy")</div></div>
+                    <div style="padding:10px;background:#f3e5f5;border:1px solid #ce93d8;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#7b1fa2;text-transform:uppercase">Movement Type</label><div style="font-size:1rem;font-weight:700;color:#4a148c">@Model.Document.MovementType</div></div>
+                </div>
+                <div class="zqm-row cols-3" style="margin-top:10px">
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Material</label><div style="font-size:0.88rem;font-weight:600">@Model.Document.MaterialCode - @Model.Document.MaterialName</div></div>
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Plant / SLoc</label><div style="font-size:0.88rem;font-weight:600">@Model.Document.Plant / @Model.Document.StorageLocation</div></div>
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Batch</label><div style="font-size:0.88rem;font-weight:600">@(Model.Document.BatchNumber ?? "-")</div></div>
+                </div>
+                <div class="zqm-row cols-3" style="margin-top:10px">
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Quantity</label><div style="font-size:0.88rem;font-weight:600">@Model.Document.Quantity @Model.Document.UOM</div></div>
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Unit Price</label><div style="font-size:0.88rem;font-weight:600">@Model.Document.UnitPrice.ToString("N2")</div></div>
+                    <div style="padding:10px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#2e7d32;text-transform:uppercase">Total Value</label><div style="font-size:1rem;font-weight:700;color:#1b5e20">@Model.Document.TotalValue.ToString("N2")</div></div>
+                </div>
+                <div class="zqm-row cols-3" style="margin-top:10px">
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Stock Bucket</label><div style="font-size:0.88rem;font-weight:600">@Model.Document.StockBucket</div></div>
+                    <div style="padding:10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px"><label style="font-size:0.68rem;font-weight:600;color:#555;text-transform:uppercase">Posted By</label><div style="font-size:0.88rem;font-weight:600">@(Model.Document.PostedBy ?? "-")</div></div>
+                    <div></div>
+                </div>
             </div>
         </div>
-    </div>
-}
-<a href="/MB/Index" class="btn btn-secondary">Back</a>
-</div>
+    }
 </div>

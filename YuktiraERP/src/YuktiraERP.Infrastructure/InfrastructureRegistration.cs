@@ -8,6 +8,7 @@ using YuktiraERP.Infrastructure.Messaging;
 using YuktiraERP.Infrastructure.MultiTenant;
 using YuktiraERP.Infrastructure.Security;
 using YuktiraERP.Infrastructure.Services;
+using YuktiraERP.Infrastructure.Hubs;
 using YuktiraERP.Infrastructure.Services.Connectors;
 using YuktiraERP.Infrastructure.Caching;
 using YuktiraERP.PluginSdk;
@@ -185,6 +186,41 @@ public static class InfrastructureRegistration
         services.AddScoped<IZqmLabCalculatorService, ZqmLabCalculatorService>();
         services.AddScoped<IZqmCoaGeneratorService, ZqmCoaGeneratorService>();
         services.AddScoped<IZqmPipelineDiagnosticService, ZqmPipelineDiagnosticService>();
+
+        // V2.0: ML.NET QC Engine
+        services.AddScoped<IQualityVisionInspectionEngine, QualityVisionInspectionEngine>();
+        services.AddScoped<INaturalLanguageQueryEngine, NaturalLanguageQueryEngine>();
+
+        // V2.0: Mobile Offline Sync & Notifications
+        services.AddScoped<IOfflineQueueService, OfflineQueueService>();
+        services.AddScoped<IMobileNotificationService, MobileNotificationService>();
+
+        // V2.0: EDI B2B Transport
+        services.AddScoped<IEdiAs2Handler, EdiAs2Handler>();
+        services.AddScoped<IEdiTransactionProcessor, EdiTransactionProcessor>();
+
+        // V2.0: CQRS Event Sourcing
+        services.AddScoped<IEventStoreService, EventStoreService>();
+        services.AddScoped<IEventProjectionService, EventProjectionService>();
+
+        // Module Gap: SD
+        services.AddScoped<ICreditManagementService, CreditManagementService>();
+        services.AddScoped<ISchedulingAgreementService, SchedulingAgreementService>();
+        services.AddScoped<IRevenueRecognitionService, RevenueRecognitionService>();
+        // Module Gap: WM
+        services.AddScoped<IPutawayStrategyService, PutawayStrategyService>();
+        services.AddScoped<ICrossDockService, CrossDockService>();
+        // Module Gap: FI
+        services.AddScoped<IIntercompanyAccountingService, IntercompanyAccountingService>();
+        services.AddScoped<IWithholdingTaxService, WithholdingTaxService>();
+        services.AddScoped<IFinancialCloseService, FinancialCloseService>();
+        // Module Gap: CO
+        services.AddScoped<IProductCostingService, ProductCostingService>();
+        services.AddScoped<IProfitabilityAnalysisService, ProfitabilityAnalysisService>();
+        services.AddScoped<ITransferPricingService, TransferPricingService>();
+        // Module Gap: HR
+        services.AddScoped<IBenefitsService, BenefitsService>();
+        services.AddScoped<ISuccessionPlanningService, SuccessionPlanningService>();
 
         RegisterRepositories(services);
 

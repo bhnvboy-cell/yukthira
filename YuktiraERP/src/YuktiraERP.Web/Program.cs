@@ -8,6 +8,7 @@ using YuktiraERP.Infrastructure;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Hubs;
 using YuktiraERP.Infrastructure.MultiTenant;
+using YuktiraERP.Web.Middleware;
 using YuktiraERP.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -106,6 +107,7 @@ app.UseMiddleware<TenantMiddleware>();
 app.UseMiddleware<TenantCultureMiddleware>();
 app.UseRequestLocalization();
 app.UseStaticFiles();
+app.UseMiddleware<ApiReverseProxyMiddleware>();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
@@ -116,6 +118,7 @@ app.UseMiddleware<ModuleAuthorizationMiddleware>();
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<YuktiraNotificationHub>("/hubs/mobile");
 app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

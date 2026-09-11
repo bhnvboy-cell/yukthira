@@ -1,203 +1,215 @@
 @page
 @model YuktiraERP.Web.Pages.SD.IndexModel
-@using YuktiraERP.Web.ViewModels
-@{
-    ViewData["Title"] = "Sales & Distribution";
+@{ ViewData["Title"] = "Sales & Distribution"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+<style>
+    .sd-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+    .sd-kpi{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+    .sd-kpi:hover{border-color:#3f51b5;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
+    .sd-kpi .kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0}
+    .sd-kpi .kpi-info .kpi-value{font-size:1.4rem;font-weight:700;color:#1a237e}
+    .sd-kpi .kpi-info .kpi-label{font-size:0.72rem;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.3px}
+    .sd-kpi .kpi-info .kpi-sub{font-size:0.72rem;color:#999}
+    .kpi-blue{background:linear-gradient(135deg,#1565c0,#1976d2)}
+    .kpi-teal{background:linear-gradient(135deg,#00695c,#00897b)}
+    .kpi-amber{background:linear-gradient(135deg,#f57f17,#fbc02d)}
+    .kpi-green{background:linear-gradient(135deg,#2e7d32,#388e3c)}
+    .kpi-purple{background:linear-gradient(135deg,#7b1fa2,#9c27b0)}
+    .kpi-red{background:linear-gradient(135deg,#c62828,#e53935)}
+</style>
 
-    var allCustomers = Model.Customers;
-    var allOrders = Model.SalesOrders;
-    var allInquiries = Model.Inquiries;
-    var allQuotations = Model.Quotations;
-    var allDeliveries = Model.Deliveries;
-    var allBilling = Model.BillingDocuments;
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-people me-2"></i>Sales & Distribution</h3>
+            <span class="badge">SD Module</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/SD/Customer/Create" class="zqm-btn"><i class="bi bi-person-plus me-1"></i>New Customer</a>
+            <a asp-page="/SD/Inquiry/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New Inquiry</a>
+            <a asp-page="/SD/Quotation/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New Quotation</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+        </div>
+    </div>
 
-    var vm = new ModuleLayoutViewModel
-    {
-        ModuleTitle = "Sales & Distribution",
-        ModuleCode = "SD",
-        Kpis = new List<KpiCard>
-        {
-            new() { Label = "Customers", Value = allCustomers.Count.ToString(), Subtext = "Registered accounts", Type = "blue" },
-            new() { Label = "Inquiries", Value = allInquiries.Count.ToString(), Subtext = "Open inquiries", Type = "teal" },
-            new() { Label = "Quotations", Value = allQuotations.Count.ToString(), Subtext = "Sent to customers", Type = "amber" },
-            new() { Label = "Sales Orders", Value = allOrders.Count.ToString(), Subtext = "Active orders", Type = "green" },
-            new() { Label = "Deliveries", Value = allDeliveries.Count.ToString(), Subtext = "In transit", Type = "purple" },
-            new() { Label = "Billing Docs", Value = allBilling.Count.ToString(), Subtext = "Invoices & credits", Type = "red" }
-        },
-        Tabs = new List<TabItem>
-        {
-            new() { Key = "customers", Label = "Customers", Count = allCustomers.Count,
-                PrimaryAction = new PrimaryAction { Label = "Create Customer", Href = "/SD/Customer/Create", Icon = "bi-plus-lg" } },
-            new() { Key = "inquiries", Label = "Inquiries", Count = allInquiries.Count,
-                PrimaryAction = new PrimaryAction { Label = "Create Inquiry", Href = "/SD/Inquiry/Create", Icon = "bi-plus-lg" } },
-            new() { Key = "quotations", Label = "Quotations", Count = allQuotations.Count,
-                PrimaryAction = new PrimaryAction { Label = "Create Quotation", Href = "/SD/Quotation/Create", Icon = "bi-plus-lg" } },
-            new() { Key = "salesorders", Label = "Sales Orders", Count = allOrders.Count,
-                PrimaryAction = new PrimaryAction { Label = "Create Sales Order", Href = "/SD/SalesOrder/Create", Icon = "bi-plus-lg" } },
-            new() { Key = "deliveries", Label = "Deliveries", Count = allDeliveries.Count,
-                PrimaryAction = new PrimaryAction { Label = "Create Delivery", Href = "/SD/Delivery/Create", Icon = "bi-plus-lg" } },
-            new() { Key = "billing", Label = "Billing", Count = allBilling.Count,
-                PrimaryAction = new PrimaryAction { Label = "Create Billing Document", Href = "/SD/Billing/Create", Icon = "bi-plus-lg" } }
-        },
-        ActiveTab = "customers",
-        GridTabs = new List<GridTab>
-        {
-            new()
-            {
-                Key = "customers",
-                Columns = new List<GridColumn>
-                {
-                    new() { Key = "code", Label = "Customer #", Align = "left" },
-                    new() { Key = "name", Label = "Name", Align = "left" },
-                    new() { Key = "creditLimit", Label = "Credit Limit", Type = "currency", Align = "right" },
-                    new() { Key = "paymentTerms", Label = "Payment Terms", Align = "center" },
-                    new() { Key = "phone", Label = "Phone", Align = "left" },
-                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" }
-                },
-                Rows = allCustomers.Select(c => new Dictionary<string, string?>
-                {
-                    { "id", c.Id.ToString() },
-                    { "code", c.Code },
-                    { "name", c.Name },
-                    { "creditLimit", c.CreditLimit.ToString() },
-                    { "paymentTerms", c.PaymentTerms },
-                    { "phone", c.Phone },
-                    { "status", c.Status }
-                }).ToList(),
-                ViewHref = r => $"/SD/Customer/Display?id={r["id"]}",
-                EditHref = r => $"/SD/Customer/Edit?id={r["id"]}"
-            },
-            new()
-            {
-                Key = "inquiries",
-                Columns = new List<GridColumn>
-                {
-                    new() { Key = "inquiryNumber", Label = "Inquiry #", Align = "left" },
-                    new() { Key = "customerName", Label = "Customer", Align = "left" },
-                    new() { Key = "description", Label = "Description", Align = "left" },
-                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
-                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
-                },
-                Rows = allInquiries.Select(i => new Dictionary<string, string?>
-                {
-                    { "id", i.Id.ToString() },
-                    { "inquiryNumber", i.InquiryNumber },
-                    { "customerName", i.CustomerName },
-                    { "description", i.Description },
-                    { "status", i.Status },
-                    { "date", i.Date.ToString("yyyy-MM-dd") }
-                }).ToList(),
-                ViewHref = r => $"/SD/Inquiry/Display?id={r["id"]}",
-                EditHref = r => $"/SD/Inquiry/Edit?id={r["id"]}"
-            },
-            new()
-            {
-                Key = "quotations",
-                Columns = new List<GridColumn>
-                {
-                    new() { Key = "quoteNumber", Label = "Quotation #", Align = "left" },
-                    new() { Key = "customerName", Label = "Customer", Align = "left" },
-                    new() { Key = "amount", Label = "Amount", Type = "currency", Align = "right" },
-                    new() { Key = "validUntil", Label = "Valid Until", Type = "date", Align = "left" },
-                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
-                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
-                },
-                Rows = allQuotations.Select(q => new Dictionary<string, string?>
-                {
-                    { "id", q.Id.ToString() },
-                    { "quoteNumber", q.QuoteNumber },
-                    { "customerName", q.CustomerName },
-                    { "amount", q.Amount.ToString() },
-                    { "validUntil", q.ValidUntil.ToString("yyyy-MM-dd") },
-                    { "status", q.Status },
-                    { "date", q.Date.ToString("yyyy-MM-dd") }
-                }).ToList(),
-                ViewHref = r => $"/SD/Quotation/Display?id={r["id"]}",
-                EditHref = r => $"/SD/Quotation/Edit?id={r["id"]}"
-            },
-            new()
-            {
-                Key = "salesorders",
-                Columns = new List<GridColumn>
-                {
-                    new() { Key = "orderNumber", Label = "SO Number", Align = "left" },
-                    new() { Key = "customerName", Label = "Customer", Align = "left" },
-                    new() { Key = "itemCount", Label = "Items", Align = "right" },
-                    new() { Key = "amount", Label = "Amount", Type = "currency", Align = "right" },
-                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
-                    new() { Key = "orderDate", Label = "Order Date", Type = "date", Align = "left" }
-                },
-                Rows = allOrders.Select(o => new Dictionary<string, string?>
-                {
-                    { "id", o.Id.ToString() },
-                    { "orderNumber", o.OrderNumber },
-                    { "customerName", o.CustomerName },
-                    { "itemCount", o.ItemCount.ToString() },
-                    { "amount", o.Amount.ToString() },
-                    { "status", o.Status },
-                    { "orderDate", o.OrderDate.ToString("yyyy-MM-dd") }
-                }).ToList(),
-                ViewHref = r => $"/SD/SalesOrder/Display?id={r["id"]}",
-                EditHref = r => $"/SD/SalesOrder/Edit?id={r["id"]}"
-            },
-            new()
-            {
-                Key = "deliveries",
-                Columns = new List<GridColumn>
-                {
-                    new() { Key = "deliveryNumber", Label = "Delivery #", Align = "left" },
-                    new() { Key = "soNumber", Label = "SO Reference", Align = "left" },
-                    new() { Key = "customerName", Label = "Customer", Align = "left" },
-                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
-                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
-                },
-                Rows = allDeliveries.Select(d => new Dictionary<string, string?>
-                {
-                    { "id", d.Id.ToString() },
-                    { "deliveryNumber", d.DeliveryNumber },
-                    { "soNumber", d.SoNumber },
-                    { "customerName", d.CustomerName },
-                    { "status", d.Status },
-                    { "date", d.Date.ToString("yyyy-MM-dd") }
-                }).ToList(),
-                ViewHref = r => $"/SD/Delivery/Display?id={r["id"]}",
-                EditHref = r => $"/SD/Delivery/Edit?id={r["id"]}"
-            },
-            new()
-            {
-                Key = "billing",
-                Columns = new List<GridColumn>
-                {
-                    new() { Key = "documentNumber", Label = "Billing #", Align = "left" },
-                    new() { Key = "soNumber", Label = "SO Reference", Align = "left" },
-                    new() { Key = "customerName", Label = "Customer", Align = "left" },
-                    new() { Key = "amount", Label = "Amount", Type = "currency", Align = "right" },
-                    new() { Key = "status", Label = "Status", Type = "status", Align = "center" },
-                    new() { Key = "date", Label = "Date", Type = "date", Align = "left" }
-                },
-                Rows = allBilling.Select(b => new Dictionary<string, string?>
-                {
-                    { "id", b.Id.ToString() },
-                    { "documentNumber", b.DocumentNumber },
-                    { "soNumber", b.SoNumber },
-                    { "customerName", b.CustomerName },
-                    { "amount", b.Amount.ToString() },
-                    { "status", b.Status },
-                    { "date", b.Date.ToString("yyyy-MM-dd") }
-                }).ToList(),
-                ViewHref = r => $"/SD/Billing/Display?id={r["id"]}",
-                EditHref = r => $"/SD/Billing/Edit?id={r["id"]}"
-            }
-        }
-    };
-}
+    <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-bottom:none">
+        <div class="sd-kpi-grid">
+            <div class="sd-kpi"><div class="kpi-icon kpi-blue"><i class="bi bi-people"></i></div><div class="kpi-info"><div class="kpi-value">@Model.Customers.Count</div><div class="kpi-label">Customers</div><div class="kpi-sub">Registered accounts</div></div></div>
+            <div class="sd-kpi"><div class="kpi-icon kpi-teal"><i class="bi bi-question-circle"></i></div><div class="kpi-info"><div class="kpi-value">@Model.Inquiries.Count</div><div class="kpi-label">Inquiries</div><div class="kpi-sub">Open inquiries</div></div></div>
+            <div class="sd-kpi"><div class="kpi-icon kpi-amber"><i class="bi bi-file-earmark-text"></i></div><div class="kpi-info"><div class="kpi-value">@Model.Quotations.Count</div><div class="kpi-label">Quotations</div><div class="kpi-sub">Sent to customers</div></div></div>
+            <div class="sd-kpi"><div class="kpi-icon kpi-green"><i class="bi bi-cart-check"></i></div><div class="kpi-info"><div class="kpi-value">@Model.SalesOrders.Count</div><div class="kpi-label">Sales Orders</div><div class="kpi-sub">Active orders</div></div></div>
+            <div class="sd-kpi"><div class="kpi-icon kpi-purple"><i class="bi bi-truck"></i></div><div class="kpi-info"><div class="kpi-value">@Model.Deliveries.Count</div><div class="kpi-label">Deliveries</div><div class="kpi-sub">In transit</div></div></div>
+            <div class="sd-kpi"><div class="kpi-icon kpi-red"><i class="bi bi-receipt"></i></div><div class="kpi-info"><div class="kpi-value">@Model.BillingDocuments.Count</div><div class="kpi-label">Billing Docs</div><div class="kpi-sub">Invoices & credits</div></div></div>
+        </div>
+    </div>
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/module-layout.css" asp-append-version="true" />
-}
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px;overflow:hidden">
+        <div class="zqm-tabs" id="sdTabs">
+            <button class="zqm-tab-btn active" data-tab="tab-customers"><i class="bi bi-people me-1"></i>Customers <span class="zqm-badge info" style="margin-left:4px">@Model.Customers.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-inquiries"><i class="bi bi-question-circle me-1"></i>Inquiries <span class="zqm-badge info" style="margin-left:4px">@Model.Inquiries.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-quotations"><i class="bi bi-file-earmark-text me-1"></i>Quotations <span class="zqm-badge info" style="margin-left:4px">@Model.Quotations.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-orders"><i class="bi bi-cart-check me-1"></i>Sales Orders <span class="zqm-badge info" style="margin-left:4px">@Model.SalesOrders.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-deliveries"><i class="bi bi-truck me-1"></i>Deliveries <span class="zqm-badge info" style="margin-left:4px">@Model.Deliveries.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-billing"><i class="bi bi-receipt me-1"></i>Billing <span class="zqm-badge info" style="margin-left:4px">@Model.BillingDocuments.Count</span></button>
+        </div>
 
-<partial name="_ModuleLayout" model="vm" />
+        <!-- Customers Tab -->
+        <div class="zqm-tab-panel active" id="tab-customers">
+            <div class="zqm-results-header"><h4>Customers</h4><div><a asp-page="/SD/Customer/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Create Customer</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Customer #</th><th>Name</th><th>Credit Limit</th><th>Payment Terms</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var c in Model.Customers)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@c.Code</td>
+                                <td>@c.Name</td>
+                                <td>@c.CreditLimit.ToString("C2")</td>
+                                <td>@c.PaymentTerms</td>
+                                <td>@c.Phone</td>
+                                <td><span class="zqm-badge @(c.Status=="Active"?"passed":"closed")">@c.Status</span></td>
+                                <td><a asp-page="/SD/Customer/Display" asp-route-id="@c.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/SD/Customer/Edit" asp-route-id="@c.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!Model.Customers.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No customers found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-@section Scripts {
-    <script src="~/js/module-layout.js" asp-append-version="true"></script>
-}
+        <!-- Inquiries Tab -->
+        <div class="zqm-tab-panel" id="tab-inquiries">
+            <div class="zqm-results-header"><h4>Inquiries</h4><div><a asp-page="/SD/Inquiry/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Create Inquiry</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Inquiry #</th><th>Customer</th><th>Description</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var i in Model.Inquiries)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@i.InquiryNumber</td>
+                                <td>@i.CustomerName</td>
+                                <td>@i.Description</td>
+                                <td><span class="zqm-badge @(i.Status=="Open"?"info":i.Status=="Closed"?"closed":"passed")">@i.Status</span></td>
+                                <td>@i.Date.ToString("yyyy-MM-dd")</td>
+                                <td><a asp-page="/SD/Inquiry/Display" asp-route-id="@i.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/SD/Inquiry/Edit" asp-route-id="@i.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!Model.Inquiries.Any()) { <tr><td colspan="6" class="zqm-empty"><i class="bi bi-inbox"></i><div>No inquiries found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quotations Tab -->
+        <div class="zqm-tab-panel" id="tab-quotations">
+            <div class="zqm-results-header"><h4>Quotations</h4><div><a asp-page="/SD/Quotation/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Create Quotation</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Quotation #</th><th>Customer</th><th>Amount</th><th>Valid Until</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var q in Model.Quotations)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@q.QuoteNumber</td>
+                                <td>@q.CustomerName</td>
+                                <td>@q.Amount.ToString("C2")</td>
+                                <td>@q.ValidUntil.ToString("yyyy-MM-dd")</td>
+                                <td><span class="zqm-badge @(q.Status=="Draft"||q.Status=="Sent"?"info":q.Status=="Accepted"?"passed":q.Status=="Rejected"?"failed":"closed")">@q.Status</span></td>
+                                <td>@q.Date.ToString("yyyy-MM-dd")</td>
+                                <td><a asp-page="/SD/Quotation/Display" asp-route-id="@q.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/SD/Quotation/Edit" asp-route-id="@q.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!Model.Quotations.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No quotations found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sales Orders Tab -->
+        <div class="zqm-tab-panel" id="tab-orders">
+            <div class="zqm-results-header"><h4>Sales Orders</h4><div><a asp-page="/SD/SalesOrder/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Create Sales Order</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>SO Number</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Order Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var o in Model.SalesOrders)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@o.OrderNumber</td>
+                                <td>@o.CustomerName</td>
+                                <td>@o.ItemCount</td>
+                                <td>@o.Amount.ToString("C2")</td>
+                                <td><span class="zqm-badge @(o.Status=="Completed"?"passed":o.Status=="Confirmed"||o.Status=="Pending"?"info":o.Status=="Cancelled"?"failed":"warning")">@o.Status</span></td>
+                                <td>@o.OrderDate.ToString("yyyy-MM-dd")</td>
+                                <td><a asp-page="/SD/SalesOrder/Display" asp-route-id="@o.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/SD/SalesOrder/Edit" asp-route-id="@o.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!Model.SalesOrders.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No sales orders found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Deliveries Tab -->
+        <div class="zqm-tab-panel" id="tab-deliveries">
+            <div class="zqm-results-header"><h4>Deliveries</h4><div><a asp-page="/SD/Delivery/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Create Delivery</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Delivery #</th><th>SO Reference</th><th>Customer</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var d in Model.Deliveries)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@d.DeliveryNumber</td>
+                                <td>@d.SoNumber</td>
+                                <td>@d.CustomerName</td>
+                                <td><span class="zqm-badge @(d.Status=="Delivered"?"passed":d.Status=="Shipped"?"info":"warning")">@d.Status</span></td>
+                                <td>@d.Date.ToString("yyyy-MM-dd")</td>
+                                <td><a asp-page="/SD/Delivery/Display" asp-route-id="@d.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/SD/Delivery/Edit" asp-route-id="@d.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!Model.Deliveries.Any()) { <tr><td colspan="6" class="zqm-empty"><i class="bi bi-inbox"></i><div>No deliveries found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Billing Tab -->
+        <div class="zqm-tab-panel" id="tab-billing">
+            <div class="zqm-results-header"><h4>Billing Documents</h4><div><a asp-page="/SD/Billing/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Create Billing Document</a></div></div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Billing #</th><th>SO Reference</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var b in Model.BillingDocuments)
+                        {
+                            <tr>
+                                <td style="font-weight:600;color:#1565c0">@b.DocumentNumber</td>
+                                <td>@b.SoNumber</td>
+                                <td>@b.CustomerName</td>
+                                <td>@b.Amount.ToString("C2")</td>
+                                <td><span class="zqm-badge @(b.Status=="Paid"?"passed":b.Status=="Overdue"?"failed":"info")">@b.Status</span></td>
+                                <td>@b.Date.ToString("yyyy-MM-dd")</td>
+                                <td><a asp-page="/SD/Billing/Display" asp-route-id="@b.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/SD/Billing/Edit" asp-route-id="@b.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                            </tr>
+                        }
+                        @if (!Model.BillingDocuments.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No billing documents found</div></td></tr> }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('#sdTabs .zqm-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#sdTabs .zqm-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.zqm-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+});
+</script>

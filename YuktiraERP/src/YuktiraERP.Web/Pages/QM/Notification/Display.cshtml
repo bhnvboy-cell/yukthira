@@ -1,0 +1,49 @@
+@page "{id:Guid}"
+@model YuktiraERP.Web.Pages.QM.Notification.DisplayModel
+@{ ViewData["Title"] = "Quality Notification Details"; }
+<link rel="stylesheet" href="~/css/enterprise-form.css" />
+<div class="ent-form-wrapper">
+    <div class="ent-form-header"><h3><i class="bi bi-bell me-2"></i>Quality Notification Details</h3><span class="badge">QM</span></div>
+    <div class="ent-form-tabs">
+        <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General</button>
+        <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-defect')"><i class="bi bi-exclamation-triangle tab-icon"></i> Defect Details</button>
+    </div>
+    <div class="ent-form-panel active" id="tab-general">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Notification Identification</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Notification #</label><div class="ent-readonly">@Model.Notification.NotificationNumber</div></div>
+                <div class="ent-field"><label>Type</label><div class="ent-readonly"><span class="qm-badge info">@Model.Notification.NotificationType</span></div></div>
+                <div class="ent-field"><label>Status</label><div class="ent-readonly"><span class="qm-badge @(Model.Notification.Status=="NEW"?"info":Model.Notification.Status=="IN_PROCESS"?"warning":"success")">@Model.Notification.Status</span></div></div>
+            </div>
+            <div class="ent-field"><label>Description</label><div class="ent-readonly">@Model.Notification.Description</div></div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Created By</label><div class="ent-readonly">@Model.Notification.CreatedBy</div></div>
+                <div class="ent-field"><label>Material Code</label><div class="ent-readonly">@Model.Notification.MaterialCode</div></div>
+                <div class="ent-field"><label>Plant</label><div class="ent-readonly">@Model.Notification.Plant</div></div>
+            </div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Batch Number</label><div class="ent-readonly">@Model.Notification.BatchNumber</div></div>
+                <div class="ent-field"><label>Reference Doc</label><div class="ent-readonly">@Model.Notification.ReferenceDocument</div></div>
+                <div class="ent-field"><label>Partner</label><div class="ent-readonly">@Model.Notification.PartnerName</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-panel" id="tab-defect">
+        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-exclamation-triangle"></i> Defect Information</div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Defect Code</label><div class="ent-readonly">@Model.Notification.DefectCode</div></div>
+                <div class="ent-field"><label>Defect Type</label><div class="ent-readonly">@Model.Notification.DefectType</div></div>
+                <div class="ent-field"><label>Priority</label><div class="ent-readonly"><span class="qm-badge @(Model.Notification.Priority=="High"||Model.Notification.Priority=="Critical"?"danger":"warning")">@Model.Notification.Priority</span></div></div>
+            </div>
+            <div class="ent-field-grid ent-grid-3">
+                <div class="ent-field"><label>Impact</label><div class="ent-readonly">@Model.Notification.Impact</div></div>
+                <div class="ent-field"><label>Cause Code</label><div class="ent-readonly">@Model.Notification.CauseCode</div></div>
+                <div class="ent-field"><label>Root Cause</label><div class="ent-readonly">@Model.Notification.RootCause</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="ent-form-actions">
+        <a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
+        <a asp-page="/QM/Notification/Edit" asp-route-id="@Model.Notification.Id" class="ent-btn ent-btn-primary"><i class="bi bi-pencil me-1"></i> Edit</a>
+    </div>
+</div>

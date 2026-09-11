@@ -1,15 +1,46 @@
 ﻿@page
 @model YuktiraERP.Web.Pages.PP.WorkCenter.EditModel
-@{ ViewData["Title"] = "Edit WorkCenter"; }
-<div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit WorkCenter</h5></div>
-<div class="card-body">
-<form method="post">
-<input type="hidden" asp-for="WorkCenter.Id" />
-<div class="row mb-3"><div class="col-md-6"><label asp-for="WorkCenter.Code" class="form-label"></label><input asp-for="WorkCenter.Code" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="WorkCenter.Name" class="form-label"></label><input asp-for="WorkCenter.Name" class="form-control" type="text" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="WorkCenter.Department" class="form-label"></label><input asp-for="WorkCenter.Department" class="form-control" type="text" /></div><div class="col-md-6"><label asp-for="WorkCenter.CapacityPerShift" class="form-label"></label><input asp-for="WorkCenter.CapacityPerShift" class="form-control" type="number" step="0.01" /></div></div><div class="row mb-3"><div class="col-md-6"><label asp-for="WorkCenter.Status" class="form-label"></label><input asp-for="WorkCenter.Status" class="form-control" type="text" /></div><div class="col-md-6"></div></div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button><a href="/PP/WorkCenter/List" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a></div>
-</form>
-</div></div>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@{ ViewData["Title"] = "Edit Work Center"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
 
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-pencil me-2"></i>Edit Work Center</h3>
+            <span class="badge">@Model.WorkCenter.Code</span>
+        </div>
+        <div class="actions">
+            <button type="submit" form="editForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Update</button>
+            <a asp-page="/PP/WorkCenter/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-building me-1"></i>Work Center Data</div>
+        <form method="post" id="editForm">
+            <input type="hidden" asp-for="WorkCenter.Id" />
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Code</label><input asp-for="WorkCenter.Code" /></div>
+                <div class="zqm-field"><label>Name</label><input asp-for="WorkCenter.Name" /></div>
+                <div class="zqm-field"><label>Category</label><select asp-for="WorkCenter.WorkCenterCategory"><option value="Machine">Machine</option><option value="Labor">Labor</option><option value="Crew">Crew</option><option value="Pool">Capacity Pool</option></select></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Department</label><input asp-for="WorkCenter.Department" /></div>
+                <div class="zqm-field"><label>Cost Center</label><input asp-for="WorkCenter.CostCenter" /></div>
+                <div class="zqm-field"><label>Responsible Person</label><input asp-for="WorkCenter.ResponsiblePerson" /></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Capacity per Shift</label><input asp-for="WorkCenter.CapacityPerShift" type="number" step="1" /></div>
+                <div class="zqm-field"><label>Shifts per Day</label><select asp-for="WorkCenter.ShiftsPerDay"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                <div class="zqm-field"><label>Status</label><select asp-for="WorkCenter.Status"><option value="Active">Active</option><option value="Maintenance">Maintenance</option><option value="Inactive">Inactive</option></select></div>
+            </div>
+            <div class="zqm-row cols-3">
+                <div class="zqm-field"><label>Machine Time (hrs)</label><input asp-for="WorkCenter.MachineTimeHrs" type="number" step="0.1" /></div>
+                <div class="zqm-field"><label>Labor Time (hrs)</label><input asp-for="WorkCenter.LaborTimeHrs" type="number" step="0.1" /></div>
+                <div class="zqm-field"><label>Capacity per Day</label><input asp-for="WorkCenter.CapacityPerDay" type="number" step="1" /></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
