@@ -1,0 +1,103 @@
+@page
+@model YuktiraERP.Web.Pages.AI.Vision.HistoryModel
+@{ ViewData["Title"] = "Inspection History"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-clock-history me-2"></i>Inspection History</h3>
+            <span class="badge">Report</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" onclick="exportHistory()"><i class="bi bi-download me-1"></i>Export</button>
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filter Criteria</div>
+        <form method="get">
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>From Date</label><input asp-for="FromDate" type="date" /></div>
+                <div class="zqm-field"><label>To Date</label><input asp-for="ToDate" type="date" /></div>
+                <div class="zqm-field"><label>Material Code</label><input asp-for="MaterialCode" placeholder="e.g. MAT-001" /></div>
+                <div class="zqm-field">
+                    <label>Plant</label>
+                    <select asp-for="Plant">
+                        <option value="">All Plants</option>
+                        <option value="1000">1000 - Manufacturing</option>
+                        <option value="2000">2000 - Warehouse</option>
+                        <option value="3000">3000 - Quality</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:10px">
+                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    @if (Model.Records != null && Model.Records.Any())
+    {
+        <div class="zqm-results">
+            <div class="zqm-results-header">
+                <h4><i class="bi bi-table me-1"></i>Inspection Records</h4>
+                <span class="count">@Model.Records.Count records</span>
+            </div>
+            <div class="zqm-table-wrap">
+                <table class="zqm-table">
+                    <thead><tr><th>Date</th><th>Material</th><th>Plant</th><th>Defect</th><th>Severity</th><th>Confidence</th><th>NC #</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var r in Model.Records)
+                        {
+                            <tr>
+                                <td>@r.InspectionDate.ToString("dd MMM yyyy HH:mm")</td>
+                                <td><strong>@r.MaterialCode</strong></td>
+                                <td>@r.Plant</td>
+                                <td>@r.DefectType</td>
+                                <td><span class="zqm-badge @(r.Severity == "Critical" ? "danger" : r.Severity == "High" ? "warning" : r.Severity == "Medium" ? "info" : "passed")">@r.Severity</span></td>
+                                <td>@r.ConfidencePct.ToString("F1")%</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(r.NCNumber))
+                                    {
+                                        <a href="#" style="color:#1565c0;text-decoration:none;font-weight:600">@r.NCNumber</a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </td>
+                                <td><span class="zqm-badge @(r.Status == "Pass" ? "passed" : r.Status == "Fail" ? "failed" : "warning")">@r.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="zqm-footer"><span>Total: @Model.Records.Count inspection records</span><div></div></div>
+        </div>
+    }
+    else
+    {
+        <div class="zqm-empty"><i class="bi bi-clock-history"></i><div>Set date range and filters, then click Search to view history</div></div>
+    }
+</div>
+
+@section Scripts {
+<script>
+function exportHistory() {
+    var table = document.querySelector('.zqm-table');
+    if (!table) return;
+    var csv = [];
+    table.querySelectorAll('tr').forEach(function(tr) {
+        var row = [];
+        tr.querySelectorAll('th,td').forEach(function(cell) { row.push('"'+cell.textContent.trim().replace(/"/g,'""')+'"'); });
+        csv.push(row.join(','));
+    });
+    var blob = new Blob([csv.join('\n')], {type:'text/csv'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'inspection-history.csv'; a.click();
+}
+</script>
+}

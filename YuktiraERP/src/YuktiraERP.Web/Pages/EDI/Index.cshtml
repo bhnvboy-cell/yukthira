@@ -1,0 +1,157 @@
+@page
+@model YuktiraERP.Web.Pages.EDI.IndexModel
+@{
+    ViewData["Title"] = "EDI & B2B Integration";
+}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+<style>
+    .edi-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+    .edi-kpi{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+    .edi-kpi:hover{border-color:#3f51b5;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
+    .edi-kpi .kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0}
+    .edi-kpi .kpi-info .kpi-value{font-size:1.4rem;font-weight:700;color:#1a237e}
+    .edi-kpi .kpi-info .kpi-label{font-size:0.72rem;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.3px}
+    .edi-kpi .kpi-info .kpi-sub{font-size:0.72rem;color:#999}
+    .kpi-blue{background:linear-gradient(135deg,#1565c0,#1976d2)}
+    .kpi-teal{background:linear-gradient(135deg,#00695c,#00897b)}
+    .kpi-green{background:linear-gradient(135deg,#2e7d32,#388e3c)}
+    .kpi-amber{background:linear-gradient(135deg,#f57f17,#fbc02d)}
+</style>
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-arrow-left-right me-2"></i>EDI &amp; B2B Integration Suite</h3>
+            <span class="badge">V1.0</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/EDI/Partners" class="zqm-btn"><i class="bi bi-people me-1"></i>Partners</a>
+            <a asp-page="/EDI/Convert" class="zqm-btn"><i class="bi bi-arrow-right-circle me-1"></i>Convert</a>
+            <a asp-page="/EDI/Parse" class="zqm-btn"><i class="bi bi-arrow-left-circle me-1"></i>Parse</a>
+            <a asp-page="/EDI/Acknowledgments" class="zqm-btn"><i class="bi bi-clipboard-check me-1"></i>Acks</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+        </div>
+    </div>
+
+    <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-bottom:none">
+        <div class="edi-kpi-grid">
+            <div class="edi-kpi">
+                <div class="kpi-icon kpi-blue"><i class="bi bi-people"></i></div>
+                <div class="kpi-info">
+                    <div class="kpi-value" id="kpiPartners">--</div>
+                    <div class="kpi-label">Active Partners</div>
+                    <div class="kpi-sub">Trading connections</div>
+                </div>
+            </div>
+            <div class="edi-kpi">
+                <div class="kpi-icon kpi-teal"><i class="bi bi-envelope-check"></i></div>
+                <div class="kpi-info">
+                    <div class="kpi-value" id="kpiMessages">--</div>
+                    <div class="kpi-label">Messages Processed</div>
+                    <div class="kpi-sub">Inbound + Outbound</div>
+                </div>
+            </div>
+            <div class="edi-kpi">
+                <div class="kpi-icon kpi-green"><i class="bi bi-check-circle"></i></div>
+                <div class="kpi-info">
+                    <div class="kpi-value" id="kpiSuccess">--</div>
+                    <div class="kpi-label">Success Rate</div>
+                    <div class="kpi-sub">Last 24 hours</div>
+                </div>
+            </div>
+            <div class="edi-kpi">
+                <div class="kpi-icon kpi-amber"><i class="bi bi-clock-history"></i></div>
+                <div class="kpi-info">
+                    <div class="kpi-value" id="kpiPending">--</div>
+                    <div class="kpi-label">Pending Acks</div>
+                    <div class="kpi-sub">Awaiting response</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px;overflow:hidden">
+        <div class="zqm-tabs" id="ediTabs">
+            <button class="zqm-tab-btn active" data-tab="tab-partners"><i class="bi bi-people me-1"></i>Trading Partners</button>
+            <button class="zqm-tab-btn" data-tab="tab-messages"><i class="bi bi-envelope-arrow-up me-1"></i>Message Hub</button>
+            <button class="zqm-tab-btn" data-tab="tab-monitoring"><i class="bi bi-speedometer me-1"></i>Monitoring</button>
+        </div>
+
+        <!-- Partners Tab -->
+        <div class="zqm-tab-panel active" id="tab-partners">
+            <div class="zqm-results-header">
+                <h4>Trading Partners</h4>
+                <div>
+                    <a asp-page="/EDI/Partners" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Manage Partners</a>
+                </div>
+            </div>
+            <div style="padding:20px;color:#666;font-size:0.88rem">
+                <i class="bi bi-info-circle me-1"></i>
+                Manage your EDI trading partners. Configure partner profiles, authentication, document types, and communication endpoints.
+                Supports EDIFACT and ANSI X12 standards.
+                <br /><br />
+                <a asp-page="/EDI/Partners" style="color:#1565c0;font-weight:600"><i class="bi bi-arrow-right me-1"></i>Go to Trading Partners</a>
+            </div>
+        </div>
+
+        <!-- Messages Tab -->
+        <div class="zqm-tab-panel" id="tab-messages">
+            <div class="zqm-results-header">
+                <h4>Message Hub</h4>
+                <div>
+                    <a asp-page="/EDI/Convert" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-arrow-right-circle me-1"></i>Convert</a>
+                    <a asp-page="/EDI/Parse" class="zqm-btn" style="background:#00695c;border-color:#00695c"><i class="bi bi-arrow-left-circle me-1"></i>Parse</a>
+                </div>
+            </div>
+            <div style="padding:20px;color:#666;font-size:0.88rem">
+                <i class="bi bi-info-circle me-1"></i>
+                Convert JSON payloads to EDI format (outbound) or parse raw EDI content to structured JSON (inbound).
+                Supports EDIFACT and ANSI X12 standards for Purchase Orders, Invoices, and more.
+                <br /><br />
+                <a asp-page="/EDI/Convert" style="color:#1565c0;font-weight:600"><i class="bi bi-arrow-right me-1"></i>Go to Message Conversion</a>
+                &nbsp;&nbsp;
+                <a asp-page="/EDI/Parse" style="color:#00695c;font-weight:600"><i class="bi bi-arrow-left me-1"></i>Go to Message Parser</a>
+            </div>
+        </div>
+
+        <!-- Monitoring Tab -->
+        <div class="zqm-tab-panel" id="tab-monitoring">
+            <div class="zqm-results-header">
+                <h4>Monitoring &amp; Acknowledgments</h4>
+                <div>
+                    <a asp-page="/EDI/Acknowledgments" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-clipboard-check me-1"></i>View Acknowledgments</a>
+                </div>
+            </div>
+            <div style="padding:20px;color:#666;font-size:0.88rem">
+                <i class="bi bi-info-circle me-1"></i>
+                Track EDI message acknowledgments (997 for X12, MDN for EDIFACT). Monitor partner response times,
+                message delivery status, and error logs.
+                <br /><br />
+                <a asp-page="/EDI/Acknowledgments" style="color:#1565c0;font-weight:600"><i class="bi bi-arrow-right me-1"></i>Go to Acknowledgment Logs</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('#ediTabs .zqm-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#ediTabs .zqm-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.zqm-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+});
+
+(function() {
+    fetch('/api/integration/edi/partners').then(function(r) { return r.json(); }).then(function(data) {
+        var partners = Array.isArray(data) ? data : [];
+        document.getElementById('kpiPartners').textContent = partners.filter(function(p) { return p.isActive; }).length;
+    }).catch(function() { document.getElementById('kpiPartners').textContent = '0'; });
+
+    fetch('/api/integration/edi/acknowledgments?page=1&pageSize=1').then(function(r) { return r.json(); }).then(function(data) {
+        var items = Array.isArray(data) ? data : (data.items || []);
+        document.getElementById('kpiMessages').textContent = data.totalCount || items.length;
+    }).catch(function() { document.getElementById('kpiMessages').textContent = '0'; });
+})();
+</script>

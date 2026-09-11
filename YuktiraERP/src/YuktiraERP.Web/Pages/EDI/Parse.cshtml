@@ -1,0 +1,110 @@
+@page
+@model YuktiraERP.Web.Pages.EDI.ParseModel
+@{
+    ViewData["Title"] = "EDI Message Parser";
+}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-arrow-left-circle me-2"></i>EDI Message Parser</h3>
+            <span class="badge">Parse</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Parse Parameters</div>
+        <div class="zqm-row cols-1">
+            <div class="zqm-field">
+                <label>Standard *</label>
+                <select id="parseStandard">
+                    <option value="EDIFACT">EDIFACT</option>
+                    <option value="X12">X12</option>
+                </select>
+            </div>
+        </div>
+        <div class="zqm-row cols-1">
+            <div class="zqm-field">
+                <label>Raw EDI Content *</label>
+                <textarea id="parseInput" rows="14" placeholder="Paste your raw EDI content here...&#10;&#10;EDIFACT example: UNH+...&#10;X12 example: ISA*00*..." style="font-family:Consolas,monospace;font-size:0.82rem"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+            <button type="button" class="zqm-btn" style="background:#00695c;border-color:#00695c" onclick="doParse()"><i class="bi bi-arrow-left-circle me-1"></i>Parse</button>
+        </div>
+    </div>
+
+    <div class="zqm-results" id="resultSection" style="display:none">
+        <div class="zqm-results-header">
+            <h4>Parsed JSON Output</h4>
+            <span class="zqm-badge passed" id="outputBadge" style="display:none"></span>
+        </div>
+        <div style="padding:16px">
+            <div class="zqm-alert success" id="parseSuccess" style="display:none"></div>
+            <div class="zqm-alert error" id="parseError" style="display:none"></div>
+            <textarea id="parseOutput" rows="18" readonly style="width:100%;font-family:Consolas,monospace;font-size:0.82rem;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;padding:12px;resize:vertical"></textarea>
+            <div style="margin-top:8px">
+                <button type="button" class="zqm-btn" onclick="copyOutput()" id="btnCopy" style="display:none"><i class="bi bi-clipboard me-1"></i>Copy JSON</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var token = document.querySelector('input[name="__RequestVerificationToken"]');
+
+function doParse() {
+    var standard = document.getElementById('parseStandard').value;
+    var content = document.getElementById('parseInput').value.trim();
+
+    if (!content) { alert('Please enter raw EDI content'); return; }
+
+    document.getElementById('resultSection').style.display = '';
+    document.getElementById('parseSuccess').style.display = 'none';
+    document.getElementById('parseError').style.display = 'none';
+    document.getElementById('parseOutput').value = '';
+    document.getElementById('btnCopy').style.display = 'none';
+    document.getElementById('outputBadge').style.display = 'none';
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['RequestVerificationToken'] = token.value; }
+
+    fetch('/api/integration/edi/parse/' + standard, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ content: content })
+    }).then(function(r) {
+        return r.text().then(function(text) {
+            if (r.ok) {
+                var pretty = text;
+                try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch(e) {}
+                document.getElementById('parseOutput').value = pretty;
+                document.getElementById('parseSuccess').textContent = 'Parse successful (' + standard + ')';
+                document.getElementById('parseSuccess').style.display = '';
+                document.getElementById('outputBadge').textContent = 'SUCCESS';
+                document.getElementById('outputBadge').style.display = '';
+                document.getElementById('btnCopy').style.display = '';
+            } else {
+                document.getElementById('parseError').textContent = 'Error: ' + text;
+                document.getElementById('parseError').style.display = '';
+            }
+        });
+    }).catch(function(err) {
+        document.getElementById('parseError').textContent = 'Network error: ' + err.message;
+        document.getElementById('parseError').style.display = '';
+    });
+}
+
+function copyOutput() {
+    var output = document.getElementById('parseOutput');
+    output.select();
+    document.execCommand('copy');
+    var btn = document.getElementById('btnCopy');
+    btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+    setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copy JSON'; }, 2000);
+}
+</script>

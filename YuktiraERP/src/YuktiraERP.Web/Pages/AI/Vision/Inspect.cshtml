@@ -1,0 +1,127 @@
+@page
+@model YuktiraERP.Web.Pages.AI.Vision.InspectModel
+@{ ViewData["Title"] = "Vision Inspection"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-camera me-2"></i>Vision Inspection</h3>
+            <span class="badge">ZQM-V01</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Inspection Parameters</div>
+        <form method="post" enctype="multipart/form-data" id="inspectForm">
+            <div class="zqm-row cols-2">
+                <div class="zqm-field">
+                    <label>Upload Image</label>
+                    <input type="file" name="ImageFile" accept="image/*" asp-for="ImageFile" style="display:block;width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;background:#fff" />
+                </div>
+                <div class="zqm-field"><label>Material Code</label><input asp-for="MaterialCode" placeholder="e.g. MAT-001" /></div>
+            </div>
+            <div class="zqm-row cols-2">
+                <div class="zqm-field">
+                    <label>Plant</label>
+                    <select asp-for="Plant">
+                        <option value="">Select Plant</option>
+                        <option value="1000">1000 - Manufacturing</option>
+                        <option value="2000">2000 - Warehouse</option>
+                        <option value="3000">3000 - Quality</option>
+                    </select>
+                </div>
+                <div class="zqm-field"><label>Inspection Lot Number</label><input asp-for="InspectionLotNumber" placeholder="e.g. IL-20260001" /></div>
+            </div>
+            <div style="margin-top:10px">
+                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-play-fill me-1"></i>Run Inspection</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+
+    @if (Model.Result != null)
+    {
+        <div class="zqm-results">
+            <div class="zqm-results-header">
+                <h4><i class="bi bi-clipboard-check me-1"></i>Inspection Result</h4>
+                <span class="count">@Model.Result.ImageName</span>
+            </div>
+            <div style="padding:20px">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+                    <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Verdict</div>
+                        <span class="zqm-badge @(Model.Result.IsPassed ? "passed" : "failed")" style="font-size:1.1rem;padding:6px 20px">@(Model.Result.IsPassed ? "PASS" : "FAIL")</span>
+                    </div>
+                    <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Confidence Score</div>
+                        <div style="font-size:1.5rem;font-weight:700;color:#1a237e">@Model.Result.ConfidencePct.ToString("F1")%</div>
+                        <div style="width:100%;height:8px;background:#e0e0e0;border-radius:4px;margin-top:8px;overflow:hidden">
+                            <div style="width:@Model.Result.ConfidencePct.ToString("F0")%;height:100%;background:@(Model.Result.ConfidencePct >= 90 ? "#2e7d32" : Model.Result.ConfidencePct >= 70 ? "#f57c00" : "#c62828");border-radius:4px"></div>
+                        </div>
+                    </div>
+                    <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Severity Level</div>
+                        <span class="zqm-badge @(Model.Result.Severity == "Critical" ? "danger" : Model.Result.Severity == "High" ? "warning" : Model.Result.Severity == "Medium" ? "info" : "passed")">@Model.Result.Severity</span>
+                    </div>
+                </div>
+
+                <div class="zqm-row cols-3">
+                    <div class="zqm-field"><label>Detected Defect</label><div style="padding:8px;background:#f5f5f5;border-radius:4px;font-weight:600;color:#333">@Model.Result.DefectType</div></div>
+                    <div class="zqm-field"><label>Material Code</label><div style="padding:8px;background:#f5f5f5;border-radius:4px;color:#333">@Model.Result.MaterialCode</div></div>
+                    <div class="zqm-field"><label>Plant</label><div style="padding:8px;background:#f5f5f5;border-radius:4px;color:#333">@Model.Result.Plant</div></div>
+                </div>
+
+                @if (Model.Result.DefectRegions != null && Model.Result.DefectRegions.Any())
+                {
+                    <div style="margin-top:16px">
+                        <h5 style="font-size:0.9rem;color:#1a237e;margin-bottom:8px"><i class="bi bi-bounding-box me-1"></i>Defect Regions</h5>
+                        <div class="zqm-table-wrap">
+                            <table class="zqm-table">
+                                <thead><tr><th>Region ID</th><th>Location</th><th>Area</th><th>Severity</th></tr></thead>
+                                <tbody>
+                                    @foreach (var region in Model.Result.DefectRegions)
+                                    {
+                                        <tr>
+                                            <td><strong>@region.Id</strong></td>
+                                            <td>@region.Location</td>
+                                            <td>@region.Area</td>
+                                            <td><span class="zqm-badge @(region.Severity == "Critical" ? "danger" : region.Severity == "High" ? "warning" : "info")">@region.Severity</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                <div class="zqm-row cols-2" style="margin-top:16px">
+                    <div class="zqm-field"><label>Recommended Action</label><div style="padding:10px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:4px;color:#e65100;font-weight:500">@Model.Result.RecommendedAction</div></div>
+                    <div class="zqm-field">
+                        <label>Non-Conformance</label>
+                        @if (Model.Result.NCRequired)
+                        {
+                            <div style="padding:10px;background:#ffcdd2;border:1px solid #ef9a9a;border-radius:4px;color:#c62828;font-weight:600"><i class="bi bi-exclamation-triangle me-1"></i>NC Auto-Created: @Model.Result.NCNumber</div>
+                        }
+                        else
+                        {
+                            <div style="padding:10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;color:#2e7d32;font-weight:500"><i class="bi bi-check-circle me-1"></i>No NC Required</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="zqm-empty" id="emptyState"><i class="bi bi-camera"></i><div>Upload an image and run inspection to see results</div></div>
+</div>
+
+@section Scripts {
+<script>
+function show(msg, type) { var el = document.getElementById('alertBox'); el.style.display = 'block'; el.className = 'zqm-alert ' + type; el.textContent = msg; }
+</script>
+}

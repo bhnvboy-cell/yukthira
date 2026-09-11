@@ -1,0 +1,122 @@
+@page
+@model YuktiraERP.Web.Pages.EDI.AcknowledgmentsModel
+@{
+    ViewData["Title"] = "Acknowledgment Logs";
+}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-clipboard-check me-2"></i>Acknowledgment Logs</h3>
+            <span class="badge">997/MDN</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filter</div>
+        <div class="zqm-row cols-3">
+            <div class="zqm-field"><label>Partner Code</label><input id="filterPartner" placeholder="Partner code..." /></div>
+            <div class="zqm-field"><label>Ack Code</label><input id="filterAckCode" placeholder="e.g. 997, MDN" /></div>
+            <div class="zqm-field"><label>&nbsp;</label><button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0;width:100%" onclick="loadAcks()"><i class="bi bi-search me-1"></i>Search</button></div>
+        </div>
+    </div>
+
+    <div class="zqm-results">
+        <div class="zqm-results-header">
+            <h4>Acknowledgment Records</h4>
+            <span class="count" id="resultCount">0 items</span>
+        </div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="ackTable">
+                <thead>
+                    <tr>
+                        <th>Received At</th>
+                        <th>Partner</th>
+                        <th>Direction</th>
+                        <th>Interchange ID</th>
+                        <th>Message Ref</th>
+                        <th>Doc Type</th>
+                        <th>Ack Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody id="ackTableBody">
+                    <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>Loading acknowledgments...</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="zqm-footer">
+            <div id="paginationInfo">Page 1</div>
+            <div style="display:flex;gap:4px">
+                <button type="button" class="zqm-btn" id="btnPrev" onclick="prevPage()" disabled><i class="bi bi-chevron-left me-1"></i>Prev</button>
+                <button type="button" class="zqm-btn" id="btnNext" onclick="nextPage()"><i class="bi bi-chevron-right me-1"></i>Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var currentPage = 1;
+var pageSize = 50;
+
+function loadAcks() {
+    currentPage = 1;
+    fetchAcks();
+}
+
+function fetchAcks() {
+    var partner = document.getElementById('filterPartner').value.trim();
+    var ackCode = document.getElementById('filterAckCode').value.trim();
+
+    var params = 'page=' + currentPage + '&pageSize=' + pageSize;
+    if (partner) params += '&partnerCode=' + encodeURIComponent(partner);
+    if (ackCode) params += '&ackCode=' + encodeURIComponent(ackCode);
+
+    document.getElementById('ackTableBody').innerHTML = '<tr><td colspan="8" class="zqm-empty"><i class="bi bi-hourglass"></i><div>Loading...</div></td></tr>';
+
+    fetch('/api/integration/edi/acknowledgments?' + params)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        var items = Array.isArray(data) ? data : (data.items || []);
+        var total = data.totalCount || items.length;
+        renderAcks(items);
+        document.getElementById('paginationInfo').textContent = 'Page ' + currentPage + ' of ' + Math.max(1, Math.ceil(total / pageSize));
+        document.getElementById('btnPrev').disabled = currentPage <= 1;
+        document.getElementById('btnNext').disabled = items.length < pageSize;
+        document.getElementById('resultCount').textContent = total + ' items';
+    }).catch(function() {
+        renderAcks([]);
+        document.getElementById('resultCount').textContent = '0 items';
+    });
+}
+
+function renderAcks(items) {
+    var tbody = document.getElementById('ackTableBody');
+    if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No acknowledgment records found</div></td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map(function(a) {
+        var dirBadge = a.direction === 'Outbound' ? 'info' : 'passed';
+        return '<tr>' +
+            '<td>' + (a.receivedAt || '') + '</td>' +
+            '<td style="font-weight:600;color:#1565c0">' + (a.partnerCode || a.partner || '') + '</td>' +
+            '<td><span class="zqm-badge ' + dirBadge + '">' + (a.direction || '') + '</span></td>' +
+            '<td>' + (a.interchangeId || '') + '</td>' +
+            '<td>' + (a.messageRef || '') + '</td>' +
+            '<td>' + (a.documentType || '') + '</td>' +
+            '<td><span class="zqm-badge ' + (a.ackCode === '997' || a.ackCode === 'MDN' ? 'passed' : 'info') + '">' + (a.ackCode || '') + '</span></td>' +
+            '<td>' + (a.description || '') + '</td>' +
+            '</tr>';
+    }).join('');
+}
+
+function prevPage() { if (currentPage > 1) { currentPage--; fetchAcks(); } }
+function nextPage() { currentPage++; fetchAcks(); }
+
+loadAcks();
+</script>

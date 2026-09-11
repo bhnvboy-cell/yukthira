@@ -1,0 +1,241 @@
+@page
+@model YuktiraERP.Web.Pages.EDI.PartnersModel
+@{
+    ViewData["Title"] = "Trading Partners";
+}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-people me-2"></i>Trading Partners</h3>
+            <span class="badge">Partners</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" id="btnCreate" onclick="showCreateForm()"><i class="bi bi-plus-circle me-1"></i>Create</button>
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-row cols-2">
+            <div class="zqm-field"><label>Partner Code</label><input id="searchCode" placeholder="Filter by code..." oninput="filterTable()" /></div>
+            <div class="zqm-field"><label>Partner Name</label><input id="searchName" placeholder="Filter by name..." oninput="filterTable()" /></div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Form -->
+    <div class="zqm-filter" id="partnerForm" style="display:none;border-left:3px solid #1565c0">
+        <div class="zqm-section-title"><i class="bi bi-pencil me-1"></i><span id="formTitle">Create Partner</span></div>
+        <form id="partnerFormEl" onsubmit="return false;">
+            <input type="hidden" id="partnerId" value="" />
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Partner Code *</label><input id="partnerCode" required placeholder="e.g. PARTNER01" /></div>
+                <div class="zqm-field"><label>Partner Name *</label><input id="partnerName" required placeholder="e.g. Acme Corp" /></div>
+                <div class="zqm-field"><label>Standard *</label><select id="partnerStandard"><option value="EDIFACT">EDIFACT</option><option value="X12">X12</option></select></div>
+                <div class="zqm-field"><label>Version</label><input id="partnerVersion" placeholder="e.g. D96A / 005010" /></div>
+            </div>
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Sender ID</label><input id="senderId" placeholder="Sender identifier" /></div>
+                <div class="zqm-field"><label>Receiver ID</label><input id="receiverId" placeholder="Receiver identifier" /></div>
+                <div class="zqm-field"><label>Sender Qualifier</label><input id="senderQualifier" placeholder="e.g. ZZ" /></div>
+                <div class="zqm-field"><label>Receiver Qualifier</label><input id="receiverQualifier" placeholder="e.g. ZZ" /></div>
+            </div>
+            <div class="zqm-row cols-4">
+                <div class="zqm-field"><label>Test Indicator</label><select id="testIndicator"><option value="P">Production (P)</option><option value="T">Test (T)</option></select></div>
+                <div class="zqm-field"><label>Endpoint URL</label><input id="endpointUrl" placeholder="https://..." /></div>
+                <div class="zqm-field"><label>Auth Type</label><select id="authType"><option value="None">None</option><option value="Basic">Basic Auth</option><option value="Certificate">Certificate</option></select></div>
+                <div class="zqm-field"><label>Document Types</label><input id="documentTypes" placeholder="e.g. PO,INV,DESADV" /></div>
+            </div>
+            <div class="zqm-row cols-2">
+                <div class="zqm-field"><label>Auth Config JSON</label><textarea id="authConfig" rows="3" placeholder='{"username":"...","password":"..."}'></textarea></div>
+                <div class="zqm-field">
+                    <label>&nbsp;</label>
+                    <div style="display:flex;align-items:center;gap:10px;padding-top:4px">
+                        <label style="display:flex;align-items:center;gap:5px;font-size:0.85rem;font-weight:500;cursor:pointer;text-transform:none">
+                            <input type="checkbox" id="isActive" checked class="zqm-chk" /> Is Active
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0" onclick="savePartner()"><i class="bi bi-check-circle me-1"></i>Save</button>
+                <button type="button" class="zqm-btn" onclick="hideForm()"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    <div class="zqm-results">
+        <div class="zqm-results-header">
+            <h4>Partners</h4>
+            <span class="count" id="resultCount">0 items</span>
+        </div>
+        <div class="zqm-table-wrap">
+            <table class="zqm-table" id="partnerTable">
+                <thead>
+                    <tr>
+                        <th>Partner Code</th>
+                        <th>Name</th>
+                        <th>Standard</th>
+                        <th>Version</th>
+                        <th>Auth Type</th>
+                        <th>Documents</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="partnerTableBody">
+                    <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>Loading partners...</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+var token = document.querySelector('input[name="__RequestVerificationToken"]');
+var partners = [];
+
+function loadPartners() {
+    fetch('/api/integration/edi/partners').then(function(r) { return r.json(); }).then(function(data) {
+        partners = Array.isArray(data) ? data : [];
+        renderTable(partners);
+    }).catch(function() {
+        partners = [];
+        renderTable([]);
+    });
+}
+
+function renderTable(list) {
+    var tbody = document.getElementById('partnerTableBody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No trading partners found</div></td></tr>';
+    } else {
+        tbody.innerHTML = list.map(function(p) {
+            var badgeClass = p.isActive ? 'passed' : 'closed';
+            var statusText = p.isActive ? 'Active' : 'Inactive';
+            return '<tr data-code="' + (p.partnerCode||'').toLowerCase() + '" data-name="' + (p.partnerName||'').toLowerCase() + '">' +
+                '<td style="font-weight:600;color:#1565c0">' + (p.partnerCode||'') + '</td>' +
+                '<td>' + (p.partnerName||'') + '</td>' +
+                '<td><span class="zqm-badge info">' + (p.standard||'') + '</span></td>' +
+                '<td>' + (p.version||'') + '</td>' +
+                '<td>' + (p.authType||'None') + '</td>' +
+                '<td>' + (p.documentTypes||'') + '</td>' +
+                '<td><span class="zqm-badge ' + badgeClass + '">' + statusText + '</span></td>' +
+                '<td>' +
+                    '<a href="javascript:editPartner(\'' + p.id + '\')" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a> ' +
+                    '<a href="javascript:deletePartner(\'' + p.id + '\')" class="zqm-act" title="Delete" style="color:#c62828"><i class="bi bi-trash"></i></a>' +
+                '</td></tr>';
+        }).join('');
+    }
+    document.getElementById('resultCount').textContent = list.length + ' items';
+}
+
+function filterTable() {
+    var code = document.getElementById('searchCode').value.toLowerCase();
+    var name = document.getElementById('searchName').value.toLowerCase();
+    var rows = document.querySelectorAll('#partnerTable tbody tr[data-code]');
+    var count = 0;
+    rows.forEach(function(r) {
+        var match = (!code || r.dataset.code.indexOf(code) > -1) && (!name || r.dataset.name.indexOf(name) > -1);
+        r.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' items';
+}
+
+function showCreateForm() {
+    document.getElementById('partnerId').value = '';
+    document.getElementById('partnerCode').value = '';
+    document.getElementById('partnerName').value = '';
+    document.getElementById('partnerStandard').value = 'EDIFACT';
+    document.getElementById('partnerVersion').value = '';
+    document.getElementById('senderId').value = '';
+    document.getElementById('receiverId').value = '';
+    document.getElementById('senderQualifier').value = '';
+    document.getElementById('receiverQualifier').value = '';
+    document.getElementById('testIndicator').value = 'P';
+    document.getElementById('endpointUrl').value = '';
+    document.getElementById('authType').value = 'None';
+    document.getElementById('authConfig').value = '';
+    document.getElementById('documentTypes').value = '';
+    document.getElementById('isActive').checked = true;
+    document.getElementById('formTitle').textContent = 'Create Partner';
+    document.getElementById('partnerForm').style.display = '';
+}
+
+function hideForm() {
+    document.getElementById('partnerForm').style.display = 'none';
+}
+
+function editPartner(id) {
+    var p = partners.find(function(x) { return x.id === id; });
+    if (!p) return;
+    document.getElementById('partnerId').value = p.id;
+    document.getElementById('partnerCode').value = p.partnerCode || '';
+    document.getElementById('partnerName').value = p.partnerName || '';
+    document.getElementById('partnerStandard').value = p.standard || 'EDIFACT';
+    document.getElementById('partnerVersion').value = p.version || '';
+    document.getElementById('senderId').value = p.senderId || '';
+    document.getElementById('receiverId').value = p.receiverId || '';
+    document.getElementById('senderQualifier').value = p.senderQualifier || '';
+    document.getElementById('receiverQualifier').value = p.receiverQualifier || '';
+    document.getElementById('testIndicator').value = p.testIndicator || 'P';
+    document.getElementById('endpointUrl').value = p.endpointUrl || '';
+    document.getElementById('authType').value = p.authType || 'None';
+    document.getElementById('authConfig').value = p.authConfig || '';
+    document.getElementById('documentTypes').value = p.documentTypes || '';
+    document.getElementById('isActive').checked = p.isActive !== false;
+    document.getElementById('formTitle').textContent = 'Edit Partner';
+    document.getElementById('partnerForm').style.display = '';
+}
+
+function savePartner() {
+    var id = document.getElementById('partnerId').value;
+    var payload = {
+        partnerCode: document.getElementById('partnerCode').value,
+        partnerName: document.getElementById('partnerName').value,
+        standard: document.getElementById('partnerStandard').value,
+        version: document.getElementById('partnerVersion').value,
+        senderId: document.getElementById('senderId').value,
+        receiverId: document.getElementById('receiverId').value,
+        senderQualifier: document.getElementById('senderQualifier').value,
+        receiverQualifier: document.getElementById('receiverQualifier').value,
+        testIndicator: document.getElementById('testIndicator').value,
+        endpointUrl: document.getElementById('endpointUrl').value,
+        authType: document.getElementById('authType').value,
+        authConfig: document.getElementById('authConfig').value,
+        documentTypes: document.getElementById('documentTypes').value,
+        isActive: document.getElementById('isActive').checked
+    };
+
+    var url = id ? '/api/integration/edi/partners/' + id : '/api/integration/edi/partners';
+    var method = id ? 'PUT' : 'POST';
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['RequestVerificationToken'] = token.value; }
+
+    fetch(url, { method: method, headers: headers, body: JSON.stringify(payload) })
+    .then(function(r) {
+        if (r.ok) { hideForm(); loadPartners(); }
+        else { alert('Error saving partner'); }
+    }).catch(function() { alert('Network error'); });
+}
+
+function deletePartner(id) {
+    if (!confirm('Delete this trading partner?')) return;
+    var headers = {};
+    if (token) { headers['RequestVerificationToken'] = token.value; }
+
+    fetch('/api/integration/edi/partners/' + id, { method: 'DELETE', headers: headers })
+    .then(function(r) {
+        if (r.ok) { loadPartners(); }
+        else { alert('Error deleting partner'); }
+    }).catch(function() { alert('Network error'); });
+}
+
+loadPartners();
+</script>

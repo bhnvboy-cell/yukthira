@@ -1,0 +1,168 @@
+@page
+@model YuktiraERP.Web.Pages.AI.Vision.ModelTrainingModel
+@{ ViewData["Title"] = "Model Training"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-diagram-3 me-2"></i>Model Training</h3>
+            <span class="badge">ZQM-V03</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:0;background:#f5f5f5;border:1px solid #e0e0e0;border-top:none;overflow-x:auto">
+        <button type="button" class="qm-tab active" onclick="switchTab(this,'tab-train')"><i class="bi bi-play-circle me-1"></i>Train Model</button>
+        <button type="button" class="qm-tab" onclick="switchTab(this,'tab-evaluate')"><i class="bi bi-clipboard-check me-1"></i>Evaluate Model</button>
+    </div>
+
+    <div id="tab-train" style="border:1px solid #e0e0e0;border-top:none;background:#fff">
+        <div class="zqm-filter">
+            <div class="zqm-section-title"><i class="bi bi-cpu me-1"></i>Training Configuration</div>
+            <form method="post" enctype="multipart/form-data" asp-page-handler="Train" id="trainForm">
+                <input type="hidden" name="Action" value="Train" />
+                <div class="zqm-row cols-2">
+                    <div class="zqm-field"><label>Model Name</label><input asp-for="TrainModelName" placeholder="e.g. defect-detector-v1" required /></div>
+                    <div class="zqm-field"><label>Training Images</label><input type="file" name="TrainImages" accept="image/*" multiple style="display:block;width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;background:#fff" /></div>
+                </div>
+                <div class="zqm-row cols-4">
+                    <div class="zqm-field"><label>Max Epochs</label><input asp-for="MaxEpochs" type="number" value="50" min="1" max="500" /></div>
+                    <div class="zqm-field"><label>Learning Rate</label><input asp-for="LearningRate" type="number" step="0.001" value="0.001" /></div>
+                    <div class="zqm-field"><label>Validation Split</label><input asp-for="ValidationSplit" type="number" step="0.01" value="0.2" min="0.1" max="0.5" /></div>
+                    <div class="zqm-field"><label>Label</label>
+                        <select asp-for="TrainLabel">
+                            <option value="scratch">Scratch</option>
+                            <option value="dent">Dent</option>
+                            <option value="discoloration">Discoloration</option>
+                            <option value="crack">Crack</option>
+                            <option value="contamination">Contamination</option>
+                            <option value="good">Good (No Defect)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="zqm-btn" style="background:#2e7d32;color:#fff;border-color:#2e7d32"><i class="bi bi-play-fill me-1"></i>Start Training</button>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.TrainingResult != null)
+        {
+            <div class="zqm-results">
+                <div class="zqm-results-header"><h4><i class="bi bi-graph-up me-1"></i>Training Results</h4></div>
+                <div style="padding:20px">
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Status</div>
+                            <span class="zqm-badge passed">@Model.TrainingResult.Status</span>
+                        </div>
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Epochs Completed</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#1a237e">@Model.TrainingResult.EpochsCompleted / @Model.TrainingResult.MaxEpochs</div>
+                        </div>
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Training Loss</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#1a237e">@Model.TrainingResult.TrainingLoss.ToString("F4")</div>
+                        </div>
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Model ID</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#1a237e">@Model.TrainingResult.ModelId</div>
+                        </div>
+                    </div>
+                    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:12px;color:#2e7d32;font-weight:500"><i class="bi bi-check-circle me-1"></i>@Model.TrainingResult.Message</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div id="tab-evaluate" style="border:1px solid #e0e0e0;border-top:none;background:#fff;display:none">
+        <div class="zqm-filter">
+            <div class="zqm-section-title"><i class="bi bi-clipboard-check me-1"></i>Evaluation Configuration</div>
+            <form method="post" enctype="multipart/form-data" asp-page-handler="Evaluate" id="evalForm">
+                <input type="hidden" name="Action" value="Evaluate" />
+                <div class="zqm-row cols-2">
+                    <div class="zqm-field"><label>Model Name</label><input asp-for="EvalModelName" placeholder="e.g. defect-detector-v1" required /></div>
+                    <div class="zqm-field"><label>Test Images</label><input type="file" name="EvalImages" accept="image/*" multiple style="display:block;width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;background:#fff" /></div>
+                </div>
+                <div class="zqm-row cols-2">
+                    <div class="zqm-field"><label>Test Label</label>
+                        <select asp-for="EvalLabel">
+                            <option value="scratch">Scratch</option>
+                            <option value="dent">Dent</option>
+                            <option value="discoloration">Discoloration</option>
+                            <option value="crack">Crack</option>
+                            <option value="contamination">Contamination</option>
+                            <option value="good">Good (No Defect)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:10px">
+                    <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-play-fill me-1"></i>Evaluate Model</button>
+                </div>
+            </form>
+        </div>
+
+        @if (Model.EvalResult != null)
+        {
+            <div class="zqm-results">
+                <div class="zqm-results-header"><h4><i class="bi bi-clipboard-data me-1"></i>Evaluation Results</h4></div>
+                <div style="padding:20px">
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Accuracy</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#2e7d32">@Model.EvalResult.Accuracy.ToString("F1")%</div>
+                        </div>
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Precision</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#1565c0">@Model.EvalResult.Precision.ToString("F1")%</div>
+                        </div>
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">Recall</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#f57c00">@Model.EvalResult.Recall.ToString("F1")%</div>
+                        </div>
+                        <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
+                            <div style="font-size:0.75rem;color:#777;text-transform:uppercase;margin-bottom:8px">F1 Score</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#7b1fa2">@Model.EvalResult.F1Score.ToString("F1")%</div>
+                        </div>
+                    </div>
+
+                    @if (Model.EvalResult.PerClassMetrics != null && Model.EvalResult.PerClassMetrics.Any())
+                    {
+                        <h5 style="font-size:0.9rem;color:#1a237e;margin:16px 0 8px"><i class="bi bi-table me-1"></i>Per-Class Precision</h5>
+                        <div class="zqm-table-wrap">
+                            <table class="zqm-table">
+                                <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1 Score</th><th>Support</th></tr></thead>
+                                <tbody>
+                                    @foreach (var cls in Model.EvalResult.PerClassMetrics)
+                                    {
+                                        <tr>
+                                            <td><strong>@cls.ClassName</strong></td>
+                                            <td>@cls.Precision.ToString("F1")%</td>
+                                            <td>@cls.Recall.ToString("F1")%</td>
+                                            <td>@cls.F1Score.ToString("F1")%</td>
+                                            <td>@cls.Support</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function switchTab(btn, id) {
+    document.querySelectorAll('.qm-tab').forEach(function(t){t.classList.remove('active')});
+    btn.classList.add('active');
+    document.getElementById('tab-train').style.display = id==='tab-train'?'':'none';
+    document.getElementById('tab-evaluate').style.display = id==='tab-evaluate'?'':'none';
+}
+</script>
+}

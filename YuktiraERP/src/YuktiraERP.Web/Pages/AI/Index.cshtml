@@ -1,0 +1,119 @@
+@page
+@model YuktiraERP.Web.Pages.AI.IndexModel
+@{ ViewData["Title"] = "AI & Machine Learning Suite"; }
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-cpu me-2"></i>AI & Machine Learning Suite</h3>
+            <span class="badge">V2.0</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/AI/Vision/Inspect" class="zqm-btn"><i class="bi bi-camera me-1"></i>New Inspection</a>
+            <a asp-page="/AI/NLQuery/Index" class="zqm-btn"><i class="bi bi-chat-dots me-1"></i>NL Query</a>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-kpi-bar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#e0e0e0;border:1px solid #e0e0e0;border-top:none">
+        <div style="background:#fff;padding:16px;text-align:center">
+            <div style="font-size:1.4rem;margin-bottom:4px"><i class="bi bi-camera" style="color:#1565c0"></i></div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1a237e">1,247</div>
+            <div style="font-size:0.7rem;color:#777;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Vision Inspections Today</div>
+        </div>
+        <div style="background:#fff;padding:16px;text-align:center">
+            <div style="font-size:1.4rem;margin-bottom:4px"><i class="bi bi-diagram-3" style="color:#2e7d32"></i></div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1a237e">12</div>
+            <div style="font-size:0.7rem;color:#777;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Models Trained</div>
+        </div>
+        <div style="background:#fff;padding:16px;text-align:center">
+            <div style="font-size:1.4rem;margin-bottom:4px"><i class="bi bi-chat-dots" style="color:#f57c00"></i></div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1a237e">3,892</div>
+            <div style="font-size:0.7rem;color:#777;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">NL Queries Run</div>
+        </div>
+        <div style="background:#fff;padding:16px;text-align:center">
+            <div style="font-size:1.4rem;margin-bottom:4px"><i class="bi bi-bullseye" style="color:#7b1fa2"></i></div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1a237e">97.3%</div>
+            <div style="font-size:0.7rem;color:#777;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Detection Accuracy</div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:0;background:#f5f5f5;border:1px solid #e0e0e0;border-top:none;overflow-x:auto">
+        <button type="button" class="qm-tab active" onclick="switchAiTab(this,'tab-vision')"><i class="bi bi-camera me-1"></i>Vision Inspection</button>
+        <button type="button" class="qm-tab" onclick="switchAiTab(this,'tab-nlq')"><i class="bi bi-chat-dots me-1"></i>NL Query</button>
+        <button type="button" class="qm-tab" onclick="switchAiTab(this,'tab-predict')"><i class="bi bi-graph-up me-1"></i>Predictive Analytics</button>
+    </div>
+
+    <div id="tab-vision" style="border:1px solid #e0e0e0;border-top:none;background:#fff">
+        <div style="padding:20px;background:#fafafa;border-bottom:1px solid #e0e0e0">
+            <h4 style="margin:0 0 4px;color:#0d47a1"><i class="bi bi-camera me-2"></i>Vision Inspection</h4>
+            <p style="margin:0;font-size:0.85rem;color:#666">AI-powered visual inspection for defect detection, quality scoring, and automated non-conformance creation</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:20px">
+            <a asp-page="/AI/Vision/Inspect" style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all 0.3s;border-top:3px solid #1565c0">
+                <div style="font-size:1.3rem;color:#1565c0;margin-bottom:12px"><i class="bi bi-camera"></i></div>
+                <div style="font-size:0.72rem;color:#1565c0;font-weight:600;margin-bottom:4px">ZQM-V01</div>
+                <h5 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#1a237e">Single Image Inspection</h5>
+                <p style="margin:0;font-size:0.82rem;color:#666">Upload a single image for defect detection, severity classification, and automated NC creation</p>
+            </a>
+            <a asp-page="/AI/Vision/BatchInspection" style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all 0.3s;border-top:3px solid #2e7d32">
+                <div style="font-size:1.3rem;color:#2e7d32;margin-bottom:12px"><i class="bi bi-images"></i></div>
+                <div style="font-size:0.72rem;color:#2e7d32;font-weight:600;margin-bottom:4px">ZQM-V02</div>
+                <h5 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#1a237e">Batch Vision Inspection</h5>
+                <p style="margin:0;font-size:0.82rem;color:#666">Upload multiple images for bulk inspection with pass/fail summary and severity breakdown</p>
+            </a>
+            <a asp-page="/AI/Vision/ModelTraining" style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all 0.3s;border-top:3px solid #f57c00">
+                <div style="font-size:1.3rem;color:#f57c00;margin-bottom:12px"><i class="bi bi-diagram-3"></i></div>
+                <div style="font-size:0.72rem;color:#f57c00;font-weight:600;margin-bottom:4px">ZQM-V03</div>
+                <h5 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#1a237e">Model Training</h5>
+                <p style="margin:0;font-size:0.82rem;color:#666">Train custom vision models with labeled images, evaluate accuracy and performance metrics</p>
+            </a>
+            <a asp-page="/AI/Vision/History" style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all 0.3s;border-top:3px solid #7b1fa2">
+                <div style="font-size:1.3rem;color:#7b1fa2;margin-bottom:12px"><i class="bi bi-clock-history"></i></div>
+                <div style="font-size:0.72rem;color:#7b1fa2;font-weight:600;margin-bottom:4px">Report</div>
+                <h5 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#1a237e">Inspection History</h5>
+                <p style="margin:0;font-size:0.82rem;color:#666">View historical inspection results, defect trends, and NC generation records</p>
+            </a>
+        </div>
+    </div>
+
+    <div id="tab-nlq" style="border:1px solid #e0e0e0;border-top:none;background:#fff;display:none">
+        <div style="padding:20px;background:#fafafa;border-bottom:1px solid #e0e0e0">
+            <h4 style="margin:0 0 4px;color:#0d47a1"><i class="bi bi-chat-dots me-2"></i>Natural Language Query</h4>
+            <p style="margin:0;font-size:0.85rem;color:#666">Ask questions in plain English and get SQL-translated queries executed against your ERP data</p>
+        </div>
+        <div style="padding:20px;text-align:center">
+            <div style="font-size:3rem;color:#1565c0;margin-bottom:12px"><i class="bi bi-chat-dots"></i></div>
+            <h5 style="margin:0 0 8px;color:#1a237e">NL2SQL Query Engine</h5>
+            <p style="margin:0 0 16px;font-size:0.85rem;color:#666">Translate natural language questions into SQL queries and execute them instantly</p>
+            <a asp-page="/AI/NLQuery/Index" style="display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:#1565c0;color:#fff;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.9rem"><i class="bi bi-arrow-right me-1"></i>Open NL Query</a>
+        </div>
+    </div>
+
+    <div id="tab-predict" style="border:1px solid #e0e0e0;border-top:none;background:#fff;display:none">
+        <div style="padding:20px;background:#fafafa;border-bottom:1px solid #e0e0e0">
+            <h4 style="margin:0 0 4px;color:#0d47a1"><i class="bi bi-graph-up me-2"></i>Predictive Analytics</h4>
+            <p style="margin:0;font-size:0.85rem;color:#666">Machine learning driven KPI forecasting and trend analysis for quality metrics</p>
+        </div>
+        <div style="padding:20px;text-align:center">
+            <div style="font-size:3rem;color:#2e7d32;margin-bottom:12px"><i class="bi bi-graph-up"></i></div>
+            <h5 style="margin:0 0 8px;color:#1a237e">KPI Predictive Monitor</h5>
+            <p style="margin:0 0 16px;font-size:0.85rem;color:#666">Forecast quality KPIs with historical trend analysis and anomaly detection</p>
+            <a asp-page="/Kpi/Index" style="display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:#2e7d32;color:#fff;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.9rem"><i class="bi bi-arrow-right me-1"></i>Open KPI Dashboard</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function switchAiTab(btn, id) {
+    document.querySelectorAll('.qm-tab').forEach(function(t){t.classList.remove('active')});
+    btn.classList.add('active');
+    ['tab-vision','tab-nlq','tab-predict'].forEach(function(tabId){
+        var el = document.getElementById(tabId);
+        if(el){el.style.display = tabId===id?'':'none';}
+    });
+}
+</script>
+}

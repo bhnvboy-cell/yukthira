@@ -1,0 +1,114 @@
+@page
+@model YuktiraERP.Web.Pages.EDI.ConvertModel
+@{
+    ViewData["Title"] = "EDI Message Conversion";
+}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><i class="bi bi-arrow-right-circle me-2"></i>EDI Message Conversion</h3>
+            <span class="badge">Convert</span>
+        </div>
+        <div class="actions">
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Conversion Parameters</div>
+        <div class="zqm-row cols-2">
+            <div class="zqm-field">
+                <label>Standard *</label>
+                <select id="convertStandard">
+                    <option value="EDIFACT">EDIFACT</option>
+                    <option value="X12">X12</option>
+                </select>
+            </div>
+            <div class="zqm-field">
+                <label>Document Type *</label>
+                <select id="convertDocType">
+                    <option value="PurchaseOrder">Purchase Order</option>
+                    <option value="Invoice">Invoice</option>
+                </select>
+            </div>
+        </div>
+        <div class="zqm-row cols-1">
+            <div class="zqm-field">
+                <label>JSON Payload *</label>
+                <textarea id="convertInput" rows="12" placeholder='{"orderNumber":"PO-001","supplier":"ACME","items":[{"sku":"SKU001","quantity":10,"price":25.50}]}' style="font-family:Consolas,monospace;font-size:0.82rem"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+            <button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0" onclick="doConvert()"><i class="bi bi-arrow-right-circle me-1"></i>Convert</button>
+            <button type="button" class="zqm-btn" onclick="copyOutput()" id="btnCopy" style="display:none"><i class="bi bi-clipboard me-1"></i>Copy Output</button>
+        </div>
+    </div>
+
+    <div class="zqm-results" id="resultSection" style="display:none">
+        <div class="zqm-results-header">
+            <h4>Converted EDI Output</h4>
+            <span class="zqm-badge passed" id="outputBadge" style="display:none"></span>
+        </div>
+        <div style="padding:16px">
+            <div class="zqm-alert success" id="convertSuccess" style="display:none"></div>
+            <div class="zqm-alert error" id="convertError" style="display:none"></div>
+            <textarea id="convertOutput" rows="15" readonly style="width:100%;font-family:Consolas,monospace;font-size:0.82rem;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;padding:12px;resize:vertical"></textarea>
+        </div>
+    </div>
+</div>
+
+<script>
+var token = document.querySelector('input[name="__RequestVerificationToken"]');
+
+function doConvert() {
+    var standard = document.getElementById('convertStandard').value;
+    var docType = document.getElementById('convertDocType').value;
+    var input = document.getElementById('convertInput').value.trim();
+
+    if (!input) { alert('Please enter JSON payload'); return; }
+
+    document.getElementById('resultSection').style.display = '';
+    document.getElementById('convertSuccess').style.display = 'none';
+    document.getElementById('convertError').style.display = 'none';
+    document.getElementById('convertOutput').value = '';
+    document.getElementById('btnCopy').style.display = 'none';
+    document.getElementById('outputBadge').style.display = 'none';
+
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['RequestVerificationToken'] = token.value; }
+
+    fetch('/api/integration/edi/convert/' + standard + '/' + docType, {
+        method: 'POST',
+        headers: headers,
+        body: input
+    }).then(function(r) {
+        return r.text().then(function(text) {
+            if (r.ok) {
+                document.getElementById('convertOutput').value = text;
+                document.getElementById('convertSuccess').textContent = 'Conversion successful (' + standard + ' / ' + docType + ')';
+                document.getElementById('convertSuccess').style.display = '';
+                document.getElementById('outputBadge').textContent = 'SUCCESS';
+                document.getElementById('outputBadge').style.display = '';
+                document.getElementById('btnCopy').style.display = '';
+            } else {
+                document.getElementById('convertError').textContent = 'Error: ' + text;
+                document.getElementById('convertError').style.display = '';
+            }
+        });
+    }).catch(function(err) {
+        document.getElementById('convertError').textContent = 'Network error: ' + err.message;
+        document.getElementById('convertError').style.display = '';
+    });
+}
+
+function copyOutput() {
+    var output = document.getElementById('convertOutput');
+    output.select();
+    document.execCommand('copy');
+    var btn = document.getElementById('btnCopy');
+    btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+    setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copy Output'; }, 2000);
+}
+</script>
