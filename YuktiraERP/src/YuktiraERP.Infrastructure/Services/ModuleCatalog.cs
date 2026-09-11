@@ -44,7 +44,7 @@ public class ModuleCatalog : IModuleCatalog
 
         // ── Analytics ──
         new() { Code = "BI", Name = "BI Reports",            Category = "Analytics",  BaseRoute = "/BI", Icon = "bi-graph-up",           Color = "#2563eb" },
-        new() { Code = "AI", Name = "AI Analytics",          Category = "Analytics",  BaseRoute = "/Transactions/Engine/AIOCR", Icon = "bi-cpu", Color = "#9333ea" },
+        new() { Code = "AI", Name = "AI & Vision",           Category = "Analytics",  BaseRoute = "/AI", Icon = "bi-cpu", Color = "#9333ea" },
         new() { Code = "PD", Name = "PP/DS Scheduling",      Category = "Analytics",  BaseRoute = "/Transactions/Engine/PPDS", Icon = "bi-calendar-range", Color = "#7c3aed" },
 
         // ── Compliance ──
@@ -60,6 +60,7 @@ public class ModuleCatalog : IModuleCatalog
         new() { Code = "ADM", Name = "Administration",       Category = "System",     BaseRoute = "/Admin", Icon = "bi-gear-wide", Color = "#6b7280", IsSystem = true },
         new() { Code = "CST", Name = "Customize",            Category = "System",     BaseRoute = "/Customization", Icon = "bi-sliders", Color = "#4f46e5", IsSystem = true },
         new() { Code = "INT", Name = "Integration Hub",      Category = "System",     BaseRoute = "/Integration", Icon = "bi-hdd-rack", Color = "#0d9488", IsSystem = true },
+        new() { Code = "EDI", Name = "EDI & B2B",            Category = "System",     BaseRoute = "/EDI", Icon = "bi-arrow-left-right", Color = "#0d9488", IsSystem = true },
         new() { Code = "PLG", Name = "Plugins",              Category = "System",     BaseRoute = "/Plugins/Manage", Icon = "bi-puzzle", Color = "#6b7280", IsSystem = true },
         new() { Code = "ME", Name = "MRP Events",            Category = "System",     BaseRoute = "/Transactions/Engine/MRPEVT", Icon = "bi-lightning", Color = "#d97706", IsSystem = true },
     };

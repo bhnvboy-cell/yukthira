@@ -107,11 +107,11 @@ app.UseMiddleware<TenantMiddleware>();
 app.UseMiddleware<TenantCultureMiddleware>();
 app.UseRequestLocalization();
 app.UseStaticFiles();
-app.UseMiddleware<ApiReverseProxyMiddleware>();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ApiReverseProxyMiddleware>();
 
 app.UseMiddleware<ModuleAuthorizationMiddleware>();
 

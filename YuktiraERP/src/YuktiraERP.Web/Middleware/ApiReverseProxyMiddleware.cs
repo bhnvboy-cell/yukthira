@@ -24,11 +24,20 @@ public class ApiReverseProxyMiddleware
                 targetRequest.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
             }
 
+            var accessToken = context.User?.FindFirst("AccessToken")?.Value;
+            if (!string.IsNullOrWhiteSpace(accessToken))
+                targetRequest.Headers.TryAddWithoutValidation("Authorization", $"Bearer {accessToken}");
+
+            var tenantId = context.User?.FindFirst("TenantId")?.Value;
+            if (!string.IsNullOrWhiteSpace(tenantId))
+                targetRequest.Headers.TryAddWithoutValidation("X-Tenant-Id", tenantId);
+
             foreach (var header in context.Request.Headers)
             {
                 if (header.Key.Equals("Host", StringComparison.OrdinalIgnoreCase) ||
                     header.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase) ||
-                    header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
+                    header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase) ||
+                    header.Key.Equals("Cookie", StringComparison.OrdinalIgnoreCase))
                     continue;
                 targetRequest.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }

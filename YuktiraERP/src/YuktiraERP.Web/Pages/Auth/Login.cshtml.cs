@@ -58,9 +58,9 @@ public class LoginModel : PageModel
             ErrorMessage = ex.Message;
             return Page();
         }
-        catch
+        catch (Exception ex)
         {
-            ErrorMessage = "Invalid credentials. Please try again.";
+            ErrorMessage = $"Login failed: {ex.Message}";
             return Page();
         }
     }
