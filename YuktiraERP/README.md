@@ -118,7 +118,7 @@ YuktiraERP/
 | **Projects & Labs** | PS · LIMS |
 | **Analytics** | BI · AI · PD |
 | **Compliance** | SX |
-| **System** | WF · APP · NOT · TCD · TCG · AUD · ADM · CST · INT · PLG · ME |
+| **System** | WF · APP · NOT · TCD · TCG · AUD · ADM · CST · INT · EDI · PLG · ME |
 
 ---
 
@@ -234,6 +234,47 @@ Domain Action → AppendEventAsync → Event Store (PostgreSQL JSONB)
 
 **Supported Aggregates:** Material, StockBalance, PurchaseOrder, SalesOrder, GoodsReceipt, GoodsIssue, InspectionLot, UsageDecision, Vendor, Customer, JournalEntry, ProductionOrder
 
+### Superadmin Module Master Data Sync Engine
+
+| Component | Description |
+|-----------|-------------|
+| **IModuleDataSyncService** | Dynamic entity inspection via EF Core reflection. Generates styled `.xlsx` templates for any of 51 module entities. |
+| **Bulk Parser & Validator** | Row-level validation: required fields, type checks, business key uniqueness, FK validation. Returns cell-level error references. |
+| **Transactional UPSERT** | `IDbContextTransaction(Serializable)` — inserts new records, updates existing by business key. Full rollback on failure. |
+| **Domain Event Audit** | Successful syncs append `DataSync.Completed` events to `yuktira_sys.domain_events` for full auditability. |
+
+**3-Step Wizard Flow:**
+```
+Step 1: Select Module → View Schema → Download .xlsx Template
+           │
+           ├── 51 modules across MM, SD, FI, CO, PP, QM, WM, HR, LIMS, PM, CRM, PS, BI
+           ├── Navy headers (#1F497D), red required indicators
+           ├── Auto-generated dropdown validation for enums
+           └── Instruction + Schema + Data sheets
+           │
+Step 2: Drag-and-Drop Upload → Auto-Validate
+           │
+           ├── Required field detection
+           ├── Business key uniqueness (file-scoped)
+           ├── Type conversion validation (GUID, int, decimal, DateTime, enum)
+           ├── Max length enforcement
+           └── Cell-level error references (e.g. "B5")
+           │
+Step 3: Review Results → Sync Data
+           │
+           ├── "Sync Data Now" (100% validation pass)
+           ├── "Sync with Skip Errors" (user confirms)
+           ├── Full transaction rollback on DB constraint failure
+           └── Inserted/Updated/Skipped/Failed counts + elapsed time
+```
+
+**Template Formatting Specs:**
+- Header Row: Dark Navy background (#1F497D), white bold text
+- Required columns: Red header text with `*` indicator
+- Data Validation: Dropdown lists for enum columns (up to 50 values)
+- Instruction Sheet: Formatting guidelines (YYYY-MM-DD dates, string padding)
+- Schema Sheet: Full column metadata (type, required, business key, max length, default, lookup source)
+
 ---
 
 ## E2E Pipeline (SAP Transaction Codes)
@@ -294,7 +335,7 @@ PO ──► GR(101) ──► Inspection Lot ──► UD ──► Release(321
 
 ## API Reference
 
-### REST API (55 Controllers)
+### REST API (56 Controllers)
 
 | Module | Route | Operations |
 |--------|-------|-----------|
@@ -378,6 +419,13 @@ GET  /api/v2/events/count                         # Get event count
 POST /api/v2/notifications/low-stock              # Low stock alert
 POST /api/v2/notifications/production-hold        # Production hold alert
 POST /api/v2/notifications/quality-ncr            # Quality NCR alert
+
+# V2.0: Module Master Data Sync
+GET  /api/v1/data-sync/modules                    # List all 51 syncable modules
+GET  /api/v1/data-sync/metadata/{module}          # Dynamic entity schema via reflection
+GET  /api/v1/data-sync/template/{module}          # Download .xlsx template (3 sheets)
+POST /api/v1/data-sync/upload/{module}            # Upload + validate .xlsx (multipart)
+POST /api/v1/data-sync/sync                       # Execute transactional UPSERT sync
 ```
 
 ### GraphQL
@@ -426,6 +474,9 @@ query {
 | QM | `/Transactions/Engine/ZQM09` | ZQM09 | COA Generator |
 | QM | `/Transactions/Engine/ZQM10` | ZQM10 | QM Pipeline Diagnostic |
 | SD | `/SD/Billing/VF03` | VF03 | Billing document pricing conditions |
+| Admin | `/Admin/DataSync` | — | Module Master Data Sync (template, upload, validate, sync) |
+| Admin | `/AI` | — | AI Vision Inspection & NL Query |
+| Admin | `/EDI` | — | EDI B2B Trading Partners & Conversion |
 
 ---
 
@@ -522,6 +573,7 @@ SAP S/4HANA · SAP HANA · Oracle ERP · MES · LIMS
 - Offline sync queue, conflict resolution, mobile notifications
 - EDI AS2/AS4 transport, S/MIME, MDN receipts
 - CQRS event store, projections, read model snapshots
+- Module master data sync (template generation, validation, UPSERT, rollback)
 
 ```bash
 dotnet test src/YuktiraERP.Tests
@@ -553,6 +605,9 @@ dotnet test src/YuktiraERP.Tests
 | EDI B2B (AS2/AS4) | ✅ | ✅ | ✅ | ✅ |
 | CQRS Event Sourcing | ✅ | ✅ | ✅ | ❌ |
 | E2E Pipeline Diagnostic | ✅ | ❌ | ❌ | ❌ |
+| Module Master Data Sync | ✅ | ✅ | ✅ | ✅ |
+| Dynamic Template Generation | ✅ | ❌ | ❌ | ❌ |
+| UPSERT with Rollback | ✅ | ✅ | ✅ | ✅ |
 | UD Reversal Engine | ✅ | ✅ | ✅ | ✅ |
 | **TCO (5 years)** | **$0** | **$2M-10M** | **$1M-5M** | **$500K-2M** |
 
