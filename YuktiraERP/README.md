@@ -1,13 +1,13 @@
 <div align="center">
 
-# YuktiraERP v2.0.0
+# YuktiraERP v2.1.0
 
 ### Open-Source Enterprise Resource Planning
 
 **.NET 10 · PostgreSQL 18 · GraphQL · SignalR · AI/ML**
 
 [![Tests](https://img.shields.io/badge/tests-275%20passing-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-2.0.0-blue)]()
+[![Version](https://img.shields.io/badge/version-2.1.0-blue)]()
 [![License](https://img.shields.io/badge/license-open%20source-green)]()
 
 > **99%+ cost savings vs SAP S/4HANA · 90%+ vs Dynamics 365**
@@ -629,7 +629,7 @@ Open Source — Free for commercial and personal use.
 
 <div align="center">
 
-**v2.0.0** · Built with ❤️ to democratize enterprise ERP
+**v2.1.0** · Built with ❤️ to democratize enterprise ERP
 
 [GitHub](https://github.com/bhnvboy-cell/yukthira)
 
