@@ -203,6 +203,10 @@ public static class InfrastructureRegistration
         services.AddScoped<IEventStoreService, EventStoreService>();
         services.AddScoped<IEventProjectionService, EventProjectionService>();
 
+        // Module Data Sync: Template generation, validation, bulk upload
+        services.AddScoped<IModuleDataSyncService, ModuleDataSyncService>();
+        services.AddSingleton<ISyncSessionStore, SyncSessionStore>();
+
         // Module Gap: SD
         services.AddScoped<ICreditManagementService, CreditManagementService>();
         services.AddScoped<ISchedulingAgreementService, SchedulingAgreementService>();

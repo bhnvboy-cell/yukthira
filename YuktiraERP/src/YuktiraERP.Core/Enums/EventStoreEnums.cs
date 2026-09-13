@@ -20,7 +20,8 @@ public enum AggregateType
     Vendor = 8,
     Customer = 9,
     JournalEntry = 10,
-    ProductionOrder = 11
+    ProductionOrder = 11,
+    System = 12
 }
 
 public enum ProjectionStatus

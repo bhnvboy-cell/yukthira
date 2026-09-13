@@ -48,7 +48,12 @@ builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptio
     options.RequestCultureProviders.Add(new Microsoft.AspNetCore.Localization.CookieRequestCultureProvider());
 });
 
-builder.Services.AddControllers(options => options.Conventions.Add(new ApiVersionRouteConvention()));
+builder.Services.AddControllers(options => options.Conventions.Add(new ApiVersionRouteConvention()))
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

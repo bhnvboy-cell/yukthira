@@ -1,0 +1,390 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.DataSyncModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Data Sync — Module Master Upload";
+    var step = Model.CurrentStep;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Data Sync — Module Master Upload</h2>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-@(Model.IsError ? "danger" : "success") alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Step Indicators -->
+<div class="d-flex align-items-center mb-4">
+    <div class="step-indicator @(step >= 1 ? "active" : "")">
+        <span class="step-number">1</span>
+        <span class="step-label">Select Module</span>
+    </div>
+    <div class="step-line @(step >= 2 ? "active" : "")"></div>
+    <div class="step-indicator @(step >= 2 ? "active" : "")">
+        <span class="step-number">2</span>
+        <span class="step-label">Upload & Validate</span>
+    </div>
+    <div class="step-line @(step >= 3 ? "active" : "")"></div>
+    <div class="step-indicator @(step >= 3 ? "active" : "")">
+        <span class="step-number">3</span>
+        <span class="step-label">Review & Sync</span>
+    </div>
+</div>
+
+<style>
+    .step-indicator { display:flex; align-items:center; gap:8px; }
+    .step-number { width:32px; height:32px; border-radius:50%; background:#dee2e6; color:#6c757d;
+                   display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px; }
+    .step-indicator.active .step-number { background:#1F497D; color:#fff; }
+    .step-label { font-size:14px; color:#6c757d; }
+    .step-indicator.active .step-label { color:#1F497D; font-weight:600; }
+    .step-line { flex:1; height:2px; background:#dee2e6; margin:0 12px; }
+    .step-line.active { background:#1F497D; }
+    .upload-zone { border:2px dashed #ccc; border-radius:12px; padding:40px; text-align:center;
+                   background:#f8f9fa; cursor:pointer; transition: all .2s; }
+    .upload-zone:hover, .upload-zone.dragover { border-color:#1F497D; background:#e8eef6; }
+    .validation-table { font-size:12px; max-height:400px; overflow-y:auto; }
+    .error-cell { background:#fff5f5; }
+    .error-badge { background:#dc3545; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; }
+    .ok-badge { background:#198754; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px; }
+    .meta-table th { background:#1F497D; color:#fff; padding:6px 10px; }
+    .meta-table td { padding:5px 10px; border-bottom:1px solid #dee2e6; }
+    .required-col { color:#dc3545; font-weight:600; }
+    .info-banner { background:#e8eef6; border-left:4px solid #1F497D; padding:10px 14px; border-radius:0 8px 8px 0; }
+</style>
+
+<!-- STEP 1: Module Selection -->
+@if (step == 1 || (step == 2 && Model.ValidationResult == null) || (step == 3 && Model.ValidationResult == null && Model.SyncResult == null))
+{
+<div class="card shadow-sm">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Step 1 — Select Module</h5></div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="SelectModule">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Target Module Entity</label>
+                    <select asp-for="ModuleSelection" class="form-select" id="moduleSelect">
+                        <option value="">— Select a module —</option>
+                        @foreach (var mod in Model.Modules.GroupBy(m => m.Category).OrderBy(g => g.Key))
+                        {
+                            <optgroup label="@mod.Key">
+                                @foreach (var m in mod.OrderBy(m => m.Label))
+                                {
+                                    <option value="@m.Value">@m.Label (@m.EntityTypeName) — @m.ColumnCount columns</option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                    <button type="submit" asp-page-handler="SelectModule" class="btn btn-primary" id="btnSelect">
+                        <i class="bi bi-check-circle me-1"></i>Select
+                    </button>
+                    <button type="submit" asp-page-handler="DownloadTemplate" class="btn btn-outline-success" id="btnDownload" disabled>
+                        <i class="bi bi-download me-1"></i>Download Template
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        @if (Model.Metadata != null)
+        {
+            <hr />
+            <div class="info-banner mb-3">
+                <strong>@Model.Metadata.DisplayName</strong> — @Model.Metadata.EntityTypeName<br />
+                <small>@Model.Metadata.Columns.Count columns — @Model.Metadata.Columns.Count(c => c.IsRequired) required</small>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm meta-table">
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Business Key</th>
+                            <th>Max Length</th>
+                            <th>Default</th>
+                            <th>Lookup Source</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var col in Model.Metadata.Columns)
+                        {
+                            <tr>
+                                <td class="@(col.IsRequired ? "required-col" : "")">
+                                    @col.PropertyName
+                                    @if (col.IsRequired) { <span class="text-danger">*</span> }
+                                </td>
+                                <td><code>@col.DataType</code></td>
+                                <td>@(col.IsRequired ? "YES" : "—")</td>
+                                <td>@(col.IsPrimaryKey ? "KEY" : "—")</td>
+                                <td>@(col.MaxLength?.ToString() ?? "—")</td>
+                                <td>@(col.DefaultValue ?? "—")</td>
+                                <td><small>@(col.LookupSource ?? "—")</small></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <form method="post" asp-page-handler="DownloadTemplate">
+                    <input type="hidden" asp-for="ModuleSelection" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bi bi-file-earmark-excel me-2"></i>Download Master Template (.xlsx)
+                    </button>
+                    <small class="text-muted ms-2">Includes Instruction sheet, Schema sheet, and Data entry sheet with validation</small>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+}
+
+<!-- STEP 2: Upload & Validate -->
+@if (step == 2 && Model.ValidationResult == null)
+{
+<div class="card shadow-sm mt-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>Step 2 — Upload Filled Template</h5></div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="Upload" enctype="multipart/form-data" id="uploadForm">
+            <input type="hidden" asp-for="ModuleSelection" />
+            <input type="hidden" asp-for="CurrentStep" value="2" />
+
+            <div class="upload-zone" id="uploadZone">
+                <i class="bi bi-cloud-arrow-up display-4 text-primary"></i>
+                <p class="mt-2 mb-1 fw-bold">Drag & drop your filled .xlsx template here</p>
+                <p class="text-muted small">or click to browse files</p>
+                <input type="file" asp-for="UploadedFile" accept=".xlsx" class="d-none" id="fileInput" />
+                <div id="fileInfo" class="mt-2 fw-bold text-success" style="display:none;"></div>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button type="submit" class="btn btn-primary btn-lg" id="btnUpload" disabled>
+                    <i class="bi bi-upload me-1"></i>Upload & Validate
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<!-- STEP 3: Validation Results & Sync -->
+@if (step == 3 || Model.ValidationResult != null)
+{
+    var vr = Model.ValidationResult;
+    var sr = Model.SyncResult;
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Step 3 — @(sr != null ? "Sync Results" : "Validation Results")</h5>
+        @if (vr != null)
+        {
+            <div>
+                <span class="ok-badge">@(vr.ValidRows) Valid</span>
+                @if (vr.ErrorRows > 0) { <span class="error-cell"><span class="error-badge">@(vr.ErrorRows) Errors</span></span> }
+            </div>
+        }
+    </div>
+    <div class="card-body">
+        @if (sr != null)
+        {
+            <!-- Sync Results -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center p-3 @(sr.Success ? "border-success" : "border-danger")">
+                        <div class="display-6 @(sr.Success ? "text-success" : "text-danger")">
+                            <i class="bi bi-@(sr.Success ? "check-circle-fill" : "x-circle-fill")"></i>
+                        </div>
+                        <h6 class="mt-2">@(sr.Success ? "Sync Complete" : "Sync Failed")</h6>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3">
+                        <div class="h3 text-primary mb-0">@sr.Inserted</div>
+                        <small>Inserted</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3">
+                        <div class="h3 text-warning mb-0">@sr.Updated</div>
+                        <small>Updated</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3">
+                        <div class="h3 text-info mb-0">@sr.ElapsedMs ms</div>
+                        <small>Duration</small>
+                    </div>
+                </div>
+            </div>
+
+            @if (!sr.Success && sr.Errors.Any())
+            {
+                <h6>Sync Errors:</h6>
+                <div class="table-responsive validation-table">
+                    <table class="table table-sm table-striped">
+                        <thead><tr><th>Row</th><th>Column</th><th>Cell</th><th>Code</th><th>Error</th></tr></thead>
+                        <tbody>
+                            @foreach (var err in sr.Errors.Take(100))
+                            {
+                                <tr class="error-cell">
+                                    <td>@err.RowNumber</td>
+                                    <td>@err.ColumnName</td>
+                                    <td><code>@err.CellReference</code></td>
+                                    <td><span class="error-badge">@err.ErrorCode</span></td>
+                                    <td>@err.ErrorMessage</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="mt-3">
+                <a asp-page="/Admin/DataSync" class="btn btn-primary">
+                    <i class="bi bi-arrow-repeat me-1"></i>Start New Sync
+                </a>
+            </div>
+        }
+        else if (vr != null)
+        {
+            <!-- Validation Results -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center p-3">
+                        <div class="h3 mb-0">@vr.TotalRows</div>
+                        <small>Total Rows</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3 border-success">
+                        <div class="h3 text-success mb-0">@vr.ValidRows</div>
+                        <small>Valid</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3 @(vr.ErrorRows > 0 ? "border-danger" : "")">
+                        <div class="h3 @(vr.ErrorRows > 0 ? "text-danger" : "text-muted") mb-0">@vr.ErrorRows</div>
+                        <small>Errors</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center p-3 @(vr.DuplicateRows > 0 ? "border-warning" : "")">
+                        <div class="h3 @(vr.DuplicateRows > 0 ? "text-warning" : "text-muted") mb-0">@vr.DuplicateRows</div>
+                        <small>Duplicates</small>
+                    </div>
+                </div>
+            </div>
+
+            @if (vr.RowErrors.Any())
+            {
+                <h6>Row Errors <small class="text-muted">(showing first 200)</small></h6>
+                <div class="table-responsive validation-table">
+                    <table class="table table-sm table-striped">
+                        <thead><tr><th>Row</th><th>Column</th><th>Cell</th><th>Code</th><th>Severity</th><th>Error</th></tr></thead>
+                        <tbody>
+                            @foreach (var err in vr.RowErrors.Take(200))
+                            {
+                                <tr class="error-cell">
+                                    <td>@err.RowNumber</td>
+                                    <td>@err.ColumnName</td>
+                                    <td><code>@err.CellReference</code></td>
+                                    <td><span class="error-badge">@err.ErrorCode</span></td>
+                                    <td>@err.Severity</td>
+                                    <td>@err.ErrorMessage</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="mt-4 d-flex gap-3 align-items-center">
+                <form method="post" asp-page-handler="Sync">
+                    <input type="hidden" asp-for="ModuleSelection" />
+                    <input type="hidden" asp-for="SessionToken" value="@vr.SessionToken" />
+                    <input type="hidden" asp-for="CurrentStep" value="3" />
+
+                    @if (vr.IsValid)
+                    {
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-lightning-charge me-1"></i>Sync Data Now
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="form-check mb-2">
+                            <input type="checkbox" asp-for="SkipErrors" class="form-check-input" id="skipErrors" />
+                            <label class="form-check-label" for="skipErrors">
+                                Skip rows with errors and sync valid rows only
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-lg" id="btnSyncWithError">
+                            <i class="bi bi-lightning-charge me-1"></i>Sync (Skip Errors)
+                        </button>
+                    }
+                </form>
+
+                <form method="post" asp-page-handler="SelectModule">
+                    <input type="hidden" asp-for="ModuleSelection" />
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Upload
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const moduleSelect = document.getElementById('moduleSelect');
+    const btnSelect = document.getElementById('btnSelect');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnUpload = document.getElementById('btnUpload');
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+
+    if (moduleSelect) {
+        moduleSelect.addEventListener('change', function() {
+            const hasVal = this.value !== '';
+            if (btnSelect) btnSelect.disabled = !hasVal;
+            if (btnDownload) btnDownload.disabled = !hasVal;
+        });
+    }
+
+    if (uploadZone && fileInput) {
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                showFileInfo(e.dataTransfer.files[0]);
+            }
+        });
+        fileInput.addEventListener('change', function() {
+            if (this.files.length) showFileInfo(this.files[0]);
+        });
+    }
+
+    function showFileInfo(file) {
+        if (fileInfo) {
+            fileInfo.style.display = 'block';
+            fileInfo.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+        }
+        if (btnUpload) btnUpload.disabled = false;
+    }
+});
+</script>
