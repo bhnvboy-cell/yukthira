@@ -312,6 +312,18 @@ Entities: WorkflowDefinition, WorkflowNode, WorkflowEdge, WorkflowInstance, Work
 ### AI Engine
 9 forecasting models — 5 original (Moving Average, Weighted MA, Exponential Smoothing, Linear Regression, Seasonal Decomposition) + 4 advanced (Holt-Winters triple exponential smoothing, ARIMA with differencing + AR + MA components, anomaly detection via ZScore/IQR/MovingAverageDeviation, accuracy dashboard with MAPE/MAE/RMSE/R² metrics). Demand prediction from real sales/production data. Safety stock calculation with service level Z-scores. Stock alert generation.
 
+### AI Vision Inspection (ZQM-V01/V02/V03)
+Full-stack AI-powered visual quality inspection system integrated with QM module. **Backend:** `VisionInspectionController` (API) — single image inspect, batch inspect (up to 200 MB), model training, model evaluation, defect type/severity enums, inspection history via NC service. `NlQueryController` (API) — natural language to SQL translation, entity type suggestions, auto-complete. **Interfaces:** `IQualityVisionInspectionEngine` (InspectImageAsync, InspectBatchAsync, TrainModelAsync, EvaluateModelAsync), `INaturalLanguageQueryEngine` (ExecuteQueryAsync, GetSuggestionsAsync). **Defect detection:** scratch, dent, discoloration, crack, contamination — severity classified as Critical/High/Medium/Low with confidence scoring. **Automated NC creation:** failed inspections auto-generate non-conformance records via `IZqmNonConformanceService`. **Web UI (6 pages):**
+
+| Page | TCode | Description |
+|------|-------|-------------|
+| AI/Index | — | Dashboard hub: 4 KPIs (inspections today, models trained, NL queries, detection accuracy), 3-tab layout (Vision/NL Query/Predictive Analytics), quick-launch cards |
+| AI/Vision/Inspect | ZQM-V01 | Single image inspection: file upload + material/plant/lot params → verdict (PASS/FAIL), confidence %, severity badge, defect type, defect region overlays, auto-NC creation |
+| AI/Vision/BatchInspection | ZQM-V02 | Multi-image batch inspection: upload multiple images → pass/fail summary, severity breakdown (Critical/High/Medium/Low counts), per-image result grid |
+| AI/Vision/ModelTraining | ZQM-V03 | Custom model training: upload labeled images, configure epochs/learning rate/validation split/defect label → training results (accuracy, precision, recall, F1). Model evaluation tab with confusion matrix |
+| AI/Vision/History | — | Historical inspection results: defect trends, NC generation records, filterable by date/material/plant |
+| AI/NLQuery/Index | — | NL2SQL engine: plain English textarea → translated SQL display + result table with column headers, row count, execution time. Pre-built query suggestions (defects by plant, stock overview, open POs, overdue deliveries) |
+
 ### MRP Engine
 Multi-level BOM explosion, gross/net requirement calculation, shortage detection, planned order generation, capacity load calculation, safety stock monitoring. **Extensions:** multi-plant planning scoped to PlantEntity, vendor lead-time integration adjusting order dates from VendorLeadTimeEntity, production capacity leveling with overtime/shift suggestions, MRP run history recording (run_type, materials_processed, duration_ms), SAP-style exception messages (STOCK_SHORTAGE, NO_VENDOR, LONG_LEAD_TIME).
 
@@ -798,6 +810,61 @@ curl http://localhost:5000/api/v1/ai/forecast-dashboard/{materialId} \
   -H "Authorization: Bearer <token>"
 ```
 
+### AI — Vision Inspection API
+```bash
+# Single image inspection
+curl -X POST http://localhost:5000/api/v1/vision/inspect/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "image=@defect_sample.jpg" \
+  -F "materialCode=MAT-001" \
+  -F "plant=1000" \
+  -F "inspectionLotNumber=IL-20260001"
+
+# Batch inspection (multiple images)
+curl -X POST http://localhost:5000/api/v1/vision/batch/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "images=@img1.jpg" -F "images=@img2.jpg" -F "images=@img3.jpg" \
+  -F "materialCode=MAT-001" \
+  -F "plant=1000" \
+  -F "inspectionLotNumber=IL-20260001"
+
+# Train custom vision model
+curl -X POST http://localhost:5000/api/v1/vision/train \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"modelName":"defect-detector-v2","label":"scratch","maxEpochs":50,"learningRate":0.001,"validationSplit":0.2}'
+
+# Evaluate model accuracy
+curl -X POST http://localhost:5000/api/v1/vision/evaluate \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"modelName":"defect-detector-v2"}'
+
+# Get inspection history
+curl http://localhost:5000/api/v1/vision/history?limit=50 \
+  -H "Authorization: Bearer <token>"
+
+# List defect types and severity levels
+curl http://localhost:5000/api/v1/vision/defect-types
+curl http://localhost:5000/api/v1/vision/severity-levels
+```
+
+### AI — Natural Language Query API
+```bash
+# Execute NL query (plain English → SQL)
+curl -X POST http://localhost:5000/api/v1/ai/nlquery/execute \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"Show me all inspection lots with critical defects from plant 1000"}'
+
+# Get query suggestions
+curl "http://localhost:5000/api/v1/ai/nlquery/suggestions?q=stock" \
+  -H "Authorization: Bearer <token>"
+
+# List supported entity types
+curl http://localhost:5000/api/v1/ai/nlquery/entity-types
+```
+
 ### MRP — Extended
 ```bash
 # Run MRP with multi-plant scope
@@ -1232,6 +1299,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 2.1.0 | September 2026 | AI Vision Inspection (ZQM-V01/V02/V03), NL2SQL Query Engine, Module Master Data Sync (51 modules), centralized versioning |
 | 1.0.8 | August 2026 | WM/PP/QM/PM module upgrades with SAP-grade parameters, 75 TCode layouts (21 new), TCode Engine API fixes, 5 new entities, comprehensive user guide |
 | 1.0.7 | August 2026 | Yuktira enterprise creation forms: 12 forms across MM/SD/QM/PP/FI/WM upgraded to tabbed layout with standardized fields (types, valuation, org assignments, line items with auto-calc), enterprise-form.css/js, _ModuleLayout.cshtml universal layout, 7-language localization, 4 UI themes, session timeout, dynamic action buttons |
 | 1.0.5 | August 2026 | Health checks + Serilog + Prometheus metrics, dark mode, real SuperUserController (unlock/reset/impersonate/module toggle/audit summary), webhook defect fixes, EDI trading-partner profiles + acknowledgments, PWA installable web app, PP module tenant isolation, webhook dispatch consolidation, real SAP HANA connector, CVE fixes |
@@ -1242,6 +1310,11 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**2.1.0 (September 2026)**
+- **AI Vision Inspection Module (ZQM-V01/V02/V03)**: Full-stack AI-powered visual quality inspection. `VisionInspectionController` — single image inspect, batch inspect (200 MB upload), model training, model evaluation, defect type/severity enums, NC history. `NlQueryController` — NL2SQL query engine with entity type suggestions and auto-complete. `IQualityVisionInspectionEngine` interface with InspectImageAsync/InspectBatchAsync/TrainModelAsync/EvaluateModelAsync. Defect detection: scratch, dent, discoloration, crack, contamination with Critical/High/Medium/Low severity and confidence scoring. Auto-NC creation on failed inspections via `IZqmNonConformanceService`. 6 Razor pages: AI/Index (dashboard hub with 4 KPIs, 3 tabs), AI/Vision/Inspect (single image → PASS/FAIL verdict + confidence + defect regions), AI/Vision/BatchInspection (multi-image → pass/fail summary + severity breakdown), AI/Vision/ModelTraining (custom model training with epochs/LR/validation split + evaluation with confusion matrix), AI/Vision/History (historical defect trends), AI/NLQuery/Index (NL2SQL with translated SQL display + result table + query suggestions)
+- **Module Master Data Sync**: Dynamic template generation, bulk upload, validation, and transactional UPSERT for 51 module entities via `DataSyncController` and `ModuleDataSyncService`. 3-step wizard UI at Admin/DataSync
+- All 275 tests pass, build clean
 
 **1.1.0 (September 2026)**
 - **UD Reversal & Stock Reversion Engine (ZQIC Equivalent)**: Full-stack implementation allowing Quality Supervisors to reverse completed Usage Decisions. `InspectionResultService.ReverseUsageDecisionAsync` executes atomic reversal via `IDbContextTransaction` — moves stock from Unrestricted/Blocked back to QualityInspection (Movement Type 322), resets lot status to `InInspection`, sets UD code to `REVERSED`, and creates full audit trail in `InspectionLotAuditEntity`. New entities: `StockBalanceEntity` (yuktira_mm.stock_balances), `InspectionLotAuditEntity` (yuktira_qm.inspection_lot_audits). Razor page `Pages/QM/Inspection/ReverseUD.cshtml` with validate/reverse form, lot info grid, stock balance table, and reversal summary. SQL migration: `042_ud_reversal_tables.sql`
