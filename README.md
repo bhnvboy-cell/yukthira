@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 1.1.0** | **September 2026**
+**Version 2.1.0** | **September 2026**
 
 ---
 
@@ -33,6 +33,7 @@ Then open **http://localhost:5001** and login with:
 │   ├── YuktiraERP.Infrastructure/  EF Core, services, multi-tenant, SignalR hub
 │   ├── YuktiraERP.Api/            REST API (port 5000), middleware, SignalR
 │   ├── YuktiraERP.Web/            Web UI (port 5001)
+│   │   └── Pages/Admin/          DataSync, Users, Tenants, Plugins, SystemConfig
 │   ├── YuktiraERP.Tests/          xUnit unit/integration tests
 │   ├── YuktiraERP.WorkflowEngine/  BPMN workflow runtime (legacy in-memory)
 │   ├── YuktiraERP.AIEngine/        ML forecasting (MA, WMA, ES, LR, Seasonal, HW, ARIMA)
@@ -339,6 +340,30 @@ Multi-level BOM explosion, gross/net requirement calculation, shortage detection
 **Real-Time Dashboard:** SignalR hub at `/hubs/dashboard` with live KPI push, stock change alerts, order updates, production status, quality alerts, SOX violation notifications, anomaly detection. Auto-refresh every 30 seconds.
 
 **GraphQL API:** HotChocolate 15 endpoint at `/api/graphql` with 16 entity types, filtering, sorting, projections. Dashboard aggregation query with KPIs across all modules.
+
+### Data Sync Engine (v2.1.0)
+
+**Module Master Data Sync:** Dynamic template generation, bulk upload, validation, and transactional UPSERT for any of 51 module entities.
+
+| Component | Description |
+|-----------|-------------|
+| **Template Generator** | ClosedXML-based `.xlsx` with navy headers, red required flags, dropdown validation, instruction + schema sheets |
+| **Bulk Parser** | Parses uploaded xlsx, validates row-level (required fields, types, business keys, FK references) |
+| **Transactional Sync** | `IDbContextTransaction(Serializable)` — UPSERT by business key with full rollback on failure |
+| **Domain Event Audit** | Successful syncs append `DataSync.Completed` events for full auditability |
+
+**Supported Modules (51):** MM Material Master, MM Vendor, SD Customer, SD Sales Order, FI Accounts, CO Cost Centers, PP Production, QM Inspection, WM Storage, HR Employee, LIMS Samples, PM Equipment, CRM Leads, PS Projects, BI Reports, Admin Tenants/Users, and more.
+
+**API Endpoints:**
+```bash
+GET  /api/v1/data-sync/modules              # List all 51 syncable modules
+GET  /api/v1/data-sync/metadata/{module}    # Dynamic entity schema via EF Core reflection
+GET  /api/v1/data-sync/template/{module}    # Download .xlsx template
+POST /api/v1/data-sync/upload/{module}      # Upload + validate .xlsx (multipart)
+POST /api/v1/data-sync/sync                 # Execute transactional UPSERT
+```
+
+**Web UI:** 3-step wizard at `/Admin/DataSync` — Select Module → Upload & Validate → Review & Sync
 
 ---
 
@@ -900,6 +925,32 @@ curl -X POST http://localhost:5000/api/v1/plugins/{pluginId}/reload \
 # Get plugin status (memory, execution stats)
 curl http://localhost:5000/api/v1/plugins/{pluginId}/status \
   -H "Authorization: Bearer <token>"
+```
+
+### Data Sync (v2.1.0)
+```bash
+# List all 51 syncable modules
+curl http://localhost:5000/api/v1/data-sync/modules \
+  -H "Authorization: Bearer <token>"
+
+# Get entity metadata (dynamic via EF Core reflection)
+curl http://localhost:5000/api/v1/data-sync/metadata/MM_MaterialMaster \
+  -H "Authorization: Bearer <token>"
+
+# Download .xlsx template (Instruction + Schema + Data sheets)
+curl -o template.xlsx http://localhost:5000/api/v1/data-sync/template/MM_MaterialMaster \
+  -H "Authorization: Bearer <token>"
+
+# Upload and validate filled template
+curl -X POST http://localhost:5000/api/v1/data-sync/upload/MM_MaterialMaster \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@filled_template.xlsx"
+
+# Execute transactional UPSERT sync
+curl -X POST http://localhost:5000/api/v1/data-sync/sync \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"module":"MM_MaterialMaster","sessionToken":"<from-upload>","skipErrors":false}'
 ```
 
 ### Real-Time (SignalR)
