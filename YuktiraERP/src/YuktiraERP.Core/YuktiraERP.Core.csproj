@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Interfaces\IMovementTypeEngineService.cs" />
+    <Compile Remove="Interfaces\IUomConversionService.cs" />
   </ItemGroup>
 </Project>

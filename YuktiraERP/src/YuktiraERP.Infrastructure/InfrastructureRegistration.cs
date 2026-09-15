@@ -170,6 +170,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IStockReservationService, StockReservationService>();
         services.AddScoped<IInventoryReportingService, InventoryReportingService>();
         services.AddScoped<IInventoryValuationService, InventoryValuationService>();
+        services.AddScoped<IUomConversionService, UomConversionService>();
         services.AddSingleton<ITCodeLayoutRegistry, TCodeLayoutRegistry>();
         services.AddScoped<ITransactionSequenceService, TransactionSequenceService>();
         services.AddScoped<CacheService>();
@@ -186,6 +187,11 @@ public static class InfrastructureRegistration
         services.AddScoped<IZqmLabCalculatorService, ZqmLabCalculatorService>();
         services.AddScoped<IZqmCoaGeneratorService, ZqmCoaGeneratorService>();
         services.AddScoped<IZqmPipelineDiagnosticService, ZqmPipelineDiagnosticService>();
+
+        // QM Inspection Plan & Auto-Generation Engine
+        services.AddScoped<IInspectionPlanService, InspectionPlanService>();
+        services.AddScoped<IAutoInspectionPlanGenerator, AutoInspectionPlanGenerator>();
+        services.AddScoped<IMicService, MicService>();
 
         // V2.0: ML.NET QC Engine
         services.AddScoped<IQualityVisionInspectionEngine, QualityVisionInspectionEngine>();
@@ -225,6 +231,8 @@ public static class InfrastructureRegistration
         // Module Gap: HR
         services.AddScoped<IBenefitsService, BenefitsService>();
         services.AddScoped<ISuccessionPlanningService, SuccessionPlanningService>();
+        // MDG
+        services.AddScoped<IMdgService, MdgService>();
 
         RegisterRepositories(services);
 

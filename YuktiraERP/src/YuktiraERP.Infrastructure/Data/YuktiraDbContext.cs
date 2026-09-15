@@ -37,6 +37,10 @@ public class YuktiraDbContext : DbContext
     // QM
     public DbSet<InspectionLotEntity> InspectionLots => Set<InspectionLotEntity>();
     public DbSet<InspectionPlanEntity> InspectionPlans => Set<InspectionPlanEntity>();
+    public DbSet<MicMasterEntity> MicMasters => Set<MicMasterEntity>();
+    public DbSet<QmInspectionPlanHeaderEntity> QmInspectionPlanHeaders => Set<QmInspectionPlanHeaderEntity>();
+    public DbSet<QmInspectionPlanOperationEntity> QmInspectionPlanOperations => Set<QmInspectionPlanOperationEntity>();
+    public DbSet<QmInspectionPlanMicEntity> QmInspectionPlanMics => Set<QmInspectionPlanMicEntity>();
     public DbSet<InspectionResultEntity> InspectionResults => Set<InspectionResultEntity>();
     public DbSet<UsageDecisionEntity> UsageDecisions => Set<UsageDecisionEntity>();
     public DbSet<QualityNotificationEntity> QualityNotifications => Set<QualityNotificationEntity>();
@@ -198,6 +202,10 @@ public class YuktiraDbContext : DbContext
     public DbSet<DepartmentKeyEntity> DepartmentKeys => Set<DepartmentKeyEntity>();
     public DbSet<ReleaseStrategyEntity> ReleaseStrategies => Set<ReleaseStrategyEntity>();
     public DbSet<ReleaseCodeEntity> ReleaseCodes => Set<ReleaseCodeEntity>();
+    // Core UoM
+    public DbSet<UomDimensionEntity> UomDimensions => Set<UomDimensionEntity>();
+    public DbSet<UnitOfMeasureEntity> UnitsOfMeasure => Set<UnitOfMeasureEntity>();
+    public DbSet<MaterialUomConversionEntity> MaterialUomConversions => Set<MaterialUomConversionEntity>();
     // Customer Complaint & Return with Supplier Pass-Through Claim
     public DbSet<CustomerComplaintReturnEntity> CustomerComplaintReturns => Set<CustomerComplaintReturnEntity>();
     public DbSet<ReturnDeliveryEntity> ReturnDeliveries => Set<ReturnDeliveryEntity>();
@@ -294,6 +302,9 @@ public class YuktiraDbContext : DbContext
     // Module Gap: HR
     public DbSet<BenefitsEnrollmentEntity> BenefitsEnrollments => Set<BenefitsEnrollmentEntity>();
     public DbSet<SuccessionPlanEntity> SuccessionPlans => Set<SuccessionPlanEntity>();
+    // MDG
+    public DbSet<MdgChangeRequestEntity> MdgChangeRequests => Set<MdgChangeRequestEntity>();
+    public DbSet<MdgAuditLogEntity> MdgAuditLogs => Set<MdgAuditLogEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

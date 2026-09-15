@@ -2281,3 +2281,115 @@ public class PeriodCloseEntity : EntityBase
     public DateTime? ClosedAt { get; set; }
     public string? ClosedBy { get; set; }
 }
+
+// Core UoM Engine (T006/CUNI parity)
+public class UomDimensionEntity : EntityBase { public Guid TenantId { get; set; } public string DimensionCode { get; set; } = ""; public string SiBaseUom { get; set; } = ""; public string LongDescription { get; set; } = ""; }
+public class UnitOfMeasureEntity : EntityBase { public Guid TenantId { get; set; } public string Msehi { get; set; } = ""; public string IsoCode { get; set; } = ""; public string DimensionCode { get; set; } = ""; public decimal Numerator { get; set; } = 1; public decimal Denominator { get; set; } = 1; public decimal AddOffset { get; set; } = 0; public int Decimals { get; set; } = 2; public bool IsActive { get; set; } = true; public string ShortText { get; set; } = ""; }
+public class MaterialUomConversionEntity : EntityBase { public Guid TenantId { get; set; } public string MaterialCode { get; set; } = ""; public string SourceUomCode { get; set; } = ""; public string TargetUomCode { get; set; } = ""; public decimal ConversionFactor { get; set; } public decimal? DensityFactor { get; set; } public string? PlantCode { get; set; } public bool IsActive { get; set; } = true; }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Master Data Governance (MDG)
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class MdgChangeRequestEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string RequestNumber { get; set; } = "";
+    public string EntityName { get; set; } = "";
+    public string? EntityId { get; set; }
+    public string StagingPayload { get; set; } = "{}";
+    public string Status { get; set; } = "PendingApproval";
+    public string RequestedBy { get; set; } = "";
+    public string? ApprovedBy { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+    public DateTime? ApprovedAt { get; set; }
+    public DateTime? ActivatedAt { get; set; }
+    public string? RejectionReason { get; set; }
+    public Guid? WorkflowInstanceId { get; set; }
+}
+
+public class MdgAuditLogEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ChangeRequestId { get; set; }
+    public string Action { get; set; } = "";
+    public string Actor { get; set; } = "";
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public string? OldValue { get; set; }
+    public string? NewValue { get; set; }
+    public string HashSha256 { get; set; } = "";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// QM: MIC Master & Inspection Plan Engine
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class MicMasterEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string PlantId { get; set; } = "";
+    public string CharacteristicCode { get; set; } = "";
+    public DateTime ValidFrom { get; set; } = DateTime.UtcNow;
+    public DateTime? ValidTo { get; set; }
+    public bool IsQuantitative { get; set; }
+    public string ShortText { get; set; } = "";
+    public string Status { get; set; } = "BeingCreated";
+    public bool LowerSpecLimit { get; set; }
+    public bool UpperSpecLimit { get; set; }
+    public bool TargetValueRequired { get; set; }
+    public string ResultsConfirmation { get; set; } = "SingleResult";
+    public string Requirement { get; set; } = "RequiredCharc";
+    public int DecimalPlaces { get; set; } = 2;
+    public decimal? LowerTolerance { get; set; }
+    public decimal? UpperTolerance { get; set; }
+    public decimal? TargetValue { get; set; }
+    public int Version { get; set; } = 1;
+    public string? InspectionMethodCode { get; set; }
+    public int? InspectionMethodVersion { get; set; }
+    public string SamplingProcedureCode { get; set; } = "";
+    public string ControlKey { get; set; } = "";
+}
+
+public class QmInspectionPlanHeaderEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string GroupKey { get; set; } = "";
+    public int GroupCounter { get; set; } = 1;
+    public string? PlantId { get; set; }
+    public string? MaterialId { get; set; }
+    public string Usage { get; set; } = "5";
+    public string OverallStatus { get; set; } = "4";
+    public decimal LotSizeFrom { get; set; } = 0;
+    public decimal LotSizeTo { get; set; } = 999999;
+    public string? Description { get; set; }
+    public DateTime ValidFrom { get; set; } = DateTime.UtcNow;
+    public DateTime? ValidTo { get; set; }
+    public List<QmInspectionPlanOperationEntity> Operations { get; set; } = new();
+}
+
+public class QmInspectionPlanOperationEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid PlanHeaderId { get; set; }
+    public string OperationNo { get; set; } = "0010";
+    public string OperationDescription { get; set; } = "";
+    public string? WorkCenter { get; set; }
+    public decimal BaseQuantity { get; set; } = 1;
+    public List<QmInspectionPlanMicEntity> Characteristics { get; set; } = new();
+}
+
+public class QmInspectionPlanMicEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid PlanHeaderId { get; set; }
+    public Guid OperationId { get; set; }
+    public int CharacteristicNo { get; set; }
+    public string MicCode { get; set; } = "";
+    public string MicPlantId { get; set; } = "";
+    public int MicVersion { get; set; } = 1;
+    public bool IsQuantitative { get; set; }
+    public string ShortText { get; set; } = "";
+    public string? InspectionMethodCode { get; set; }
+    public int? InspectionMethodVersion { get; set; }
+    public string? SamplingProcedureCode { get; set; }
+}
