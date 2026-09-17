@@ -305,6 +305,13 @@ public class YuktiraDbContext : DbContext
     // MDG
     public DbSet<MdgChangeRequestEntity> MdgChangeRequests => Set<MdgChangeRequestEntity>();
     public DbSet<MdgAuditLogEntity> MdgAuditLogs => Set<MdgAuditLogEntity>();
+    // Security Import & Role Management
+    public DbSet<MasterRoleEntity> MasterRoles => Set<MasterRoleEntity>();
+    public DbSet<CompositeRoleEntity> CompositeRoles => Set<CompositeRoleEntity>();
+    public DbSet<DerivedRoleEntity> DerivedRoles => Set<DerivedRoleEntity>();
+    public DbSet<RoleTCodeAssignmentEntity> RoleTCodeAssignments => Set<RoleTCodeAssignmentEntity>();
+    public DbSet<SecurityImportBatchEntity> SecurityImportBatches => Set<SecurityImportBatchEntity>();
+    public DbSet<UserRoleAssignmentEntity> UserRoleAssignments => Set<UserRoleAssignmentEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

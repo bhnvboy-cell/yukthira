@@ -1,0 +1,531 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.RoleManagerModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Role & T-Code Manager";
+}
+
+<style>
+    .rm-header { background: #1F497D; color: #fff; padding: 16px 20px; border-radius: 8px 8px 0 0; }
+    .rm-header h4 { margin: 0; font-weight: 600; }
+    .stat-card { border: none; border-radius: 8px; transition: transform .15s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; color: #1F497D; }
+    .stat-card .stat-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; color: #6c757d; }
+    .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 3px solid transparent; }
+    .nav-tabs .nav-link.active { color: #1F497D; border-bottom-color: #1F497D; font-weight: 600; }
+    .nav-tabs .nav-link:hover { border-bottom-color: #adb5bd; }
+    .tree-node { padding: 4px 0 4px 20px; position: relative; }
+    .tree-node::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: #dee2e6; }
+    .tree-item { padding: 6px 12px; margin: 2px 0; border-radius: 6px; cursor: pointer; transition: background .15s; display: flex; align-items: center; gap: 8px; }
+    .tree-item:hover { background: #e8eef6; }
+    .tree-item .toggle-icon { width: 16px; text-align: center; font-size: 12px; color: #6c757d; }
+    .tree-item .role-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .badge-composite { background: #1F497D; color: #fff; }
+    .badge-derived { background: #0d6efd; color: #fff; }
+    .badge-master { background: #198754; color: #fff; }
+    .tcode-badge { background: #6c757d; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; }
+    .table-rm th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .table-rm td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .table-rm tbody tr:hover { background: #f0f4fa; }
+    .status-active { color: #198754; font-weight: 600; }
+    .status-inactive { color: #dc3545; font-weight: 600; }
+    .import-zone { border: 2px dashed #ccc; border-radius: 10px; padding: 30px; text-align: center; background: #f8f9fa; transition: all .2s; }
+    .import-zone:hover { border-color: #1F497D; background: #e8eef6; }
+    .filter-bar { background: #f8f9fa; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.7); z-index: 9999; display: none; align-items: center; justify-content: center; }
+    .loading-overlay.show { display: flex; }
+    .tree-children { overflow: hidden; transition: max-height .3s ease; }
+    .tree-children.collapsed { max-height: 0; }
+    .expand-all-btn { font-size: 12px; padding: 2px 8px; }
+    .search-highlight { background: #fff3cd; padding: 0 2px; border-radius: 2px; }
+</style>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Role & T-Code Manager</h2>
+    <button class="btn btn-sm btn-outline-secondary expand-all-btn" onclick="toggleAllNodes()" id="btnExpandAll">
+        <i class="bi bi-arrows-expand me-1"></i>Expand All
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-@(Model.IsError ? "danger" : "success") alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card shadow-sm text-center p-3">
+            <div class="stat-value">@Model.TotalRoles</div>
+            <div class="stat-label">Total Roles</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card shadow-sm text-center p-3">
+            <div class="stat-value">@Model.TotalTcodes</div>
+            <div class="stat-label">Total T-Codes</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card shadow-sm text-center p-3">
+            <div class="stat-value">@Model.CompositeRoles.Count</div>
+            <div class="stat-label">Composite Roles</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card shadow-sm text-center p-3">
+            <div class="stat-value">@Model.RoleHierarchy.Sum(r => r.DerivedRoles.Count)</div>
+            <div class="stat-label">Derived Roles</div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tabHierarchy">
+            <i class="bi bi-diagram-3 me-1"></i>Role Hierarchy
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabTcodes">
+            <i class="bi bi-key me-1"></i>T-Code Registry
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabAssign">
+            <i class="bi bi-person-check me-1"></i>Role Assignment
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabImport">
+            <i class="bi bi-cloud-upload me-1"></i>Import
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+    <!-- TAB 1: Role Hierarchy -->
+    <div class="tab-pane fade show active" id="tabHierarchy">
+        <div class="filter-bar">
+            <form method="post" asp-page-handler="Filter" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Filter by Module</label>
+                    <select asp-for="FilterModule" class="form-select form-select-sm">
+                        <option value="">All Modules</option>
+                        @foreach (var mod in Model.CompositeRoles.Select(r => r.Module).Distinct().OrderBy(m => m))
+                        {
+                            <option value="@mod">@mod</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Search Roles</label>
+                    <input asp-for="SearchQuery" class="form-control form-control-sm" placeholder="Search by name or code..." />
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" asp-page-handler="Filter" class="btn btn-sm btn-primary">
+                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                    </button>
+                    <a asp-page="/Admin/RoleManager" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <h6 class="text-muted mb-3">Composite → Derived → Master → T-Codes</h6>
+        <div id="hierarchyTree">
+            @if (Model.RoleHierarchy.Any())
+            {
+                @foreach (var composite in Model.RoleHierarchy)
+                {
+                    <div class="tree-root" data-role-id="@composite.CompositeRoleId">
+                        <div class="tree-item" onclick="toggleTreeNode(this)">
+                            <span class="toggle-icon"><i class="bi bi-chevron-right"></i></span>
+                            <span class="role-badge badge-composite">COMPOSITE</span>
+                            <strong>@composite.CompositeRoleName</strong>
+                            <small class="text-muted ms-2">(@composite.CompositeRoleId)</small>
+                            <span class="badge bg-secondary ms-auto">@(composite.DerivedRoles.Count) derived</span>
+                        </div>
+                        <div class="tree-children collapsed">
+                            @foreach (var derived in composite.DerivedRoles)
+                            {
+                                <div class="tree-node">
+                                    <div class="tree-item" onclick="toggleTreeNode(this)">
+                                        <span class="toggle-icon"><i class="bi bi-chevron-right"></i></span>
+                                        <span class="role-badge badge-derived">DERIVED</span>
+                                        <span>@derived.DerivedRoleName</span>
+                                        <small class="text-muted ms-2">(@derived.DerivedRoleId)</small>
+                                        <span class="badge bg-secondary ms-auto">@(derived.TCodeAssignments.Count) tcodes</span>
+                                    </div>
+                                    <div class="tree-children collapsed">
+                                        @foreach (var tc in derived.TCodeAssignments)
+                                        {
+                                            <div class="tree-node">
+                                                <div class="tree-item">
+                                                    <span class="toggle-icon"></span>
+                                                    <span class="tcode-badge">@tc.TransactionCode</span>
+                                                    <span>@tc.AppDescription</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox display-4"></i>
+                    <p class="mt-2">No role hierarchy data found. Import roles using the Import tab.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- TAB 2: T-Code Registry -->
+    <div class="tab-pane fade" id="tabTcodes">
+        <div class="filter-bar">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small">Module</label>
+                    <select asp-for="FilterModule" class="form-select form-select-sm" id="tcModuleFilter" onchange="this.form.submit()">
+                        <option value="">All Modules</option>
+                        @foreach (var mod in Model.AllTcodes.Select(t => t.Module).Distinct().OrderBy(m => m))
+                        {
+                            <option value="@mod">@mod</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Search</label>
+                    <input type="text" id="tcSearchInput" class="form-control form-control-sm" placeholder="Search T-Code, name, route..." oninput="filterTcodes()" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Status</label>
+                    <select id="tcStatusFilter" class="form-select form-select-sm" onchange="filterTcodes()">
+                        <option value="">All</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Deprecated">Deprecated</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="text-muted small" id="tcCount">@Model.AllTcodes.Count T-Codes</span>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered table-rm" id="tcodeTable">
+                <thead>
+                    <tr>
+                        <th style="cursor:pointer" onclick="sortTable(0)">Code <i class="bi bi-arrow-down-up small"></i></th>
+                        <th style="cursor:pointer" onclick="sortTable(1)">Name <i class="bi bi-arrow-down-up small"></i></th>
+                        <th style="cursor:pointer" onclick="sortTable(2)">Module <i class="bi bi-arrow-down-up small"></i></th>
+                        <th>Group</th>
+                        <th>Route</th>
+                        <th>Status</th>
+                        <th>Required Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tc in Model.AllTcodes)
+                    {
+                        <tr data-module="@tc.Module" data-status="@tc.Status">
+                            <td><code class="fw-bold">@tc.Code</code></td>
+                            <td>@tc.Name</td>
+                            <td><span class="badge bg-light text-dark">@tc.Module</span></td>
+                            <td>@tc.Group</td>
+                            <td><small class="text-muted">@tc.Route</small></td>
+                            <td class="@(tc.Status.ToString() == "Active" ? "status-active" : "status-inactive")">
+                                @tc.Status
+                            </td>
+                            <td><small>@tc.RequiredRole</small></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.AllTcodes.Any())
+        {
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-key display-4"></i>
+                <p class="mt-2">No T-Codes found.</p>
+            </div>
+        }
+    </div>
+
+    <!-- TAB 3: Role Assignment -->
+    <div class="tab-pane fade" id="tabAssign">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="rm-header">
+                        <h5 class="mb-0"><i class="bi bi-person-plus me-2"></i>Assign Composite Role to User</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="Assign" id="assignForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">User ID</label>
+                                <input asp-for="AssignUserId" class="form-control" placeholder="Enter User ID (GUID)" required />
+                                <small class="text-muted">Enter the User ID to assign the role to.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Composite Role</label>
+                                <select asp-for="AssignRoleId" class="form-select" required>
+                                    <option value="">— Select a composite role —</option>
+                                    @foreach (var role in Model.CompositeRoles.OrderBy(r => r.Name))
+                                    {
+                                        <option value="@role.Id">@role.Name (@role.Module)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" asp-page-handler="Assign" class="btn btn-primary" id="btnAssign">
+                                    <i class="bi bi-check-circle me-1"></i>Assign Role
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>Reset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-info-circle me-1"></i>Assignment Guide</h6>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">How Role Assignment Works</h6>
+                        <ol class="small">
+                            <li>Select a <strong>User</strong> by their User ID.</li>
+                            <li>Choose a <strong>Composite Role</strong> from the dropdown.</li>
+                            <li>The system will automatically grant all T-Code permissions from the composite role and its derived roles.</li>
+                            <li>Existing permissions are preserved; new permissions are added.</li>
+                        </ol>
+                        <hr />
+                        <h6 class="text-primary">Role Types</h6>
+                        <ul class="small">
+                            <li><span class="role-badge badge-composite">COMPOSITE</span> — Top-level role grouping multiple derived roles.</li>
+                            <li><span class="role-badge badge-derived">DERIVED</span> — Functional role with specific T-Code access.</li>
+                            <li><span class="role-badge badge-master">MASTER</span> — Individual T-Code permission entry.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: Import -->
+    <div class="tab-pane fade" id="tabImport">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card shadow-sm">
+                    <div class="rm-header">
+                        <h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>Import Role Matrix Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="Import">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Paste Role Matrix (Tab or Pipe Delimited)</label>
+                                <textarea asp-for="ImportData" class="form-control font-monospace" rows="14" 
+                                    placeholder="CompositeCode&#9;CompositeName&#9;Module&#9;DerivedCode&#9;DerivedName&#9;TCode
+PROC_MM&#9;Procurement Manager&#9;MM&#9;PURCHASER&#9;Purchaser Role&#9;ME21N
+PROC_MM&#9;Procurement Manager&#9;MM&#9;PURCHASER&#9;Purchaser Role&#9;ME22N
+PROC_MM&#9;Procurement Manager&#9;MM&#9;GR_PROCESSOR&#9;GR Processor&#9;MIGO
+SALES_SD&#9;Sales Manager&#9;SD&#9;SALES_REP&#9;Sales Rep&#9;VA01
+SALES_SD&#9;Sales Manager&#9;SD&#9;SALES_REP&#9;Sales Rep&#9;VA03"
+                                    required></textarea>
+                                <small class="text-muted">Expected columns: CompositeCode, CompositeName, Module, DerivedCode, DerivedName, TCode</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" asp-page-handler="Import" class="btn btn-success" id="btnImport">
+                                    <i class="bi bi-upload me-1"></i>Import Role Matrix
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="previewImport()">
+                                    <i class="bi bi-eye me-1"></i>Preview
+                                </button>
+                            </div>
+                        </form>
+                        <div id="importPreview" class="mt-3" style="display:none;">
+                            <h6>Parsed Data Preview</h6>
+                            <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                                <table class="table table-sm table-bordered table-rm" id="previewTable">
+                                    <thead><tr><th>Composite</th><th>Derived</th><th>Module</th><th>T-Code</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-file-earmark-text me-1"></i>Import Format</h6>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary">Expected Format</h6>
+                        <p class="small">Paste tab-delimited or pipe-delimited data with these columns:</p>
+                        <table class="table table-sm table-bordered small">
+                            <thead class="table-light">
+                                <tr><th>#</th><th>Column</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td><code>CompositeCode</code></td><td>Unique code for the composite role</td></tr>
+                                <tr><td>2</td><td><code>CompositeName</code></td><td>Display name</td></tr>
+                                <tr><td>3</td><td><code>Module</code></td><td>Module code (MM, SD, FI, etc.)</td></tr>
+                                <tr><td>4</td><td><code>DerivedCode</code></td><td>Derived role code</td></tr>
+                                <tr><td>5</td><td><code>DerivedName</code></td><td>Derived role name</td></tr>
+                                <tr><td>6</td><td><code>TCode</code></td><td>Transaction code to assign</td></tr>
+                            </tbody>
+                        </table>
+                        <hr />
+                        <h6 class="text-primary">Example</h6>
+                        <pre class="small bg-light p-2 rounded">PROC_MM	Procurement Manager	MM	PURCHASER	Purchaser Role	ME21N
+PROC_MM	Procurement Manager	MM	GR_PROC	GR Processor	MIGO
+SALES_SD	Sales Manager	SD	SALES_REP	Sales Rep	VA01</pre>
+                        <hr />
+                        <h6 class="text-primary">Tips</h6>
+                        <ul class="small text-muted">
+                            <li>Export from Excel using Tab delimiter</li>
+                            <li>First row can be a header row (it will be auto-skipped)</li>
+                            <li>Duplicate entries are merged automatically</li>
+                            <li>T-Codes not found in registry will be flagged</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.nav-link').forEach(function (tab) {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            var target = e.target.getAttribute('href');
+            if (target === '#tabHierarchy') {
+                document.getElementById('btnExpandAll').style.display = '';
+            } else {
+                document.getElementById('btnExpandAll').style.display = 'none';
+            }
+        });
+    });
+});
+
+function toggleTreeNode(el) {
+    var children = el.nextElementSibling;
+    if (!children || !children.classList.contains('tree-children')) return;
+    var icon = el.querySelector('.toggle-icon i');
+    if (children.classList.contains('collapsed')) {
+        children.classList.remove('collapsed');
+        children.style.maxHeight = children.scrollHeight + 'px';
+        if (icon) { icon.className = 'bi bi-chevron-down'; }
+    } else {
+        children.classList.add('collapsed');
+        children.style.maxHeight = '0';
+        if (icon) { icon.className = 'bi bi-chevron-right'; }
+    }
+}
+
+var allExpanded = false;
+function toggleAllNodes() {
+    allExpanded = !allExpanded;
+    var btn = document.getElementById('btnExpandAll');
+    document.querySelectorAll('#hierarchyTree .tree-children').forEach(function (c) {
+        if (allExpanded) {
+            c.classList.remove('collapsed');
+            c.style.maxHeight = c.scrollHeight + 'px';
+        } else {
+            c.classList.add('collapsed');
+            c.style.maxHeight = '0';
+        }
+    });
+    document.querySelectorAll('#hierarchyTree .toggle-icon i').forEach(function (i) {
+        i.className = allExpanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right';
+    });
+    btn.innerHTML = allExpanded
+        ? '<i class="bi bi-arrows-collapse me-1"></i>Collapse All'
+        : '<i class="bi bi-arrows-expand me-1"></i>Expand All';
+}
+
+function filterTcodes() {
+    var search = document.getElementById('tcSearchInput').value.toLowerCase();
+    var status = document.getElementById('tcStatusFilter').value;
+    var rows = document.querySelectorAll('#tcodeTable tbody tr');
+    var count = 0;
+    rows.forEach(function (row) {
+        var text = row.textContent.toLowerCase();
+        var rowStatus = row.getAttribute('data-status');
+        var matchSearch = !search || text.indexOf(search) >= 0;
+        var matchStatus = !status || rowStatus === status;
+        if (matchSearch && matchStatus) {
+            row.style.display = '';
+            count++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    document.getElementById('tcCount').textContent = count + ' T-Codes';
+}
+
+var sortDir = {};
+function sortTable(colIdx) {
+    var table = document.getElementById('tcodeTable');
+    var tbody = table.querySelector('tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    var dir = sortDir[colIdx] === 'asc' ? 'desc' : 'asc';
+    sortDir[colIdx] = dir;
+    rows.sort(function (a, b) {
+        var aVal = a.cells[colIdx].textContent.trim();
+        var bVal = b.cells[colIdx].textContent.trim();
+        return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    });
+    rows.forEach(function (row) { tbody.appendChild(row); });
+}
+
+function previewImport() {
+    var textarea = document.querySelector('[name="ImportData"]');
+    var data = textarea.value.trim();
+    if (!data) return;
+    var lines = data.split('\n');
+    var tbody = document.querySelector('#previewTable tbody');
+    tbody.innerHTML = '';
+    var startIdx = 0;
+    var firstLine = lines[0].toLowerCase();
+    if (firstLine.indexOf('composite') >= 0 || firstLine.indexOf('code') >= 0) startIdx = 1;
+    for (var i = startIdx; i < lines.length && i < startIdx + 50; i++) {
+        var line = lines[i].trim();
+        if (!line) continue;
+        var parts = line.includes('\t') ? line.split('\t') : line.split('|');
+        if (parts.length >= 6) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + escapeHtml(parts[0].trim()) + '</td>' +
+                           '<td>' + escapeHtml(parts[3].trim()) + '</td>' +
+                           '<td>' + escapeHtml(parts[2].trim()) + '</td>' +
+                           '<td><code>' + escapeHtml(parts[5].trim()) + '</code></td>';
+            tbody.appendChild(tr);
+        }
+    }
+    document.getElementById('importPreview').style.display = 'block';
+}
+
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+}
+</script>

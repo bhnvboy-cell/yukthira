@@ -2393,3 +2393,76 @@ public class QmInspectionPlanMicEntity : EntityBase
     public int? InspectionMethodVersion { get; set; }
     public string? SamplingProcedureCode { get; set; }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Security Import & Role Management (yuktira_sys)
+// ══════════════════════════════════════════════════════════════════════════════
+
+public class MasterRoleEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string RoleId { get; set; } = "";
+    public string RoleName { get; set; } = "";
+    public string Module { get; set; } = "";
+    public string SubProcess { get; set; } = "";
+    public string Catalog { get; set; } = "";
+    public string Space { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Status { get; set; } = "Active";
+}
+
+public class CompositeRoleEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string CompositeRoleId { get; set; } = "";
+    public string CompositeRoleName { get; set; } = "";
+    public string Module { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Status { get; set; } = "Active";
+}
+
+public class DerivedRoleEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string DerivedRoleId { get; set; } = "";
+    public string DerivedRoleName { get; set; } = "";
+    public string CompositeRoleId { get; set; } = "";
+    public string MasterRoleId { get; set; } = "";
+    public string Module { get; set; } = "";
+    public string Status { get; set; } = "Active";
+}
+
+public class RoleTCodeAssignmentEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string RoleId { get; set; } = "";
+    public string RoleType { get; set; } = "";
+    public string TransactionCode { get; set; } = "";
+    public string AppId { get; set; } = "";
+    public string AppDescription { get; set; } = "";
+    public bool HasAccess { get; set; } = true;
+}
+
+public class SecurityImportBatchEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string BatchNumber { get; set; } = "";
+    public string FileName { get; set; } = "";
+    public int TotalRows { get; set; }
+    public int ImportedRows { get; set; }
+    public int ErrorRows { get; set; }
+    public string Status { get; set; } = "Pending";
+    public string ImportedBy { get; set; } = "";
+    public DateTime? ImportedAt { get; set; }
+    public string? ErrorMessage { get; set; }
+}
+
+public class UserRoleAssignmentEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public string UserId { get; set; } = "";
+    public string CompositeRoleId { get; set; } = "";
+    public string AssignedBy { get; set; } = "";
+    public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+    public string Status { get; set; } = "Active";
+}

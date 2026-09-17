@@ -128,6 +128,7 @@ public static class InfrastructureRegistration
         services.AddScoped<ILocalizationService, LocalizationService>();
         services.AddScoped<IPayrollService, PayrollService>();
         services.AddScoped<ITransactionCodeService, TransactionCodeService>();
+        services.AddScoped<ISecurityImportService, SecurityImportService>();
         services.AddScoped<IWorkflowEngine, WorkflowService>();
         services.AddScoped<ISuperUserService, SuperUserService>();
         services.AddScoped<IThemeService, ThemeService>();
@@ -212,6 +213,9 @@ public static class InfrastructureRegistration
         // Module Data Sync: Template generation, validation, bulk upload
         services.AddScoped<IModuleDataSyncService, ModuleDataSyncService>();
         services.AddSingleton<ISyncSessionStore, SyncSessionStore>();
+
+        // Enhanced Template Generator & Data Sync V2
+        services.AddScoped<IModuleTemplateService, ModuleTemplateService>();
 
         // Module Gap: SD
         services.AddScoped<ICreditManagementService, CreditManagementService>();
