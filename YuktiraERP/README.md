@@ -366,7 +366,58 @@ Multi-level BOM explosion, gross/net requirement calculation, shortage detection
 
 **Supported Modules (51):** MM Material Master, MM Vendor, SD Customer, SD Sales Order, FI Accounts, CO Cost Centers, PP Production, QM Inspection, WM Storage, HR Employee, LIMS Samples, PM Equipment, CRM Leads, PS Projects, BI Reports, Admin Tenants/Users, and more.
 
-**API Endpoints:**
+### Security Import & Role Management Engine (v2.2.0)
+
+**Role Matrix & T-Code Registry Ingestion:** Parse enterprise spreadsheet structures containing Master Role Lists (Module, Sub Process, Apps/T-Codes, App Description, Master Role, Catalog, Space) and Composite/Derived Role Hierarchies (Module, Composite Role, Derived/Single Role, Master Role). Dynamic T-Code registry with 512+ codes mapped to controller routes. RBAC seeding engine building Composite Role → Derived Role → Master Role → T-Code permission hierarchy. Multi-tenant isolated imports scoped to active TenantId.
+
+| Entity | Schema | Description |
+|--------|--------|-------------|
+| `MasterRoleEntity` | `yuktira_sys` | Individual master roles with Module, SubProcess, Catalog, Space |
+| `CompositeRoleEntity` | `yuktira_sys` | Aggregated composite roles grouping multiple derived roles |
+| `DerivedRoleEntity` | `yuktira_sys` | Intermediate roles linking composite to master roles |
+| `RoleTCodeAssignmentEntity` | `yuktira_sys` | Role→TCode permission mappings (RoleType: Composite/Derived/Master) |
+| `SecurityImportBatchEntity` | `yuktira_sys` | Import batch tracking with row counts, status, error logs |
+| `UserRoleAssignmentEntity` | `yuktira_sys` | User→CompositeRole assignments with permission propagation |
+
+**API Endpoints (`api/v1/security/*`):**
+```bash
+POST /api/v1/security/import/master-roles      # Import master role list from spreadsheet rows
+POST /api/v1/security/import/composite-roles   # Import composite→derived→master hierarchy
+POST /api/v1/security/import/full-matrix       # Full role matrix import (both sheets)
+GET  /api/v1/security/roles/master             # Query master roles (filter: module)
+GET  /api/v1/security/roles/composite          # Query composite roles (filter: module)
+GET  /api/v1/security/roles/hierarchy          # Full hierarchy: Composite→Derived→Master→TCodes
+POST /api/v1/security/roles/assign             # Assign composite role to user (propagates permissions)
+GET  /api/v1/security/roles/user/{userId}      # Get user's role assignments
+GET  /api/v1/security/roles/{roleId}/tcodes    # Get T-Code permissions for a role
+GET  /api/v1/security/stats                    # Role count + T-Code count
+```
+
+### Dynamic Master Data Template Generator (v2.2.0)
+
+**EF Core Metadata-Driven Templates:** `IModuleTemplateService` reads `DbContext.Model.FindEntityType()` to determine database constraints and generates 3-sheet Excel workbooks via ClosedXML.
+
+| Sheet | Content |
+|-------|---------|
+| **Instructions** | Formatting guidelines (dates YYYY-MM-DD, decimal formats, string length limits), Dark Navy header |
+| **Schema** | Column names, data types, required flags, max lengths, allowed values, FK lookup sources |
+| **Data** | Dark Navy `#1F497D` background headers, white bold text, RED text for required/non-nullable columns, auto-sized columns, DataValidation dropdowns for FK fields (Plant, Status, Type, UOM, Currency, Valuation Class, Storage Location) |
+
+### Data Sync v2 API (v2.2.0)
+
+**Enhanced Atomic Bulk Import:** Transactional upload pipeline at `api/v2/data-sync/*` with dry-run validation, session management, and full rollback.
+
+```bash
+GET  /api/v2/data-sync/modules                 # List modules with column counts
+GET  /api/v2/data-sync/metadata/{module}       # Entity metadata with FK relations
+GET  /api/v2/data-sync/template/{module}       # Download enhanced template
+POST /api/v2/data-sync/upload/{module}         # Parse xlsx → dry-run validation → session token
+POST /api/v2/data-sync/sync                    # Atomic commit (full rollback on failure)
+POST /api/v2/data-sync/validate                # Manual row validation
+GET  /api/v2/data-sync/history                 # Recent sync batch history
+```
+
+**API Endpoints (v1):**
 ```bash
 GET  /api/v1/data-sync/modules              # List all 51 syncable modules
 GET  /api/v1/data-sync/metadata/{module}    # Dynamic entity schema via EF Core reflection
@@ -1299,6 +1350,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 2.2.0 | September 2026 | Security Import Engine (role matrix, T-Code registry, composite hierarchy), Dynamic Template Generator (EF Core metadata-driven), DataSync v2 API, Admin/RoleManager UI |
 | 2.1.0 | September 2026 | AI Vision Inspection (ZQM-V01/V02/V03), NL2SQL Query Engine, Module Master Data Sync (51 modules), centralized versioning |
 | 1.0.8 | August 2026 | WM/PP/QM/PM module upgrades with SAP-grade parameters, 75 TCode layouts (21 new), TCode Engine API fixes, 5 new entities, comprehensive user guide |
 | 1.0.7 | August 2026 | Yuktira enterprise creation forms: 12 forms across MM/SD/QM/PP/FI/WM upgraded to tabbed layout with standardized fields (types, valuation, org assignments, line items with auto-calc), enterprise-form.css/js, _ModuleLayout.cshtml universal layout, 7-language localization, 4 UI themes, session timeout, dynamic action buttons |
@@ -1310,6 +1362,17 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**2.2.0 (September 2026)**
+- **Security Import & Role Management Engine**: 6 new entities (`MasterRoleEntity`, `CompositeRoleEntity`, `DerivedRoleEntity`, `RoleTCodeAssignmentEntity`, `SecurityImportBatchEntity`, `UserRoleAssignmentEntity`) in `yuktira_sys` schema. `ISecurityImportService` with 12 methods: master role import, composite role import, full matrix import, role hierarchy query, user assignment with permission propagation. `SecurityImportController` with 10 REST endpoints at `api/v1/security/*`. Batch-tracked imports with upsert by business keys, SHA-256 audit logging, multi-tenant isolation. Role hierarchy: Composite → Derived → Master → T-Code permissions. User assignment auto-propagates all derived role T-Code permissions to `TransactionPermissionEntity`
+- **Dynamic Master Data Template Generator**: `IModuleTemplateService` / `ModuleTemplateService` — EF Core metadata-driven 3-sheet Excel workbook generation. Instructions sheet (formatting guidelines), Schema sheet (column metadata with FK lookup info), Data sheet (Dark Navy #1F497D headers, red required columns, auto-injected DataValidation dropdowns for Plant/Status/Type/UOM/Currency/FK fields). Uses `DbContext.Model.FindEntityType()` for constraint detection
+- **Data Sync v2 API**: `DataSyncV2Controller` at `api/v2/data-sync/*` — 7 endpoints: enhanced template download with FK relations, dry-run validation with session tokens, atomic sync with full `IDbContextTransaction` rollback, manual validation endpoint, sync batch history. Integrates `IModuleTemplateService` for enhanced templates
+- **Admin/RoleManager UI**: `RoleManager.cshtml` (531 lines) — 4-tab admin page: collapsible role hierarchy tree (Composite → Derived → T-Codes), sortable/searchable T-Code registry table with module filter, user role assignment form, bulk role import with preview parser. Bootstrap 5, Dark Navy theme, responsive design. `Admin/Index.cshtml` updated with Role Manager card
+- **Core UoM Engine (T006/CUNI parity)**: 3 entities in `yuktira_core` — `UomDimensionEntity` (MASS/VOLU/TEMP/PRES/LENG), `UnitOfMeasureEntity` (Msehi, IsoCode, Numerator/Denominator/AddOffset/Decimals), `MaterialUomConversionEntity` (material-specific factors with DensityFactor). `UomConversionService` with exact linear transformation: TargetValue = ((SrcVal × SrcNum/SrcDen) + SrcOffset) / (TgtNum/TgtDen) − TgtOffset. All `decimal` precision, temperature offset support. `UomController` at `api/v1/core/uom` — 5 endpoints
+- **MDG Engine (Master Data Governance)**: 2 entities in `yuktira_mdg` — `MdgChangeRequestEntity` (JSONB staging payload, Draft→PendingApproval→Approved→Rejected→Activated lifecycle), `MdgAuditLogEntity` (SHA-256 hash chain). `MdgService` with validation, duplicate detection, workflow integration, atomic activation via reflection, full rollback. `MdgController` at `api/v1/mdg` — 6 endpoints
+- **QM MIC Engine (Master Inspection Characteristics)**: `MicMasterEntity` in `yuktira_qm` — composite key (PlantId, CharacteristicCode, ValidFrom), control indicators (LowerSpecLimit, UpperSpecLimit, TargetValueRequired), ResultsConfirmation, Requirement types. `DuplicateEntityException` on conflicts. `MicController` at `api/v1/qm/mic` — 4 endpoints
+- **Inspection Plan & Characteristic Assignment**: 3 entities — `QmInspectionPlanHeaderEntity` (nullable PlantId/MaterialId for generic templates), `QmInspectionPlanOperationEntity`, `QmInspectionPlanMicEntity`. Priority resolution: specific match → generic fallback. `AutoInspectionPlanGenerator` for zero-human-input headless plan creation. `InspectionPlanController` at `api/v1/qm/inspection-plans` — 6 endpoints
+- All 299 tests pass, build clean
 
 **2.1.0 (September 2026)**
 - **AI Vision Inspection Module (ZQM-V01/V02/V03)**: Full-stack AI-powered visual quality inspection. `VisionInspectionController` — single image inspect, batch inspect (200 MB upload), model training, model evaluation, defect type/severity enums, NC history. `NlQueryController` — NL2SQL query engine with entity type suggestions and auto-complete. `IQualityVisionInspectionEngine` interface with InspectImageAsync/InspectBatchAsync/TrainModelAsync/EvaluateModelAsync. Defect detection: scratch, dent, discoloration, crack, contamination with Critical/High/Medium/Low severity and confidence scoring. Auto-NC creation on failed inspections via `IZqmNonConformanceService`. 6 Razor pages: AI/Index (dashboard hub with 4 KPIs, 3 tabs), AI/Vision/Inspect (single image → PASS/FAIL verdict + confidence + defect regions), AI/Vision/BatchInspection (multi-image → pass/fail summary + severity breakdown), AI/Vision/ModelTraining (custom model training with epochs/LR/validation split + evaluation with confusion matrix), AI/Vision/History (historical defect trends), AI/NLQuery/Index (NL2SQL with translated SQL display + result table + query suggestions)
