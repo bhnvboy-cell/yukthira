@@ -1,7 +1,9 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Infrastructure.Data;
@@ -9,11 +11,13 @@ public class DataSeeder
 {
     private readonly YuktiraDbContext _db;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<DataSeeder>? _logger;
 
-    public DataSeeder(YuktiraDbContext db, IConfiguration configuration)
+    public DataSeeder(YuktiraDbContext db, IConfiguration configuration, ILogger<DataSeeder>? logger = null)
     {
         _db = db;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task SeedAsync()
@@ -398,16 +402,31 @@ public class DataSeeder
             using var tx = await _db.Database.BeginTransactionAsync();
             try
             {
-                await _db.Database.ExecuteSqlRawAsync(sql);
+                await ExecuteScriptAsync(sql);
+                await ExecuteScriptAsync("SET search_path TO public");
                 _db.Set<MigrationEntity>().Add(new MigrationEntity { Name = name });
                 await _db.SaveChangesAsync();
                 await tx.CommitAsync();
             }
-            catch
+            catch (Exception ex)
             {
                 await tx.RollbackAsync();
-                break;
+                _logger?.LogWarning("Database script {Script} failed and was skipped: {Message}", name, ex.Message);
+                foreach (var entry in _db.ChangeTracker.Entries<MigrationEntity>().Where(e => e.State == EntityState.Added).ToList())
+                {
+                    entry.State = EntityState.Detached;
+                }
+                continue;
             }
         }
+    }
+
+    private async Task ExecuteScriptAsync(string sql)
+    {
+        var connection = _db.Database.GetDbConnection();
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        command.Transaction = (_db.Database.CurrentTransaction as RelationalTransaction)?.GetDbTransaction();
+        await command.ExecuteNonQueryAsync();
     }
 }

@@ -34,4 +34,25 @@ public class SpcController : ControllerBase
         var result = await _spc.GetFilterOptionsAsync(ct);
         return Ok(new { data = result, tenantId = _tenant.TenantId });
     }
+
+    /// <summary>Evaluates one live measurement against the historical control limits.</summary>
+    [HttpPost("live")]
+    public async Task<IActionResult> EvaluateLive([FromBody] SpcLivePointRequest request, CancellationToken ct)
+    {
+        request ??= new SpcLivePointRequest();
+        var evaluation = await _spc.EvaluateLivePointAsync(request, ct);
+
+        if (string.IsNullOrWhiteSpace(request.Characteristic) || !string.IsNullOrWhiteSpace(evaluation.Error))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                error = evaluation.Error ?? "Characteristic is required",
+                foundPoints = evaluation.FoundPoints,
+                tenantId = _tenant.TenantId
+            });
+        }
+
+        return Ok(new { data = evaluation, tenantId = _tenant.TenantId });
+    }
 }

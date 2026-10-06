@@ -251,6 +251,30 @@ public static class InfrastructureRegistration
         services.AddScoped<IExchangeRateSyncService, ExchangeRateSyncService>();
         services.AddHostedService<ExchangeRateSyncJob>();
 
+        services.Configure<SelfHealingOptions>(configuration.GetSection(SelfHealingOptions.SectionName));
+        services.Configure<Nl2SqlOptions>(configuration.GetSection(Nl2SqlOptions.SectionName));
+        services.Configure<VisionQmOptions>(configuration.GetSection(VisionQmOptions.SectionName));
+        services.Configure<FinancialEventStreamOptions>(configuration.GetSection(FinancialEventStreamOptions.SectionName));
+        services.Configure<MrpEngineOptions>(configuration.GetSection(MrpEngineOptions.SectionName));
+        services.Configure<ColumnarCacheOptions>(configuration.GetSection(ColumnarCacheOptions.SectionName));
+        services.Configure<MassBalanceOptions>(configuration.GetSection(MassBalanceOptions.SectionName));
+        services.Configure<EmissionsOptions>(configuration.GetSection(EmissionsOptions.SectionName));
+        services.AddScoped<ISelfHealingReconciliationService, SelfHealingReconciliationService>();
+        services.AddScoped<INl2SqlService, Nl2SqlService>();
+        services.AddScoped<IVisionQmGateService, VisionQmGateService>();
+        services.AddScoped<IWorkflowThresholdService, WorkflowThresholdService>();
+        services.AddScoped<IMassBalanceCalculator, MassBalanceCalculator>();
+        services.AddScoped<IEmissionsTrackerService, EmissionsTrackerService>();
+        services.AddSingleton<IFinancialEventStream, FinancialEventStream>();
+        services.AddSingleton<IColumnarJournalCache, ColumnarJournalCache>();
+        services.AddSingleton<IDuckdbAnalyticsService, DuckdbAnalyticsService>();
+        services.AddSingleton<EventDrivenMrpEngine>();
+        services.AddSingleton<IMrpEventListener>(sp => sp.GetRequiredService<EventDrivenMrpEngine>());
+        services.AddHostedService<SelfHealingReconciliationJob>();
+        services.AddHostedService<FinancialEventStreamProcessor>();
+        services.AddHostedService<ParquetExportWorker>();
+        services.AddHostedService<MrpBusBridge>();
+
         RegisterRepositories(services);
 
         services.AddScoped<DataSeeder>();

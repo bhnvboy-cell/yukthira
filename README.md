@@ -2,7 +2,7 @@
 
 Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
 
-**Version 2.1.0** | **September 2026**
+**Version 2.3.0** | **October 2026**
 
 ---
 
@@ -41,7 +41,7 @@ Then open **http://localhost:5001** and login with:
 │   ├── YuktiraERP.PluginSdk/       Plugin SDK — interfaces, assembly loader, 4 hook types, hot reload, sandboxing
 │   └── plugins/                    Example plugins (AdvancedQC, Dairy, Reports) — see `docs/plugin-development.md`
 ├── database/
-│   ├── scripts/                    SQL migration scripts (001–013)
+│   ├── scripts/                    SQL migration scripts (001–051)
 │   └── backup/                     Disaster recovery runbook
 ├── scripts/                        Docker, deploy, build scripts
 ├── apache-config/                  Reverse proxy config
@@ -428,6 +428,63 @@ POST /api/v1/data-sync/sync                 # Execute transactional UPSERT
 
 **Web UI:** 3-step wizard at `/Admin/DataSync` — Select Module → Upload & Validate → Review & Sync
 
+### Autonomous Operations & Process Industry Platform (v2.3.0)
+
+Four-pillar release: autonomous self-healing + NL2SQL, a real-time financial event stream with columnar analytics, a dynamic UX/offline platform, and a process-industry quality & engineering engine. Migration pipeline repaired end-to-end. **369 tests green.**
+
+#### Pillar 1 — Autonomous Operations
+
+| Component | Route | Description |
+|-----------|-------|-------------|
+| **Self-Healing Reconciliation** | `api/self-healing` | `POST /run` executes the reconciliation chain — hash-chained (SHA-256 sequence) verification of stock, ledger, and workflow invariants with remediation actions; `GET /status` reports chain sequence, last run, and discovered inconsistencies |
+| **NL2SQL Query Engine** | `api/ai/nl2sql` | `POST /query` translates plain-English questions into validated, entity-whitelisted SQL and returns rows + the executed SQL; `POST /draft` returns SQL without executing; `GET /intents` lists supported intent/entity combinations |
+
+```bash
+curl -X POST http://localhost:5000/api/self-healing/run -H "Authorization: Bearer <token>"
+
+curl -X POST http://localhost:5000/api/ai/nl2sql/query -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"Show critical inspection lots from plant 1000"}'
+```
+
+#### Pillar 2 — Real-Time Financial Event Stream & Event-Driven MRP
+
+Channel-backed financial event bus with guaranteed processing, dead-lettering, and columnar analytics (DuckDB + Parquet).
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST api/fi/event-stream/journal-event` | Ingest a `JournalPosted` event → validated and applied to the ledger, or dead-lettered with reason |
+| `GET api/fi/event-stream/outbox` | Pending/failed events; `POST stream/{id}/replay` reprocesses |
+| `GET api/fi/event-stream/stats` | Throughput, applied/failed counts, lag |
+| `POST api/fi/event-stream/columnar/query` | Columnar SQL over the journal cache (DuckDB) |
+| `POST api/fi/event-stream/parquet/query` | SQL over exported Parquet files |
+| `POST api/fi/event-stream/columnar/export` | Parquet export → `data/parquet/*.parquet` |
+| `GET api/fi/event-stream/columnar/status` | Cache freshness / row counts |
+
+**Event-Driven MRP** (`api/mrp/event-engine`): `GET /status`, `GET /proposals`, `POST /simulate` — stock and ledger events flow through `MrpBusBridge` into the MRP engine, producing shortage/reschedule proposals without a batch run.
+
+#### Pillar 3 — Dynamic UX & Offline Platform
+
+- **Dynamic Dashboard** — `/Dashboard/DynamicCanvas`: drag-to-configure live KPI widgets rendered from server-side widget configuration (rearrange without redeploy).
+- **Workflow Designer** — `/Admin/WorkflowDesigner`: full BPMN palette (start/end/task/gateway/timer nodes) plus an **Approval Thresholds** tab. `api/workflow-design`: `definitions` CRUD, `definitions/{id}/validate`, `definitions/{id}/publish`, `thresholds` CRUD + `thresholds/preview`.
+- **Admin home** — two new cards: Dynamic Dashboard (`bi-palette`), Workflow Designer (`bi-kanban`).
+- **PWA offline** — `/sw.js` service worker (app-shell cache + navigation fallback) re-enabled in `_Layout`, plus `wwwroot/js/pwa-sync.js`: mutations queue while offline and replay on reconnect (`window.YuktiraPwa`).
+
+#### Pillar 4 — Process Industry Engine
+
+| Feature | Route | Highlights |
+|---------|-------|------------|
+| **Vision Quality Gate** | `api/qm/vision-gate` | `POST /frame` (base64) or `POST /frame/upload` (multipart) → defect classification with PASS/grade verdict; `GET /results` history |
+| **SPC Live Control** | `api/qm/spc` | `GET /filters`, `GET /analysis`, `POST /live` — control charts with Cp/Cpk process capability on live measurements |
+| **Mass Balance** | `api/pp/mass-balance` | `POST /calculate` input/output/loss reconciliation per production order; `GET /order/{id}`, `GET /recent`, `POST /order/{id}/recalculate` |
+| **ESG Emissions** | `api/esg/emissions` | GHG ledger — `GET /summary`, `GET/POST /factors` (seeded energy/freight factors), `GET /ledger`, `POST /recompute` |
+
+Configuration sections added to `appsettings.json` (API + Web): `SelfHealing`, `Nl2Sql`, `VisionQm`, `FinancialEventStream`, `EventDrivenMrp`, `ColumnarCache`, `MassBalance`, `Emissions` (`MonthlyEnergyKwh`, `DefaultFreightDistanceKm`).
+
+#### Migration Pipeline Repair
+
+`DataSeeder` previously created the `Migrations` tracking table but never recorded or applied scripts (silent abort on first failure). It now executes each pending script via raw `DbCommand` (bypassing EF `ExecuteSqlRaw` composite-format parsing of `{}` literals), resets `search_path` per script, detaches and logs failures as warnings, and records successes — 30 scripts applied and tracked, including `051_next_gen_pillars.sql` (pillar DDL + emission-factor seeds). Nine pre-1.0 scripts (001–021, abandoned schema conventions) remain permanently skipped and are superseded by the EF Core model.
+
 ---
 
 ## Security
@@ -511,7 +568,7 @@ dotnet run
 ### Option 3: Initialize the Database
 
 ```batch
-# 1. Run the DB bootstrap script (creates yuktira_erp, applies 001–013 migrations, seeds sample data)
+# 1. Run the DB bootstrap script (creates yuktira_erp, applies pending migrations 001–051, seeds sample data)
 init-db.bat
 
 # 2. Connection string (both API and Web use the same key)
@@ -1350,6 +1407,7 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 2.3.0 | October 2026 | Autonomous self-healing + NL2SQL, real-time financial event stream with DuckDB/Parquet columnar analytics, event-driven MRP, dynamic dashboard + BPMN workflow designer + PWA offline sync, process-industry engine (vision gate, SPC Cp/Cpk, mass balance, ESG emissions), DataSeeder migration pipeline repair |
 | 2.2.0 | September 2026 | Security Import Engine (role matrix, T-Code registry, composite hierarchy), Dynamic Template Generator (EF Core metadata-driven), DataSync v2 API, Admin/RoleManager UI |
 | 2.1.0 | September 2026 | AI Vision Inspection (ZQM-V01/V02/V03), NL2SQL Query Engine, Module Master Data Sync (51 modules), centralized versioning |
 | 1.0.8 | August 2026 | WM/PP/QM/PM module upgrades with SAP-grade parameters, 75 TCode layouts (21 new), TCode Engine API fixes, 5 new entities, comprehensive user guide |
@@ -1362,6 +1420,18 @@ See `database/backup/disaster_recovery.md` for detailed runbook.
 | 1.0.0 | July 2026 | Initial release — Core ERP, MRP, AI, Workflow, Plugin SDK, Export, Security |
 
 ### Changelog
+
+**2.3.0 (October 2026)**
+- **Self-Healing Reconciliation Engine**: `SelfHealingController` at `api/self-healing` — `POST /run` executes a SHA-256 hash-chained verification chain over stock, ledger, and workflow invariants with remediation actions; `GET /status` reports chain sequence and last run. Config section `SelfHealing`
+- **NL2SQL Query Engine v2**: `Nl2SqlController` at `api/ai/nl2sql` — `POST /query` (plain English → validated entity-whitelisted SQL, returns rows + executed SQL), `POST /draft`, `GET /intents`. Config section `Nl2Sql`
+- **Real-Time Financial Event Stream**: `FinancialEventStreamController` at `api/fi/event-stream` — channel-backed ingest → validate → apply pipeline for `JournalPosted` events with outbox inspection, per-stream replay (`stream/{id}/replay`), stats, and dead-letter handling for unsupported/failed events. `ColumnarJournalCache` (DuckDB.NET.Data.Full + Parquet.Net) provides columnar SQL (`columnar/query`), Parquet-over-file SQL (`parquet/query`), export to `data/parquet/*.parquet` (`columnar/export`), and cache status. Config sections `FinancialEventStream`, `ColumnarCache`
+- **Event-Driven MRP**: `EventDrivenMrpController` at `api/mrp/event-engine` (`status`, `proposals`, `simulate`) + `MrpBusBridge` — live stock/ledger events produce shortage and reschedule proposals without a nightly batch. Config section `EventDrivenMrp`
+- **Dynamic Dashboard**: new Razor page `/Dashboard/DynamicCanvas` — drag-to-configure live widget canvas driven by server-side widget config; Admin home card added
+- **Workflow Designer**: new Razor page `/Admin/WorkflowDesigner` — full BPMN node palette (start/end/task/gateway/timer) + Approval Thresholds tab; `WorkflowDesignController` at `api/workflow-design` with definition CRUD, `validate`, `publish`, and threshold CRUD + `preview`
+- **PWA Offline Sync**: `_Layout.cshtml` now registers `/sw.js` (app-shell cache, navigation fallback) and loads `wwwroot/js/pwa-sync.js`, which queues offline mutations and replays them on reconnect (`window.YuktiraPwa`); Admin home cards for Dynamic Dashboard and Workflow Designer
+- **Process Industry Engine**: Vision Quality Gate (`api/qm/vision-gate/frame`, `frame/upload`, `results`) — frame grading with defect verdicts; SPC live control charts with Cp/Cpk (`api/qm/spc/analysis`, `filters`, `live`); Mass Balance reconciliation (`api/pp/mass-balance/calculate`, `order/{id}`, `recent`, `recalculate`); ESG Emissions GHG ledger with seeded factors (`api/esg/emissions/summary`, `factors`, `ledger`, `recompute`). Config sections `VisionQm`, `MassBalance`, `Emissions`
+- **DataSeeder migration pipeline repair**: pending scripts now actually execute and record — failures no longer abort the run (continue + warning log + detached `MigrationEntity`), each script runs via raw `DbCommand` (immune to EF `ExecuteSqlRaw` composite-format parsing) with `search_path` reset afterwards; 30 scripts recorded including `051_next_gen_pillars.sql` (pillar DDL + emission-factor seeds) and the rebuilt idempotent `002_refresh_tokens.sql`; 9 legacy pre-1.0 scripts documented as permanently superseded by the EF Core model
+- All 369 tests pass, build clean
 
 **2.2.0 (September 2026)**
 - **Security Import & Role Management Engine**: 6 new entities (`MasterRoleEntity`, `CompositeRoleEntity`, `DerivedRoleEntity`, `RoleTCodeAssignmentEntity`, `SecurityImportBatchEntity`, `UserRoleAssignmentEntity`) in `yuktira_sys` schema. `ISecurityImportService` with 12 methods: master role import, composite role import, full matrix import, role hierarchy query, user assignment with permission propagation. `SecurityImportController` with 10 REST endpoints at `api/v1/security/*`. Batch-tracked imports with upsert by business keys, SHA-256 audit logging, multi-tenant isolation. Role hierarchy: Composite → Derived → Master → T-Code permissions. User assignment auto-propagates all derived role T-Code permissions to `TransactionPermissionEntity`

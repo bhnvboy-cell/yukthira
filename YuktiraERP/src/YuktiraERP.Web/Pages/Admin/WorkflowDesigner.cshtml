@@ -1,0 +1,1374 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.WorkflowDesignerModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Workflow Designer";
+}
+
+@section Styles {
+<style>
+    .wd-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+    .wd-toolbar .wd-spacer { flex: 1; }
+    .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 3px solid transparent; }
+    .nav-tabs .nav-link.active { color: #1F497D; border-bottom-color: #1F497D; font-weight: 600; }
+    .nav-tabs .nav-link:hover { border-bottom-color: #adb5bd; }
+    .wd-meta { display: grid; grid-template-columns: 140px 1fr 120px 1fr auto; gap: 10px; align-items: end; margin-bottom: 12px; }
+    .wd-meta .form-label { font-size: 11px; margin-bottom: 2px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .wd-status { font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 12px; background: rgba(31, 73, 125, .1); color: #1F497D; white-space: nowrap; align-self: center; }
+    .wd-panel-head { background: #1F497D; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 12px; }
+    .wd-palette-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; padding: 7px 9px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); cursor: grab; margin-bottom: 6px; user-select: none; }
+    .wd-palette-item:hover { border-color: #1F497D; }
+    .wd-shape { display: inline-block; flex-shrink: 0; background: var(--node-color, #1F497D); }
+    .wd-shape-circle { width: 18px; height: 18px; border-radius: 50%; }
+    .wd-shape-diamond { width: 17px; height: 17px; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+    .wd-shape-rect { width: 26px; height: 15px; border-radius: 4px; }
+    .wd-canvas { position: relative; height: 560px; overflow: auto; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); background-image: radial-gradient(var(--border-color) 1px, transparent 1px); background-size: 20px 20px; }
+    .wd-sizer { position: relative; }
+    .wd-inner { position: absolute; top: 0; left: 0; width: 2400px; height: 1400px; transform-origin: 0 0; }
+    .wd-edges { position: absolute; top: 0; left: 0; overflow: visible; }
+    .wd-edge-hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
+    .wd-edge-line { fill: none; stroke-width: 2; pointer-events: none; }
+    .wd-edge-label { font-size: 10px; pointer-events: none; }
+    .wd-node { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; cursor: grab; user-select: none; color: #fff; font-size: 11.5px; font-weight: 600; text-align: center; box-shadow: var(--shadow-sm); }
+    .wd-node.shape-circle { width: 56px; height: 56px; border-radius: 50%; background: var(--node-color); }
+    .wd-node.shape-diamond { width: 60px; height: 60px; background: var(--node-color); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+    .wd-node.shape-rect { width: 152px; height: 56px; border-radius: 10px; background: var(--node-color); border: 2px solid rgba(255, 255, 255, .35); }
+    .wd-node.wd-selected { outline: 3px solid #1F497D; outline-offset: 3px; z-index: 20; }
+    .wd-node.wd-connecting { outline: 3px dashed #059669; outline-offset: 3px; }
+    .wd-node-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 5px; white-space: nowrap; font-size: 11px; font-weight: 600; color: var(--text-primary); background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1px 7px; pointer-events: none; }
+    .shape-rect .wd-node-label { position: static; transform: none; margin-top: 0; max-width: 138px; overflow: hidden; text-overflow: ellipsis; color: #fff; background: transparent; border: none; padding: 0; }
+    .wd-port { position: absolute; left: 100%; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: var(--card-bg); border: 2px solid #1F497D; cursor: crosshair; opacity: 0; }
+    .wd-node:hover .wd-port, .wd-node.wd-selected .wd-port, .wd-node.wd-connecting .wd-port { opacity: 1; }
+    .wd-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 13px; }
+    .wd-config .form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .wd-flow-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; margin-bottom: 6px; }
+    .wd-flow-row .wd-flow-to { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wd-th-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .wd-th-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .wd-th-table tbody tr:hover { background: #f0f4fa; }
+    .wd-preview-result { font-size: 13px; padding: 10px 12px; border-radius: 8px; background: var(--card-bg); border: 1px solid var(--border-color); margin-top: 10px; }
+    .wd-preview-result.matched { border-left: 4px solid #059669; }
+    .wd-preview-result.miss { border-left: 4px solid #dc2626; }
+    .wd-validation { font-size: 12.5px; max-height: 160px; overflow: auto; }
+    .wd-validation .wd-err { color: #dc2626; }
+    .wd-validation .wd-ok { color: #059669; font-weight: 600; }
+    .wd-zoom { display: inline-flex; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
+    .wd-zoom button { border: none; background: var(--card-bg); padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--text-primary); }
+    .wd-zoom button:hover { background: #f0f4fa; }
+    [data-theme="dark"] .wd-toolbar { background: rgba(255, 255, 255, .04); }
+    [data-theme="dark"] .wd-palette-item:hover { border-color: #8ab4e8; }
+    [data-theme="dark"] .wd-node.wd-selected { outline-color: #8ab4e8; }
+    [data-theme="dark"] .wd-port { border-color: #8ab4e8; }
+    [data-theme="dark"] .wd-th-table tbody tr:hover { background: rgba(96, 165, 250, .06); }
+</style>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0"><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Workflow Designer</h2>
+    <span class="text-muted small">BPMN 2.0 visual builder with no-code approval thresholds</span>
+</div>
+
+<div id="wdAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="wdAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<ul class="nav nav-tabs" id="wdTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tabWdCanvas" role="tab">
+            <svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>BPMN Designer
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabWdThresholds" role="tab">
+            <svg class="bi bi-cash-coin me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-coin"></use></svg>Approval Thresholds
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+    <div class="tab-pane fade show active" id="tabWdCanvas" role="tabpanel">
+        <div class="wd-toolbar">
+            <select id="wdLoadList" class="form-select form-select-sm" style="max-width: 280px">
+                <option value="">Select a workflow definition...</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadSelectedDefinition()">
+                <svg class="bi bi-folder2-open me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-folder2-open"></use></svg>Load
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="newDefinition()">
+                <svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New
+            </button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="saveDefinition()">
+                <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="validateDefinition()">
+                <svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Validate
+            </button>
+            <button type="button" class="btn btn-sm btn-success" onclick="publishDefinition()">
+                <svg class="bi bi-rocket-takeoff me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-rocket-takeoff"></use></svg>Publish
+            </button>
+            <span class="wd-spacer"></span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportBpmn()">
+                <svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export BPMN
+            </button>
+            <label class="btn btn-sm btn-outline-secondary mb-0" for="wdImportFile">
+                <svg class="bi bi-upload me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-upload"></use></svg>Import BPMN
+            </label>
+            <input type="file" id="wdImportFile" accept=".bpmn,.xml,text/xml,application/xml" class="d-none" onchange="importBpmnFile(event)" />
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportJson()">
+                <svg class="bi bi-code-slash me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-code-slash"></use></svg>Export JSON
+            </button>
+            <span class="wd-zoom">
+                <button type="button" onclick="setZoom(zoom - 0.1)" aria-label="Zoom out">-</button>
+                <button type="button" onclick="setZoom(1)" id="wdZoomLabel">100%</button>
+                <button type="button" onclick="setZoom(zoom + 0.1)" aria-label="Zoom in">+</button>
+            </span>
+        </div>
+
+        <div class="wd-meta">
+            <div>
+                <label class="form-label" for="wdCode">Code</label>
+                <input type="text" id="wdCode" class="form-control form-control-sm" placeholder="WF-PO-01" oninput="wf.code = this.value" />
+            </div>
+            <div>
+                <label class="form-label" for="wdName">Name</label>
+                <input type="text" id="wdName" class="form-control form-control-sm" placeholder="Purchase Order approval" oninput="wf.name = this.value" />
+            </div>
+            <div>
+                <label class="form-label" for="wdModule">Module</label>
+                <input type="text" id="wdModule" class="form-control form-control-sm" placeholder="MM" oninput="wf.module = this.value" />
+            </div>
+            <div>
+                <label class="form-label" for="wdDescription">Description</label>
+                <input type="text" id="wdDescription" class="form-control form-control-sm" placeholder="What this workflow does" oninput="wf.description = this.value" />
+            </div>
+            <span class="wd-status" id="wdStatus">Draft</span>
+        </div>
+
+        <div class="wd-validation mb-2" id="wdValidation"></div>
+
+        <div class="row g-2">
+            <div class="col-md-2">
+                <div class="card">
+                    <div class="wd-panel-head">BPMN Elements</div>
+                    <div class="card-body p-2">
+                        <div class="wd-palette-item" draggable="true" data-type="START" style="--node-color:#059669"><span class="wd-shape wd-shape-circle" style="--node-color:#059669"></span><span>Start Event</span></div>
+                        <div class="wd-palette-item" draggable="true" data-type="TASK" style="--node-color:#1F497D"><span class="wd-shape wd-shape-rect" style="--node-color:#1F497D"></span><span>Task</span></div>
+                        <div class="wd-palette-item" draggable="true" data-type="APPROVAL" style="--node-color:#d97706"><span class="wd-shape wd-shape-rect" style="--node-color:#d97706"></span><span>Approval Task</span></div>
+                        <div class="wd-palette-item" draggable="true" data-type="EXCLUSIVE_GATEWAY" style="--node-color:#0891b2"><span class="wd-shape wd-shape-diamond" style="--node-color:#0891b2"></span><span>Exclusive Gateway</span></div>
+                        <div class="wd-palette-item" draggable="true" data-type="PARALLEL_GATEWAY" style="--node-color:#7c3aed"><span class="wd-shape wd-shape-diamond" style="--node-color:#7c3aed"></span><span>Parallel Gateway</span></div>
+                        <div class="wd-palette-item" draggable="true" data-type="END" style="--node-color:#dc2626"><span class="wd-shape wd-shape-circle" style="--node-color:#dc2626"></span><span>End Event</span></div>
+                        <div class="text-muted" style="font-size:11px;margin-top:8px">Drag onto the canvas. Click the right port of a node, then click another node to connect. Select a node and press Delete to remove it.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="wd-canvas" id="wdCanvas">
+                    <div class="wd-sizer" id="wdSizer" style="width:2400px;height:1400px">
+                        <div class="wd-inner" id="wdInner">
+                            <svg class="wd-edges" id="wdEdges" width="2400" height="1400"></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card wd-config">
+                    <div class="wd-panel-head" id="wdConfigTitle">Configuration</div>
+                    <div class="card-body p-2" id="wdConfigBody">
+                        <div class="text-muted" style="font-size:12px">Select a node or a sequence flow to configure it.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tabWdThresholds" role="tabpanel">
+        <div class="wd-toolbar">
+            <label class="form-label mb-0 small fw-bold" for="thFilter">Document type</label>
+            <select id="thFilter" class="form-select form-select-sm" style="max-width: 180px" onchange="loadThresholds()">
+                <option value="">All types</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadThresholds()">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="toggleThresholdForm()">
+                <svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Add Threshold
+            </button>
+            <span class="wd-spacer"></span>
+            <span class="text-muted small" id="thSummary"></span>
+        </div>
+
+        <div class="card mb-3 d-none" id="thFormCard">
+            <div class="wd-panel-head">New approval threshold</div>
+            <div class="card-body p-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold" for="thDocType">Document type</label>
+                        <input type="text" id="thDocType" class="form-control form-control-sm" placeholder="PO" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold" for="thName">Name</label>
+                        <input type="text" id="thName" class="form-control form-control-sm" placeholder="Purchase Order approvals above $50,000" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold" for="thMin">Min amount</label>
+                        <input type="number" id="thMin" class="form-control form-control-sm" value="0" step="0.01" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold" for="thMax">Max amount</label>
+                        <input type="number" id="thMax" class="form-control form-control-sm" value="100000" step="0.01" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold" for="thRoles">Approver levels</label>
+                        <input type="text" id="thRoles" class="form-control form-control-sm" placeholder="MANAGER, ADMIN" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold" for="thPlant">Plant (optional)</label>
+                        <input type="text" id="thPlant" class="form-control form-control-sm" placeholder="any" />
+                    </div>
+                    <div class="col-md-3 d-flex align-items-center gap-2">
+                        <input type="checkbox" id="thActive" class="form-check-input" checked />
+                        <label class="form-check-label small" for="thActive">Active</label>
+                        <button type="button" class="btn btn-sm btn-success ms-auto" onclick="createThreshold()">
+                            <svg class="bi bi-send me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-send"></use></svg>Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover wd-th-table mb-0" id="thTable">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Document type</th>
+                        <th>Name</th>
+                        <th>Range</th>
+                        <th>Approver levels</th>
+                        <th>Plant</th>
+                        <th>Active</th>
+                        <th style="width: 130px"></th>
+                    </tr>
+                </thead>
+                <tbody id="thBody">
+                    <tr><td colspan="8" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card mt-3">
+            <div class="wd-panel-head">Threshold preview calculator</div>
+            <div class="card-body p-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold" for="pvDocType">Document type</label>
+                        <input type="text" id="pvDocType" class="form-control form-control-sm" placeholder="PO" list="pvDocTypes" />
+                        <datalist id="pvDocTypes"></datalist>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold" for="pvAmount">Amount</label>
+                        <input type="number" id="pvAmount" class="form-control form-control-sm" value="75000" step="0.01" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold" for="pvPlant">Plant (optional)</label>
+                        <input type="text" id="pvPlant" class="form-control form-control-sm" placeholder="any" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="previewThreshold()">
+                            <svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Preview
+                        </button>
+                    </div>
+                </div>
+                <div id="pvResult"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var API = '/api/v1/workflow-design';
+
+    var NODE_TYPES = {
+        START: { label: 'Start Event', shape: 'circle', color: '#059669', serverType: 'START' },
+        TASK: { label: 'Task', shape: 'rect', color: '#1F497D', serverType: 'TASK' },
+        APPROVAL: { label: 'Approval Task', shape: 'rect', color: '#d97706', serverType: 'APPROVAL' },
+        EXCLUSIVE_GATEWAY: { label: 'Exclusive Gateway', shape: 'diamond', color: '#0891b2', serverType: 'DECISION' },
+        PARALLEL_GATEWAY: { label: 'Parallel Gateway', shape: 'diamond', color: '#7c3aed', serverType: 'TASK' },
+        END: { label: 'End Event', shape: 'circle', color: '#dc2626', serverType: 'END' }
+    };
+
+    var wf = { id: null, code: '', name: '', module: '', description: '', isActive: false, version: 1, bpmnXml: '', nodes: [], edges: [] };
+    var selected = null;
+    var connectFrom = null;
+    var zoom = 1;
+    var lastDragAt = 0;
+    var thresholdRows = [];
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function showAlert(message, success) {
+        var box = document.getElementById('wdAlert');
+        document.getElementById('wdAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showAlert._timer);
+            showAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    async function postJson(url, payload) {
+        var res = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload === undefined || payload === null ? undefined : JSON.stringify(payload)
+        });
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        return { ok: res.ok, status: res.status, body: body };
+    }
+
+    function newId() {
+        if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/x/g, function (c) {
+            var r = Math.random() * 16 | 0;
+            var v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    function metaOf(type) { return NODE_TYPES[type] || { label: type, shape: 'rect', color: '#6c757d', serverType: type }; }
+    function nodeById(id) { for (var i = 0; i < wf.nodes.length; i++) { if (wf.nodes[i].id === id) return wf.nodes[i]; } return null; }
+    function edgeById(id) { for (var i = 0; i < wf.edges.length; i++) { if (wf.edges[i].id === id) return wf.edges[i]; } return null; }
+
+    function syncMetaInputs() {
+        document.getElementById('wdCode').value = wf.code || '';
+        document.getElementById('wdName').value = wf.name || '';
+        document.getElementById('wdModule').value = wf.module || '';
+        document.getElementById('wdDescription').value = wf.description || '';
+        updateStatusBadge();
+    }
+
+    function updateStatusBadge() {
+        var badge = document.getElementById('wdStatus');
+        badge.textContent = wf.isActive ? ('Active v' + wf.version) : (wf.id ? ('Draft v' + wf.version) : 'Unsaved draft');
+    }
+
+    function addNode(type, x, y) {
+        var meta = metaOf(type);
+        var node = {
+            id: newId(),
+            type: type,
+            label: meta.label,
+            x: Math.round(x),
+            y: Math.round(y),
+            config: {}
+        };
+        wf.nodes.push(node);
+        selected = { kind: 'node', id: node.id };
+        connectFrom = null;
+        renderAll();
+        renderConfig();
+        return node;
+    }
+
+    function connectNodes(fromId, toId) {
+        if (fromId === toId) return;
+        var exists = wf.edges.some(function (e) { return e.from === fromId && e.to === toId; });
+        if (exists) { showAlert('Those nodes are already connected', false); return; }
+        var source = nodeById(fromId);
+        wf.edges.push({
+            id: newId(),
+            from: fromId,
+            to: toId,
+            condition: '',
+            label: '',
+            branchType: source && source.type === 'PARALLEL_GATEWAY' ? 'PARALLEL' : 'SEQUENTIAL'
+        });
+        connectFrom = null;
+        renderAll();
+        renderConfig();
+    }
+
+    function deleteSelection() {
+        if (!selected) return;
+        if (selected.kind === 'node') {
+            wf.nodes = wf.nodes.filter(function (n) { return n.id !== selected.id; });
+            wf.edges = wf.edges.filter(function (e) { return e.from !== selected.id && e.to !== selected.id; });
+        } else {
+            wf.edges = wf.edges.filter(function (e) { return e.id !== selected.id; });
+        }
+        selected = null;
+        connectFrom = null;
+        renderAll();
+        renderConfig();
+    }
+
+    function halfSize(node) {
+        var meta = metaOf(node.type);
+        if (meta.shape === 'rect') return { w: 78, h: 30 };
+        return { w: 30, h: 30 };
+    }
+
+    function boundaryPoint(from, to) {
+        var dx = to.x - from.x;
+        var dy = to.y - from.y;
+        var h = halfSize(from);
+        var denom = Math.sqrt((dx * dx) / (h.w * h.w) + (dy * dy) / (h.h * h.h));
+        if (!denom) return { x: from.x, y: from.y };
+        var s = 1 / denom;
+        return { x: from.x + dx * s, y: from.y + dy * s };
+    }
+
+    function edgePoints(a, b) {
+        var start = boundaryPoint(a, b);
+        var end = boundaryPoint(b, a);
+        return { start: start, end: end };
+    }
+
+    function svgEl(name) { return document.createElementNS('http://www.w3.org/2000/svg', name); }
+
+    function renderEdges() {
+        var svg = document.getElementById('wdEdges');
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+        var defs = svgEl('defs');
+        var marker = svgEl('marker');
+        marker.setAttribute('id', 'wdArrow');
+        marker.setAttribute('markerWidth', '10');
+        marker.setAttribute('markerHeight', '7');
+        marker.setAttribute('refX', '9');
+        marker.setAttribute('refY', '3.5');
+        marker.setAttribute('orient', 'auto');
+        var polygon = svgEl('polygon');
+        polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+        polygon.style.fill = 'var(--text-muted)';
+        marker.appendChild(polygon);
+        defs.appendChild(marker);
+        svg.appendChild(defs);
+
+        wf.edges.forEach(function (edge) {
+            var a = nodeById(edge.from);
+            var b = nodeById(edge.to);
+            if (!a || !b) return;
+            var pts = edgePoints(a, b);
+            var midX = (pts.start.x + pts.end.x) / 2;
+            var midY = (pts.start.y + pts.end.y) / 2;
+
+            var hit = svgEl('path');
+            hit.setAttribute('class', 'wd-edge-hit');
+            hit.setAttribute('d', 'M ' + pts.start.x + ' ' + pts.start.y + ' L ' + pts.end.x + ' ' + pts.end.y);
+            hit.dataset.edgeId = edge.id;
+            hit.addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                selected = { kind: 'edge', id: edge.id };
+                connectFrom = null;
+                renderAll();
+                renderConfig();
+            });
+            svg.appendChild(hit);
+
+            var line = svgEl('path');
+            line.setAttribute('class', 'wd-edge-line');
+            line.setAttribute('d', 'M ' + pts.start.x + ' ' + pts.start.y + ' L ' + pts.end.x + ' ' + pts.end.y);
+            line.setAttribute('marker-end', 'url(#wdArrow)');
+            line.style.stroke = selected && selected.kind === 'edge' && selected.id === edge.id ? '#1F497D' : 'var(--text-muted)';
+            if (selected && selected.kind === 'edge' && selected.id === edge.id) line.style.strokeWidth = '3';
+            svg.appendChild(line);
+
+            var text = svgEl('text');
+            text.setAttribute('class', 'wd-edge-label');
+            text.setAttribute('x', midX);
+            text.setAttribute('y', midY - 6);
+            text.setAttribute('text-anchor', 'middle');
+            text.style.fill = 'var(--text-muted)';
+            text.textContent = edge.condition ? edge.condition : (edge.label || '');
+            svg.appendChild(text);
+        });
+    }
+
+    function positionNode(el, node) {
+        el.style.left = node.x + 'px';
+        el.style.top = node.y + 'px';
+    }
+
+    function renderNodes() {
+        var inner = document.getElementById('wdInner');
+        Array.prototype.slice.call(inner.querySelectorAll('.wd-node')).forEach(function (el) { el.remove(); });
+
+        wf.nodes.forEach(function (node) {
+            var meta = metaOf(node.type);
+            var el = document.createElement('div');
+            el.className = 'wd-node shape-' + meta.shape;
+            el.dataset.nodeId = node.id;
+            el.style.setProperty('--node-color', meta.color);
+            positionNode(el, node);
+
+            var label = document.createElement('span');
+            label.className = 'wd-node-label';
+            label.textContent = node.label;
+            el.appendChild(label);
+
+            var port = document.createElement('span');
+            port.className = 'wd-port';
+            port.title = 'Drag or click to connect';
+            el.appendChild(port);
+
+            if (selected && selected.kind === 'node' && selected.id === node.id) el.classList.add('wd-selected');
+            if (connectFrom === node.id) el.classList.add('wd-connecting');
+
+            port.addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                if (!connectFrom) {
+                    connectFrom = node.id;
+                    selected = { kind: 'node', id: node.id };
+                    showAlert('Now click the target node to connect', true);
+                } else {
+                    connectNodes(connectFrom, node.id);
+                }
+                renderAll();
+            });
+
+            el.addEventListener('pointerdown', function (evt) {
+                if (evt.button !== 0) return;
+                if (evt.target === port) return;
+                lastDragAt = 0;
+                evt.preventDefault();
+                evt.stopPropagation();
+                var rect = document.getElementById('wdInner').getBoundingClientRect();
+                var startX = (evt.clientX - rect.left) / zoom;
+                var startY = (evt.clientY - rect.top) / zoom;
+                var origX = node.x;
+                var origY = node.y;
+                var moved = false;
+                el.setPointerCapture(evt.pointerId);
+
+                function onMove(moveEvt) {
+                    var nx = origX + ((moveEvt.clientX - rect.left) / zoom - startX);
+                    var ny = origY + ((moveEvt.clientY - rect.top) / zoom - startY);
+                    if (Math.abs(nx - origX) > 3 || Math.abs(ny - origY) > 3) moved = true;
+                    node.x = Math.round(nx);
+                    node.y = Math.round(ny);
+                    positionNode(el, node);
+                    renderEdges();
+                }
+
+                function onUp() {
+                    el.removeEventListener('pointermove', onMove);
+                    el.removeEventListener('pointerup', onUp);
+                    if (moved) lastDragAt = Date.now();
+                }
+
+                el.addEventListener('pointermove', onMove);
+                el.addEventListener('pointerup', onUp);
+            });
+
+            el.addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                if (Date.now() - lastDragAt < 250) return;
+                if (connectFrom && connectFrom !== node.id) {
+                    connectNodes(connectFrom, node.id);
+                    return;
+                }
+                connectFrom = null;
+                selected = { kind: 'node', id: node.id };
+                renderAll();
+                renderConfig();
+            });
+
+            inner.appendChild(el);
+        });
+    }
+
+    function renderAll() {
+        renderEdges();
+        renderNodes();
+    }
+
+    function renderConfig() {
+        var body = document.getElementById('wdConfigBody');
+        var title = document.getElementById('wdConfigTitle');
+
+        if (!selected) {
+            title.textContent = 'Configuration';
+            body.innerHTML = '<div class="text-muted" style="font-size:12px">Select a node or a sequence flow to configure it.</div>';
+            return;
+        }
+
+        if (selected.kind === 'edge') {
+            var edge = edgeById(selected.id);
+            if (!edge) { selected = null; renderConfig(); return; }
+            var from = nodeById(edge.from);
+            var to = nodeById(edge.to);
+            title.textContent = 'Sequence Flow';
+            body.innerHTML =
+                '<div class="mb-2"><span class="wd-flow-to">' + esc(from ? from.label : '?') + ' &rarr; ' + esc(to ? to.label : '?') + '</span></div>' +
+                '<div class="mb-2"><label class="form-label" for="cfgEdgeLabel">Label</label>' +
+                '<input type="text" id="cfgEdgeLabel" class="form-control form-control-sm" value="' + esc(edge.label) + '" /></div>' +
+                '<div class="mb-2"><label class="form-label" for="cfgEdgeCondition">Condition expression</label>' +
+                '<textarea id="cfgEdgeCondition" class="form-control form-control-sm" rows="2" placeholder="amount > 50000">' + esc(edge.condition) + '</textarea>' +
+                '<div class="text-muted" style="font-size:10.5px">Leave empty to make this the default flow.</div></div>' +
+                '<div class="mb-2"><label class="form-label" for="cfgEdgeBranch">Branch type</label>' +
+                '<select id="cfgEdgeBranch" class="form-select form-select-sm"><option value="SEQUENTIAL"' + (edge.branchType !== 'PARALLEL' ? ' selected' : '') + '>SEQUENTIAL</option><option value="PARALLEL"' + (edge.branchType === 'PARALLEL' ? ' selected' : '') + '>PARALLEL</option></select></div>' +
+                '<div class="d-flex gap-2"><button type="button" class="btn btn-sm btn-primary" onclick="saveEdgeConfig()">Apply</button>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteSelection()">Delete flow</button></div>';
+            return;
+        }
+
+        var node = nodeById(selected.id);
+        if (!node) { selected = null; renderConfig(); return; }
+        var meta = metaOf(node.type);
+        title.textContent = meta.label;
+
+        var html = '<div class="mb-2"><label class="form-label" for="cfgLabel">Name</label>' +
+            '<input type="text" id="cfgLabel" class="form-control form-control-sm" value="' + esc(node.label) + '" /></div>';
+
+        if (node.type === 'APPROVAL') {
+            html += '<div class="mb-2"><label class="form-label" for="cfgRole">Assignee role</label>' +
+                '<select id="cfgRole" class="form-select form-select-sm">' +
+                optionList(['MANAGER', 'POWER_USER', 'ADMIN', 'SUPER_USER', 'PURCHASER'], node.config.assigneeRole) + '</select></div>' +
+                '<div class="mb-2"><label class="form-label" for="cfgThreshold">Amount threshold</label>' +
+                '<input type="number" id="cfgThreshold" class="form-control form-control-sm" step="0.01" value="' + esc(node.config.amountThreshold) + '" placeholder="50000" />' +
+                '<div class="text-muted" style="font-size:10.5px">Approval applies at or above this amount.</div></div>';
+        }
+
+        if (node.type === 'EXCLUSIVE_GATEWAY' || node.type === 'PARALLEL_GATEWAY') {
+            html += '<div class="mb-2"><label class="form-label" for="cfgCondition">Condition expression</label>' +
+                '<textarea id="cfgCondition" class="form-control form-control-sm" rows="2" placeholder="amount > 50000">' + esc(node.config.condition || '') + '</textarea>' +
+                '<div class="text-muted" style="font-size:10.5px">Applied to every outgoing flow except the default one.</div></div>';
+        }
+
+        var outgoing = wf.edges.filter(function (e) { return e.from === node.id; });
+        if (outgoing.length) {
+            html += '<div class="mb-2"><span class="form-label">Outgoing flows</span>';
+            outgoing.forEach(function (edge) {
+                var target = nodeById(edge.to);
+                html += '<div class="wd-flow-row"><span class="wd-flow-to">' + esc(target ? target.label : '?') + '</span>' +
+                    '<input type="text" class="form-control form-control-sm" data-edge-input="' + edge.id + '" value="' + esc(edge.condition) + '" placeholder="default" style="max-width:150px" /></div>';
+            });
+            html += '</div>';
+        }
+
+        html += '<div class="mb-2"><label class="form-label" for="cfgDescription">Description</label>' +
+            '<textarea id="cfgDescription" class="form-control form-control-sm" rows="2">' + esc(node.description || '') + '</textarea></div>' +
+            '<div class="d-flex gap-2"><button type="button" class="btn btn-sm btn-primary" onclick="saveNodeConfig()">Apply</button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteSelection()">Delete node</button></div>';
+
+        body.innerHTML = html;
+    }
+
+    function optionList(values, current) {
+        return values.map(function (value) {
+            return '<option value="' + esc(value) + '"' + (current === value ? ' selected' : '') + '>' + esc(value) + '</option>';
+        }).join('');
+    }
+
+    function saveNodeConfig() {
+        var node = selected && selected.kind === 'node' ? nodeById(selected.id) : null;
+        if (!node) return;
+        var labelInput = document.getElementById('cfgLabel');
+        if (labelInput) node.label = labelInput.value || node.label;
+        var descInput = document.getElementById('cfgDescription');
+        if (descInput) node.description = descInput.value;
+
+        var roleInput = document.getElementById('cfgRole');
+        var thresholdInput = document.getElementById('cfgThreshold');
+        if (roleInput) node.config.assigneeRole = roleInput.value;
+        if (thresholdInput) node.config.amountThreshold = thresholdInput.value === '' ? '' : Number(thresholdInput.value);
+
+        var conditionInput = document.getElementById('cfgCondition');
+        if (conditionInput) {
+            node.config.condition = conditionInput.value;
+            var outgoing = wf.edges.filter(function (e) { return e.from === node.id; });
+            if (outgoing.length) {
+                var defaultEdge = null;
+                for (var i = 0; i < outgoing.length; i++) {
+                    if (!outgoing[i].condition) { defaultEdge = outgoing[i]; break; }
+                }
+                if (!defaultEdge) defaultEdge = outgoing[outgoing.length - 1];
+                outgoing.forEach(function (edge) {
+                    if (edge !== defaultEdge) edge.condition = node.config.condition;
+                });
+            }
+        }
+
+        document.querySelectorAll('[data-edge-input]').forEach(function (input) {
+            var edge = edgeById(input.getAttribute('data-edge-input'));
+            if (edge) edge.condition = input.value;
+        });
+
+        renderAll();
+        renderConfig();
+        showAlert('Node configuration applied', true);
+    }
+
+    function saveEdgeConfig() {
+        var edge = selected && selected.kind === 'edge' ? edgeById(selected.id) : null;
+        if (!edge) return;
+        edge.label = document.getElementById('cfgEdgeLabel').value;
+        edge.condition = document.getElementById('cfgEdgeCondition').value;
+        edge.branchType = document.getElementById('cfgEdgeBranch').value;
+        renderAll();
+        renderConfig();
+        showAlert('Sequence flow updated', true);
+    }
+
+    function toServerNode(node) {
+        var config = Object.assign({}, node.config, { bpmnType: node.type });
+        return {
+            id: node.id,
+            type: metaOf(node.type).serverType,
+            label: node.label,
+            description: node.description || '',
+            configJson: JSON.stringify(config),
+            positionX: node.x,
+            positionY: node.y
+        };
+    }
+
+    function toServerEdge(edge) {
+        return {
+            id: edge.id,
+            fromNodeId: edge.from,
+            toNodeId: edge.to,
+            conditionExpression: edge.condition || '',
+            label: edge.label || '',
+            sequenceOrder: 0,
+            branchType: edge.branchType || 'SEQUENTIAL'
+        };
+    }
+
+    function fromServerNode(raw) {
+        var config = {};
+        try { config = JSON.parse(raw.configJson || '{}') || {}; } catch (e) { config = {}; }
+        var type = config.bpmnType && NODE_TYPES[config.bpmnType] ? config.bpmnType : clientType(raw.nodeType);
+        return {
+            id: raw.id,
+            type: type,
+            label: raw.label,
+            description: raw.description || '',
+            x: raw.positionX,
+            y: raw.positionY,
+            config: config
+        };
+    }
+
+    function clientType(serverType) {
+        var value = (serverType || '').toUpperCase();
+        if (value === 'DECISION') return 'EXCLUSIVE_GATEWAY';
+        if (NODE_TYPES[value]) return value;
+        if (value === 'TIMER' || value === 'API_CALL' || value === 'EMAIL') return 'TASK';
+        return 'TASK';
+    }
+
+    async function saveDefinition() {
+        if (!wf.code.trim() && !wf.name.trim()) {
+            showAlert('Enter a workflow code or name before saving', false);
+            return null;
+        }
+        var payload = {
+            id: wf.id,
+            code: wf.code,
+            name: wf.name,
+            module: wf.module,
+            description: wf.description,
+            bpmnXml: wf.bpmnXml || '',
+            nodes: wf.nodes.map(toServerNode),
+            edges: wf.edges.map(toServerEdge)
+        };
+        var result = await postJson(API + '/definitions', payload);
+        if (!result.ok) {
+            showAlert(result.body && result.body.error ? result.body.error : 'The workflow could not be saved', false);
+            return null;
+        }
+        wf.id = result.body.id;
+        wf.version = result.body.version;
+        wf.isActive = result.body.isActive;
+        updateStatusBadge();
+        await refreshDefinitionList();
+        showAlert('Workflow saved with ' + result.body.nodeCount + ' nodes and ' + result.body.edgeCount + ' flows', true);
+        return result.body;
+    }
+
+    async function validateDefinition() {
+        var saved = await saveDefinition();
+        if (!saved) return;
+        var result = await postJson(API + '/definitions/' + wf.id + '/validate');
+        if (!result.ok) {
+            showAlert('Validation could not be run', false);
+            return;
+        }
+        renderValidation(result.body);
+        if (result.body && result.body.isValid) showAlert('Workflow is valid and ready to publish', true);
+        else showAlert('Workflow validation found problems', false);
+    }
+
+    async function publishDefinition() {
+        var saved = await saveDefinition();
+        if (!saved) return;
+        var result = await postJson(API + '/definitions/' + wf.id + '/publish');
+        renderValidation(result.body);
+        if (!result.ok) {
+            showAlert(result.body && result.body.message ? result.body.message : 'Publish failed', false);
+            return;
+        }
+        wf.isActive = true;
+        wf.version = result.body.version;
+        updateStatusBadge();
+        await refreshDefinitionList();
+        showAlert('Workflow published as version ' + result.body.version, true);
+    }
+
+    function renderValidation(result) {
+        var box = document.getElementById('wdValidation');
+        if (!result) { box.innerHTML = ''; return; }
+        if (result.isValid) {
+            box.innerHTML = '<span class="wd-ok">Validation passed: one START node, reachable flow, no structural errors.</span>';
+            return;
+        }
+        var errors = Array.isArray(result.errors) ? result.errors : [];
+        if (!errors.length) {
+            box.innerHTML = '<span class="wd-err">Validation failed with no detail available.</span>';
+            return;
+        }
+        box.innerHTML = errors.map(function (err) {
+            var where = err.field ? (' [' + err.field + ']') : '';
+            return '<div class="' + (err.severity === 'Warning' ? 'text-warning' : 'wd-err') + '">' + esc(err.message) + esc(where) + '</div>';
+        }).join('');
+    }
+
+    function newDefinition() {
+        wf = { id: null, code: '', name: '', module: '', description: '', isActive: false, version: 1, bpmnXml: '', nodes: [], edges: [] };
+        selected = null;
+        connectFrom = null;
+        syncMetaInputs();
+        document.getElementById('wdValidation').innerHTML = '';
+        document.getElementById('wdLoadList').value = '';
+        renderAll();
+        renderConfig();
+        showAlert('Started a new workflow definition', true);
+    }
+
+    async function refreshDefinitionList() {
+        var data = await apiFetch(API + '/definitions');
+        var list = document.getElementById('wdLoadList');
+        var current = list.value;
+        var html = '<option value="">Select a workflow definition...</option>';
+        (data.definitions || []).forEach(function (def) {
+            html += '<option value="' + esc(def.id) + '">' + esc(def.code || def.name) + ' - ' + esc(def.name) + (def.isActive ? ' (Active)' : '') + '</option>';
+        });
+        list.innerHTML = html;
+        if (current) list.value = current;
+    }
+
+    async function loadSelectedDefinition() {
+        var id = document.getElementById('wdLoadList').value;
+        if (!id) { showAlert('Select a workflow definition to load', false); return; }
+        var data = await apiFetch(API + '/definitions/' + id);
+        wf = {
+            id: data.definition.id,
+            code: data.definition.code,
+            name: data.definition.name,
+            module: data.definition.module,
+            description: data.definition.description,
+            isActive: data.definition.isActive,
+            version: data.definition.version,
+            bpmnXml: data.definition.bpmnXml || '',
+            nodes: (data.nodes || []).map(fromServerNode),
+            edges: (data.edges || []).map(function (raw) {
+                return { id: raw.id, from: raw.fromNodeId, to: raw.toNodeId, condition: raw.conditionExpression || '', label: raw.label || '', branchType: raw.branchType || 'SEQUENTIAL' };
+            })
+        };
+        selected = null;
+        connectFrom = null;
+        syncMetaInputs();
+        document.getElementById('wdValidation').innerHTML = '';
+        renderAll();
+        renderConfig();
+        showAlert('Loaded ' + wf.name, true);
+    }
+
+    function downloadFile(filename, content, mime) {
+        var blob = new Blob([content], { type: mime });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+    }
+
+    function xmlEscape(value) {
+        return String(value === null || value === undefined ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function bpmnElementName(type) {
+        if (type === 'START') return 'startEvent';
+        if (type === 'END') return 'endEvent';
+        if (type === 'APPROVAL') return 'manualTask';
+        if (type === 'EXCLUSIVE_GATEWAY') return 'exclusiveGateway';
+        if (type === 'PARALLEL_GATEWAY') return 'parallelGateway';
+        return 'task';
+    }
+
+    function buildBpmnXml() {
+        var processId = (wf.code || 'workflow').replace(/\s+/g, '_');
+        var lines = [];
+        lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+        lines.push('<definitions xmlns="https://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_' + processId + '" targetNamespace="http://yuktira.com/workflow" exporter="Yuktira Workflow Designer" exporterVersion="2.3.0">');
+        lines.push('  <process id="' + xmlEscape(processId) + '" name="' + xmlEscape(wf.name || processId) + '" isExecutable="true">');
+
+        wf.nodes.forEach(function (node) {
+            var tag = bpmnElementName(node.type);
+            lines.push('    <' + tag + ' id="' + xmlEscape(node.id) + '" name="' + xmlEscape(node.label) + '">');
+            if (node.type === 'APPROVAL' && node.config && node.config.assigneeRole) {
+                lines.push('      <property id="' + xmlEscape(node.id) + '_assigneeRole" name="assigneeRole" value="' + xmlEscape(node.config.assigneeRole) + '"/>');
+            }
+            lines.push('    </' + tag + '>');
+        });
+
+        wf.edges.forEach(function (edge) {
+            lines.push('    <sequenceFlow id="' + xmlEscape(edge.id) + '" name="' + xmlEscape(edge.label || '') + '" sourceRef="' + xmlEscape(edge.from) + '" targetRef="' + xmlEscape(edge.to) + '">');
+            if (edge.condition) {
+                lines.push('      <conditionExpression xsi:type="tFormalExpression">' + xmlEscape(edge.condition) + '</conditionExpression>');
+            }
+            lines.push('    </sequenceFlow>');
+        });
+
+        lines.push('  </process>');
+        lines.push('  <bpmndi:BPMNDiagram id="BPMNDiagram_' + processId + '">');
+        lines.push('    <bpmndi:BPMNPlane id="BPMNPlane_' + processId + '" bpmnElement="' + xmlEscape(processId) + '">');
+        wf.nodes.forEach(function (node) {
+            var meta = metaOf(node.type);
+            var w = meta.shape === 'rect' ? 152 : 60;
+            var h = meta.shape === 'rect' ? 56 : 60;
+            lines.push('      <bpmndi:BPMNShape id="Shape_' + xmlEscape(node.id) + '" bpmnElement="' + xmlEscape(node.id) + '"><dc:Bounds x="' + (node.x - w / 2) + '" y="' + (node.y - h / 2) + '" width="' + w + '" height="' + h + '"/></bpmndi:BPMNShape>');
+        });
+        wf.edges.forEach(function (edge) {
+            var a = nodeById(edge.from);
+            var b = nodeById(edge.to);
+            if (!a || !b) return;
+            var pts = edgePoints(a, b);
+            lines.push('      <bpmndi:BPMNEdge id="Edge_' + xmlEscape(edge.id) + '" bpmnElement="' + xmlEscape(edge.id) + '"><di:waypoint x="' + pts.start.x + '" y="' + pts.start.y + '"/><di:waypoint x="' + pts.end.x + '" y="' + pts.end.y + '"/></bpmndi:BPMNEdge>');
+        });
+        lines.push('    </bpmndi:BPMNPlane>');
+        lines.push('  </bpmndi:BPMNDiagram>');
+        lines.push('</definitions>');
+        return lines.join('\n');
+    }
+
+    function exportBpmn() {
+        if (!wf.nodes.length) { showAlert('Add at least one node before exporting', false); return; }
+        var xml = buildBpmnXml();
+        wf.bpmnXml = xml;
+        downloadFile((wf.code || 'workflow') + '.bpmn', xml, 'application/xml');
+        showAlert('BPMN 2.0 XML exported', true);
+    }
+
+    function exportJson() {
+        var payload = {
+            code: wf.code,
+            name: wf.name,
+            module: wf.module,
+            description: wf.description,
+            nodes: wf.nodes.map(toServerNode),
+            edges: wf.edges.map(toServerEdge)
+        };
+        downloadFile((wf.code || 'workflow') + '.json', JSON.stringify(payload, null, 2), 'application/json');
+        showAlert('Workflow JSON exported', true);
+    }
+
+    function childrenByLocalName(root, name) {
+        var found = [];
+        for (var i = 0; i < root.children.length; i++) {
+            if (root.children[i].localName === name) found.push(root.children[i]);
+        }
+        return found;
+    }
+
+    function firstByLocalName(root, name) {
+        var found = childrenByLocalName(root, name);
+        return found.length ? found[0] : null;
+    }
+
+    var IMPORT_TYPES = {
+        startEvent: 'START',
+        endEvent: 'END',
+        task: 'TASK',
+        manualTask: 'APPROVAL',
+        userTask: 'APPROVAL',
+        exclusiveGateway: 'EXCLUSIVE_GATEWAY',
+        parallelGateway: 'PARALLEL_GATEWAY'
+    };
+
+    function parseBpmn(text) {
+        var doc = new DOMParser().parseFromString(text, 'application/xml');
+        if (doc.getElementsByTagName('parsererror').length) throw new Error('The file is not valid XML');
+        var root = doc.documentElement;
+        if (!root || root.localName !== 'definitions') throw new Error('Not a BPMN 2.0 definitions file');
+        var processEl = firstByLocalName(root, 'process');
+        if (!processEl) throw new Error('No process element found in the BPMN file');
+
+        var bounds = {};
+        var shapes = doc.getElementsByTagNameNS('*', 'BPMNShape');
+        for (var i = 0; i < shapes.length; i++) {
+            var shape = shapes[i];
+            var elementRef = shape.getAttribute('bpmnElement');
+            var boundsEl = childrenByLocalName(shape, 'Bounds')[0];
+            if (elementRef && boundsEl) {
+                bounds[elementRef] = { x: Number(boundsEl.getAttribute('x')) + Number(boundsEl.getAttribute('width')) / 2, y: Number(boundsEl.getAttribute('y')) + Number(boundsEl.getAttribute('height')) / 2 };
+            }
+        }
+
+        var nodes = [];
+        var columns = 0;
+        for (var c = 0; c < processEl.children.length; c++) {
+            var child = processEl.children[c];
+            var type = IMPORT_TYPES[child.localName];
+            if (!type) continue;
+            var id = child.getAttribute('id') || newId();
+            var position = bounds[id];
+            if (!position) {
+                position = { x: 140 + (columns % 6) * 200, y: 120 + Math.floor(columns / 6) * 140 };
+                columns++;
+            }
+            nodes.push({
+                id: id,
+                type: type,
+                label: child.getAttribute('name') || metaOf(type).label,
+                description: '',
+                x: Math.round(position.x),
+                y: Math.round(position.y),
+                config: {}
+            });
+        }
+
+        var edges = [];
+        childrenByLocalName(processEl, 'sequenceFlow').forEach(function (flow) {
+            edges.push({
+                id: flow.getAttribute('id') || newId(),
+                from: flow.getAttribute('sourceRef'),
+                to: flow.getAttribute('targetRef'),
+                condition: (firstByLocalName(flow, 'conditionExpression') || { textContent: '' }).textContent || '',
+                label: flow.getAttribute('name') || '',
+                branchType: 'SEQUENTIAL'
+            });
+        });
+
+        return {
+            code: processEl.getAttribute('id') || '',
+            name: processEl.getAttribute('name') || '',
+            nodes: nodes,
+            edges: edges
+        };
+    }
+
+    function importBpmnFile(evt) {
+        var file = evt.target.files && evt.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+            try {
+                var parsed = parseBpmn(String(reader.result));
+                wf = {
+                    id: null,
+                    code: parsed.code,
+                    name: parsed.name,
+                    module: wf.module,
+                    description: wf.description,
+                    isActive: false,
+                    version: 1,
+                    bpmnXml: String(reader.result),
+                    nodes: parsed.nodes,
+                    edges: parsed.edges.filter(function (edge) {
+                        return parsed.nodes.some(function (node) { return node.id === edge.from; }) &&
+                            parsed.nodes.some(function (node) { return node.id === edge.to; });
+                    })
+                };
+                selected = null;
+                connectFrom = null;
+                syncMetaInputs();
+                document.getElementById('wdValidation').innerHTML = '';
+                renderAll();
+                renderConfig();
+                showAlert('Imported ' + wf.nodes.length + ' nodes and ' + wf.edges.length + ' flows. Save to persist.', true);
+            } catch (e) {
+                showAlert('BPMN import failed: ' + e.message, false);
+            }
+        };
+        reader.readAsText(file);
+        evt.target.value = '';
+    }
+
+    function setZoom(next) {
+        zoom = Math.min(1.6, Math.max(0.5, Math.round(next * 10) / 10));
+        document.getElementById('wdInner').style.transform = 'scale(' + zoom + ')';
+        document.getElementById('wdSizer').style.width = Math.round(2400 * zoom) + 'px';
+        document.getElementById('wdSizer').style.height = Math.round(1400 * zoom) + 'px';
+        document.getElementById('wdZoomLabel').textContent = Math.round(zoom * 100) + '%';
+    }
+
+    function toContentPoint(evt) {
+        var rect = document.getElementById('wdInner').getBoundingClientRect();
+        return { x: (evt.clientX - rect.left) / zoom, y: (evt.clientY - rect.top) / zoom };
+    }
+
+    function initCanvas() {
+        var canvas = document.getElementById('wdCanvas');
+        var inner = document.getElementById('wdInner');
+
+        document.querySelectorAll('.wd-palette-item').forEach(function (item) {
+            item.addEventListener('dragstart', function (evt) {
+                evt.dataTransfer.setData('text/plain', item.getAttribute('data-type'));
+                evt.dataTransfer.effectAllowed = 'copy';
+            });
+        });
+
+        canvas.addEventListener('dragover', function (evt) { evt.preventDefault(); });
+        canvas.addEventListener('drop', function (evt) {
+            evt.preventDefault();
+            var type = evt.dataTransfer.getData('text/plain');
+            if (!NODE_TYPES[type]) return;
+            var point = toContentPoint(evt);
+            addNode(type, point.x, point.y);
+        });
+
+        inner.addEventListener('click', function (evt) {
+            if (evt.target === inner || evt.target.id === 'wdEdges') {
+                connectFrom = null;
+                selected = null;
+                renderAll();
+                renderConfig();
+            }
+        });
+    }
+
+    async function loadThresholds() {
+        var filter = document.getElementById('thFilter').value;
+        var url = API + '/thresholds' + (filter ? '?documentType=' + encodeURIComponent(filter) : '');
+        var data = await apiFetch(url);
+        var rows = data.thresholds || [];
+        thresholdRows = rows;
+        renderThresholds(rows);
+        populateDocumentTypes(rows);
+        document.getElementById('thSummary').textContent = rows.length + ' threshold(s)';
+    }
+
+    function populateDocumentTypes(rows) {
+        var types = [];
+        rows.forEach(function (row) {
+            if (row.documentType && types.indexOf(row.documentType) === -1) types.push(row.documentType);
+        });
+        var filter = document.getElementById('thFilter');
+        var current = filter.value;
+        var html = '<option value="">All types</option>';
+        types.forEach(function (type) { html += '<option value="' + esc(type) + '">' + esc(type) + '</option>'; });
+        filter.innerHTML = html;
+        if (current && types.indexOf(current) >= 0) filter.value = current;
+
+        document.getElementById('pvDocTypes').innerHTML = types.map(function (type) {
+            return '<option value="' + esc(type) + '"></option>';
+        }).join('');
+    }
+
+    function rolesOf(row) {
+        return (row.levels || []).map(function (level) { return level.approverRole; }).filter(function (role) { return !!role; }).join(', ');
+    }
+
+    function renderThresholds(rows) {
+        var body = document.getElementById('thBody');
+        if (!rows.length) {
+            body.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-3">No approval thresholds yet. Use Add Threshold to create one.</td></tr>';
+            return;
+        }
+        body.innerHTML = rows.map(function (row) {
+            return '<tr data-th-id="' + esc(row.id) + '">' +
+                '<td class="fw-semibold">' + esc(row.code) + '</td>' +
+                '<td>' + esc(row.documentType) + '</td>' +
+                '<td>' + esc(row.name) + '</td>' +
+                '<td>' + esc(row.minAmount) + ' - ' + esc(row.maxAmount) + '</td>' +
+                '<td class="small">' + esc(rolesOf(row)) + '</td>' +
+                '<td class="small">' + esc(row.plant || 'any') + '</td>' +
+                '<td>' + (row.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') + '</td>' +
+                '<td class="text-end">' +
+                '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editThreshold(\'' + esc(row.id) + '\')"><svg class="bi bi-pencil" aria-hidden="true"><use href="/images/sprite.svg#bi-pencil"></use></svg></button>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteThreshold(\'' + esc(row.id) + '\')"><svg class="bi bi-trash" aria-hidden="true"><use href="/images/sprite.svg#bi-trash"></use></svg></button>' +
+                '</td></tr>';
+        }).join('');
+    }
+
+    function toggleThresholdForm() {
+        document.getElementById('thFormCard').classList.toggle('d-none');
+    }
+
+    function parseRoles(value) {
+        return String(value || '').split(',').map(function (role) { return role.trim(); }).filter(function (role) { return !!role; });
+    }
+
+    async function createThreshold() {
+        var documentType = document.getElementById('thDocType').value.trim();
+        var roles = parseRoles(document.getElementById('thRoles').value);
+        if (!documentType) { showAlert('Document type is required', false); return; }
+        var payload = {
+            documentType: documentType,
+            name: document.getElementById('thName').value.trim(),
+            minAmount: Number(document.getElementById('thMin').value || 0),
+            maxAmount: Number(document.getElementById('thMax').value || 0),
+            plant: document.getElementById('thPlant').value.trim(),
+            isActive: document.getElementById('thActive').checked,
+            approverRole: roles.length ? roles.join(',') : 'ADMIN'
+        };
+        var result = await postJson(API + '/thresholds', payload);
+        if (!result.ok) {
+            showAlert(result.body && result.body.error ? result.body.error : 'Threshold could not be created', false);
+            return;
+        }
+        showAlert('Approval threshold created: ' + result.body.threshold.code, true);
+        document.getElementById('thFormCard').classList.add('d-none');
+        await loadThresholds();
+    }
+
+    async function editThreshold(id) {
+        var row = document.querySelector('tr[data-th-id="' + id + '"]');
+        var source = null;
+        for (var i = 0; i < thresholdRows.length; i++) {
+            if (thresholdRows[i].id === id) source = thresholdRows[i];
+        }
+        if (!row || !source) return;
+        row.innerHTML =
+            '<td>' + esc(source.code) + '</td>' +
+            '<td>' + esc(source.documentType) + '</td>' +
+            '<td><input type="text" class="form-control form-control-sm" id="edName-' + esc(id) + '" value="' + esc(source.name) + '" /></td>' +
+            '<td><div class="d-flex gap-1"><input type="number" step="0.01" class="form-control form-control-sm" id="edMin-' + esc(id) + '" value="' + esc(source.minAmount) + '" /><input type="number" step="0.01" class="form-control form-control-sm" id="edMax-' + esc(id) + '" value="' + esc(source.maxAmount) + '" /></div></td>' +
+            '<td><input type="text" class="form-control form-control-sm" id="edRoles-' + esc(id) + '" value="' + esc(rolesOf(source)) + '" /></td>' +
+            '<td><input type="text" class="form-control form-control-sm" id="edPlant-' + esc(id) + '" value="' + esc(source.plant) + '" /></td>' +
+            '<td><div class="form-check"><input type="checkbox" class="form-check-input" id="edActive-' + esc(id) + '"' + (source.isActive ? ' checked' : '') + ' /></div></td>' +
+            '<td class="text-end">' +
+            '<button type="button" class="btn btn-sm btn-success me-1" onclick="saveThresholdEdit(\'' + esc(id) + '\')"><svg class="bi bi-check" aria-hidden="true"><use href="/images/sprite.svg#bi-check"></use></svg></button>' +
+            '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadThresholds()"><svg class="bi bi-x" aria-hidden="true"><use href="/images/sprite.svg#bi-x"></use></svg></button>' +
+            '</td>';
+    }
+
+    async function saveThresholdEdit(id) {
+        var roles = parseRoles(document.getElementById('edRoles-' + id).value);
+        var payload = {
+            documentType: thresholdRows.find(function (row) { return row.id === id; }).documentType,
+            name: document.getElementById('edName-' + id).value.trim(),
+            minAmount: Number(document.getElementById('edMin-' + id).value || 0),
+            maxAmount: Number(document.getElementById('edMax-' + id).value || 0),
+            plant: document.getElementById('edPlant-' + id).value.trim(),
+            isActive: document.getElementById('edActive-' + id).checked,
+            levels: roles.map(function (role, index) { return { level: index + 1, approverRole: role }; })
+        };
+        var result = await fetch(API + '/thresholds/' + id, {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        var body = null;
+        try { body = await result.json(); } catch (e) { body = null; }
+        if (!result.ok) {
+            showAlert(body && body.error ? body.error : 'Threshold could not be updated', false);
+            return;
+        }
+        showAlert('Approval threshold updated', true);
+        await loadThresholds();
+    }
+
+    async function deleteThreshold(id) {
+        if (!window.confirm('Delete this approval threshold?')) return;
+        var result = await fetch(API + '/thresholds/' + id, { method: 'DELETE', credentials: 'same-origin' });
+        var body = null;
+        try { body = await result.json(); } catch (e) { body = null; }
+        if (!result.ok) {
+            showAlert(body && body.error ? body.error : 'Threshold could not be deleted', false);
+            return;
+        }
+        showAlert('Approval threshold deleted', true);
+        await loadThresholds();
+    }
+
+    async function previewThreshold() {
+        var documentType = document.getElementById('pvDocType').value.trim();
+        var amount = Number(document.getElementById('pvAmount').value);
+        var plant = document.getElementById('pvPlant').value.trim();
+        if (!documentType || isNaN(amount)) { showAlert('Enter a document type and amount to preview', false); return; }
+        var url = API + '/thresholds/preview?documentType=' + encodeURIComponent(documentType) + '&amount=' + encodeURIComponent(amount);
+        if (plant) url += '&plant=' + encodeURIComponent(plant);
+        var data = await apiFetch(url);
+        var box = document.getElementById('pvResult');
+        if (!data.matched || !data.threshold) {
+            box.innerHTML = '<div class="wd-preview-result miss"><strong>No threshold matches</strong> ' + esc(documentType) + ' at ' + esc(amount) + '. Add or widen a range so this document knows who must approve it.</div>';
+            return;
+        }
+        var t = data.threshold;
+        box.innerHTML = '<div class="wd-preview-result matched">' +
+            '<strong>' + esc(t.code) + '</strong> ' + esc(t.name) + '<br />' +
+            '<span class="small">Range ' + esc(t.minAmount) + ' - ' + esc(t.maxAmount) + ' for ' + esc(t.documentType) +
+            (t.plant ? ' · plant ' + esc(t.plant) : '') + '</span><br />' +
+            '<span class="small">Approver chain: ' + esc(rolesOf(t)) + '</span>' +
+            '</div>';
+    }
+
+    document.addEventListener('keydown', function (evt) {
+        var tag = document.activeElement ? document.activeElement.tagName : '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        if (evt.key === 'Delete' || evt.key === 'Backspace') {
+            if (!selected) return;
+            evt.preventDefault();
+            deleteSelection();
+        }
+        if (evt.key === 'Escape') {
+            connectFrom = null;
+            renderAll();
+        }
+    });
+
+    async function initWorkflowDesigner() {
+        initCanvas();
+        syncMetaInputs();
+        renderAll();
+        renderConfig();
+        try {
+            await refreshDefinitionList();
+        } catch (e) {
+            showAlert('Workflow definitions could not be loaded', false);
+        }
+        try {
+            await loadThresholds();
+        } catch (e) {
+            document.getElementById('thBody').innerHTML = '<tr><td colspan="8" class="text-center text-muted py-3">Approval thresholds could not be loaded.</td></tr>';
+        }
+    }
+
+    initWorkflowDesigner();
+</script>
+}

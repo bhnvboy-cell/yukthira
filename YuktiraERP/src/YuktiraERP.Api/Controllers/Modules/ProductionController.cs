@@ -21,6 +21,8 @@ public class ProductionController : ControllerBase
     private readonly ITenantContext _tenant;
     private readonly IProductionOrderService _productionOrderService;
     private readonly IGoodsMovementService _goodsMovementService;
+    private readonly IMassBalanceCalculator _massBalance;
+    private readonly ILogger<ProductionController> _logger;
 
     public ProductionController(
         IRepository<ProductionPlanEntity, Guid> plans,
@@ -30,7 +32,9 @@ public class ProductionController : ControllerBase
         IRepository<ProductionOrderEntity, Guid> orders,
         ITenantContext tenant,
         IProductionOrderService productionOrderService,
-        IGoodsMovementService goodsMovementService)
+        IGoodsMovementService goodsMovementService,
+        IMassBalanceCalculator massBalance,
+        ILogger<ProductionController> logger)
     {
         _plans = plans;
         _bom = bom;
@@ -40,6 +44,8 @@ public class ProductionController : ControllerBase
         _tenant = tenant;
         _productionOrderService = productionOrderService;
         _goodsMovementService = goodsMovementService;
+        _massBalance = massBalance;
+        _logger = logger;
     }
 
     [HttpGet("plans")] public async Task<IActionResult> GetPlans() => Ok(new { data = await _plans.FindAsync(p => p.TenantId == _tenant.TenantId), tenantId = _tenant.TenantId });
@@ -99,6 +105,14 @@ public class ProductionController : ControllerBase
         try
         {
             var order = await _productionOrderService.ConfirmProductionAsync(id, request.YieldQty, request.ScrapQty, User.Identity?.Name ?? "system");
+            try
+            {
+                await _massBalance.CalculateForOrderAsync(id, User.Identity?.Name ?? "system", default);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Mass balance calculation failed for production order {OrderId}", id);
+            }
             return Ok(new { success = true, order });
         }
         catch (InvalidOperationException ex)

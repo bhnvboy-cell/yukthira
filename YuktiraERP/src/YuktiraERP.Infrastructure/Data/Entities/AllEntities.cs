@@ -2504,3 +2504,84 @@ public class TCodeAuthCheckEntity : EntityBase
     public string Description { get; set; } = "";
     public bool IsActive { get; set; } = true;
 }
+
+public class SxAuditEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public long SequenceNumber { get; set; }
+    public string ActionCategory { get; set; } = "";
+    public string TargetEntity { get; set; } = "";
+    public string TargetId { get; set; } = "";
+    public string Summary { get; set; } = "";
+    public decimal DeltaAmount { get; set; }
+    public string Currency { get; set; } = "INR";
+    public string Status { get; set; } = "Applied";
+    public string UserId { get; set; } = "system";
+    public string PreviousHash { get; set; } = "";
+    public string CurrentHash { get; set; } = "";
+    public string Details { get; set; } = "{}";
+}
+
+public class FinancialEventEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid StreamId { get; set; }
+    public string StreamType { get; set; } = "UniversalJournal";
+    public long Sequence { get; set; }
+    public string EventType { get; set; } = "";
+    public string Payload { get; set; } = "{}";
+    public string CorrelationId { get; set; } = "";
+    public string Status { get; set; } = "Pending";
+    public string PreviousHash { get; set; } = "";
+    public string Hash { get; set; } = "";
+    public DateTime? AppliedAt { get; set; }
+    public string Error { get; set; } = "";
+}
+
+public class EmissionFactorEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public int Scope { get; set; }
+    public string SourceType { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public string Unit { get; set; } = "kg";
+    public decimal KgCo2ePerUnit { get; set; }
+    public string Region { get; set; } = "";
+    public bool IsActive { get; set; } = true;
+    public DateTime EffectiveFrom { get; set; } = DateTime.UtcNow;
+}
+
+public class EmissionLogEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public int Scope { get; set; }
+    public string SourceType { get; set; } = "";
+    public string ReferenceType { get; set; } = "";
+    public string ReferenceId { get; set; } = "";
+    public string MaterialCode { get; set; } = "";
+    public decimal Quantity { get; set; }
+    public string Unit { get; set; } = "kg";
+    public decimal KgCo2e { get; set; }
+    public decimal KgCo2ePerUnit { get; set; }
+    public string Period { get; set; } = "";
+    public DateTime ComputedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class MassBalanceResultEntity : EntityBase
+{
+    public Guid TenantId { get; set; }
+    public Guid ProductionOrderId { get; set; }
+    public string OrderNumber { get; set; } = "";
+    public decimal TotalInputKg { get; set; }
+    public decimal TotalOutputKg { get; set; }
+    public decimal TotalCoProductKg { get; set; }
+    public decimal YieldLossKg { get; set; }
+    public decimal YieldLossPct { get; set; }
+    public decimal DrySubstanceInputKg { get; set; }
+    public decimal DrySubstanceOutputKg { get; set; }
+    public decimal DrySubstanceLossKg { get; set; }
+    public decimal ThresholdPct { get; set; }
+    public string Status { get; set; } = "WithinTolerance";
+    public string BreakdownJson { get; set; } = "{}";
+    public DateTime CalculatedAt { get; set; } = DateTime.UtcNow;
+}

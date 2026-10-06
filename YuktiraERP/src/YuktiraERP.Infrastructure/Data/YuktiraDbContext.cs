@@ -315,6 +315,12 @@ public class YuktiraDbContext : DbContext
     public DbSet<RoleTCodeAssignmentEntity> RoleTCodeAssignments => Set<RoleTCodeAssignmentEntity>();
     public DbSet<SecurityImportBatchEntity> SecurityImportBatches => Set<SecurityImportBatchEntity>();
     public DbSet<UserRoleAssignmentEntity> UserRoleAssignments => Set<UserRoleAssignmentEntity>();
+    // Next-Gen pillars (v2.3.0)
+    public DbSet<SxAuditEntity> SxAudits => Set<SxAuditEntity>();
+    public DbSet<FinancialEventEntity> FinancialEvents => Set<FinancialEventEntity>();
+    public DbSet<EmissionFactorEntity> EmissionFactors => Set<EmissionFactorEntity>();
+    public DbSet<EmissionLogEntity> EmissionLogs => Set<EmissionLogEntity>();
+    public DbSet<MassBalanceResultEntity> MassBalanceResults => Set<MassBalanceResultEntity>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);

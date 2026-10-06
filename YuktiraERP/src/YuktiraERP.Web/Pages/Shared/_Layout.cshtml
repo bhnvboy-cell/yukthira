@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/yuktira.css" />
+    <script src="~/js/pwa-sync.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -383,14 +384,10 @@
     </script>
 
     <script>
-        // ── Unregister old service worker and clear cache ──
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
-                regs.forEach(function(r) { r.unregister(); });
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').catch(function () { });
             });
-        }
-        if ('caches' in window) {
-            caches.keys().then(function(keys) { keys.forEach(function(k) { caches.delete(k); }); });
         }
     </script>
     <!-- Session Timeout Warning Modal (SAP-style) -->

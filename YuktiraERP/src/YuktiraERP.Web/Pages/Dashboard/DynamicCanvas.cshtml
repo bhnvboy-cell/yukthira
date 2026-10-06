@@ -1,0 +1,400 @@
+@page
+@model YuktiraERP.Web.Pages.Dashboard.DynamicCanvasModel
+@{
+    ViewData["Title"] = "Context Dashboard";
+}
+
+@section Styles {
+<style>
+    .dc-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 8px; }
+    .dc-widget { min-height: 170px; border-left: 3px solid #1F497D; }
+    .dc-widget-head { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); color: #1F497D; font-weight: 600; font-size: 13px; letter-spacing: .01em; }
+    .dc-widget-head .bi { width: 16px; height: 16px; flex-shrink: 0; }
+    .dc-widget-tag { margin-left: auto; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); background: rgba(31, 73, 125, .08); border-radius: 10px; padding: 2px 8px; }
+    .dc-widget-body { flex: 1; font-size: 13px; color: var(--text-primary); }
+    .dc-subgrid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 0; }
+    .dc-stat-value { font-size: 26px; font-weight: 700; line-height: 1.05; letter-spacing: -.5px; color: #1F497D; }
+    .dc-stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .dc-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .dc-list { list-style: none; margin: 8px 0 0; padding: 0; }
+    .dc-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--border-color); font-size: 12.5px; }
+    .dc-list li:last-child { border-bottom: none; }
+    .dc-list .dc-list-main { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dc-list .dc-list-amount { font-weight: 600; white-space: nowrap; }
+    .dc-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 12px; font-weight: 600; color: #1F497D; text-decoration: none; }
+    .dc-link:hover { text-decoration: underline; }
+    .dc-empty { color: var(--text-muted); font-size: 12.5px; padding: 8px 0; }
+    .dc-loading { color: var(--text-muted); font-size: 12.5px; padding: 8px 0; }
+    .dc-error { color: #dc2626; font-size: 12.5px; padding: 8px 0; }
+    .dc-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 4px 9px; border-radius: 12px; background: rgba(31, 73, 125, .08); color: #1F497D; border: 1px solid var(--border-color); margin: 0 6px 6px 0; }
+    .dc-chip strong { font-weight: 700; }
+    .dc-chips { margin-top: 8px; }
+    .dc-context-pills { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+    .dc-pill { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px; background: rgba(255, 255, 255, .16); color: #fff; white-space: nowrap; }
+    .dc-focus { font-size: 12.5px; margin-top: 4px; opacity: .9; }
+    .dc-badge { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 9px; background: rgba(31, 73, 125, .1); color: #1F497D; white-space: nowrap; }
+    [data-theme="dark"] .dc-widget-head { color: #8ab4e8; }
+    [data-theme="dark"] .dc-stat-value { color: #8ab4e8; }
+    [data-theme="dark"] .dc-link { color: #8ab4e8; }
+    [data-theme="dark"] .dc-chip { color: #8ab4e8; background: rgba(138, 180, 232, .1); }
+    [data-theme="dark"] .dc-badge { color: #8ab4e8; background: rgba(138, 180, 232, .12); }
+    [data-theme="dark"] .dc-widget-tag { background: rgba(138, 180, 232, .12); }
+</style>
+}
+
+<div class="welcome-bar">
+    <div>
+        <h1>@Model.Context.Greeting</h1>
+        <p class="dc-focus" id="dcFocus"></p>
+    </div>
+    <div class="dc-context-pills" id="dcPills"></div>
+</div>
+
+<div class="kpi-grid dc-grid" id="dcGrid"></div>
+
+@section Scripts {
+<script>
+    var dcCtx = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Context, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+
+    var ROLE_RANK = { READ_ONLY: 10, NORMAL_USER: 20, POWER_USER: 30, ADMIN: 40, SUPER_USER: 50 };
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    async function fetchJsonIfOk(url) {
+        try {
+            var res = await fetch(url, { credentials: 'same-origin' });
+            if (!res.ok) return null;
+            return await res.json();
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function money(value) {
+        var cfg = window.YuktiraConfig || {};
+        try {
+            return new Intl.NumberFormat(cfg.locale || undefined, {
+                style: 'currency',
+                currency: cfg.currencyCode || 'INR',
+                maximumFractionDigits: 0
+            }).format(value);
+        } catch (e) {
+            return String(value);
+        }
+    }
+
+    function rankOf(role) {
+        if (ROLE_RANK[role] !== undefined) return ROLE_RANK[role];
+        return role ? 25 : 0;
+    }
+
+    function timeBonus(hour) {
+        if (hour >= 5 && hour < 12) return 5;
+        if (hour >= 12 && hour < 17) return 3;
+        if (hour >= 17 && hour < 23) return 5;
+        return 0;
+    }
+
+    function stat(label, value) {
+        return '<div><div class="dc-stat-value">' + esc(value) + '</div><div class="dc-stat-label">' + esc(label) + '</div></div>';
+    }
+
+    function setBody(id, html) {
+        var body = document.getElementById('wb-' + id);
+        if (body) body.innerHTML = html;
+    }
+
+    function removeWidget(id) {
+        var card = document.getElementById('w-' + id);
+        if (card) card.remove();
+    }
+
+    async function loadPendingApprovals(ctx) {
+        var rows = await apiFetch('/api/v1/approvals/pending');
+        if (!Array.isArray(rows)) rows = [];
+        var html = stat('awaiting your decision', rows.length);
+        if (!rows.length) {
+            html += '<div class="dc-empty">Nothing is waiting in your queue.</div>';
+        } else {
+            html += '<ul class="dc-list">';
+            rows.slice(0, 5).forEach(function (row) {
+                html += '<li><span class="dc-list-main">' + esc(row.documentNumber || row.documentType || row.id) +
+                    '<span class="dc-badge">L' + esc(row.currentLevel) + '/' + esc(row.maxLevel) + '</span></span>' +
+                    '<span class="dc-list-amount">' + esc(money(row.amount)) + '</span></li>';
+            });
+            html += '</ul>';
+            if (rows.length > 5) html += '<div class="dc-empty">+' + (rows.length - 5) + ' more</div>';
+        }
+        html += '<a class="dc-link" href="/Approval/Pending">Open approvals<svg class="bi bi-arrow-right" aria-hidden="true"><use href="/images/sprite.svg#bi-arrow-right"></use></svg></a>';
+        setBody('pendingApprovals', html);
+    }
+
+    async function loadKpiOverview() {
+        var kpis = await apiFetch('/api/v1/kpi/dashboard');
+        if (!Array.isArray(kpis) || !kpis.length) {
+            setBody('kpiOverview', '<div class="dc-empty">No KPIs published yet.</div>');
+            return;
+        }
+        var html = '<div class="kpi-grid dc-subgrid">';
+        kpis.slice(0, 6).forEach(function (k) {
+            var trendIcon = k.trend === 'up' ? 'bi-arrow-up' : k.trend === 'down' ? 'bi-arrow-down' : 'bi-dash';
+            html += '<a href="' + esc(k.drillDownUrl || '/Dashboard') + '" class="kpi-card color-' + esc(k.color || 'green') + '" style="min-height:86px;padding:12px 12px 10px">';
+            html += '<div class="kpi-top"><div class="kpi-icon"><svg class="bi ' + esc(k.icon || 'bi-graph-up') + '" aria-hidden="true"><use href="/images/sprite.svg#' + esc(k.icon || 'bi-graph-up') + '"></use></svg></div>' +
+                '<span class="kpi-trend ' + esc(k.trend || 'flat') + '"><svg class="bi ' + trendIcon + '" aria-hidden="true"><use href="/images/sprite.svg#' + trendIcon + '"></use></svg></span></div>';
+            html += '<div class="kpi-value">' + esc(k.displayValue) + '</div>';
+            html += '<div class="kpi-label">' + esc(k.label) + '</div></a>';
+        });
+        html += '</div>';
+        setBody('kpiOverview', html);
+    }
+
+    async function loadModuleTiles() {
+        var badges = await apiFetch('/api/v1/kpi/module-badges');
+        if (!Array.isArray(badges) || !badges.length) {
+            setBody('moduleTiles', '<div class="dc-empty">No module badges yet.</div>');
+            return;
+        }
+        var html = '<div class="dc-chips">';
+        badges.slice(0, 14).forEach(function (b) {
+            html += '<span class="dc-chip">' + esc(b.moduleCode) + ' <strong>' + esc(b.value) + '</strong></span>';
+        });
+        html += '</div>';
+        html += '<a class="dc-link" href="/Dashboard">All modules<svg class="bi bi-arrow-right" aria-hidden="true"><use href="/images/sprite.svg#bi-arrow-right"></use></svg></a>';
+        setBody('moduleTiles', html);
+    }
+
+    async function loadSecurityPosture() {
+        var total = await apiFetch('/api/v1/security/trace?pageSize=1');
+        var denied = await apiFetch('/api/v1/security/trace?decision=Deny&pageSize=1');
+        var html = '<div class="dc-stat-grid">';
+        html += stat('authorization checks traced', total && total.totalCount !== undefined ? total.totalCount : '--');
+        html += stat('denied decisions', denied && denied.totalCount !== undefined ? denied.totalCount : '--');
+        html += '</div>';
+        html += '<a class="dc-link" href="/Admin/AuthTrace">Open authorization trace<svg class="bi bi-arrow-right" aria-hidden="true"><use href="/images/sprite.svg#bi-arrow-right"></use></svg></a>';
+        setBody('securityPosture', html);
+    }
+
+    async function loadSoxViolations() {
+        var summary = await apiFetch('/api/v1/sox/summary');
+        var html = '<div class="dc-stat-grid">';
+        html += stat('open violations', summary && summary.openViolations !== undefined ? summary.openViolations : '--');
+        html += stat('open high severity', summary && summary.openHigh !== undefined ? summary.openHigh : '--');
+        html += '</div>';
+        html += '<a class="dc-link" href="/Admin/SoxCompliance">Open SOX compliance<svg class="bi bi-arrow-right" aria-hidden="true"><use href="/images/sprite.svg#bi-arrow-right"></use></svg></a>';
+        setBody('soxViolations', html);
+    }
+
+    async function loadReconciliation() {
+        var data = await fetchJsonIfOk('/api/v1/self-healing/status');
+        if (!data) data = await fetchJsonIfOk('/api/v1/selfhealing/status');
+        if (!data) return null;
+        var pairs = [];
+        if (data.healthy !== undefined && data.healthy !== null) pairs.push(['healthy', data.healthy ? 'Yes' : 'No']);
+        if (data.actionsToday !== undefined) pairs.push(['actions today', data.actionsToday]);
+        if (data.pendingFlagged !== undefined) pairs.push(['pending flagged', data.pendingFlagged]);
+        if (data.lastRunAt) pairs.push(['last run', new Date(data.lastRunAt).toLocaleString()]);
+        if (!pairs.length) {
+            if (data.enabled !== undefined) pairs.push(['agent enabled', data.enabled ? 'Yes' : 'No']);
+            if (data.intervalMinutes !== undefined) pairs.push(['interval (min)', data.intervalMinutes]);
+        }
+        if (!pairs.length) return null;
+        var html = '<div class="dc-stat-grid">';
+        pairs.forEach(function (pair) { html += stat(pair[0], pair[1]); });
+        html += '</div>';
+        return html;
+    }
+
+    async function loadCarbonFootprint() {
+        var response = await fetchJsonIfOk('/api/v1/esg/emissions/summary');
+        if (!response) return null;
+        var data = response.data || response;
+        var html = '<div class="dc-stat-grid">';
+        var any = false;
+        if (data.scope1Kg !== undefined) { html += stat('scope 1 kg', data.scope1Kg); any = true; }
+        if (data.scope2Kg !== undefined) { html += stat('scope 2 kg', data.scope2Kg); any = true; }
+        if (data.scope3Kg !== undefined) { html += stat('scope 3 kg', data.scope3Kg); any = true; }
+        if (data.totalKg !== undefined) { html += stat('total kg', data.totalKg); any = true; }
+        if (data.perUnitKg !== undefined) { html += stat('per unit kg', data.perUnitKg); any = true; }
+        html += '</div>';
+        return any ? html : null;
+    }
+
+    var WIDGETS = [
+        {
+            id: 'pendingApprovals',
+            title: 'Pending Approvals',
+            icon: 'bi-inbox',
+            tag: 'action',
+            minRole: 0,
+            minPriority: 0,
+            hours: [0, 24],
+            priority: 40,
+            coreMorning: true,
+            eveningFocus: false,
+            load: loadPendingApprovals
+        },
+        {
+            id: 'kpiOverview',
+            title: 'KPI Overview',
+            icon: 'bi-graph-up',
+            tag: 'analytics',
+            minRole: 0,
+            minPriority: 0,
+            hours: null,
+            priority: 30,
+            coreMorning: false,
+            eveningFocus: true,
+            load: loadKpiOverview
+        },
+        {
+            id: 'moduleTiles',
+            title: 'Module Tiles',
+            icon: 'bi-grid-3x3-gap',
+            tag: 'navigate',
+            minRole: 0,
+            minPriority: 0,
+            hours: null,
+            priority: 50,
+            coreMorning: false,
+            eveningFocus: false,
+            load: loadModuleTiles
+        },
+        {
+            id: 'securityPosture',
+            title: 'Security Posture',
+            icon: 'bi-shield-check',
+            tag: 'admin',
+            minRole: 40,
+            minPriority: 40,
+            hours: null,
+            priority: 35,
+            coreMorning: false,
+            eveningFocus: true,
+            load: loadSecurityPosture
+        },
+        {
+            id: 'soxViolations',
+            title: 'SOX Open Violations',
+            icon: 'bi-patch-check',
+            tag: 'admin',
+            minRole: 40,
+            minPriority: 40,
+            hours: null,
+            priority: 20,
+            coreMorning: false,
+            eveningFocus: true,
+            load: loadSoxViolations
+        },
+        {
+            id: 'reconciliation',
+            title: 'Reconciliation Health',
+            icon: 'bi-arrow-left-right',
+            tag: 'admin',
+            minRole: 40,
+            minPriority: 40,
+            hours: null,
+            priority: 25,
+            coreMorning: false,
+            eveningFocus: true,
+            load: loadReconciliation
+        },
+        {
+            id: 'carbonFootprint',
+            title: 'Carbon Footprint',
+            icon: 'bi-lightbulb',
+            tag: 'esg',
+            minRole: 0,
+            minPriority: 0,
+            hours: null,
+            priority: 45,
+            coreMorning: false,
+            eveningFocus: false,
+            load: loadCarbonFootprint
+        }
+    ];
+
+    function isEligible(widget, ctx, rank, score) {
+        if (rank < widget.minRole) return false;
+        if (score < widget.minPriority) return false;
+        if (widget.hours && !(ctx.hour >= widget.hours[0] && ctx.hour < widget.hours[1])) return false;
+        return true;
+    }
+
+    function renderContextHeader(ctx, rank, score, morning) {
+        var focus = document.getElementById('dcFocus');
+        if (focus) {
+            focus.textContent = morning
+                ? 'Morning focus: approvals first, then the numbers.'
+                : 'Evening focus: analytics and system health first.';
+        }
+        var pills = document.getElementById('dcPills');
+        if (pills) {
+            pills.innerHTML =
+                '<span class="dc-pill">Role ' + esc(ctx.role || 'USER') + '</span>' +
+                '<span class="dc-pill">Hour ' + esc(ctx.hour) + '</span>' +
+                '<span class="dc-pill">Context score ' + esc(score) + '</span>' +
+                '<span class="dc-pill">' + esc(ctx.pendingApprovals) + ' pending</span>';
+        }
+    }
+
+    function renderWidgets(ctx) {
+        var rank = rankOf(ctx.role);
+        var score = rank + timeBonus(ctx.hour);
+        var morning = ctx.hour >= 5 && ctx.hour < 12;
+        renderContextHeader(ctx, rank, score, morning);
+
+        var eligible = WIDGETS.filter(function (widget) { return isEligible(widget, ctx, rank, score); });
+        eligible.forEach(function (widget) {
+            widget.effectivePriority = widget.priority;
+            if (morning && widget.coreMorning) widget.effectivePriority -= 100;
+            if (!morning && widget.eveningFocus) widget.effectivePriority -= 100;
+        });
+        eligible.sort(function (a, b) { return a.effectivePriority - b.effectivePriority; });
+
+        var grid = document.getElementById('dcGrid');
+        if (!grid) return;
+        grid.innerHTML = eligible.map(function (widget) {
+            return '<div class="kpi-card dc-widget" id="w-' + widget.id + '">' +
+                '<div class="dc-widget-head">' +
+                '<svg class="bi ' + widget.icon + '" aria-hidden="true"><use href="/images/sprite.svg#' + widget.icon + '"></use></svg>' +
+                '<span>' + esc(widget.title) + '</span>' +
+                '<span class="dc-widget-tag">' + esc(widget.tag) + '</span>' +
+                '</div>' +
+                '<div class="dc-widget-body" id="wb-' + widget.id + '"><div class="dc-loading">Loading...</div></div>' +
+                '</div>';
+        }).join('');
+
+        eligible.forEach(function (widget) {
+            Promise.resolve()
+                .then(function () { return widget.load(ctx); })
+                .then(function (html) {
+                    if (html === null || html === undefined) { removeWidget(widget.id); return; }
+                    if (html) setBody(widget.id, html);
+                })
+                .catch(function () {
+                    setBody(widget.id, '<div class="dc-stat-value">--</div><div class="dc-stat-label">live data unavailable</div>');
+                });
+        });
+    }
+
+    renderWidgets(dcCtx);
+</script>
+}

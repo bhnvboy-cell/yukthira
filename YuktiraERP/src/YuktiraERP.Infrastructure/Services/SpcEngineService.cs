@@ -777,4 +777,166 @@ public class SpcEngineService : ISpcEngineService
 
         return dto;
     }
+
+    public async Task<SpcLiveEvaluation> EvaluateLivePointAsync(SpcLivePointRequest request, CancellationToken ct = default)
+    {
+        const int minimumHistory = 5;
+        request ??= new SpcLivePointRequest();
+
+        var evaluation = new SpcLiveEvaluation
+        {
+            Characteristic = request.Characteristic?.Trim() ?? ""
+        };
+        var characteristic = evaluation.Characteristic;
+        if (string.IsNullOrWhiteSpace(characteristic))
+        {
+            evaluation.Error = "Characteristic is required (0 points found).";
+            return evaluation;
+        }
+
+        var tenantId = _tenant.TenantId;
+        var results = await _db.InspectionResults.AsNoTracking()
+            .Where(r => r.TenantId == tenantId && r.Characteristic == characteristic)
+            .OrderBy(r => r.CreatedAt)
+            .ToListAsync(ct);
+        evaluation.FoundPoints = results.Count;
+
+        if (results.Count == 0)
+        {
+            evaluation.Error = $"No historical points found for characteristic '{characteristic}' (0 points found).";
+            return evaluation;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Plant) || !string.IsNullOrWhiteSpace(request.MaterialCode))
+        {
+            var lotNumbers = results.Select(r => r.LotNumber).Distinct().ToList();
+            var lots = await _db.InspectionLots.AsNoTracking()
+                .Where(l => l.TenantId == tenantId && lotNumbers.Contains(l.LotNumber))
+                .ToListAsync(ct);
+            var lotMap = new Dictionary<string, (string Plant, string MaterialCode)>(StringComparer.Ordinal);
+            foreach (var lot in lots)
+            {
+                if (!lotMap.ContainsKey(lot.LotNumber))
+                    lotMap[lot.LotNumber] = (lot.Plant, lot.MaterialCode);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Plant))
+            {
+                var plant = request.Plant.Trim();
+                results = results
+                    .Where(r => lotMap.TryGetValue(r.LotNumber, out var meta) && meta.Plant == plant)
+                    .ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(request.MaterialCode))
+            {
+                var materialCode = request.MaterialCode.Trim();
+                results = results
+                    .Where(r => lotMap.TryGetValue(r.LotNumber, out var meta) && meta.MaterialCode == materialCode)
+                    .ToList();
+            }
+            evaluation.FoundPoints = results.Count;
+        }
+
+        if (results.Count == 0)
+        {
+            evaluation.Error = $"No historical points found for characteristic '{characteristic}' (0 points found).";
+            return evaluation;
+        }
+
+        if (results.Count < minimumHistory)
+        {
+            evaluation.Error = $"Insufficient history for characteristic '{characteristic}': {results.Count} points found (minimum {minimumHistory}).";
+            return evaluation;
+        }
+
+        var subgroups = new List<SpcSubgroupDto>();
+        foreach (var group in results.GroupBy(r => r.LotNumber))
+        {
+            var ordered = group.OrderBy(r => r.CreatedAt).ToList();
+            var values = ordered.Select(r => r.MeasuredValue).ToList();
+            subgroups.Add(BuildSubgroup(0, group.Key, ordered[0].CreatedAt, values));
+        }
+        subgroups = subgroups.OrderBy(s => s.Timestamp).ToList();
+        for (var i = 0; i < subgroups.Count; i++)
+        {
+            subgroups[i].Index = i + 1;
+            subgroups[i].Label = subgroups[i].LotNumber;
+        }
+
+        var rBar = ComputeRBar(subgroups);
+        var grandMean = 0.0;
+        foreach (var s in subgroups) grandMean += s.Mean;
+        grandMean /= subgroups.Count;
+
+        var meanN = 0.0;
+        foreach (var s in subgroups) meanN += s.N;
+        meanN /= subgroups.Count;
+
+        var effectiveN = request.SubgroupSize.HasValue && request.SubgroupSize.Value > 0
+            ? request.SubgroupSize.Value
+            : Math.Max(1, (int)Math.Round(meanN));
+        var xLimits = XbarLimits(grandMean, rBar, effectiveN);
+        var rLimits = RChartLimits(rBar, effectiveN);
+
+        evaluation.Xbar = grandMean;
+        evaluation.Ucl = xLimits.Ucl;
+        evaluation.Lcl = xLimits.Lcl;
+        evaluation.RBar = rBar;
+        evaluation.RUcl = rLimits.Ucl;
+        evaluation.RLcl = rLimits.Lcl;
+        evaluation.PointIndex = subgroups.Count;
+
+        var series = new List<SpcPointDto>();
+        for (var i = 0; i < subgroups.Count; i++)
+        {
+            series.Add(new SpcPointDto
+            {
+                Index = i,
+                Label = subgroups[i].Label,
+                Value = subgroups[i].Mean,
+                Cl = xLimits.Cl,
+                Ucl = xLimits.Ucl,
+                Lcl = xLimits.Lcl
+            });
+        }
+
+        var livePoint = new SpcPointDto
+        {
+            Index = subgroups.Count,
+            Label = "Live",
+            Value = (double)request.MeasuredValue,
+            Cl = xLimits.Cl,
+            Ucl = xLimits.Ucl,
+            Lcl = xLimits.Lcl
+        };
+        livePoint.Violating = IsBeyondLimits(livePoint);
+        series.Add(livePoint);
+
+        foreach (var violation in EvaluateRules(series))
+        {
+            if (!violation.PointIndexes.Contains(livePoint.Index)) continue;
+            evaluation.Violations.Add(new SpcLiveViolation
+            {
+                Rule = violation.RuleId,
+                Description = violation.Description
+            });
+        }
+
+        evaluation.InControl = !livePoint.Violating && evaluation.Violations.Count == 0;
+
+        var allValues = results.Select(r => (double)r.MeasuredValue).ToList();
+        var sigmaOverall = SampleStdDev(allValues);
+        var d2 = GetD2((int)Math.Round(meanN));
+        var sigmaWithin = d2 > 0 ? rBar / d2 : 0;
+        var lsl = (double?)results.Min(r => r.TargetMin);
+        var usl = (double?)results.Max(r => r.TargetMax);
+        var capability = ComputeCapability(lsl, usl, grandMean, sigmaWithin, sigmaOverall);
+        if (capability != null)
+        {
+            evaluation.Cp = capability.Cp;
+            evaluation.Cpk = capability.Cpk;
+        }
+
+        return evaluation;
+    }
 }
