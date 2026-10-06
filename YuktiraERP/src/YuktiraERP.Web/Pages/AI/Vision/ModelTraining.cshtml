@@ -6,22 +6,22 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-diagram-3 me-2"></i>Model Training</h3>
+            <h3><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Model Training</h3>
             <span class="badge">ZQM-V03</span>
         </div>
         <div class="actions">
-            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div style="display:flex;gap:0;background:#f5f5f5;border:1px solid #e0e0e0;border-top:none;overflow-x:auto">
-        <button type="button" class="qm-tab active" onclick="switchTab(this,'tab-train')"><i class="bi bi-play-circle me-1"></i>Train Model</button>
-        <button type="button" class="qm-tab" onclick="switchTab(this,'tab-evaluate')"><i class="bi bi-clipboard-check me-1"></i>Evaluate Model</button>
+        <button type="button" class="qm-tab active" onclick="switchTab(this,'tab-train')"><svg class="bi bi-play-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-circle"></use></svg>Train Model</button>
+        <button type="button" class="qm-tab" onclick="switchTab(this,'tab-evaluate')"><svg class="bi bi-clipboard-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Evaluate Model</button>
     </div>
 
     <div id="tab-train" style="border:1px solid #e0e0e0;border-top:none;background:#fff">
         <div class="zqm-filter">
-            <div class="zqm-section-title"><i class="bi bi-cpu me-1"></i>Training Configuration</div>
+            <div class="zqm-section-title"><svg class="bi bi-cpu me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg>Training Configuration</div>
             <form method="post" enctype="multipart/form-data" asp-page-handler="Train" id="trainForm">
                 <input type="hidden" name="Action" value="Train" />
                 <div class="zqm-row cols-2">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="zqm-btn" style="background:#2e7d32;color:#fff;border-color:#2e7d32"><i class="bi bi-play-fill me-1"></i>Start Training</button>
+                    <button type="submit" class="zqm-btn" style="background:#2e7d32;color:#fff;border-color:#2e7d32"><svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Start Training</button>
                 </div>
             </form>
         </div>
@@ -52,7 +52,7 @@
         @if (Model.TrainingResult != null)
         {
             <div class="zqm-results">
-                <div class="zqm-results-header"><h4><i class="bi bi-graph-up me-1"></i>Training Results</h4></div>
+                <div class="zqm-results-header"><h4><svg class="bi bi-graph-up me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>Training Results</h4></div>
                 <div style="padding:20px">
                     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
                         <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
@@ -72,7 +72,7 @@
                             <div style="font-size:1.3rem;font-weight:700;color:#1a237e">@Model.TrainingResult.ModelId</div>
                         </div>
                     </div>
-                    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:12px;color:#2e7d32;font-weight:500"><i class="bi bi-check-circle me-1"></i>@Model.TrainingResult.Message</div>
+                    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:12px;color:#2e7d32;font-weight:500"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>@Model.TrainingResult.Message</div>
                 </div>
             </div>
         }
@@ -80,7 +80,7 @@
 
     <div id="tab-evaluate" style="border:1px solid #e0e0e0;border-top:none;background:#fff;display:none">
         <div class="zqm-filter">
-            <div class="zqm-section-title"><i class="bi bi-clipboard-check me-1"></i>Evaluation Configuration</div>
+            <div class="zqm-section-title"><svg class="bi bi-clipboard-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Evaluation Configuration</div>
             <form method="post" enctype="multipart/form-data" asp-page-handler="Evaluate" id="evalForm">
                 <input type="hidden" name="Action" value="Evaluate" />
                 <div class="zqm-row cols-2">
@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <div style="margin-top:10px">
-                    <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-play-fill me-1"></i>Evaluate Model</button>
+                    <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Evaluate Model</button>
                 </div>
             </form>
         </div>
@@ -108,7 +108,7 @@
         @if (Model.EvalResult != null)
         {
             <div class="zqm-results">
-                <div class="zqm-results-header"><h4><i class="bi bi-clipboard-data me-1"></i>Evaluation Results</h4></div>
+                <div class="zqm-results-header"><h4><svg class="bi bi-clipboard-data me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-data"></use></svg>Evaluation Results</h4></div>
                 <div style="padding:20px">
                     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
                         <div style="background:#f5f7ff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
@@ -131,7 +131,7 @@
 
                     @if (Model.EvalResult.PerClassMetrics != null && Model.EvalResult.PerClassMetrics.Any())
                     {
-                        <h5 style="font-size:0.9rem;color:#1a237e;margin:16px 0 8px"><i class="bi bi-table me-1"></i>Per-Class Precision</h5>
+                        <h5 style="font-size:0.9rem;color:#1a237e;margin:16px 0 8px"><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Per-Class Precision</h5>
                         <div class="zqm-table-wrap">
                             <table class="zqm-table">
                                 <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1 Score</th><th>Support</th></tr></thead>

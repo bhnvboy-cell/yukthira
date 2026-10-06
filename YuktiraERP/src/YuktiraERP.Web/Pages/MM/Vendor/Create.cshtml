@@ -4,7 +4,7 @@
 
 <div class="ent-form-wrapper">
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-building"></i></div>
+        <div class="banner-icon"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg></div>
         <div class="banner-info">
             <h5>Create Vendor Master</h5>
             <span>FK01 — Vendor Master Data</span>
@@ -19,20 +19,20 @@
 
         <div class="ent-form-tabs">
             <button type="button" class="ent-form-tab active" data-tab="general">
-                <i class="bi bi-person-vcard tab-icon"></i> General Data
+                <svg class="bi bi-person-vcard tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-vcard"></use></svg> General Data
             </button>
             <button type="button" class="ent-form-tab" data-tab="purchasing">
-                <i class="bi bi-cart tab-icon"></i> Purchasing
+                <svg class="bi bi-cart tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cart"></use></svg> Purchasing
             </button>
             <button type="button" class="ent-form-tab" data-tab="accounting">
-                <i class="bi bi-calculator tab-icon"></i> Accounting & Payment
+                <svg class="bi bi-calculator tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg> Accounting & Payment
             </button>
         </div>
 
         <!-- ═══ TAB: General Data ═══ -->
         <div class="ent-form-panel active" data-panel="general">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-person-vcard"></i><h6>Vendor Identification</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-person-vcard" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-vcard"></use></svg><h6>Vendor Identification</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Vendor Code</label>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-telephone"></i><h6>Contact & Address</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-telephone" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-telephone"></use></svg><h6>Contact & Address</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Phone</label>
@@ -76,7 +76,7 @@
         <!-- ═══ TAB: Purchasing ═══ -->
         <div class="ent-form-panel" data-panel="purchasing">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-cart-check"></i><h6>Purchasing Organization</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-cart-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cart-check"></use></svg><h6>Purchasing Organization</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Purchasing Organization</label>
@@ -106,7 +106,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-truck"></i><h6>Delivery & Terms</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-truck" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-truck"></use></svg><h6>Delivery & Terms</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Incoterms</label>
@@ -134,7 +134,7 @@
         <!-- ═══ TAB: Accounting & Payment ═══ -->
         <div class="ent-form-panel" data-panel="accounting">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-credit-card"></i><h6>Payment Information</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-credit-card" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg><h6>Payment Information</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Payment Terms <span class="required">*</span></label>
@@ -170,7 +170,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-receipt"></i><h6>Tax & Compliance</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-receipt" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg><h6>Tax & Compliance</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Tax ID / GSTIN</label>
@@ -196,7 +196,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-toggle-on"></i><h6>Status</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-toggle-on" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-toggle-on"></use></svg><h6>Status</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label>Vendor Status</label>
@@ -221,11 +221,11 @@
 
         <div class="ent-form-footer">
             <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>All changes are SOX-audit logged
+                <svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>All changes are SOX-audit logged
             </div>
             <div class="footer-actions">
-                <a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Vendor</button>
+                <a asp-page="/MM/Index" class="btn btn-outline-secondary"><svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Vendor</button>
             </div>
         </div>
     </form>

@@ -4,7 +4,7 @@
 
 <div class="ent-form-wrapper">
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-water"></i></div>
+        <div class="banner-icon"><svg class="bi bi-water" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-water"></use></svg></div>
         <div class="banner-info">
             <h5>Create Picking Wave</h5>
             <span>WM03 — Wave Picking Management</span>
@@ -18,17 +18,17 @@
 
         <div class="ent-form-tabs">
             <button type="button" class="ent-form-tab active" data-tab="wave-config">
-                <i class="bi bi-water tab-icon"></i> Wave Configuration
+                <svg class="bi bi-water tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-water"></use></svg> Wave Configuration
             </button>
             <button type="button" class="ent-form-tab" data-tab="deliveries">
-                <i class="bi bi-truck tab-icon"></i> Delivery Selection
+                <svg class="bi bi-truck tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-truck"></use></svg> Delivery Selection
             </button>
         </div>
 
         <!-- ═══ TAB: Wave Configuration ═══ -->
         <div class="ent-form-panel active" data-panel="wave-config">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-water"></i><h6>Wave Parameters</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-water" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-water"></use></svg><h6>Wave Parameters</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Wave Number</label>
@@ -74,7 +74,7 @@
         <!-- ═══ TAB: Delivery Selection ═══ -->
         <div class="ent-form-panel" data-panel="deliveries">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-truck"></i><h6>Delivery Notes</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-truck" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-truck"></use></svg><h6>Delivery Notes</h6></div>
                 <div class="ent-field" style="grid-column: span 3">
                     <label>Delivery Notes (comma-separated) <span class="required">*</span></label>
                     <textarea asp-for="Wave.DeliveryNotes" class="form-control" rows="4" placeholder="Enter delivery note numbers, one per line or comma-separated:&#10;DN-20260828-001&#10;DN-20260828-002&#10;DN-20260828-003"></textarea>
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Wave Summary</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg><h6>Wave Summary</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Total Deliveries</label>
@@ -103,11 +103,11 @@
 
         <div class="ent-form-footer">
             <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>Picking waves are SOX-audit logged
+                <svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>Picking waves are SOX-audit logged
             </div>
             <div class="footer-actions">
-                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Create Wave</button>
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Create Wave</button>
             </div>
         </div>
     </form>

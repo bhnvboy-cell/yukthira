@@ -1,0 +1,701 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.EdiWorkbenchModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "EDI Workbench";
+}
+
+<style>
+    .wb-header { background: #1F497D; color: #fff; padding: 14px 20px; border-radius: 8px 8px 0 0; }
+    .wb-header h4 { margin: 0; font-weight: 600; }
+    .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 3px solid transparent; }
+    .nav-tabs .nav-link.active { color: #1F497D; border-bottom-color: #1F497D; font-weight: 600; }
+    .nav-tabs .nav-link:hover { border-bottom-color: #adb5bd; }
+    .wb-chip { font-size: .85rem; padding: .55rem .9rem; }
+    .wb-log-table tbody tr { cursor: pointer; }
+    .wb-log-table tbody tr:hover { background: #f0f4fa; }
+    .wb-log-table th { background: #1F497D; color: #fff; font-size: 12px; white-space: nowrap; }
+    .wb-log-table td { font-size: 13px; vertical-align: middle; }
+    .wb-partner-table th { background: #1F497D; color: #fff; font-size: 12px; white-space: nowrap; }
+    .wb-partner-table td { font-size: 13px; vertical-align: middle; }
+    #payloadPre { white-space: pre; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><svg class="bi bi-arrow-left-right me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>EDI Workbench</h2>
+    <a asp-page="/EDI/Index" class="btn btn-sm btn-outline-secondary"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>EDI Suite</a>
+</div>
+
+<ul class="nav nav-tabs" id="ediWbTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tabWbPartners" role="tab">
+            <svg class="bi bi-people me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Partner Directory
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabWbLog" role="tab">
+            <svg class="bi bi-list-ul me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>Interchange Log
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabWbInspector" role="tab">
+            <svg class="bi bi-eye me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>Payload Inspector
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+
+    <!-- ── TAB 1: Partner Directory ── -->
+    <div class="tab-pane fade show active" id="tabWbPartners" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary" onclick="openPartnerModal(null)">
+                    <svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New Partner
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadPartners()">
+                    <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+                </button>
+            </div>
+            <span class="text-muted small" id="partnerCount">0 partners</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered wb-partner-table" id="partnerTable">
+                <thead>
+                    <tr>
+                        <th>Partner Code</th>
+                        <th>Name</th>
+                        <th>Standard</th>
+                        <th>Protocol</th>
+                        <th>Endpoint URL</th>
+                        <th>Auth</th>
+                        <th>Documents</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="partnerTableBody">
+                    <tr><td colspan="9" class="text-center text-muted py-3">Loading partners...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── TAB 2: Interchange Log ── -->
+    <div class="tab-pane fade" id="tabWbLog" role="tabpanel">
+        <div class="d-flex flex-wrap gap-2 mb-3" id="logChips">
+            <span class="badge rounded-pill bg-secondary wb-chip">Total <span id="statTotal">–</span></span>
+            <span class="badge rounded-pill bg-info text-dark wb-chip">Inbound <span id="statInbound">–</span></span>
+            <span class="badge rounded-pill bg-primary wb-chip">Outbound <span id="statOutbound">–</span></span>
+            <span class="badge rounded-pill bg-danger wb-chip">Failed <span id="statFailed">–</span></span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+            <label class="small fw-bold mb-0" for="logDirection">Direction</label>
+            <select id="logDirection" class="form-select form-select-sm" style="width:auto" onchange="resetAndLoadLog()">
+                <option value="">All</option>
+                <option value="Inbound">Inbound</option>
+                <option value="Outbound">Outbound</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshLog()">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+            <span class="text-muted small ms-auto">Auto-refreshes every 5s while this tab is active — click a row to inspect its payload.</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered wb-log-table" id="logTable">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Direction</th>
+                        <th>Message / Document</th>
+                        <th>Sender → Receiver</th>
+                        <th>Partner</th>
+                        <th>Status</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody">
+                    <tr><td colspan="7" class="text-center text-muted py-3">Loading transmissions...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted small" id="logPageInfo">Page 1</span>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnLogPrev" onclick="prevLogPage()" disabled>
+                    <svg class="bi bi-chevron-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg>Prev
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnLogNext" onclick="nextLogPage()" disabled>
+                    Next<svg class="bi bi-chevron-right ms-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TAB 3: Payload Inspector ── -->
+    <div class="tab-pane fade" id="tabWbInspector" role="tabpanel">
+        <div class="d-flex flex-wrap gap-2 mb-3" id="inspectorMeta">
+            <span class="text-muted small">Select a row in the Interchange Log tab to inspect its payload.</span>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="mb-0"><svg class="bi bi-file-earmark-text me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-text"></use></svg>Raw Payload</h6>
+                    <span class="badge bg-light text-dark border" id="payloadProtocol"></span>
+                </div>
+                <pre id="payloadPre" class="border rounded p-3" style="max-height:65vh;overflow:auto;font-size:.78rem;background:#f8f9fa">No payload</pre>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="mb-0"><svg class="bi bi-translate me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-translate"></use></svg>Parsed / ERP View</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnReparse" onclick="reparseCurrent()">
+                        <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Re-parse
+                    </button>
+                </div>
+                <pre id="parsedPre" class="border rounded p-3" style="max-height:65vh;overflow:auto;font-size:.78rem;background:#fff">Select a transmission from the Interchange Log tab.</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Partner Create/Edit Modal ── -->
+<div class="modal fade" id="partnerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="partnerModalTitle">New Trading Partner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-none" id="partnerError"></div>
+                <form id="partnerForm" class="row g-3" onsubmit="return false;">
+                    <input type="hidden" id="pId" value="" />
+                    <div class="col-md-6">
+                        <label class="form-label" for="pCode">Partner Code <span class="text-danger">*</span></label>
+                        <input id="pCode" class="form-control" placeholder="e.g. ACME01" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="pName">Partner Name <span class="text-danger">*</span></label>
+                        <input id="pName" class="form-control" placeholder="e.g. Acme Corporation" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="pStandard">Standard</label>
+                        <select id="pStandard" class="form-select" onchange="standardChanged()">
+                            <option value="EDIFACT">EDIFACT D96A</option>
+                            <option value="X12">X12 4010</option>
+                            <option value="GS1">GS1</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="pVersion">Version</label>
+                        <input id="pVersion" class="form-control" placeholder="D96A / 4010" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="pProtocol">Protocol</label>
+                        <select id="pProtocol" class="form-select">
+                            <option value="As2">AS2</option>
+                            <option value="As4">AS4</option>
+                            <option value="Ftp">FTP</option>
+                            <option value="Https">HTTPS</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="pEndpoint">Endpoint URL</label>
+                        <input id="pEndpoint" class="form-control" placeholder="https://..." />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="pAuthType">Auth Type</label>
+                        <select id="pAuthType" class="form-select">
+                            <option value="None">None</option>
+                            <option value="Basic">Basic Auth</option>
+                            <option value="Certificate">Certificate</option>
+                            <option value="AS2">AS2</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="pDocTypes">Document Types</label>
+                        <input id="pDocTypes" class="form-control" placeholder="PO,INVOICE,GRN" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="pSenderId">Sender ID</label>
+                        <input id="pSenderId" class="form-control" placeholder="Own interchange ID" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="pReceiverId">Receiver ID</label>
+                        <input id="pReceiverId" class="form-control" placeholder="Partner interchange ID" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="pAuthConfig">Auth Config JSON (AS2 settings)</label>
+                        <textarea id="pAuthConfig" class="form-control font-monospace" rows="3" placeholder='{"url":"https://...","as2From":"...","as2To":"...","certificate":"..."}'></textarea>
+                        <div class="form-text">Transport protocol preference is stored in this JSON as the <code>protocol</code> key.</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check ms-1">
+                            <input type="checkbox" class="form-check-input" id="pIsActive" checked />
+                            <label class="form-check-label" for="pIsActive">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePartner()">
+                    <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Partner
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var API = '/api/v1/integration/edi';
+var partners = [];
+var transmissions = [];
+var logPage = 1;
+var logPageSize = 10;
+var logTotal = 0;
+var logBusy = false;
+var pollTimer = null;
+var currentTransmission = null;
+var partnerModal = null;
+
+function esc(value) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(value === null || value === undefined ? '' : String(value)));
+    return div.innerHTML;
+}
+
+// ── Partner Directory ──
+
+async function loadPartners() {
+    var tbody = document.getElementById('partnerTableBody');
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-3">Loading partners...</td></tr>';
+    try {
+        var r = await fetch(API + '/partners', { credentials: 'same-origin' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var data = await r.json();
+        partners = (data && Array.isArray(data.data)) ? data.data : [];
+        renderPartners();
+    } catch (e) {
+        partners = [];
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger py-3">Failed to load partners: ' + esc(e.message) + '</td></tr>';
+        document.getElementById('partnerCount').textContent = '';
+    }
+}
+
+function protocolOf(partner) {
+    try {
+        var cfg = JSON.parse(partner.authConfigJson || '{}');
+        if (cfg && cfg.protocol) return String(cfg.protocol);
+    } catch (e) { }
+    return '';
+}
+
+function normalizeProtocol(value) {
+    var options = ['As2', 'As4', 'Ftp', 'Https'];
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].toLowerCase() === String(value || '').toLowerCase()) return options[i];
+    }
+    return 'As2';
+}
+
+function renderPartners() {
+    var tbody = document.getElementById('partnerTableBody');
+    if (!partners.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-3">No trading partners yet — create one with "New Partner".</td></tr>';
+        document.getElementById('partnerCount').textContent = '0 partners';
+        return;
+    }
+    tbody.innerHTML = partners.map(function (p, idx) {
+        var protocol = protocolOf(p);
+        return '<tr>' +
+            '<td class="fw-bold">' + esc(p.partnerCode) + '</td>' +
+            '<td>' + esc(p.partnerName) + '</td>' +
+            '<td><span class="badge bg-light text-dark border">' + esc(p.standard) + ' ' + esc(p.version) + '</span></td>' +
+            '<td>' + (protocol ? esc(protocol) : '<span class="text-muted">&mdash;</span>') + '</td>' +
+            '<td><code class="small">' + esc(p.endpointUrl) + '</code></td>' +
+            '<td>' + esc(p.authType || 'None') + '</td>' +
+            '<td class="small">' + esc(p.documentTypes) + '</td>' +
+            '<td>' + (p.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') + '</td>' +
+            '<td class="text-end">' +
+                '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openPartnerModal(' + idx + ')">' +
+                '<svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg> Edit</button>' +
+            '</td>' +
+        '</tr>';
+    }).join('');
+    document.getElementById('partnerCount').textContent = partners.length + ' partner' + (partners.length === 1 ? '' : 's');
+}
+
+function openPartnerModal(index) {
+    var editing = (index !== null && index !== undefined && partners[index]) ? partners[index] : null;
+    document.getElementById('partnerModalTitle').textContent = editing ? 'Edit Trading Partner' : 'New Trading Partner';
+    document.getElementById('partnerError').classList.add('d-none');
+    document.getElementById('pId').value = editing ? editing.id : '';
+    document.getElementById('pCode').value = editing ? (editing.partnerCode || '') : '';
+    document.getElementById('pCode').disabled = !!editing;
+    document.getElementById('pName').value = editing ? (editing.partnerName || '') : '';
+    var stdSelect = document.getElementById('pStandard');
+    var std = editing ? (editing.standard || 'EDIFACT') : 'EDIFACT';
+    stdSelect.value = (std === 'X12' || std === 'GS1' || std === 'EDIFACT') ? std : 'EDIFACT';
+    document.getElementById('pVersion').value = editing ? (editing.version || '') : 'D96A';
+    document.getElementById('pProtocol').value = normalizeProtocol(editing ? protocolOf(editing) : 'As2');
+    document.getElementById('pEndpoint').value = editing ? (editing.endpointUrl || '') : '';
+    document.getElementById('pAuthType').value = editing ? (editing.authType || 'None') : 'None';
+    document.getElementById('pDocTypes').value = editing ? (editing.documentTypes || '') : '';
+    document.getElementById('pSenderId').value = editing ? (editing.senderId || '') : '';
+    document.getElementById('pReceiverId').value = editing ? (editing.receiverId || '') : '';
+    document.getElementById('pAuthConfig').value = editing ? (editing.authConfigJson || '{}') : '{}';
+    document.getElementById('pIsActive').checked = editing ? (editing.isActive !== false) : true;
+    partnerModal.show();
+}
+
+function standardChanged() {
+    var std = document.getElementById('pStandard').value;
+    var versionInput = document.getElementById('pVersion');
+    if (std === 'X12') versionInput.value = '4010';
+    else if (std === 'EDIFACT') versionInput.value = 'D96A';
+}
+
+function buildAuthConfig() {
+    var text = document.getElementById('pAuthConfig').value.trim() || '{}';
+    var obj;
+    try { obj = JSON.parse(text); } catch (e) { return text; }
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) obj = {};
+    obj.protocol = document.getElementById('pProtocol').value;
+    return JSON.stringify(obj);
+}
+
+async function savePartner() {
+    var errorBox = document.getElementById('partnerError');
+    errorBox.classList.add('d-none');
+
+    var code = document.getElementById('pCode').value.trim();
+    var name = document.getElementById('pName').value.trim();
+    if (!code || !name) {
+        errorBox.textContent = 'Partner Code and Partner Name are required.';
+        errorBox.classList.remove('d-none');
+        return;
+    }
+
+    var id = document.getElementById('pId').value;
+    var editing = null;
+    for (var i = 0; i < partners.length; i++) {
+        if (partners[i].id === id) { editing = partners[i]; break; }
+    }
+
+    var payload = {
+        partnerCode: code,
+        partnerName: name,
+        standard: document.getElementById('pStandard').value,
+        version: document.getElementById('pVersion').value.trim(),
+        senderId: document.getElementById('pSenderId').value.trim(),
+        receiverId: document.getElementById('pReceiverId').value.trim(),
+        senderQualifier: editing ? (editing.senderQualifier || 'ZZ') : 'ZZ',
+        receiverQualifier: editing ? (editing.receiverQualifier || 'ZZ') : 'ZZ',
+        testIndicator: editing ? (editing.testIndicator || 'T') : 'T',
+        endpointUrl: document.getElementById('pEndpoint').value.trim(),
+        authType: document.getElementById('pAuthType').value,
+        authConfigJson: buildAuthConfig(),
+        documentTypes: document.getElementById('pDocTypes').value.trim() || (editing ? (editing.documentTypes || '') : ''),
+        isActive: document.getElementById('pIsActive').checked
+    };
+
+    try {
+        var r = await fetch(id ? API + '/partners/' + id : API + '/partners', {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        });
+        if (!r.ok) {
+            var text = await r.text();
+            var message = text;
+            try {
+                var body = JSON.parse(text);
+                if (body && body.message) message = body.message;
+            } catch (e) { }
+            errorBox.textContent = message || ('HTTP ' + r.status);
+            errorBox.classList.remove('d-none');
+            return;
+        }
+        partnerModal.hide();
+        await loadPartners();
+    } catch (e) {
+        errorBox.textContent = 'Network error: ' + e.message;
+        errorBox.classList.remove('d-none');
+    }
+}
+
+// ── Interchange Log ──
+
+async function loadStats() {
+    try {
+        var r = await fetch(API + '/stats', { credentials: 'same-origin' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var s = await r.json();
+        setChip('statTotal', s.total);
+        setChip('statInbound', s.inbound);
+        setChip('statOutbound', s.outbound);
+        setChip('statFailed', s.failed);
+    } catch (e) {
+        setChip('statTotal', null);
+        setChip('statInbound', null);
+        setChip('statOutbound', null);
+        setChip('statFailed', null);
+    }
+}
+
+function setChip(id, value) {
+    document.getElementById(id).textContent = (typeof value === 'number') ? value : '–';
+}
+
+async function loadTransmissions(showLoading) {
+    if (logBusy) return;
+    logBusy = true;
+    var tbody = document.getElementById('logTableBody');
+    if (showLoading) tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">Loading transmissions...</td></tr>';
+
+    var params = '?page=' + logPage + '&pageSize=' + logPageSize;
+    var direction = document.getElementById('logDirection').value;
+    if (direction) params += '&direction=' + encodeURIComponent(direction);
+
+    try {
+        var r = await fetch(API + '/transmissions' + params, { credentials: 'same-origin' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var data = await r.json();
+        transmissions = (data && Array.isArray(data.items)) ? data.items : [];
+        logTotal = (data && typeof data.totalCount === 'number') ? data.totalCount : 0;
+
+        var pages = Math.max(1, Math.ceil(logTotal / logPageSize));
+        if (!transmissions.length && logPage > pages) {
+            logPage = pages;
+            logBusy = false;
+            await loadTransmissions(showLoading);
+            return;
+        }
+
+        renderLogTable();
+        updateLogPagination();
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-3">Failed to load transmissions: ' + esc(e.message) + '</td></tr>';
+        document.getElementById('logPageInfo').textContent = '—';
+        document.getElementById('btnLogPrev').disabled = true;
+        document.getElementById('btnLogNext').disabled = true;
+    } finally {
+        logBusy = false;
+    }
+}
+
+function directionBadge(direction) {
+    var cls = direction === 'Outbound' ? 'bg-primary' : 'bg-info text-dark';
+    return '<span class="badge ' + cls + '">' + esc(direction || '—') + '</span>';
+}
+
+function statusBadge(status) {
+    var cls = 'bg-secondary';
+    if (status === 'Processed' || status === 'Translated' || status === 'Applied' || status === 'Acknowledged') cls = 'bg-success';
+    else if (status === 'Error' || status === 'Rejected') cls = 'bg-danger';
+    else if (status === 'Received' || status === 'PendingTranslation') cls = 'bg-warning text-dark';
+    return '<span class="badge ' + cls + '">' + esc(status || 'Unknown') + '</span>';
+}
+
+function fmtTime(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return esc(iso);
+    return esc(d.toLocaleString());
+}
+
+function renderLogTable() {
+    var tbody = document.getElementById('logTableBody');
+    if (!transmissions.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">No transmissions found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = transmissions.map(function (t) {
+        var errorHtml = '<span class="text-muted">—</span>';
+        if (t.errorMessage) {
+            var snippet = String(t.errorMessage).length > 70 ? String(t.errorMessage).substring(0, 70) + '…' : String(t.errorMessage);
+            errorHtml = '<span class="text-danger small" title="' + esc(t.errorMessage) + '">' + esc(snippet) + '</span>';
+        }
+        return '<tr onclick="openInspector(\'' + esc(t.id) + '\')">' +
+            '<td class="small">' + fmtTime(t.createdAt) + '</td>' +
+            '<td>' + directionBadge(t.direction) + '</td>' +
+            '<td><div class="fw-semibold small">' + esc(t.messageType) + '</div><div class="text-muted small">' + esc(t.documentType) + '</div></td>' +
+            '<td class="small">' + esc(t.senderId) + ' <span class="text-muted">→</span> ' + esc(t.receiverId) + '</td>' +
+            '<td class="small">' + (t.partnerCode ? esc(t.partnerCode) : '<span class="text-muted">—</span>') + '</td>' +
+            '<td>' + statusBadge(t.status) + '</td>' +
+            '<td>' + errorHtml + '</td>' +
+        '</tr>';
+    }).join('');
+}
+
+function updateLogPagination() {
+    var pages = Math.max(1, Math.ceil(logTotal / logPageSize));
+    document.getElementById('logPageInfo').textContent = 'Page ' + logPage + ' of ' + pages + ' · ' + logTotal + ' records';
+    document.getElementById('btnLogPrev').disabled = logPage <= 1;
+    document.getElementById('btnLogNext').disabled = logPage >= pages;
+}
+
+function resetAndLoadLog() {
+    logPage = 1;
+    loadStats();
+    loadTransmissions(true);
+}
+
+function refreshLog() {
+    loadStats();
+    loadTransmissions(true);
+}
+
+function prevLogPage() {
+    if (logPage > 1) { logPage--; loadTransmissions(false); }
+}
+
+function nextLogPage() {
+    var pages = Math.max(1, Math.ceil(logTotal / logPageSize));
+    if (logPage < pages) { logPage++; loadTransmissions(false); }
+}
+
+function startLogPolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(function () {
+        if (document.querySelector('#ediWbTabs a[href="#tabWbLog"]').classList.contains('active')) {
+            loadStats();
+            loadTransmissions(false);
+        }
+    }, 5000);
+}
+
+function stopLogPolling() {
+    if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+    }
+}
+
+// ── Payload Inspector ──
+
+function showWorkbenchTab(href) {
+    var link = document.querySelector('#ediWbTabs a[href="' + href + '"]');
+    if (link) bootstrap.Tab.getOrCreateInstance(link).show();
+}
+
+async function openInspector(id) {
+    showWorkbenchTab('#tabWbInspector');
+    await loadInspector(id);
+}
+
+async function loadInspector(id) {
+    var meta = document.getElementById('inspectorMeta');
+    var payloadPre = document.getElementById('payloadPre');
+    var parsedPre = document.getElementById('parsedPre');
+    meta.innerHTML = '<span class="text-muted small">Loading transmission...</span>';
+    payloadPre.textContent = 'Loading...';
+    parsedPre.textContent = 'Loading...';
+    document.getElementById('payloadProtocol').textContent = '';
+    try {
+        var r = await fetch(API + '/transmissions/' + id, { credentials: 'same-origin' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var t = await r.json();
+        currentTransmission = t;
+        renderInspectorMeta(t);
+        payloadPre.textContent = formatSegments(t.rawPayload);
+        document.getElementById('payloadProtocol').textContent = detectStandard(t.rawPayload);
+        await parsePayload(t.rawPayload);
+    } catch (e) {
+        meta.innerHTML = '<span class="badge bg-danger">Failed to load transmission: ' + esc(e.message) + '</span>';
+        payloadPre.textContent = 'No payload';
+        parsedPre.textContent = 'Select a row in the Interchange Log tab.';
+    }
+}
+
+function renderInspectorMeta(t) {
+    var chips = '';
+    chips += '<span class="badge bg-secondary">Document: ' + esc(t.documentType || '—') + '</span>';
+    chips += '<span class="badge bg-light text-dark border">Type: ' + esc(t.messageType || '—') + '</span>';
+    chips += '<span class="badge ' + (t.direction === 'Outbound' ? 'bg-primary' : 'bg-info text-dark') + '">' + esc(t.direction || '—') + '</span>';
+    chips += statusBadge(t.status);
+    chips += '<span class="badge bg-light text-dark border">' + esc(t.senderId || '—') + ' → ' + esc(t.receiverId || '—') + '</span>';
+    if (t.partnerCode) chips += '<span class="badge bg-light text-dark border">Partner: ' + esc(t.partnerCode) + '</span>';
+    if (t.acknowledgmentId) chips += '<span class="badge bg-info text-dark">Ack: ' + esc(t.acknowledgmentId) + '</span>';
+    if (t.errorMessage) chips += '<span class="badge bg-danger" title="' + esc(t.errorMessage) + '">Error: ' + esc(t.errorMessage) + '</span>';
+    document.getElementById('inspectorMeta').innerHTML = chips;
+}
+
+function detectStandard(payload) {
+    if (!payload || !payload.trim()) return '';
+    return payload.trim().indexOf('ISA') === 0 ? 'X12' : 'EDIFACT';
+}
+
+function formatSegments(payload) {
+    if (!payload || !payload.trim()) return 'No payload';
+    var terminator = detectStandard(payload) === 'X12' ? '~' : "'";
+    var parts = payload.split(terminator);
+    var lines = [];
+    for (var i = 0; i < parts.length; i++) {
+        var segment = parts[i].replace(/\r?\n/g, ' ').trim();
+        if (segment) lines.push(segment + terminator);
+    }
+    return lines.length ? lines.join('\n') : payload;
+}
+
+async function parsePayload(payload) {
+    var parsedPre = document.getElementById('parsedPre');
+    if (!payload || !payload.trim()) {
+        parsedPre.textContent = 'No payload to parse';
+        return;
+    }
+    parsedPre.textContent = 'Parsing...';
+    var standard = detectStandard(payload);
+    try {
+        var r = await fetch(API + '/parse/' + standard, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ content: payload })
+        });
+        var text = await r.text();
+        if (!r.ok) {
+            parsedPre.textContent = 'Parse failed: ' + text;
+            return;
+        }
+        try {
+            var obj = JSON.parse(text);
+            parsedPre.textContent = JSON.stringify(obj && obj.parsed !== undefined ? obj.parsed : obj, null, 2);
+        } catch (e) {
+            parsedPre.textContent = text;
+        }
+    } catch (e) {
+        parsedPre.textContent = 'Parse failed: ' + e.message;
+    }
+}
+
+function reparseCurrent() {
+    if (currentTransmission) parsePayload(currentTransmission.rawPayload);
+}
+
+// ── Wiring ──
+
+document.getElementById('ediWbTabs').addEventListener('shown.bs.tab', function (e) {
+    var href = e.target.getAttribute('href');
+    if (href === '#tabWbLog') {
+        loadStats();
+        loadTransmissions(true);
+        startLogPolling();
+    } else {
+        stopLogPolling();
+    }
+    if (href === '#tabWbPartners') loadPartners();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    partnerModal = new bootstrap.Modal(document.getElementById('partnerModal'));
+    loadPartners();
+    loadStats();
+    loadTransmissions(true);
+});
+</script>

@@ -18,10 +18,10 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         var userId = GetUserId();
-        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value;
 
-        var all = await _service.GetAllAsync();
-        Groups = all.GroupBy(t => t.Group)
+        var permitted = await _service.GetPermittedCodesAsync(userId, role);
+        Groups = permitted.GroupBy(t => t.Group)
             .Select(g => new TransactionGroupVm
             {
                 Name = g.Key.ToString(),
@@ -29,8 +29,9 @@ public class IndexModel : PageModel
                 Codes = g.OrderBy(t => t.SortOrder).ToList()
             }).ToList();
 
-        Recent = await _service.GetRecentAsync(userId, 10);
-        Favorites = await _service.GetFavoritesAsync(userId);
+        var permittedIds = permitted.Select(t => t.Code).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        Recent = (await _service.GetRecentAsync(userId, 10)).Where(t => permittedIds.Contains(t.Code)).ToList();
+        Favorites = (await _service.GetFavoritesAsync(userId)).Where(t => permittedIds.Contains(t.Code)).ToList();
     }
 
     private Guid GetUserId() => Guid.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var uid) ? uid : Guid.Empty;

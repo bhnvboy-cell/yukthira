@@ -5,7 +5,7 @@
 }
 <div class="row justify-content-center">
 <div class="col-lg-11">
-<h4 class="mb-3"><i class="bi bi-arrow-left-right me-2"></i>MIGO - Goods Movement</h4>
+<h4 class="mb-3"><svg class="bi bi-arrow-left-right me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>MIGO - Goods Movement</h4>
 
 @if (!string.IsNullOrEmpty(Model.SuccessMessage))
 {
@@ -146,9 +146,9 @@
         <button type="button" class="btn btn-outline-secondary btn-sm mb-2" onclick="addLine()">+ Add Line</button>
 
         <div class="d-flex gap-2 mt-3">
-            <button type="submit" asp-page-handler="Validate" class="btn btn-outline-primary"><i class="bi bi-check-circle me-1"></i>Check</button>
-            <button type="submit" asp-page-handler="Simulate" class="btn btn-outline-info"><i class="bi bi-play-circle me-1"></i>Simulate</button>
-            <button type="submit" asp-page-handler="Post" class="btn btn-primary"><i class="bi bi-send me-1"></i>Post</button>
+            <button type="submit" asp-page-handler="Validate" class="btn btn-outline-primary"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Check</button>
+            <button type="submit" asp-page-handler="Simulate" class="btn btn-outline-info"><svg class="bi bi-play-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-circle"></use></svg>Simulate</button>
+            <button type="submit" asp-page-handler="Post" class="btn btn-primary"><svg class="bi bi-send me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-send"></use></svg>Post</button>
             <a asp-page="/MM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
         </form>
@@ -258,7 +258,7 @@
                 <input asp-for="ReverseReason" class="form-control" placeholder="Reversal reason" />
             </div>
             <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-warning"><i class="bi bi-arrow-counterclockwise me-1"></i>Reverse</button>
+                <button type="submit" class="btn btn-warning"><svg class="bi bi-arrow-counterclockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-counterclockwise"></use></svg>Reverse</button>
             </div>
         </div>
         </form>

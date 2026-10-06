@@ -2,7 +2,7 @@
 @model YuktiraERP.Web.Pages.MM.PR.ConvertToPoModel
 @{ ViewData["Title"] = "Convert PR to PO"; }
 <div class="row justify-content-center"><div class="col-lg-10">
-<div class="card shadow-sm"><div class="card-header bg-success text-white"><h5 class="mb-0"><i class="bi bi-arrow-right-circle me-2"></i>Convert Purchase Requisition to Purchase Order</h5></div>
+<div class="card shadow-sm"><div class="card-header bg-success text-white"><h5 class="mb-0"><svg class="bi bi-arrow-right-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right-circle"></use></svg>Convert Purchase Requisition to Purchase Order</h5></div>
 <div class="card-body">
 @if (Model.Preview != null)
 {
@@ -41,7 +41,7 @@
 </table>
 
 <div class="d-flex gap-2">
-<button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Convert to PO</button>
+<button type="submit" class="btn btn-success"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Convert to PO</button>
 <a href="/MM/PR/Display?id=@Model.Preview.PrId" class="btn btn-outline-secondary">Cancel</a>
 </div>
 </form>

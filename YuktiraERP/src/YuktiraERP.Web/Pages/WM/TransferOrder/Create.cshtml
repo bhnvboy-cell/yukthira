@@ -4,7 +4,7 @@
 
 <div class="ent-form-wrapper">
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-arrow-left-right"></i></div>
+        <div class="banner-icon"><svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg></div>
         <div class="banner-info">
             <h5>Create Transfer Order</h5>
             <span>WM02 — Transfer Order Management</span>
@@ -18,20 +18,20 @@
 
         <div class="ent-form-tabs">
             <button type="button" class="ent-form-tab active" data-tab="material">
-                <i class="bi bi-box-seam tab-icon"></i> Material & Bin
+                <svg class="bi bi-box-seam tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg> Material & Bin
             </button>
             <button type="button" class="ent-form-tab" data-tab="quantity">
-                <i class="bi bi-rulers tab-icon"></i> Quantity & Batch
+                <svg class="bi bi-rulers tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-rulers"></use></svg> Quantity & Batch
             </button>
             <button type="button" class="ent-form-tab" data-tab="assignment">
-                <i class="bi bi-person tab-icon"></i> Assignment
+                <svg class="bi bi-person tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg> Assignment
             </button>
         </div>
 
         <!-- ═══ TAB: Material & Bin ═══ -->
         <div class="ent-form-panel active" data-panel="material">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-box-seam"></i><h6>Material Information</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg><h6>Material Information</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Material Code <span class="required">*</span></label>
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-arrow-left-right"></i><h6>Bin Assignment (SAP EWM)</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg><h6>Bin Assignment (SAP EWM)</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label>Source Bin (FRBIN) <span class="required">*</span></label>
@@ -81,7 +81,7 @@
         <!-- ═══ TAB: Quantity & Batch ═══ -->
         <div class="ent-form-panel" data-panel="quantity">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-rulers"></i><h6>Quantity Details</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-rulers" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-rulers"></use></svg><h6>Quantity Details</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Transfer Quantity <span class="required">*</span></label>
@@ -134,7 +134,7 @@
         <!-- ═══ TAB: Assignment ═══ -->
         <div class="ent-form-panel" data-panel="assignment">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Operator Assignment</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-person" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg><h6>Operator Assignment</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label>Assigned Operator <span class="required">*</span></label>
@@ -155,7 +155,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Additional Notes</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg><h6>Additional Notes</h6></div>
                 <div class="ent-field" style="grid-column: span 2">
                     <label>Remarks</label>
                     <textarea class="form-control" rows="3" placeholder="Special handling instructions, priority notes..."></textarea>
@@ -165,11 +165,11 @@
 
         <div class="ent-form-footer">
             <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>Transfer orders are SOX-audit logged
+                <svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>Transfer orders are SOX-audit logged
             </div>
             <div class="footer-actions">
-                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Create Order</button>
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Create Order</button>
             </div>
         </div>
     </form>

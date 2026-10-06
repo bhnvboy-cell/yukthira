@@ -6,7 +6,8 @@ namespace YuktiraERP.Api.Controllers;
 
 [ApiController]
 [Route("api/webhook/dispatch")]
-[Authorize(Roles = "SUPER_USER,ADMIN")]
+[Authorize]
+[Authorize(Policy = "AdminOrAbove")]
 public class WebhookDispatchController : ControllerBase
 {
     private readonly IWebhookService _webhook;

@@ -9,13 +9,13 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-cash-coin me-2"></i>New AR Entry</h3>
+            <h3><svg class="bi bi-cash-coin me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-coin"></use></svg>New AR Entry</h3>
             <span class="badge">FB70</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Save AR Entry</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Save AR Entry</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
@@ -24,20 +24,20 @@
             <input type="hidden" asp-for="Entry.Status" value="Open" />
 
             <div class="zqm-tabs" id="arTabs">
-                <button type="button" class="zqm-tab-btn active" data-tab="tab-invoice"><i class="bi bi-receipt me-1"></i>Invoice Header</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-accounting"><i class="bi bi-journal-text me-1"></i>Accounting</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-payment"><i class="bi bi-credit-card me-1"></i>Payment Terms</button>
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-invoice"><svg class="bi bi-receipt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg>Invoice Header</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-accounting"><svg class="bi bi-journal-text me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-text"></use></svg>Accounting</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-payment"><svg class="bi bi-credit-card me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg>Payment Terms</button>
             </div>
 
             <!-- Tab: Invoice Header -->
             <div class="zqm-tab-panel active" id="tab-invoice" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-receipt me-1"></i>Invoice Information</div>
+                <div class="zqm-section-title"><svg class="bi bi-receipt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg>Invoice Information</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Document Number</label><div class="zqm-ro">Auto-generated</div></div>
                     <div class="zqm-field"><label>Invoice Number</label><input type="text" placeholder="Invoice #" /></div>
                     <div class="zqm-field"><label>Invoice Date</label><input asp-for="Entry.Date" type="date" /></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-people me-1"></i>Customer Information</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-people me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Customer Information</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Customer Name <span style="color:#c62828">*</span></label><input asp-for="Entry.CustomerName" placeholder="Customer company name" required /></div>
                     <div class="zqm-field"><label>Customer Code</label><input type="text" placeholder="e.g. C-001" /></div>
@@ -47,13 +47,13 @@
 
             <!-- Tab: Accounting -->
             <div class="zqm-tab-panel" id="tab-accounting" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-calculator me-1"></i>Amounts & Currency</div>
+                <div class="zqm-section-title"><svg class="bi bi-calculator me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Amounts & Currency</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Gross Amount <span style="color:#c62828">*</span></label><input asp-for="Entry.Amount" min="0" step="0.01" placeholder="0.00" required /></div>
                     <div class="zqm-field"><label>Received Amount</label><input asp-for="Entry.ReceivedAmount" min="0" step="0.01" value="0" /></div>
                     <div class="zqm-field"><label>Currency</label><select><option value="USD">USD - US Dollar</option><option value="INR">INR - Indian Rupee</option><option value="EUR">EUR - Euro</option><option value="GBP">GBP - British Pound</option></select></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-journal-text me-1"></i>GL Account Assignment</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-journal-text me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-text"></use></svg>GL Account Assignment</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>G/L Account (Revenue)</label><select><option value="">-- Select --</option><option value="400000">400000 - Product Revenue</option><option value="410000">410000 - Service Revenue</option><option value="420000">420000 - Other Revenue</option></select></div>
                     <div class="zqm-field"><label>Profit Center</label><select><option value="">-- Select --</option><option value="PC-1000">PC-1000 - Main Business</option><option value="PC-2000">PC-2000 - Services</option></select></div>
@@ -63,13 +63,13 @@
 
             <!-- Tab: Payment Terms -->
             <div class="zqm-tab-panel" id="tab-payment" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-credit-card me-1"></i>Payment Terms & Due</div>
+                <div class="zqm-section-title"><svg class="bi bi-credit-card me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg>Payment Terms & Due</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Payment Terms</label><select><option value="Net 30">Net 30</option><option value="Net 45">Net 45</option><option value="Net 60">Net 60</option><option value="Due on Receipt">Due on Receipt</option></select></div>
                     <div class="zqm-field"><label>Due Date</label><input type="date" /></div>
                     <div class="zqm-field"><label>Dunning Level</label><select><option value="0">0 - No Dunning</option><option value="1">1 - First Reminder</option><option value="2">2 - Second Reminder</option><option value="3">3 - Final Notice</option></select></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-toggle-on me-1"></i>Status</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-toggle-on me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-toggle-on"></use></svg>Status</div>
                 <div class="zqm-row cols-2">
                     <div class="zqm-field"><label>Entry Status</label><select asp-for="Entry.Status"><option value="Open">Open</option><option value="Partially Received">Partially Received</option><option value="Paid">Paid</option></select></div>
                     <div class="zqm-field"><label>Reference / Note</label><input type="text" placeholder="Additional reference" /></div>

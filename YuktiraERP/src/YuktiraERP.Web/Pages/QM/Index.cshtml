@@ -35,7 +35,7 @@
     .qm-panel.active{display:block}
     .qm-grid-toolbar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#fafafa;border-bottom:1px solid #e0e0e0;flex-wrap:wrap;gap:8px}
     .qm-grid-toolbar .search-box{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #ccc;border-radius:4px;padding:0 10px}
-    .qm-grid-toolbar .search-box i{color:#888;font-size:0.85rem}
+    .qm-grid-toolbar .search-box i,.qm-grid-toolbar .search-box svg.bi{color:#888;font-size:0.85rem}
     .qm-grid-toolbar .search-box input{border:none;outline:none;padding:7px 0;font-size:0.85rem;width:250px}
     .qm-grid-toolbar .search-box input:focus{box-shadow:none}
     .qm-grid-actions{display:flex;gap:4px}
@@ -73,7 +73,7 @@
     .qm-act{padding:3px 6px;border:1px solid #ccc;border-radius:3px;background:#fff;cursor:pointer;font-size:0.75rem;text-decoration:none;color:#555;display:inline-flex;align-items:center;transition:all 0.2s}
     .qm-act:hover{background:#e3f2fd;border-color:#90caf9;color:#1565c0}
     .qm-empty{text-align:center;padding:48px 20px;color:#999}
-    .qm-empty i{font-size:2.5rem;margin-bottom:12px;display:block}
+    .qm-empty i,.qm-empty svg.bi{font-size:2.5rem;margin-bottom:12px;display:block}
     .qm-empty div{font-size:0.9rem}
     .qm-footer{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#fafafa;border-top:1px solid #e0e0e0;font-size:0.78rem;color:#666}
     .zqm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:20px}
@@ -95,45 +95,46 @@
 </style>
 
 <div class="qm-root" data-module-root="qm">
-    <!-- ═══ TOOLBAR ═══ -->
+    <!-- â•â•â• TOOLBAR â•â•â• -->
     <div class="qm-toolbar">
-        <h2><i class="bi bi-clipboard-check"></i> Quality Management <span class="badge">QM</span></h2>
+        <h2><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg> Quality Management <span class="badge">QM</span></h2>
         <div class="actions">
-            <a asp-page="/QM/InspectionLot/Select" class="btn-tb"><i class="bi bi-search"></i> QA32 Selection</a>
-            <a asp-page="/QM/InspectionLot/Create" class="btn-tb"><i class="bi bi-plus-circle"></i> New Inspection Lot</a>
-            <a asp-page="/QM/Inspection/ReverseUD" class="btn-tb"><i class="bi bi-arrow-counterclockwise"></i> UD Reversal</a>
+            <a asp-page="/QM/InspectionLot/Select" class="btn-tb"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg> QA32 Selection</a>
+            <a asp-page="/QM/InspectionLot/Create" class="btn-tb"><svg class="bi bi-plus-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> New Inspection Lot</a>
+            <a asp-page="/QM/Inspection/ReverseUD" class="btn-tb"><svg class="bi bi-arrow-counterclockwise" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-counterclockwise"></use></svg> UD Reversal</a>
+            <a asp-page="/QM/Analytics/SpcDashboard" class="btn-tb"><svg class="bi bi-graph-up" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg> SPC Dashboard</a>
         </div>
     </div>
 
-    <!-- ═══ KPI BAR ═══ -->
+    <!-- â•â•â• KPI BAR â•â•â• -->
     <div class="qm-kpi-bar">
-        <div class="qm-kpi-item"><div class="kpi-icon blue"><i class="bi bi-clipboard-data"></i></div><div class="kpi-value">@Model.InspectionLots.Count</div><div class="kpi-label">Inspection Lots</div></div>
-        <div class="qm-kpi-item"><div class="kpi-icon amber"><i class="bi bi-hourglass-split"></i></div><div class="kpi-value">@Model.PendingTestingCount</div><div class="kpi-label">Pending Testing</div></div>
-        <div class="qm-kpi-item"><div class="kpi-icon green"><i class="bi bi-check-circle"></i></div><div class="kpi-value">@(Model.FirstPassYield)%</div><div class="kpi-label">First-Pass Yield</div></div>
-        <div class="qm-kpi-item"><div class="kpi-icon teal"><i class="bi bi-check2-square"></i></div><div class="kpi-value">@Model.UDsTodayCount</div><div class="kpi-label">UDs Today</div></div>
-        <div class="qm-kpi-item"><div class="kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div><div class="kpi-value">@Model.OOSAlertCount</div><div class="kpi-label">Out-of-Spec</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon blue"><svg class="bi bi-clipboard-data" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-data"></use></svg></div><div class="kpi-value">@Model.InspectionLots.Count</div><div class="kpi-label">Inspection Lots</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon amber"><svg class="bi bi-hourglass-split" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-hourglass-split"></use></svg></div><div class="kpi-value">@Model.PendingTestingCount</div><div class="kpi-label">Pending Testing</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon green"><svg class="bi bi-check-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg></div><div class="kpi-value">@(Model.FirstPassYield)%</div><div class="kpi-label">First-Pass Yield</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon teal"><svg class="bi bi-check2-square" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-square"></use></svg></div><div class="kpi-value">@Model.UDsTodayCount</div><div class="kpi-label">UDs Today</div></div>
+        <div class="qm-kpi-item"><div class="kpi-icon red"><svg class="bi bi-exclamation-triangle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg></div><div class="kpi-value">@Model.OOSAlertCount</div><div class="kpi-label">Out-of-Spec</div></div>
     </div>
 
-    <!-- ═══ TABS ═══ -->
+    <!-- â•â•â• TABS â•â•â• -->
     <div class="qm-tabs" id="qmTabs">
-        <button type="button" class="qm-tab active" data-tab="lots"><i class="bi bi-clipboard-check"></i> Inspection Lots <span class="tab-count">@Model.InspectionLots.Count</span></button>
-        <button type="button" class="qm-tab" data-tab="results"><i class="bi bi-clipboard-data"></i> Results <span class="tab-count">@Model.InspectionResults.Count</span></button>
-        <button type="button" class="qm-tab" data-tab="decisions"><i class="bi bi-check2-circle"></i> Usage Decisions <span class="tab-count">@Model.UsageDecisions.Count</span></button>
-        <button type="button" class="qm-tab" data-tab="notifications"><i class="bi bi-bell"></i> Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
-        <button type="button" class="qm-tab" data-tab="plans"><i class="bi bi-journal-text"></i> Inspection Plans <span class="tab-count">@Model.InspectionPlans.Count</span></button>
-        <button type="button" class="qm-tab" data-tab="coa"><i class="bi bi-file-earmark-check"></i> Certificates <span class="tab-count">@Model.Certificates.Count</span></button>
-        <button type="button" class="qm-tab" data-tab="zqm"><i class="bi bi-gear-wide-connected"></i> ZQM Suite</button>
+        <button type="button" class="qm-tab active" data-tab="lots"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg> Inspection Lots <span class="tab-count">@Model.InspectionLots.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="results"><svg class="bi bi-clipboard-data" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-data"></use></svg> Results <span class="tab-count">@Model.InspectionResults.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="decisions"><svg class="bi bi-check2-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-circle"></use></svg> Usage Decisions <span class="tab-count">@Model.UsageDecisions.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="notifications"><svg class="bi bi-bell" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bell"></use></svg> Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="plans"><svg class="bi bi-journal-text" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-text"></use></svg> Inspection Plans <span class="tab-count">@Model.InspectionPlans.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="coa"><svg class="bi bi-file-earmark-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-check"></use></svg> Certificates <span class="tab-count">@Model.Certificates.Count</span></button>
+        <button type="button" class="qm-tab" data-tab="zqm"><svg class="bi bi-gear-wide-connected" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear-wide-connected"></use></svg> ZQM Suite</button>
     </div>
 
-    <!-- ═══ TAB: Inspection Lots ═══ -->
+    <!-- â•â•â• TAB: Inspection Lots â•â•â• -->
     <div class="qm-panel active" data-panel="lots">
         <div class="qm-grid-toolbar">
-            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search lots by material, batch, inspector..." class="grid-search" data-target="lots" /></div>
+            <div class="search-box"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search lots by material, batch, inspector..." class="grid-search" data-target="lots" /></div>
             <div class="qm-grid-actions">
                 <span class="qm-grid-info" id="lots-info">Showing @Model.InspectionLots.Count records</span>
-                <a asp-page="/QM/InspectionLot/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
-                <button class="btn-g" onclick="exportGrid('lots')"><i class="bi bi-download"></i> Export</button>
-                <button class="btn-g danger" id="lots-delete-selected" style="display:none"><i class="bi bi-trash"></i> Delete Selected</button>
+                <a asp-page="/QM/InspectionLot/Create" class="btn-g primary"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New</a>
+                <button class="btn-g" onclick="exportGrid('lots')"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
+                <button class="btn-g danger" id="lots-delete-selected" style="display:none"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg> Delete Selected</button>
             </div>
         </div>
         <div class="qm-table-wrap">
@@ -152,7 +153,7 @@
                             <td><span class="qm-badge info">@l.InspectionType</span></td>
                             <td>@l.Quantity @l.BaseUOM</td><td>@l.SampleSize</td><td>@l.AssignedInspector</td>
                             <td><span class="qm-badge @(l.Status=="Created"?"created":l.Status=="In Testing"?"testing":l.Status=="UD Made"?"ud-made":l.Status=="Closed"?"closed":"info")">@l.Status</span></td>
-                            <td><a asp-page="/QM/InspectionLot/Edit" asp-route-id="@l.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a> <a asp-page="/QM/InspectionLot/Display" asp-route-id="@l.Id" class="qm-act" title="View"><i class="bi bi-eye"></i></a></td>
+                            <td><a asp-page="/QM/InspectionLot/Edit" asp-route-id="@l.Id" class="qm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a> <a asp-page="/QM/InspectionLot/Display" asp-route-id="@l.Id" class="qm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a></td>
                         </tr>
                     }
                 </tbody>
@@ -161,14 +162,14 @@
         <div class="qm-footer"><span id="lots-footer-info">Total: @Model.InspectionLots.Count lots</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Results ═══ -->
+    <!-- â•â•â• TAB: Results â•â•â• -->
     <div class="qm-panel" data-panel="results" style="display:none">
         <div class="qm-grid-toolbar">
-            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search results by lot, characteristic..." class="grid-search" data-target="results" /></div>
+            <div class="search-box"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search results by lot, characteristic..." class="grid-search" data-target="results" /></div>
             <div class="qm-grid-actions">
                 <span class="qm-grid-info" id="results-info">Showing @Model.InspectionResults.Count records</span>
-                <a asp-page="/QM/InspectionResult/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
-                <button class="btn-g" onclick="exportGrid('results')"><i class="bi bi-download"></i> Export</button>
+                <a asp-page="/QM/InspectionResult/Create" class="btn-g primary"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New</a>
+                <button class="btn-g" onclick="exportGrid('results')"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
             </div>
         </div>
         <div class="qm-table-wrap">
@@ -189,7 +190,7 @@
                             <td>@r.MeasuredValue @r.Unit</td><td>@r.Unit</td>
                             <td><span class="qm-badge @(r.Evaluation=="Pass"?"passed":"rejected")">@r.Evaluation</span></td>
                             <td><span class="qm-badge @(r.Status=="Passed"?"passed":"rejected")">@r.Status</span></td>
-                            <td><a asp-page="/QM/InspectionResult/Edit" asp-route-id="@r.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                            <td><a asp-page="/QM/InspectionResult/Edit" asp-route-id="@r.Id" class="qm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a></td>
                         </tr>
                     }
                 </tbody>
@@ -198,14 +199,14 @@
         <div class="qm-footer"><span>Total: @Model.InspectionResults.Count results</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Usage Decisions ═══ -->
+    <!-- â•â•â• TAB: Usage Decisions â•â•â• -->
     <div class="qm-panel" data-panel="decisions" style="display:none">
         <div class="qm-grid-toolbar">
-            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search decisions by lot, material..." class="grid-search" data-target="decisions" /></div>
+            <div class="search-box"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search decisions by lot, material..." class="grid-search" data-target="decisions" /></div>
             <div class="qm-grid-actions">
                 <span class="qm-grid-info" id="decisions-info">Showing @Model.UsageDecisions.Count records</span>
-                <a asp-page="/QM/UsageDecision/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
-                <button class="btn-g" onclick="exportGrid('decisions')"><i class="bi bi-download"></i> Export</button>
+                <a asp-page="/QM/UsageDecision/Create" class="btn-g primary"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New</a>
+                <button class="btn-g" onclick="exportGrid('decisions')"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
             </div>
         </div>
         <div class="qm-table-wrap">
@@ -225,7 +226,7 @@
                             <td><span class="qm-badge @(d.UDCode=="Accepted"?"success":d.UDCode=="Rejected"?"rejected":"warning")">@d.UDCode</span></td>
                             <td>@d.QualityScore</td><td>@d.UnrestrictedStock</td><td>@d.BlockedStock</td><td>@d.ScrapQuantity</td>
                             <td>@d.InspectorID</td><td>@d.DecisionDate.ToString("dd MMM yyyy")</td>
-                            <td><a asp-page="/QM/UsageDecision/Edit" asp-route-id="@d.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                            <td><a asp-page="/QM/UsageDecision/Edit" asp-route-id="@d.Id" class="qm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a></td>
                         </tr>
                     }
                 </tbody>
@@ -234,14 +235,14 @@
         <div class="qm-footer"><span>Total: @Model.UsageDecisions.Count decisions</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Notifications ═══ -->
+    <!-- â•â•â• TAB: Notifications â•â•â• -->
     <div class="qm-panel" data-panel="notifications" style="display:none">
         <div class="qm-grid-toolbar">
-            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search notifications..." class="grid-search" data-target="notifications" /></div>
+            <div class="search-box"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search notifications..." class="grid-search" data-target="notifications" /></div>
             <div class="qm-grid-actions">
                 <span class="qm-grid-info" id="notifications-info">Showing @Model.Notifications.Count records</span>
-                <a asp-page="/QM/Notification/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
-                <button class="btn-g" onclick="exportGrid('notifications')"><i class="bi bi-download"></i> Export</button>
+                <a asp-page="/QM/Notification/Create" class="btn-g primary"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New</a>
+                <button class="btn-g" onclick="exportGrid('notifications')"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
             </div>
         </div>
         <div class="qm-table-wrap">
@@ -261,7 +262,7 @@
                             <td>@n.MaterialCode</td><td>@n.Plant</td><td>@n.DefectCode</td>
                             <td><span class="qm-badge @(n.Priority=="High"||n.Priority=="Critical"?"danger":n.Priority=="Medium"?"warning":"info")">@n.Priority</span></td>
                             <td><span class="qm-badge @(n.Status=="NEW"?"info":n.Status=="IN_PROCESS"?"warning":"success")">@n.Status</span></td>
-                            <td><a asp-page="/QM/Notification/Edit" asp-route-id="@n.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                            <td><a asp-page="/QM/Notification/Edit" asp-route-id="@n.Id" class="qm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a></td>
                         </tr>
                     }
                 </tbody>
@@ -270,14 +271,14 @@
         <div class="qm-footer"><span>Total: @Model.Notifications.Count notifications</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Inspection Plans ═══ -->
+    <!-- â•â•â• TAB: Inspection Plans â•â•â• -->
     <div class="qm-panel" data-panel="plans" style="display:none">
         <div class="qm-grid-toolbar">
-            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search plans by material..." class="grid-search" data-target="plans" /></div>
+            <div class="search-box"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search plans by material..." class="grid-search" data-target="plans" /></div>
             <div class="qm-grid-actions">
                 <span class="qm-grid-info" id="plans-info">Showing @Model.InspectionPlans.Count records</span>
-                <a asp-page="/QM/InspectionPlan/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
-                <button class="btn-g" onclick="exportGrid('plans')"><i class="bi bi-download"></i> Export</button>
+                <a asp-page="/QM/InspectionPlan/Create" class="btn-g primary"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New</a>
+                <button class="btn-g" onclick="exportGrid('plans')"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
             </div>
         </div>
         <div class="qm-table-wrap">
@@ -295,7 +296,7 @@
                             <td><strong>@p.PlanId</strong></td><td>@p.MaterialName</td><td>@p.Characteristic</td>
                             <td>@p.Method</td><td>@p.Frequency</td>
                             <td><span class="qm-badge @(p.Status=="Active"?"success":"warning")">@p.Status</span></td>
-                            <td><a asp-page="/QM/InspectionPlan/Edit" asp-route-id="@p.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                            <td><a asp-page="/QM/InspectionPlan/Edit" asp-route-id="@p.Id" class="qm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a></td>
                         </tr>
                     }
                 </tbody>
@@ -304,14 +305,14 @@
         <div class="qm-footer"><span>Total: @Model.InspectionPlans.Count plans</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: Certificates ═══ -->
+    <!-- â•â•â• TAB: Certificates â•â•â• -->
     <div class="qm-panel" data-panel="coa" style="display:none">
         <div class="qm-grid-toolbar">
-            <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search certificates by customer..." class="grid-search" data-target="coa" /></div>
+            <div class="search-box"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search certificates by customer..." class="grid-search" data-target="coa" /></div>
             <div class="qm-grid-actions">
                 <span class="qm-grid-info" id="coa-info">Showing @Model.Certificates.Count records</span>
-                <a asp-page="/QM/COA/Create" class="btn-g primary"><i class="bi bi-plus"></i> New</a>
-                <button class="btn-g" onclick="exportGrid('coa')"><i class="bi bi-download"></i> Export</button>
+                <a asp-page="/QM/COA/Create" class="btn-g primary"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New</a>
+                <button class="btn-g" onclick="exportGrid('coa')"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
             </div>
         </div>
         <div class="qm-table-wrap">
@@ -331,7 +332,7 @@
                             <td><span class="qm-badge @(c.OverallResult=="Passed"?"success":"rejected")">@c.OverallResult</span></td>
                             <td>@c.IssuedBy</td><td>@c.IssueDate.ToString("dd MMM yyyy")</td>
                             <td><span class="qm-badge @(c.Status=="Issued"?"success":"warning")">@c.Status</span></td>
-                            <td><a asp-page="/QM/COA/Edit" asp-route-id="@c.Id" class="qm-act" title="Edit"><i class="bi bi-pencil"></i></a></td>
+                            <td><a asp-page="/QM/COA/Edit" asp-route-id="@c.Id" class="qm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a></td>
                         </tr>
                     }
                 </tbody>
@@ -340,79 +341,79 @@
         <div class="qm-footer"><span>Total: @Model.Certificates.Count certificates</span><div></div></div>
     </div>
 
-    <!-- ═══ TAB: ZQM Suite ═══ -->
+    <!-- â•â•â• TAB: ZQM Suite â•â•â• -->
     <div class="qm-panel" data-panel="zqm" style="display:none">
         <div style="padding:20px;background:#fafafa;border-bottom:1px solid #e0e0e0">
-            <h4 style="margin:0 0 4px;color:#0d47a1"><i class="bi bi-gear-wide-connected me-2"></i>ZQM Transaction Suite</h4>
+            <h4 style="margin:0 0 4px;color:#0d47a1"><svg class="bi bi-gear-wide-connected me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear-wide-connected"></use></svg>ZQM Transaction Suite</h4>
             <p style="margin:0;font-size:0.85rem;color:#666">Advanced quality management backend services with frontend UI</p>
         </div>
         <div class="zqm-grid">
             <a asp-page="/QM/ZqmSuite/AutoLotGenerator" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon blue"><i class="bi bi-clipboard-plus"></i></div>
+                <div class="zqm-icon blue"><svg class="bi bi-clipboard-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-plus"></use></svg></div>
                 <div class="zqm-code">ZQM01</div>
                 <h5>Auto Inspection Lot Generator</h5>
                 <p>Generate inspection lots automatically from GR/PO movements with intelligent type detection</p>
             </a>
             <a asp-page="/QM/ZqmSuite/ResultsWorkbench" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon green"><i class="bi bi-clipboard-check"></i></div>
+                <div class="zqm-icon green"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg></div>
                 <div class="zqm-code">ZQM02</div>
                 <h5>Results Recording Workbench</h5>
                 <p>Record characteristic results with spec evaluation and tolerance checking</p>
             </a>
             <a asp-page="/QM/ZqmSuite/UsageDecision" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon amber"><i class="bi bi-gavel"></i></div>
+                <div class="zqm-icon amber"><svg class="bi bi-hammer" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-hammer"></use></svg></div>
                 <div class="zqm-code">ZQM03</div>
                 <h5>Usage Decision Engine</h5>
                 <p>Post usage decisions with automatic stock movements and quality scoring</p>
             </a>
             <a asp-page="/QM/Inspection/ReverseUD" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon red"><i class="bi bi-arrow-counterclockwise"></i></div>
+                <div class="zqm-icon red"><svg class="bi bi-arrow-counterclockwise" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-counterclockwise"></use></svg></div>
                 <div class="zqm-code">ZQM04</div>
                 <h5>UD Reversal Engine</h5>
                 <p>Reverse usage decisions with stock reversal (Mvt 322) and audit trail</p>
             </a>
             <a asp-page="/QM/ZqmSuite/HandlingUnit" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon teal"><i class="bi bi-box-seam"></i></div>
+                <div class="zqm-icon teal"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg></div>
                 <div class="zqm-code">ZQM05</div>
                 <h5>Handling Unit Manager</h5>
                 <p>Create, manage and release handling units for quality inspection packaging</p>
             </a>
             <a asp-page="/QM/ZqmSuite/QaWorklist" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon purple"><i class="bi bi-list-task"></i></div>
+                <div class="zqm-icon purple"><svg class="bi bi-list-task" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-task"></use></svg></div>
                 <div class="zqm-code">ZQM06</div>
                 <h5>QA Worklist</h5>
                 <p>Central worklist for QA tasks: pending lots, overdue inspections, supervisor reviews</p>
             </a>
             <a asp-page="/QM/ZqmSuite/NonConformanceCapa" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="zqm-icon red"><svg class="bi bi-exclamation-triangle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg></div>
                 <div class="zqm-code">ZQM07</div>
                 <h5>Non-Conformance & CAPA</h5>
                 <p>Create NC reports, CAPAs, containment actions with root cause analysis</p>
             </a>
             <a asp-page="/QM/ZqmSuite/LabCalculator" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon blue"><i class="bi bi-calculator"></i></div>
+                <div class="zqm-icon blue"><svg class="bi bi-calculator" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg></div>
                 <div class="zqm-code">ZQM08</div>
                 <h5>Lab Calculator</h5>
                 <p>Moisture, DE value, Baume gravity, starch purity, grain defect calculations</p>
             </a>
             <a asp-page="/QM/ZqmSuite/CertificateOfAnalysis" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon green"><i class="bi bi-file-earmark-medical"></i></div>
+                <div class="zqm-icon green"><svg class="bi bi-file-earmark-medical" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-medical"></use></svg></div>
                 <div class="zqm-code">ZQM09</div>
                 <h5>Certificate of Analysis</h5>
                 <p>Generate CoA with pass/fail per characteristic and customer delivery docs</p>
             </a>
             <a asp-page="/QM/ZqmSuite/PipelineDiagnostic" class="zqm-card">
                 <span class="zqm-status ready">ACTIVE</span>
-                <div class="zqm-icon amber"><i class="bi bi-diagram-3"></i></div>
+                <div class="zqm-icon amber"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg></div>
                 <div class="zqm-code">ZQM10</div>
                 <h5>Pipeline Diagnostic</h5>
                 <p>Full QM pipeline trace: Inspection Lot -> Results -> UD -> Release -> CoA</p>

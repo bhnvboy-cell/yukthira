@@ -9,21 +9,21 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-gear-wide-connected me-2"></i>Production Planning</h3>
+            <h3><svg class="bi bi-gear-wide-connected me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear-wide-connected"></use></svg>Production Planning</h3>
             <span class="badge">PP</span>
         </div>
         <div class="actions">
-            <a asp-page="/PP/ProductionOrder/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>Create Prod Order</a>
-            <a asp-page="/PP/BOM/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>Create BOM</a>
-            <a asp-page="/PP/WorkCenter/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>Create Work Center</a>
-            <a asp-page="/PP/Routing/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>Create Routing</a>
-            <a asp-page="/PP/Confirmation/Create" class="zqm-btn"><i class="bi bi-check-circle me-1"></i>Confirm Production</a>
-            <a asp-page="/PP/MrpRun" class="zqm-btn"><i class="bi bi-lightning me-1"></i>Execute MRP Run</a>
+            <a asp-page="/PP/ProductionOrder/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create Prod Order</a>
+            <a asp-page="/PP/BOM/Create" class="zqm-btn"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create BOM</a>
+            <a asp-page="/PP/WorkCenter/Create" class="zqm-btn"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create Work Center</a>
+            <a asp-page="/PP/Routing/Create" class="zqm-btn"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create Routing</a>
+            <a asp-page="/PP/Confirmation/Create" class="zqm-btn"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Confirm Production</a>
+            <a asp-page="/PP/MrpRun" class="zqm-btn"><svg class="bi bi-lightning me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lightning"></use></svg>Execute MRP Run</a>
         </div>
     </div>
 
     <div class="zqm-filter" style="border-radius:0;padding:16px 20px">
-        <div class="zqm-section-title"><i class="bi bi-speedometer2 me-1"></i>Key Performance Indicators</div>
+        <div class="zqm-section-title"><svg class="bi bi-speedometer2 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer2"></use></svg>Key Performance Indicators</div>
         <div class="zqm-row cols-5">
             <div style="background:#e3f2fd;padding:14px;border-radius:6px;text-align:center;border:1px solid #bbdefb">
                 <div style="font-size:1.4rem;font-weight:700;color:#1565c0">@Model.ActiveOrderCount</div>
@@ -49,12 +49,12 @@
     </div>
 
     <div class="zqm-tabs" id="ppTabs">
-        <button type="button" class="zqm-tab-btn active" data-tab="prodorders"><i class="bi bi-gear"></i> Production Orders <span class="zqm-badge info" style="margin-left:4px">@Model.ProductionOrders.Count</span></button>
-        <button type="button" class="zqm-tab-btn" data-tab="bom"><i class="bi bi-box-seam"></i> BOM <span class="zqm-badge info" style="margin-left:4px">@Model.BillOfMaterials.Count</span></button>
-        <button type="button" class="zqm-tab-btn" data-tab="workcenters"><i class="bi bi-building"></i> Work Centers <span class="zqm-badge info" style="margin-left:4px">@Model.WorkCenters.Count</span></button>
-        <button type="button" class="zqm-tab-btn" data-tab="routings"><i class="bi bi-diagram-3"></i> Routings <span class="zqm-badge info" style="margin-left:4px">@Model.Routings.Count</span></button>
-        <button type="button" class="zqm-tab-btn" data-tab="mrp"><i class="bi bi-cpu"></i> MRP Run</button>
-        <button type="button" class="zqm-tab-btn" data-tab="confirmations"><i class="bi bi-check2-square"></i> Order Confirmation <span class="zqm-badge info" style="margin-left:4px">@Model.Confirmations.Count</span></button>
+        <button type="button" class="zqm-tab-btn active" data-tab="prodorders"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg> Production Orders <span class="zqm-badge info" style="margin-left:4px">@Model.ProductionOrders.Count</span></button>
+        <button type="button" class="zqm-tab-btn" data-tab="bom"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg> BOM <span class="zqm-badge info" style="margin-left:4px">@Model.BillOfMaterials.Count</span></button>
+        <button type="button" class="zqm-tab-btn" data-tab="workcenters"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg> Work Centers <span class="zqm-badge info" style="margin-left:4px">@Model.WorkCenters.Count</span></button>
+        <button type="button" class="zqm-tab-btn" data-tab="routings"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg> Routings <span class="zqm-badge info" style="margin-left:4px">@Model.Routings.Count</span></button>
+        <button type="button" class="zqm-tab-btn" data-tab="mrp"><svg class="bi bi-cpu" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg> MRP Run</button>
+        <button type="button" class="zqm-tab-btn" data-tab="confirmations"><svg class="bi bi-check2-square" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-square"></use></svg> Order Confirmation <span class="zqm-badge info" style="margin-left:4px">@Model.Confirmations.Count</span></button>
     </div>
 
     <!-- TAB: Production Orders -->
@@ -94,15 +94,15 @@
                                     <td>@o.StorageLocation</td>
                                     <td><span class="zqm-badge @(o.Status=="PLANNED"?"info":o.Status=="RELEASED"?"warning":o.Status=="IN_PROGRESS"?"purple":o.Status=="COMPLETED"?"passed":o.Status=="TECO"?"closed":"failed")">@o.Status</span></td>
                                     <td>
-                                        <a asp-page="/PP/ProductionOrder/Edit" asp-route-id="@o.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
-                                        <a asp-page="/PP/ProductionOrder/Display" asp-route-id="@o.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                        <a asp-page="/PP/ProductionOrder/Edit" asp-route-id="@o.Id" class="zqm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                        <a asp-page="/PP/ProductionOrder/Display" asp-route-id="@o.Id" class="zqm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="10" class="zqm-empty"><i class="bi bi-gear"></i><div>No production orders found</div></td></tr>
+                            <tr><td colspan="10" class="zqm-empty"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg><div>No production orders found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -153,15 +153,15 @@
                                     <td>@b.ValidTo.ToString("dd MMM yyyy")</td>
                                     <td><span class="zqm-badge @(b.Status=="Active"?"passed":"warning")">@b.Status</span></td>
                                     <td>
-                                        <a asp-page="/PP/BOM/Edit" asp-route-id="@b.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
-                                        <a asp-page="/PP/BOM/Display" asp-route-id="@b.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                        <a asp-page="/PP/BOM/Edit" asp-route-id="@b.Id" class="zqm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                        <a asp-page="/PP/BOM/Display" asp-route-id="@b.Id" class="zqm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="13" class="zqm-empty"><i class="bi bi-box-seam"></i><div>No BOMs found</div></td></tr>
+                            <tr><td colspan="13" class="zqm-empty"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg><div>No BOMs found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -206,15 +206,15 @@
                                     <td>@w.CapacityPerDay</td>
                                     <td><span class="zqm-badge @(w.Status=="Active"?"passed":w.Status=="Maintenance"?"warning":"failed")">@w.Status</span></td>
                                     <td>
-                                        <a asp-page="/PP/WorkCenter/Edit" asp-route-id="@w.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
-                                        <a asp-page="/PP/WorkCenter/Display" asp-route-id="@w.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                        <a asp-page="/PP/WorkCenter/Edit" asp-route-id="@w.Id" class="zqm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                        <a asp-page="/PP/WorkCenter/Display" asp-route-id="@w.Id" class="zqm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="10" class="zqm-empty"><i class="bi bi-building"></i><div>No work centers found</div></td></tr>
+                            <tr><td colspan="10" class="zqm-empty"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg><div>No work centers found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -263,15 +263,15 @@
                                     <td>@r.ScrapPercent%</td>
                                     <td><span class="zqm-badge @(r.Status=="Active"?"passed":"warning")">@r.Status</span></td>
                                     <td>
-                                        <a asp-page="/PP/Routing/Edit" asp-route-id="@r.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
-                                        <a asp-page="/PP/Routing/Display" asp-route-id="@r.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                        <a asp-page="/PP/Routing/Edit" asp-route-id="@r.Id" class="zqm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                        <a asp-page="/PP/Routing/Display" asp-route-id="@r.Id" class="zqm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="12" class="zqm-empty"><i class="bi bi-diagram-3"></i><div>No routings found</div></td></tr>
+                            <tr><td colspan="12" class="zqm-empty"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg><div>No routings found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -283,20 +283,20 @@
     <!-- TAB: MRP Run -->
     <div class="zqm-tab-panel" data-panel="mrp">
         <div class="zqm-results" style="border-radius:0 0 6px 6px;padding:20px">
-            <div class="zqm-section-title"><i class="bi bi-cpu me-1"></i>Material Requirements Planning</div>
+            <div class="zqm-section-title"><svg class="bi bi-cpu me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg>Material Requirements Planning</div>
             <div class="zqm-row cols-3">
                 <a asp-page="/PP/MrpRun" style="background:#e3f2fd;padding:20px;border-radius:8px;text-decoration:none;color:inherit;border:1px solid #bbdefb;display:block;transition:all 0.2s">
-                    <div style="font-size:1.5rem;margin-bottom:6px;color:#1565c0"><i class="bi bi-play-circle"></i></div>
+                    <div style="font-size:1.5rem;margin-bottom:6px;color:#1565c0"><svg class="bi bi-play-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-circle"></use></svg></div>
                     <div style="font-weight:700;font-size:0.9rem;color:#1a237e">MD01 — MRP Run</div>
                     <div style="font-size:0.78rem;color:#666;margin-top:4px">Run material requirements planning</div>
                 </a>
                 <a asp-page="/PP/Mrp" style="background:#fff3e0;padding:20px;border-radius:8px;text-decoration:none;color:inherit;border:1px solid #ffe0b2;display:block;transition:all 0.2s">
-                    <div style="font-size:1.5rem;margin-bottom:6px;color:#e65100"><i class="bi bi-cpu"></i></div>
+                    <div style="font-size:1.5rem;margin-bottom:6px;color:#e65100"><svg class="bi bi-cpu" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg></div>
                     <div style="font-weight:700;font-size:0.9rem;color:#1a237e">MRP & Capacity Planning</div>
                     <div style="font-size:0.78rem;color:#666;margin-top:4px">BOM explosion and capacity leveling</div>
                 </a>
                 <a asp-page="/PP/MrpStock" style="background:#e8f5e9;padding:20px;border-radius:8px;text-decoration:none;color:inherit;border:1px solid #c8e6c9;display:block;transition:all 0.2s">
-                    <div style="font-size:1.5rem;margin-bottom:6px;color:#2e7d32"><i class="bi bi-clipboard-data"></i></div>
+                    <div style="font-size:1.5rem;margin-bottom:6px;color:#2e7d32"><svg class="bi bi-clipboard-data" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-data"></use></svg></div>
                     <div style="font-weight:700;font-size:0.9rem;color:#1a237e">MD04 — Stock/Requirements</div>
                     <div style="font-size:0.78rem;color:#666;margin-top:4px">Material stock and requirements list</div>
                 </a>
@@ -346,14 +346,14 @@
                                     <td>@c.ConfirmationDate.ToString("dd MMM yyyy")</td>
                                     <td><span class="zqm-badge @(c.Status=="Confirmed"?"passed":"warning")">@c.Status</span></td>
                                     <td>
-                                        <a href="javascript:void(0)" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
+                                        <a href="javascript:void(0)" class="zqm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                     </td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="13" class="zqm-empty"><i class="bi bi-check2-square"></i><div>No confirmations found</div></td></tr>
+                            <tr><td colspan="13" class="zqm-empty"><svg class="bi bi-check2-square" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-square"></use></svg><div>No confirmations found</div></td></tr>
                         }
                     </tbody>
                 </table>

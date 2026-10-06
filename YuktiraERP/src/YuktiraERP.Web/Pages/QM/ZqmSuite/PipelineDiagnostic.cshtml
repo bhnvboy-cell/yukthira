@@ -17,20 +17,20 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-diagram-3 me-2"></i>Pipeline Diagnostic</h3>
+            <h3><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Pipeline Diagnostic</h3>
             <span class="badge">ZQM10</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="traceFull()"><i class="bi bi-diagram-3 me-1"></i>Full Trace</button>
-            <button type="button" class="zqm-btn" onclick="validateStep('inspection')"><i class="bi bi-check-circle me-1"></i>Validate Insp</button>
-            <button type="button" class="zqm-btn" onclick="validateStep('results')"><i class="bi bi-check-circle me-1"></i>Validate Results</button>
-            <button type="button" class="zqm-btn" onclick="validateStep('ud')"><i class="bi bi-check-circle me-1"></i>Validate UD</button>
-            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="traceFull()"><svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Full Trace</button>
+            <button type="button" class="zqm-btn" onclick="validateStep('inspection')"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Validate Insp</button>
+            <button type="button" class="zqm-btn" onclick="validateStep('results')"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Validate Results</button>
+            <button type="button" class="zqm-btn" onclick="validateStep('ud')"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Validate UD</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Lot Selection</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Lot Selection</div>
         <div class="zqm-row cols-3">
             <div class="zqm-field"><label>Inspection Lot Number</label><input id="pipe-lot" placeholder="e.g. IL-20260001" /></div>
             <div class="zqm-field"><label>Material</label><div class="zqm-ro" id="pipeMaterial">-</div></div>
@@ -41,7 +41,7 @@
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-results" id="pipeSection" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-diagram-3 me-1"></i>Pipeline Status</h4><span class="count" id="pipeCount"></span></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Pipeline Status</h4><span class="count" id="pipeCount"></span></div>
         <div style="padding:16px">
             <div class="pipe-visual" id="pipeVisual"></div>
             <div class="zqm-detail-grid" id="pipeDetails"></div>
@@ -66,8 +66,8 @@ function renderPipeline(stepResults) {
         var cls = st==='pass' ? 'pass' : st==='fail' ? 'fail' : 'pending';
         var txt = st==='pass' ? 'PASS' : st==='fail' ? 'FAIL' : 'PENDING';
         var clr = st==='pass' ? '#2e7d32' : st==='fail' ? '#c62828' : '#e65100';
-        html += '<div class="pipe-step '+cls+'"><div class="step-icon"><i class="bi '+s.icon+'"></i></div><div class="step-title">'+s.title+'</div><div class="step-status" style="color:'+clr+'">'+txt+'</div></div>';
-        if (i < steps.length - 1) html += '<div class="pipe-arrow '+(st==='pass'?'pass':'')+'"><i class="bi bi-arrow-right"></i></div>';
+        html += '<div class="pipe-step '+cls+'"><div class="step-icon"><svg class="bi '+s.icon+'" aria-hidden="true"><use href="/images/sprite.svg#'+s.icon+'"></use></svg></div><div class="step-title">'+s.title+'</div><div class="step-status" style="color:'+clr+'">'+txt+'</div></div>';
+        if (i < steps.length - 1) html += '<div class="pipe-arrow '+(st==='pass'?'pass':'')+'"><svg class="bi bi-arrow-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right"></use></svg></div>';
     });
     document.getElementById('pipeVisual').innerHTML = html;
 }

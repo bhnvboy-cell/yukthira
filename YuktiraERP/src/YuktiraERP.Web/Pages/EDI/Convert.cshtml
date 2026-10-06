@@ -8,16 +8,16 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-arrow-right-circle me-2"></i>EDI Message Conversion</h3>
+            <h3><svg class="bi bi-arrow-right-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right-circle"></use></svg>EDI Message Conversion</h3>
             <span class="badge">Convert</span>
         </div>
         <div class="actions">
-            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Conversion Parameters</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Conversion Parameters</div>
         <div class="zqm-row cols-2">
             <div class="zqm-field">
                 <label>Standard *</label>
@@ -29,8 +29,8 @@
             <div class="zqm-field">
                 <label>Document Type *</label>
                 <select id="convertDocType">
-                    <option value="PurchaseOrder">Purchase Order</option>
-                    <option value="Invoice">Invoice</option>
+                    <option value="PO">Purchase Order</option>
+                    <option value="INVOICE">Invoice</option>
                 </select>
             </div>
         </div>
@@ -41,8 +41,8 @@
             </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px">
-            <button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0" onclick="doConvert()"><i class="bi bi-arrow-right-circle me-1"></i>Convert</button>
-            <button type="button" class="zqm-btn" onclick="copyOutput()" id="btnCopy" style="display:none"><i class="bi bi-clipboard me-1"></i>Copy Output</button>
+            <button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0" onclick="doConvert()"><svg class="bi bi-arrow-right-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right-circle"></use></svg>Convert</button>
+            <button type="button" class="zqm-btn" onclick="copyOutput()" id="btnCopy" style="display:none"><svg class="bi bi-clipboard me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard"></use></svg>Copy Output</button>
         </div>
     </div>
 
@@ -79,14 +79,19 @@ function doConvert() {
     var headers = { 'Content-Type': 'application/json' };
     if (token) { headers['RequestVerificationToken'] = token.value; }
 
-    fetch('/api/integration/edi/convert/' + standard + '/' + docType, {
+    fetch('/api/v1/integration/edi/convert/' + standard + '/' + docType, {
         method: 'POST',
         headers: headers,
         body: input
     }).then(function(r) {
         return r.text().then(function(text) {
             if (r.ok) {
-                document.getElementById('convertOutput').value = text;
+                var output = text;
+                try {
+                    var parsed = JSON.parse(text);
+                    if (parsed && parsed.content !== undefined) output = parsed.content;
+                } catch (e) {}
+                document.getElementById('convertOutput').value = output;
                 document.getElementById('convertSuccess').textContent = 'Conversion successful (' + standard + ' / ' + docType + ')';
                 document.getElementById('convertSuccess').style.display = '';
                 document.getElementById('outputBadge').textContent = 'SUCCESS';
@@ -108,7 +113,7 @@ function copyOutput() {
     output.select();
     document.execCommand('copy');
     var btn = document.getElementById('btnCopy');
-    btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
-    setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copy Output'; }, 2000);
+    btn.innerHTML = '<svg class="bi bi-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check"></use></svg>Copied!';
+    setTimeout(function() { btn.innerHTML = '<svg class="bi bi-clipboard me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard"></use></svg>Copy Output'; }, 2000);
 }
 </script>

@@ -3,9 +3,9 @@
 @{ ViewData["Title"] = "Create Inspection Plan"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-journal-plus me-2"></i>Create Inspection Plan</h2>
+        <h2><svg class="bi bi-journal-plus me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-plus"></use></svg>Create Inspection Plan</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="planForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="planForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -16,7 +16,7 @@
     <form id="planForm" method="post">
         <div class="ent-form-panel active" data-panel="tabGeneral">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Plan Identification</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Plan Identification</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Plan.PlanId" class="ent-label required">Plan ID</label>
@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-rulers"></i> Characteristic & Sampling</div>
+                <div class="ent-section-title"><svg class="bi bi-rulers" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-rulers"></use></svg> Characteristic & Sampling</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Plan.Characteristic" class="ent-label">Characteristic</label>
@@ -52,7 +52,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-gear"></i> Control & Status</div>
+                <div class="ent-section-title"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg> Control & Status</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Plan.ControlKey" class="ent-label">Control Key</label>
@@ -82,7 +82,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabChars" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-list-check"></i> Characteristic Definitions</div>
+                <div class="ent-section-title"><svg class="bi bi-list-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg> Characteristic Definitions</div>
                 <p class="text-muted">Define inspection characteristics, tolerance limits, and evaluation modes for this plan.</p>
                 <div class="ent-field-grid ent-grid-1">
                     <div class="ent-field">

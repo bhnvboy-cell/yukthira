@@ -103,7 +103,7 @@
     .qa32-empty {
         text-align: center; padding: 40px 20px; color: #999;
     }
-    .qa32-empty i { font-size: 2rem; display: block; margin-bottom: 10px; }
+    .qa32-empty i, .qa32-empty svg.bi { font-size: 2rem; display: block; margin-bottom: 10px; }
     @@media print {
         .qa32-toolbar, .qa32-filter-card, .qa32-list-settings, .qa32-action-btn { display: none !important; }
         .qa32-results-card { border: none; }
@@ -115,30 +115,30 @@
     <form method="post" id="qa32Form">
         <div class="qa32-toolbar">
             <div style="display:flex;align-items:center;gap:10px;">
-                <h3><i class="bi bi-clipboard-data me-2"></i>Inspection Lot Selection</h3>
+                <h3><svg class="bi bi-clipboard-data me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-data"></use></svg>Inspection Lot Selection</h3>
                 <span class="badge">QA32</span>
             </div>
             <div class="actions">
                 <button type="submit" asp-page-handler="" class="btn-toolbar" title="Execute search (F8)">
-                    <i class="bi bi-play-fill me-1"></i>Execute
+                    <svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Execute
                 </button>
                 <button type="submit" asp-page-handler="Clear" class="btn-toolbar" title="Clear all filters">
-                    <i class="bi bi-x-circle me-1"></i>Clear
+                    <svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear
                 </button>
                 <button type="button" class="btn-toolbar" onclick="window.print()" title="Print (Ctrl+P)">
-                    <i class="bi bi-printer me-1"></i>Print
+                    <svg class="bi bi-printer me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-printer"></use></svg>Print
                 </button>
                 <button type="button" class="btn-toolbar" title="Download">
-                    <i class="bi bi-download me-1"></i>Export
+                    <svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export
                 </button>
             </div>
         </div>
 
         <div class="qa32-filter-card">
-            <div class="qa32-section-title"><i class="bi bi-funnel me-1"></i>Selection Criteria</div>
+            <div class="qa32-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Selection Criteria</div>
 
             <div class="qa32-section-title" style="margin-top:8px;font-size:0.78rem;color:#666;">
-                <i class="bi bi-calendar3 me-1"></i>Date Ranges
+                <svg class="bi bi-calendar3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar3"></use></svg>Date Ranges
             </div>
             <div class="qa32-field-row cols-3">
                 <div class="qa32-field">
@@ -168,7 +168,7 @@
             </div>
 
             <div class="qa32-section-title" style="margin-top:14px;font-size:0.78rem;color:#666;">
-                <i class="bi bi-box-seam me-1"></i>Master Data
+                <svg class="bi bi-box-seam me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg>Master Data
             </div>
             <div class="qa32-field-row cols-3">
                 <div class="qa32-field">
@@ -222,7 +222,7 @@
         </div>
 
         <div class="qa32-list-settings">
-            <div class="qa32-section-title" style="margin-bottom:10px;"><i class="bi bi-gear me-1"></i>List Settings</div>
+            <div class="qa32-section-title" style="margin-bottom:10px;"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>List Settings</div>
             <div class="qa32-field-row">
                 <div class="qa32-field">
                     <label>Usage Decision Status</label>
@@ -249,7 +249,7 @@
     {
         <div class="qa32-results-card">
             <div class="qa32-results-header">
-                <h4><i class="bi bi-table me-1"></i>Inspection Lot Overview</h4>
+                <h4><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Inspection Lot Overview</h4>
                 <span class="count">
                     @Model.Results.ReturnedCount of @Model.Results.TotalCount shown
                     @if (Model.Results.HasMore) { <text>(limited by Max Hits: @Model.Results.MaxHits)</text> }
@@ -259,7 +259,7 @@
                 @if (Model.Results.Results.Count == 0)
                 {
                     <div class="qa32-empty">
-                        <i class="bi bi-inbox"></i>
+                        <svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg>
                         <p>No inspection lots match the selected criteria.</p>
                         <p style="font-size:0.8rem;">Adjust filters and execute again.</p>
                     </div>
@@ -331,14 +331,14 @@
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <a href="/QM/InspectionLot/Display?id=@lot.Id" class="qa32-action-btn" title="Display lot">
-                                                <i class="bi bi-eye"></i>
+                                                <svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>
                                             </a>
                                             <a href="/QM/InspectionLot/Edit?id=@lot.Id" class="qa32-action-btn" title="Edit lot">
-                                                <i class="bi bi-pencil"></i>
+                                                <svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>
                                             </a>
                                             <a href="/QM/UsageDecision/Create?lotNumber=@lot.LotNumber" class="qa32-action-btn" title="Record Usage Decision"
                                                style="@(lot.HasUsageDecision ? "opacity:0.4;pointer-events:none;" : "")">
-                                                <i class="bi bi-check2-circle"></i>
+                                                <svg class="bi bi-check2-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-circle"></use></svg>
                                             </a>
                                         </div>
                                     </td>

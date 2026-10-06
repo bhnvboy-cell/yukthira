@@ -6,23 +6,23 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-box-seam me-2"></i>Handling Unit Manager</h3>
+            <h3><svg class="bi bi-box-seam me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg>Handling Unit Manager</h3>
             <span class="badge">ZQM05</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="createHU()"><i class="bi bi-plus-circle me-1"></i>Create HU</button>
-            <button type="button" class="zqm-btn" onclick="releaseHU()"><i class="bi bi-box-arrow-right me-1"></i>Release</button>
-            <button type="button" class="zqm-btn" onclick="searchHU()"><i class="bi bi-search me-1"></i>Search</button>
-            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="createHU()"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create HU</button>
+            <button type="button" class="zqm-btn" onclick="releaseHU()"><svg class="bi bi-box-arrow-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-right"></use></svg>Release</button>
+            <button type="button" class="zqm-btn" onclick="searchHU()"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Search</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
         <div class="zqm-tabs">
-            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-create')"><i class="bi bi-plus-circle"></i> Create</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-release')"><i class="bi bi-box-arrow-right"></i> Release</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-search')"><i class="bi bi-search"></i> Search</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-queue')"><i class="bi bi-list-task"></i> Packaging Queue</button>
+            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-create')"><svg class="bi bi-plus-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-release')"><svg class="bi bi-box-arrow-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-right"></use></svg> Release</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-search')"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg> Search</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-queue')"><svg class="bi bi-list-task" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-task"></use></svg> Packaging Queue</button>
         </div>
 
         <div class="zqm-tab-panel active" id="tab-create">
@@ -68,7 +68,7 @@
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-results" id="resultsSection" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-table me-1"></i>Results</h4><span class="count" id="resultCount"></span></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Results</h4><span class="count" id="resultCount"></span></div>
         <div class="zqm-table-wrap"><table class="zqm-table" id="huTable"><thead id="huHead"></thead><tbody id="huBody"></tbody></table></div>
     </div>
 </div>

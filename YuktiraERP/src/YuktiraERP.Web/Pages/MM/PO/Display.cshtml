@@ -3,7 +3,7 @@
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Purchase Order Details"; }
 <div class="row justify-content-center"><div class="col-lg-10">
-<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><i class="bi bi-eye me-2"></i>Purchase Order Details</h5></div>
+<div class="card shadow-sm"><div class="card-header bg-info text-white"><h5 class="mb-0"><svg class="bi bi-eye me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>Purchase Order Details</h5></div>
 <div class="card-body">
 <dl class="row mb-0">
 <dt class="col-sm-3">PO Number</dt><dd class="col-sm-3">@Model.Order.PoNumber</dd>
@@ -34,13 +34,13 @@
 }
 </div>
 <div class="card-footer">
-<a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
-<a asp-page="/MM/PO/Edit" asp-route-id="@Model.Order.Id" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+<a asp-page="/MM/Index" class="btn btn-outline-secondary"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
+<a asp-page="/MM/PO/Edit" asp-route-id="@Model.Order.Id" class="btn btn-warning"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Edit</a>
 @if (Model.Order.Status == "Draft" || Model.Order.Status == "Pending Approval")
 {
 <form method="post" asp-page-handler="SubmitForApproval" style="display:inline">
 <input type="hidden" name="poId" value="@Model.Order.Id" />
-<button type="submit" class="btn btn-success"><i class="bi bi-send me-1"></i>Submit for Approval</button>
+<button type="submit" class="btn btn-success"><svg class="bi bi-send me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-send"></use></svg>Submit for Approval</button>
 </form>
 }
 </div>

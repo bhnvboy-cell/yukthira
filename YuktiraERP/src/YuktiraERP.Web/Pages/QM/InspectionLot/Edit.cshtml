@@ -3,16 +3,16 @@
 @{ ViewData["Title"] = "Edit Inspection Lot"; }
 <link rel="stylesheet" href="~/css/enterprise-form.css" />
 <div class="ent-form-wrapper">
-    <div class="ent-form-header"><h3><i class="bi bi-clipboard-check me-2"></i>Edit Inspection Lot</h3><span class="badge">QM</span></div>
+    <div class="ent-form-header"><h3><svg class="bi bi-clipboard-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Edit Inspection Lot</h3><span class="badge">QM</span></div>
     <form method="post">
         <input type="hidden" asp-for="Lot.Id" />
         <div class="ent-form-tabs">
-            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
-            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-material')"><i class="bi bi-box tab-icon"></i> Material & Plant</button>
-            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-inspection')"><i class="bi bi-search tab-icon"></i> Inspection</button>
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><svg class="bi bi-info-circle tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-material')"><svg class="bi bi-box tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box"></use></svg> Material & Plant</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-inspection')"><svg class="bi bi-search tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg> Inspection</button>
         </div>
         <div class="ent-form-panel active" id="tab-general">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Lot Identification</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-tag" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-tag"></use></svg> Lot Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field"><label>Lot Number</label><input asp-for="Lot.LotNumber" class="ent-input" readonly /></div>
                     <div class="ent-field"><label>Inspection Type</label><select asp-for="Lot.InspectionType" class="ent-select"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option></select></div>
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="ent-form-panel" id="tab-material">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-box"></i> Material & Plant Data</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-box" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box"></use></svg> Material & Plant Data</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field"><label>Material Code</label><input asp-for="Lot.MaterialCode" class="ent-input" /></div>
                     <div class="ent-field"><label>Material Name</label><input asp-for="Lot.MaterialName" class="ent-input" /></div>
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="ent-form-panel" id="tab-inspection">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-search"></i> Inspection Data</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg> Inspection Data</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field"><label>Quantity</label><input asp-for="Lot.Quantity" class="ent-input" /></div>
                     <div class="ent-field"><label>Sample Size</label><input asp-for="Lot.SampleSize" class="ent-input" /></div>
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg> Back</a><button type="submit" class="ent-btn ent-btn-primary"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg> Save Changes</button></div>
     </form>
 </div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

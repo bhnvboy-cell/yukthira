@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.FI.FixedAsset.CreateModel
 @{ ViewData["Title"] = "Create Fixed Asset"; }
 <link rel="stylesheet" href="~/css/zqm-classic.css" />
@@ -6,13 +6,13 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-pc-display me-2"></i>New Fixed Asset</h3>
+            <h3><svg class="bi bi-pc-display me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pc-display"></use></svg>New Fixed Asset</h3>
             <span class="badge">AS01</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Save Asset</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/FI/FixedAsset/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Save Asset</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/FI/FixedAsset/List" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
@@ -21,25 +21,25 @@
             <input type="hidden" asp-for="Asset.Status" value="Active" />
 
             <div class="zqm-tabs" id="assetTabs">
-                <button type="button" class="zqm-tab-btn active" data-tab="tab-general"><i class="bi bi-info-circle me-1"></i>General Data</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-depreciation"><i class="bi bi-graph-down-arrow me-1"></i>Depreciation</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-valuation"><i class="bi bi-currency-dollar me-1"></i>Valuation</button>
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-general"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>General Data</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-depreciation"><svg class="bi bi-graph-down-arrow me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-down-arrow"></use></svg>Depreciation</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-valuation"><svg class="bi bi-currency-dollar me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-currency-dollar"></use></svg>Valuation</button>
             </div>
 
             <!-- Tab: General Data -->
             <div class="zqm-tab-panel active" id="tab-general" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-info-circle me-1"></i>Asset Identification</div>
+                <div class="zqm-section-title"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Asset Identification</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Asset Code</label><input asp-for="Asset.AssetCode" placeholder="Auto-generated" /></div>
                     <div class="zqm-field" style="grid-column:span 2"><label>Asset Name <span style="color:#c62828">*</span></label><input asp-for="Asset.AssetName" placeholder="Asset description" required /><span asp-validation-for="Asset.AssetName" class="text-danger"></span></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-diagram-3 me-1"></i>Classification</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Classification</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Asset Category <span style="color:#c62828">*</span></label><select asp-for="Asset.Category"><option value="Equipment">Equipment</option><option value="Machinery">Machinery</option><option value="Vehicles">Vehicles</option><option value="Property">Property</option><option value="IT">IT Equipment</option><option value="Furniture">Furniture & Fixtures</option></select></div>
                     <div class="zqm-field"><label>Asset Class</label><select><option value="1500">1500 - Machinery & Equipment</option><option value="1600">1600 - Vehicles</option><option value="1700">1700 - IT Equipment</option><option value="1800">1800 - Buildings</option></select></div>
                     <div class="zqm-field"><label>Status</label><select asp-for="Asset.Status"><option value="Active">Active</option><option value="Under Maintenance">Under Maintenance</option><option value="Disposed">Disposed</option></select></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-geo-alt me-1"></i>Location & Assignment</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-geo-alt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-geo-alt"></use></svg>Location & Assignment</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Location</label><input type="text" placeholder="e.g. Building A, Floor 2" /></div>
                     <div class="zqm-field"><label>Cost Center</label><select><option value="">-- Select --</option><option value="CC-1000">CC-1000 - Production</option><option value="CC-2000">CC-2000 - Administration</option><option value="CC-3000">CC-3000 - R&D</option></select></div>
@@ -49,13 +49,13 @@
 
             <!-- Tab: Depreciation -->
             <div class="zqm-tab-panel" id="tab-depreciation" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-graph-down-arrow me-1"></i>Depreciation Method</div>
+                <div class="zqm-section-title"><svg class="bi bi-graph-down-arrow me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-down-arrow"></use></svg>Depreciation Method</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Depreciation Method</label><select><option value="Straight Line">Straight Line (SLM)</option><option value="Declining Balance">Declining Balance (WDV)</option><option value="Double Declining">Double Declining Balance</option><option value="Sum of Years">Sum of Years Digits</option><option value="Units of Production">Units of Production</option></select></div>
                     <div class="zqm-field"><label>Useful Life (Years) <span style="color:#c62828">*</span></label><input asp-for="Asset.UsefulLifeYears" min="1" max="50" step="1" required /><span asp-validation-for="Asset.UsefulLifeYears" class="text-danger"></span></div>
                     <div class="zqm-field"><label>Depreciation Start Date</label><input type="date" /></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-calculator me-1"></i>Depreciation Details</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-calculator me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Depreciation Details</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Depreciation Period</label><select><option value="Monthly">Monthly</option><option value="Quarterly">Quarterly</option><option value="Yearly">Yearly</option></select></div>
                     <div class="zqm-field"><label>Depr. Key</label><select><option value="LINE">LINE - Straight Line</option><option value="WDV">WDV - Written Down Value</option></select></div>
@@ -65,13 +65,13 @@
 
             <!-- Tab: Valuation -->
             <div class="zqm-tab-panel" id="tab-valuation" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-currency-dollar me-1"></i>Acquisition Value</div>
+                <div class="zqm-section-title"><svg class="bi bi-currency-dollar me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-currency-dollar"></use></svg>Acquisition Value</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Purchase Date <span style="color:#c62828">*</span></label><input asp-for="Asset.PurchaseDate" type="date" required /></div>
                     <div class="zqm-field"><label>Acquisition Cost <span style="color:#c62828">*</span></label><input asp-for="Asset.Cost" min="0" step="0.01" required /><span asp-validation-for="Asset.Cost" class="text-danger"></span></div>
                     <div class="zqm-field"><label>Salvage / Residual Value</label><input asp-for="Asset.SalvageValue" min="0" step="0.01" /><span asp-validation-for="Asset.SalvageValue" class="text-danger"></span></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-cash-stack me-1"></i>Current Values</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-cash-stack me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-stack"></use></svg>Current Values</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Accumulated Depreciation</label><div class="zqm-ro">0.00</div></div>
                     <div class="zqm-field"><label>Net Book Value</label><div class="zqm-ro">0.00</div></div>

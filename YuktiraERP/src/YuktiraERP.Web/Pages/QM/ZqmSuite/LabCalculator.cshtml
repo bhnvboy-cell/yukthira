@@ -6,20 +6,20 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-calculator me-2"></i>Lab Calculator</h3>
+            <h3><svg class="bi bi-calculator me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Lab Calculator</h3>
             <span class="badge">ZQM08</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="calculate()"><i class="bi bi-play-fill me-1"></i>Calculate</button>
-            <button type="button" class="zqm-btn" onclick="loadHistory()"><i class="bi bi-clock-history me-1"></i>History</button>
-            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="calculate()"><svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Calculate</button>
+            <button type="button" class="zqm-btn" onclick="loadHistory()"><svg class="bi bi-clock-history me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>History</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
         <div class="zqm-tabs">
-            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-calc')"><i class="bi bi-calculator"></i> Calculate</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-history')"><i class="bi bi-clock-history"></i> Analysis History</button>
+            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-calc')"><svg class="bi bi-calculator" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg> Calculate</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-history')"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg> Analysis History</button>
         </div>
 
         <div class="zqm-tab-panel active" id="tab-calc">
@@ -57,7 +57,7 @@
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-results" id="calcResult" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-check-circle me-1"></i>Calculation Result</h4></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Calculation Result</h4></div>
         <div class="zqm-table-wrap">
             <table class="zqm-table"><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
                 <tr><td><strong>Analysis #</strong></td><td id="resAnalysisId">-</td></tr>
@@ -71,7 +71,7 @@
     </div>
 
     <div class="zqm-results" id="histSection" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-clock-history me-1"></i>Analysis History</h4><span class="count" id="histCount"></span></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-clock-history me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>Analysis History</h4><span class="count" id="histCount"></span></div>
         <div class="zqm-table-wrap"><table class="zqm-table"><thead><tr><th>Analysis #</th><th>Type</th><th>Raw</th><th>Converted</th><th>Unit</th><th>Spec?</th><th>Evaluation</th><th>Analyzed</th></tr></thead><tbody id="histBody"></tbody></table></div>
     </div>
 </div>

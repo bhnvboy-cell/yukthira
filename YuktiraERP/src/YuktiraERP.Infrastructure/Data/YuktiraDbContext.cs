@@ -219,6 +219,9 @@ public class YuktiraDbContext : DbContext
     public DbSet<SoxAssignmentEntity> SoxAssignments => Set<SoxAssignmentEntity>();
     public DbSet<SoxViolationEntity> SoxViolations => Set<SoxViolationEntity>();
     public DbSet<ImmutableAuditTrailEntity> ImmutableAuditTrails => Set<ImmutableAuditTrailEntity>();
+    // Security Workbench: authorization tracing & t-code authorization mapping
+    public DbSet<AuthorizationTraceEntity> AuthorizationTraces => Set<AuthorizationTraceEntity>();
+    public DbSet<TCodeAuthCheckEntity> TCodeAuthChecks => Set<TCodeAuthCheckEntity>();
     // Phase 1.1: Universal Journal
     public DbSet<UniversalJournalEntity> UniversalJournals => Set<UniversalJournalEntity>();
     // Phase 1.3: RF Framework

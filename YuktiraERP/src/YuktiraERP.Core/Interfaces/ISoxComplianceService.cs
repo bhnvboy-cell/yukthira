@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace YuktiraERP.Core.Interfaces
@@ -227,6 +228,81 @@ namespace YuktiraERP.Core.Interfaces
         public long FileSizeBytes { get; set; }
     }
 
+    public class SoxDutyDto
+    {
+        public Guid Id { get; set; }
+        public string DutyCode { get; set; } = string.Empty;
+        public string DutyName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Module { get; set; } = string.Empty;
+        public string TransactionCode { get; set; } = string.Empty;
+        public string ActionType { get; set; } = string.Empty;
+        public int MinApprovers { get; set; } = 1;
+        public List<string> RequiredRoles { get; set; } = new();
+        public List<string> ConflictDuties { get; set; } = new();
+        public bool IsActive { get; set; } = true;
+        public DateTime? EffectiveFrom { get; set; }
+        public DateTime? EffectiveTo { get; set; }
+    }
+
+    public class SoxAssignmentDto
+    {
+        public Guid Id { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string DutyCode { get; set; } = string.Empty;
+        public string DutyName { get; set; } = string.Empty;
+        public DateTime AssignedAt { get; set; }
+        public string AssignedBy { get; set; } = string.Empty;
+        public DateTime? ExpiresAt { get; set; }
+        public bool IsActive { get; set; } = true;
+        public string Notes { get; set; } = string.Empty;
+        public string Source { get; set; } = "Explicit";
+    }
+
+    public class SoxDutySaveRequest
+    {
+        public string DutyCode { get; set; } = string.Empty;
+        public string DutyName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Module { get; set; } = string.Empty;
+        public string TransactionCode { get; set; } = string.Empty;
+        public string ActionType { get; set; } = string.Empty;
+        public int MinApprovers { get; set; } = 1;
+        public List<string> RequiredRoles { get; set; } = new();
+        public List<string> ConflictDuties { get; set; } = new();
+        public bool IsActive { get; set; } = true;
+        public DateTime? EffectiveFrom { get; set; }
+        public DateTime? EffectiveTo { get; set; }
+    }
+
+    public class SoxAssignRequest
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string DutyCode { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
+        public string AssignedBy { get; set; } = string.Empty;
+        public DateTime? ExpiresAt { get; set; }
+    }
+
+    public class SoDScanResult
+    {
+        public int UsersScanned { get; set; }
+        public int DutiesEvaluated { get; set; }
+        public int NewViolations { get; set; }
+        public int ExistingSkipped { get; set; }
+        public List<SoxDetectedViolation> Violations { get; set; } = new();
+        public DateTime ScannedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public class SoDDutyConflictPair
+    {
+        public string DutyA { get; set; } = string.Empty;
+        public string DutyB { get; set; } = string.Empty;
+        public string Severity { get; set; } = "Medium";
+    }
+
     public interface ISoxComplianceService
     {
         Task<DutyAssignmentResult> AssignDutyAsync(DutyAssignmentRequest request);
@@ -240,5 +316,16 @@ namespace YuktiraERP.Core.Interfaces
         Task<AuditChainVerifyResult> VerifyAuditChainAsync(AuditChainVerifyRequest request);
         Task<GetAuditTrailResult> GetAuditTrailAsync(AuditTrailQueryRequest request);
         Task<AuditReportExportResult> ExportAuditReportAsync(AuditReportExportRequest request);
+
+        Task<List<SoxDutyDto>> GetDutiesAsync(Guid tenantId, bool includeInactive = false);
+        Task<SoxDutyDto?> CreateDutyAsync(Guid tenantId, SoxDutySaveRequest request, string actor);
+        Task<SoxDutyDto?> UpdateDutyAsync(Guid tenantId, Guid dutyId, SoxDutySaveRequest request, string actor);
+        Task<bool> DeleteDutyAsync(Guid tenantId, Guid dutyId);
+        Task<List<SoxAssignmentDto>> GetAssignmentsAsync(Guid tenantId, string? userId = null, bool activeOnly = true);
+        Task<DutyAssignmentResult> AssignDutyToUserAsync(Guid tenantId, SoxAssignRequest request);
+        Task<DutyRevokeResult> DeactivateAssignmentAsync(Guid tenantId, Guid assignmentId, string actor);
+        Task<SoDScanResult> RunSoDScanAsync(Guid tenantId, string scannedBy);
+        Task<List<SoxAssignmentDto>> GetEffectiveDutiesAsync(Guid tenantId, string userId);
+        Task ExportViolationsToCsvAsync(Guid tenantId, Stream stream, string? status = null, string? severity = null);
     }
 }

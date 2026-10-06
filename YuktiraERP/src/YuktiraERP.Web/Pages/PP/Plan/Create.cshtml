@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.PP.Plan.CreateModel
 @{ ViewData["Title"] = "Create Production Plan"; }
 <link rel="stylesheet" href="~/css/zqm-classic.css" />
@@ -6,18 +6,18 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-calendar-range me-2"></i>Create Production Plan</h3>
+            <h3><svg class="bi bi-calendar-range me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-range"></use></svg>Create Production Plan</h3>
             <span class="badge">New</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-save me-1"></i>Save Plan</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/PP/Plan/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Plan</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/PP/Plan/List" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-calendar-range me-1"></i>Production Plan Data</div>
+        <div class="zqm-section-title"><svg class="bi bi-calendar-range me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-range"></use></svg>Production Plan Data</div>
         <form method="post" id="createForm">
             <div class="zqm-row cols-3">
                 <div class="zqm-field"><label>Plan ID</label><input asp-for="Plan.PlanId" placeholder="e.g., PLAN-001" /></div>

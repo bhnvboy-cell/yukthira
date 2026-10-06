@@ -21,22 +21,22 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-arrow-left-right me-2"></i>EDI &amp; B2B Integration Suite</h3>
+            <h3><svg class="bi bi-arrow-left-right me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>EDI &amp; B2B Integration Suite</h3>
             <span class="badge">V1.0</span>
         </div>
         <div class="actions">
-            <a asp-page="/EDI/Partners" class="zqm-btn"><i class="bi bi-people me-1"></i>Partners</a>
-            <a asp-page="/EDI/Convert" class="zqm-btn"><i class="bi bi-arrow-right-circle me-1"></i>Convert</a>
-            <a asp-page="/EDI/Parse" class="zqm-btn"><i class="bi bi-arrow-left-circle me-1"></i>Parse</a>
-            <a asp-page="/EDI/Acknowledgments" class="zqm-btn"><i class="bi bi-clipboard-check me-1"></i>Acks</a>
-            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+            <a asp-page="/EDI/Partners" class="zqm-btn"><svg class="bi bi-people me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Partners</a>
+            <a asp-page="/EDI/Convert" class="zqm-btn"><svg class="bi bi-arrow-right-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right-circle"></use></svg>Convert</a>
+            <a asp-page="/EDI/Parse" class="zqm-btn"><svg class="bi bi-arrow-left-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-circle"></use></svg>Parse</a>
+            <a asp-page="/EDI/Acknowledgments" class="zqm-btn"><svg class="bi bi-clipboard-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Acks</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Home</a>
         </div>
     </div>
 
     <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-bottom:none">
         <div class="edi-kpi-grid">
             <div class="edi-kpi">
-                <div class="kpi-icon kpi-blue"><i class="bi bi-people"></i></div>
+                <div class="kpi-icon kpi-blue"><svg class="bi bi-people" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg></div>
                 <div class="kpi-info">
                     <div class="kpi-value" id="kpiPartners">--</div>
                     <div class="kpi-label">Active Partners</div>
@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div class="edi-kpi">
-                <div class="kpi-icon kpi-teal"><i class="bi bi-envelope-check"></i></div>
+                <div class="kpi-icon kpi-teal"><svg class="bi bi-envelope-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-envelope-check"></use></svg></div>
                 <div class="kpi-info">
                     <div class="kpi-value" id="kpiMessages">--</div>
                     <div class="kpi-label">Messages Processed</div>
@@ -52,7 +52,7 @@
                 </div>
             </div>
             <div class="edi-kpi">
-                <div class="kpi-icon kpi-green"><i class="bi bi-check-circle"></i></div>
+                <div class="kpi-icon kpi-green"><svg class="bi bi-check-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg></div>
                 <div class="kpi-info">
                     <div class="kpi-value" id="kpiSuccess">--</div>
                     <div class="kpi-label">Success Rate</div>
@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="edi-kpi">
-                <div class="kpi-icon kpi-amber"><i class="bi bi-clock-history"></i></div>
+                <div class="kpi-icon kpi-amber"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg></div>
                 <div class="kpi-info">
                     <div class="kpi-value" id="kpiPending">--</div>
                     <div class="kpi-label">Pending Acks</div>
@@ -72,9 +72,9 @@
 
     <div style="background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px;overflow:hidden">
         <div class="zqm-tabs" id="ediTabs">
-            <button class="zqm-tab-btn active" data-tab="tab-partners"><i class="bi bi-people me-1"></i>Trading Partners</button>
-            <button class="zqm-tab-btn" data-tab="tab-messages"><i class="bi bi-envelope-arrow-up me-1"></i>Message Hub</button>
-            <button class="zqm-tab-btn" data-tab="tab-monitoring"><i class="bi bi-speedometer me-1"></i>Monitoring</button>
+            <button class="zqm-tab-btn active" data-tab="tab-partners"><svg class="bi bi-people me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Trading Partners</button>
+            <button class="zqm-tab-btn" data-tab="tab-messages"><svg class="bi bi-envelope me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-envelope"></use></svg>Message Hub</button>
+            <button class="zqm-tab-btn" data-tab="tab-monitoring"><svg class="bi bi-speedometer me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer"></use></svg>Monitoring</button>
         </div>
 
         <!-- Partners Tab -->
@@ -82,15 +82,15 @@
             <div class="zqm-results-header">
                 <h4>Trading Partners</h4>
                 <div>
-                    <a asp-page="/EDI/Partners" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>Manage Partners</a>
+                    <a asp-page="/EDI/Partners" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>Manage Partners</a>
                 </div>
             </div>
             <div style="padding:20px;color:#666;font-size:0.88rem">
-                <i class="bi bi-info-circle me-1"></i>
+                <svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>
                 Manage your EDI trading partners. Configure partner profiles, authentication, document types, and communication endpoints.
                 Supports EDIFACT and ANSI X12 standards.
                 <br /><br />
-                <a asp-page="/EDI/Partners" style="color:#1565c0;font-weight:600"><i class="bi bi-arrow-right me-1"></i>Go to Trading Partners</a>
+                <a asp-page="/EDI/Partners" style="color:#1565c0;font-weight:600"><svg class="bi bi-arrow-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right"></use></svg>Go to Trading Partners</a>
             </div>
         </div>
 
@@ -99,18 +99,18 @@
             <div class="zqm-results-header">
                 <h4>Message Hub</h4>
                 <div>
-                    <a asp-page="/EDI/Convert" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-arrow-right-circle me-1"></i>Convert</a>
-                    <a asp-page="/EDI/Parse" class="zqm-btn" style="background:#00695c;border-color:#00695c"><i class="bi bi-arrow-left-circle me-1"></i>Parse</a>
+                    <a asp-page="/EDI/Convert" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-arrow-right-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right-circle"></use></svg>Convert</a>
+                    <a asp-page="/EDI/Parse" class="zqm-btn" style="background:#00695c;border-color:#00695c"><svg class="bi bi-arrow-left-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-circle"></use></svg>Parse</a>
                 </div>
             </div>
             <div style="padding:20px;color:#666;font-size:0.88rem">
-                <i class="bi bi-info-circle me-1"></i>
+                <svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>
                 Convert JSON payloads to EDI format (outbound) or parse raw EDI content to structured JSON (inbound).
                 Supports EDIFACT and ANSI X12 standards for Purchase Orders, Invoices, and more.
                 <br /><br />
-                <a asp-page="/EDI/Convert" style="color:#1565c0;font-weight:600"><i class="bi bi-arrow-right me-1"></i>Go to Message Conversion</a>
+                <a asp-page="/EDI/Convert" style="color:#1565c0;font-weight:600"><svg class="bi bi-arrow-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right"></use></svg>Go to Message Conversion</a>
                 &nbsp;&nbsp;
-                <a asp-page="/EDI/Parse" style="color:#00695c;font-weight:600"><i class="bi bi-arrow-left me-1"></i>Go to Message Parser</a>
+                <a asp-page="/EDI/Parse" style="color:#00695c;font-weight:600"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Go to Message Parser</a>
             </div>
         </div>
 
@@ -119,15 +119,15 @@
             <div class="zqm-results-header">
                 <h4>Monitoring &amp; Acknowledgments</h4>
                 <div>
-                    <a asp-page="/EDI/Acknowledgments" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-clipboard-check me-1"></i>View Acknowledgments</a>
+                    <a asp-page="/EDI/Acknowledgments" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-clipboard-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>View Acknowledgments</a>
                 </div>
             </div>
             <div style="padding:20px;color:#666;font-size:0.88rem">
-                <i class="bi bi-info-circle me-1"></i>
+                <svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>
                 Track EDI message acknowledgments (997 for X12, MDN for EDIFACT). Monitor partner response times,
                 message delivery status, and error logs.
                 <br /><br />
-                <a asp-page="/EDI/Acknowledgments" style="color:#1565c0;font-weight:600"><i class="bi bi-arrow-right me-1"></i>Go to Acknowledgment Logs</a>
+                <a asp-page="/EDI/Acknowledgments" style="color:#1565c0;font-weight:600"><svg class="bi bi-arrow-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-right"></use></svg>Go to Acknowledgment Logs</a>
             </div>
         </div>
     </div>
@@ -144,14 +144,14 @@ document.querySelectorAll('#ediTabs .zqm-tab-btn').forEach(function(btn) {
 });
 
 (function() {
-    fetch('/api/integration/edi/partners').then(function(r) { return r.json(); }).then(function(data) {
-        var partners = Array.isArray(data) ? data : [];
+    fetch('/api/v1/integration/edi/partners').then(function(r) { return r.json(); }).then(function(data) {
+        var partners = (data && Array.isArray(data.data)) ? data.data : [];
         document.getElementById('kpiPartners').textContent = partners.filter(function(p) { return p.isActive; }).length;
     }).catch(function() { document.getElementById('kpiPartners').textContent = '0'; });
 
-    fetch('/api/integration/edi/acknowledgments?page=1&pageSize=1').then(function(r) { return r.json(); }).then(function(data) {
-        var items = Array.isArray(data) ? data : (data.items || []);
-        document.getElementById('kpiMessages').textContent = data.totalCount || items.length;
+    fetch('/api/v1/integration/edi/acknowledgments?page=1&pageSize=1').then(function(r) { return r.json(); }).then(function(data) {
+        var items = (data && Array.isArray(data.data)) ? data.data : [];
+        document.getElementById('kpiMessages').textContent = (data && data.total) || items.length;
     }).catch(function() { document.getElementById('kpiMessages').textContent = '0'; });
 })();
 </script>

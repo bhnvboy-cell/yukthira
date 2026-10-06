@@ -7,49 +7,49 @@
 <div class="module-root" data-module-root="hr">
     <div class="module-header">
         <div class="module-header-left">
-            <h2><i class="bi bi-people me-2"></i>Human Resources</h2>
+            <h2><svg class="bi bi-people me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Human Resources</h2>
             <span class="module-badge">HR</span>
         </div>
         <div class="module-header-right">
-            <a asp-page="/HR/Employee/Create" class="btn btn-primary module-action-btn" data-action-tab="employees"><i class="bi bi-plus-circle me-1"></i> Hire Employee</a>
-            <a asp-page="/HR/OrgUnit/Create" class="btn btn-primary module-action-btn" data-action-tab="orgunits" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Org Unit</a>
-            <a asp-page="/HR/TimeEntry/Create" class="btn btn-primary module-action-btn" data-action-tab="timeattendance" style="display:none"><i class="bi bi-plus-circle me-1"></i> Log Time</a>
-            <a asp-page="/HR/Payroll/Create" class="btn btn-primary module-action-btn" data-action-tab="payroll" style="display:none"><i class="bi bi-lightning me-1"></i> Run Payroll</a>
-            <a asp-page="/HR/Recruitment/Create" class="btn btn-primary module-action-btn" data-action-tab="recruitment" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Requisition</a>
+            <a asp-page="/HR/Employee/Create" class="btn btn-primary module-action-btn" data-action-tab="employees"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Hire Employee</a>
+            <a asp-page="/HR/OrgUnit/Create" class="btn btn-primary module-action-btn" data-action-tab="orgunits" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Org Unit</a>
+            <a asp-page="/HR/TimeEntry/Create" class="btn btn-primary module-action-btn" data-action-tab="timeattendance" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Log Time</a>
+            <a asp-page="/HR/Payroll/Create" class="btn btn-primary module-action-btn" data-action-tab="payroll" style="display:none"><svg class="bi bi-lightning me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lightning"></use></svg> Run Payroll</a>
+            <a asp-page="/HR/Recruitment/Create" class="btn btn-primary module-action-btn" data-action-tab="recruitment" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Requisition</a>
         </div>
     </div>
 
     <div class="module-kpi-grid">
         <div class="module-kpi-card">
-            <div class="module-kpi-icon green"><i class="bi bi-person-check"></i></div>
+            <div class="module-kpi-icon green"><svg class="bi bi-person-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-check"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.TotalActiveHeadcount</div>
                 <div class="module-kpi-label">Total Active Headcount</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon amber"><i class="bi bi-calendar-x"></i></div>
+            <div class="module-kpi-icon amber"><svg class="bi bi-calendar-x" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-x"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.PendingLeaveRequests</div>
                 <div class="module-kpi-label">Pending Leave Requests</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon blue"><i class="bi bi-person-plus"></i></div>
+            <div class="module-kpi-icon blue"><svg class="bi bi-person-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-plus"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.OpenRequisitions</div>
                 <div class="module-kpi-label">Open Requisitions</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon purple"><i class="bi bi-cash-stack"></i></div>
+            <div class="module-kpi-icon purple"><svg class="bi bi-cash-stack" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-stack"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.MonthlyPayrollTotal.ToString("C0")</div>
                 <div class="module-kpi-label">Monthly Payroll Total</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon red"><i class="bi bi-person-dash"></i></div>
+            <div class="module-kpi-icon red"><svg class="bi bi-person-dash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-dash"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.AbsenteeismRate%</div>
                 <div class="module-kpi-label">Absenteeism Rate</div>
@@ -58,11 +58,11 @@
     </div>
 
     <div class="module-tabs" id="hrTabs">
-        <button type="button" class="module-tab active" data-tab="employees"><i class="bi bi-person-badge"></i> Employee Master <span class="tab-count">@Model.Employees.Count</span></button>
-        <button type="button" class="module-tab" data-tab="orgunits"><i class="bi bi-diagram-3"></i> Org Management <span class="tab-count">@Model.OrgUnits.Count</span></button>
-        <button type="button" class="module-tab" data-tab="timeattendance"><i class="bi bi-clock-history"></i> Time &amp; Attendance <span class="tab-count">@Model.TimeEntries.Count</span></button>
-        <button type="button" class="module-tab" data-tab="payroll"><i class="bi bi-wallet2"></i> Payroll Processing <span class="tab-count">@Model.PayrollEntries.Count</span></button>
-        <button type="button" class="module-tab" data-tab="recruitment"><i class="bi bi-briefcase"></i> Recruitment <span class="tab-count">@Model.Recruitments.Count</span></button>
+        <button type="button" class="module-tab active" data-tab="employees"><svg class="bi bi-person-badge" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-badge"></use></svg> Employee Master <span class="tab-count">@Model.Employees.Count</span></button>
+        <button type="button" class="module-tab" data-tab="orgunits"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg> Org Management <span class="tab-count">@Model.OrgUnits.Count</span></button>
+        <button type="button" class="module-tab" data-tab="timeattendance"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg> Time &amp; Attendance <span class="tab-count">@Model.TimeEntries.Count</span></button>
+        <button type="button" class="module-tab" data-tab="payroll"><svg class="bi bi-wallet2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-wallet2"></use></svg> Payroll Processing <span class="tab-count">@Model.PayrollEntries.Count</span></button>
+        <button type="button" class="module-tab" data-tab="recruitment"><svg class="bi bi-briefcase" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-briefcase"></use></svg> Recruitment <span class="tab-count">@Model.Recruitments.Count</span></button>
     </div>
 
     <!-- ═══ TAB: Employee Master ═══ -->
@@ -70,7 +70,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search employees..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search employees..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right">
                     <span class="sheet-selected-count"></span>
@@ -105,8 +105,8 @@
                                     <td><span class="status-badge @(emp.Status == "Active" ? "success" : emp.Status == "On Leave" ? "warning" : "danger")">@emp.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/HR/Employee/Edit" asp-route-id="@emp.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/HR/Employee/Display" asp-route-id="@emp.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/HR/Employee/Edit" asp-route-id="@emp.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/HR/Employee/Display" asp-route-id="@emp.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -114,7 +114,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-person-badge"></i><div>No employees found</div></td></tr>
+                            <tr><td colspan="8" class="sheet-empty"><svg class="bi bi-person-badge" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-badge"></use></svg><div>No employees found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -131,7 +131,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search org units..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search org units..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -164,8 +164,8 @@
                                     <td><span class="status-badge @(u.Status == "Active" ? "success" : "danger")">@u.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/HR/OrgUnit/Edit" asp-route-id="@u.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/HR/OrgUnit/Display" asp-route-id="@u.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/HR/OrgUnit/Edit" asp-route-id="@u.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/HR/OrgUnit/Display" asp-route-id="@u.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -173,7 +173,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-diagram-3"></i><div>No org units found</div></td></tr>
+                            <tr><td colspan="8" class="sheet-empty"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg><div>No org units found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -190,7 +190,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search time entries..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search time entries..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -223,8 +223,8 @@
                                     <td><span class="status-badge @(t.Status == "Approved" ? "success" : t.Status == "Rejected" ? "danger" : "info")">@t.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/HR/TimeEntry/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/HR/TimeEntry/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/HR/TimeEntry/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/HR/TimeEntry/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -232,7 +232,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-clock-history"></i><div>No time entries found</div></td></tr>
+                            <tr><td colspan="8" class="sheet-empty"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg><div>No time entries found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -249,7 +249,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search payroll entries..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search payroll entries..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -284,8 +284,8 @@
                                     <td><span class="status-badge @(p.Status == "Paid" ? "success" : p.Status == "Processed" ? "info" : "warning")">@p.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/HR/Payroll/Edit" asp-route-id="@p.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/HR/Payroll/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/HR/Payroll/Edit" asp-route-id="@p.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/HR/Payroll/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -293,7 +293,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-wallet2"></i><div>No payroll entries found</div></td></tr>
+                            <tr><td colspan="9" class="sheet-empty"><svg class="bi bi-wallet2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-wallet2"></use></svg><div>No payroll entries found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -310,7 +310,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search requisitions..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search requisitions..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -343,8 +343,8 @@
                                     <td><span class="status-badge @(r.Status == "Open" ? "info" : r.Status == "Filled" ? "success" : r.Status == "Cancelled" ? "danger" : "warning")">@r.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/HR/Recruitment/Edit" asp-route-id="@r.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/HR/Recruitment/Display" asp-route-id="@r.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/HR/Recruitment/Edit" asp-route-id="@r.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/HR/Recruitment/Display" asp-route-id="@r.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -352,7 +352,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="8" class="sheet-empty"><i class="bi bi-briefcase"></i><div>No requisitions found</div></td></tr>
+                            <tr><td colspan="8" class="sheet-empty"><svg class="bi bi-briefcase" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-briefcase"></use></svg><div>No requisitions found</div></td></tr>
                         }
                     </tbody>
                 </table>

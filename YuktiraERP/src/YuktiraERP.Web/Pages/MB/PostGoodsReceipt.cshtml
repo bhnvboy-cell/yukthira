@@ -6,20 +6,20 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-arrow-down-circle me-2"></i>MB01 - Goods Receipt</h3>
+            <h3><svg class="bi bi-arrow-down-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-circle"></use></svg>MB01 - Goods Receipt</h3>
             <span class="badge">MT 101</span>
         </div>
         <div class="actions">
-            <button type="submit" form="grForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Post Receipt</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('grForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="grForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Post Receipt</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('grForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-gear me-1"></i>Document Header</div>
+        <div class="zqm-section-title"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Document Header</div>
         <form method="post" id="grForm">
             <div class="zqm-row cols-4">
                 <div class="zqm-field"><label>Posting Date</label><input asp-for="Request.PostingDate" type="date" /></div>
@@ -33,7 +33,7 @@
                 <div class="zqm-field"><label>Movement Type</label><div class="zqm-ro">101 - GR for PO</div></div>
             </div>
 
-            <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-table me-1"></i>Line Items</div>
+            <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Line Items</div>
             <div class="zqm-table-wrap">
                 <table class="zqm-table" id="lineItems">
                     <thead>
@@ -59,13 +59,13 @@
                             <td><input name="Request.Lines[0].UnitPrice" type="number" step="0.01" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
                             <td><input name="Request.Lines[0].BatchNumber" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
                             <td><input name="Request.Lines[0].PurchaseOrderNo" style="width:100%;padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem" /></td>
-                            <td><button type="button" class="zqm-act" style="color:#c62828;border-color:#ffcdd2" onclick="this.closest('tr').remove()"><i class="bi bi-x"></i></button></td>
+                            <td><button type="button" class="zqm-act" style="color:#c62828;border-color:#ffcdd2" onclick="this.closest('tr').remove()"><svg class="bi bi-x" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg></button></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div style="margin-top:8px">
-                <button type="button" class="zqm-btn" onclick="addLine()"><i class="bi bi-plus me-1"></i>Add Line</button>
+                <button type="button" class="zqm-btn" onclick="addLine()"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>Add Line</button>
             </div>
         </form>
     </div>
@@ -73,7 +73,7 @@
     @if (Model.Result != null)
     {
         <div class="zqm-results" style="margin-top:0">
-            <div class="zqm-results-header"><h4><i class="bi bi-check-circle me-1"></i>Posting Result</h4></div>
+            <div class="zqm-results-header"><h4><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Posting Result</h4></div>
             <div style="padding:16px">
                 @if (Model.Result.Success)
                 {
@@ -85,7 +85,7 @@
                     </div>
                     @if (Model.Result.InspectionLotNumber != null)
                     {
-                        <div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:4px;font-size:0.85rem"><i class="bi bi-clipboard-check me-1" style="color:#e65100"></i><strong>Inspection Lot:</strong> @Model.Result.InspectionLotNumber</div>
+                        <div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:4px;font-size:0.85rem"><svg class="bi bi-clipboard-check me-1" style="color:#e65100" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg><strong>Inspection Lot:</strong> @Model.Result.InspectionLotNumber</div>
                     }
                     @if (Model.Result.StockImpacts.Any())
                     {
@@ -126,7 +126,7 @@ function addLine() {
         '<td><input name="Request.Lines['+idx+'].UnitPrice" type="number" step="0.01" style="'+s+'" /></td>' +
         '<td><input name="Request.Lines['+idx+'].BatchNumber" style="'+s+'" /></td>' +
         '<td><input name="Request.Lines['+idx+'].PurchaseOrderNo" style="'+s+'" /></td>' +
-        '<td><button type="button" class="zqm-act" style="color:#c62828;border-color:#ffcdd2" onclick="this.closest(\'tr\').remove()"><i class="bi bi-x"></i></button></td></tr>';
+        '<td><button type="button" class="zqm-act" style="color:#c62828;border-color:#ffcdd2" onclick="this.closest(\'tr\').remove()"><svg class="bi bi-x" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg></button></td></tr>';
     tbody.insertAdjacentHTML('beforeend', row);
 }
 </script>

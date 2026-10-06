@@ -155,3 +155,67 @@ public class EdiTransactionSummary
     public DateTime ReceivedAt { get; set; }
     public DateTime? ProcessedAt { get; set; }
 }
+
+public class EdiTransmissionQuery
+{
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 20;
+    public string? Direction { get; set; }
+    public EdiTransactionStatus? Status { get; set; }
+    public EdiMessageType? MessageType { get; set; }
+    public string? Search { get; set; }
+}
+
+public class EdiTransmissionEntry
+{
+    public Guid Id { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string Direction { get; set; } = string.Empty;
+    public EdiMessageType MessageType { get; set; }
+    public EdiTransportProtocol Protocol { get; set; }
+    public EdiTransactionStatus Status { get; set; }
+    public string SenderId { get; set; } = string.Empty;
+    public string ReceiverId { get; set; } = string.Empty;
+    public string PartnerCode { get; set; } = string.Empty;
+    public string DocumentType { get; set; } = string.Empty;
+    public string? ErrorMessage { get; set; }
+    public string? AcknowledgmentId { get; set; }
+}
+
+public class EdiTransmissionDetail : EdiTransmissionEntry
+{
+    public string? RawPayload { get; set; }
+}
+
+public class EdiTransmissionPageResult
+{
+    public List<EdiTransmissionEntry> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+}
+
+public class EdiTransmissionStatsResult
+{
+    public int Total { get; set; }
+    public int Inbound { get; set; }
+    public int Outbound { get; set; }
+    public int Failed { get; set; }
+    public Dictionary<string, int> ByDirection { get; set; } = new();
+    public Dictionary<string, int> ByStatus { get; set; } = new();
+}
+
+public class EdiTransmissionLogEntry
+{
+    public string Direction { get; set; } = string.Empty;
+    public EdiMessageType? MessageType { get; set; }
+    public EdiTransportProtocol Protocol { get; set; } = EdiTransportProtocol.As2;
+    public EdiTransactionStatus Status { get; set; }
+    public string SenderId { get; set; } = string.Empty;
+    public string ReceiverId { get; set; } = string.Empty;
+    public string PartnerCode { get; set; } = string.Empty;
+    public string DocumentType { get; set; } = string.Empty;
+    public string? RawPayload { get; set; }
+    public string? AcknowledgmentId { get; set; }
+    public string? ErrorMessage { get; set; }
+}

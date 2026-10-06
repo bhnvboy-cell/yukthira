@@ -8,10 +8,10 @@
 @if (Model.Config == null)
 {
     <div class="container-fluid py-5 text-center">
-        <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+        <svg class="bi bi-exclamation-triangle display-1 text-warning" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>
         <h2 class="mt-3">Transaction Not Found</h2>
         <p class="text-muted">No layout configuration found for <strong>@Model.Code</strong></p>
-        <a href="/Transactions" class="btn btn-primary mt-3"><i class="bi bi-arrow-left me-1"></i>Back to Launcher</a>
+        <a href="/Transactions" class="btn btn-primary mt-3"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back to Launcher</a>
     </div>
 }
 else
@@ -21,7 +21,7 @@ else
         <div class="tcode-toolbar">
             <div class="tcode-toolbar-left">
                 <span class="tcode-module-badge">@Model.Config.Module</span>
-                <span class="tcode-title"><i class="bi @Model.Config.Icon me-2"></i>@Model.Config.Title</span>
+                <span class="tcode-title"><svg class="bi @Model.Config.Icon me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@Model.Config.Icon"></use></svg>@Model.Config.Title</span>
                 <span class="tcode-subtitle">Transaction Code: <strong>@Model.Config.TCode</strong></span>
             </div>
             <div class="tcode-toolbar-right">
@@ -30,7 +30,7 @@ else
                     <button type="button" class="btn btn-sm tcode-toolbar-btn tcode-btn-@action.Style"
                             data-action="@action.Handler" @(action.Disabled ? "disabled" : "")
                             title="@(!string.IsNullOrEmpty(action.Tooltip) ? action.Tooltip : action.Label)">
-                        <i class="bi @action.Icon"></i>
+                        <svg class="bi @action.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@action.Icon"></use></svg>
                         <span class="tcode-toolbar-label">@action.Label</span>
                     </button>
                 }
@@ -81,7 +81,7 @@ else
                 @foreach (var tab in Model.Config.Tabs)
                 {
                     <button type="button" class="tcode-tab @(tab.Active ? "active" : "")" data-tab="@tab.Id">
-                        <i class="bi @tab.Icon"></i>
+                        <svg class="bi @tab.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@tab.Icon"></use></svg>
                         <span>@tab.Label</span>
                     </button>
                 }
@@ -95,20 +95,20 @@ else
                     @if (Model.Config.TableToolbar.ShowSearch)
                     {
                         <div class="tcode-table-search">
-                            <i class="bi bi-search"></i>
+                            <svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>
                             <input type="text" placeholder="Filter..." class="tcode-filter-input" aria-label="Filter table rows" />
                         </div>
                     }
                     @if (Model.Config.TableToolbar.ShowAddRow)
                     {
                         <button type="button" class="btn btn-sm tcode-table-btn" data-action="addRow" title="Add row">
-                            <i class="bi bi-plus-lg"></i><span>Add Row</span>
+                            <svg class="bi bi-plus-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg><span>Add Row</span>
                         </button>
                     }
                     @if (Model.Config.TableToolbar.ShowDeleteRow)
                     {
                         <button type="button" class="btn btn-sm tcode-table-btn" data-action="deleteRow" title="Delete selected" disabled id="deleteRowBtn">
-                            <i class="bi bi-trash"></i><span>Delete</span>
+                            <svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg><span>Delete</span>
                         </button>
                     }
                 </div>
@@ -117,19 +117,19 @@ else
                     {
                         <button type="button" class="btn btn-sm tcode-table-btn tcode-btn-@custom.Style" data-action="@custom.Handler"
                                 title="@custom.Label">
-                            <i class="bi @custom.Icon"></i><span>@custom.Label</span>
+                            <svg class="bi @custom.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@custom.Icon"></use></svg><span>@custom.Label</span>
                         </button>
                     }
                     @if (Model.Config.TableToolbar.ShowExport)
                     {
                         <button type="button" class="btn btn-sm tcode-table-btn" data-action="export" title="Export to CSV">
-                            <i class="bi bi-download"></i><span>Export</span>
+                            <svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg><span>Export</span>
                         </button>
                     }
                     @if (Model.Config.TableToolbar.ShowFilter)
                     {
                         <button type="button" class="btn btn-sm tcode-table-btn" data-action="toggleFilter" title="Toggle advanced filters">
-                            <i class="bi bi-funnel"></i><span>Filter</span>
+                            <svg class="bi bi-funnel" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg><span>Filter</span>
                         </button>
                     }
                 </div>
@@ -148,7 +148,7 @@ else
                                         <span>@col.Label</span>
                                         @if (col.Sortable)
                                         {
-                                            <i class="bi bi-arrow-down-up tcode-sort-icon"></i>
+                                            <svg class="bi bi-arrow-down-up tcode-sort-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-up"></use></svg>
                                         }
                                     </div>
                                 </th>
@@ -158,7 +158,7 @@ else
                     <tbody id="tcodeTableBody">
                         <tr class="tcode-empty-row">
                             <td colspan="@(Model.Config.Columns.Count(c => !c.Fixed) + 1)" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                <svg class="bi bi-inbox fs-3 d-block mb-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg>
                                 No data loaded. Click <strong>Add Row</strong> or execute a query.
                             </td>
                         </tr>
@@ -178,7 +178,7 @@ else
             <div class="tcode-action-bar">
                 <div class="tcode-action-bar-left">
                     <span class="tcode-status-indicator" id="tcodeStatus">
-                        <i class="bi bi-check-circle-fill text-success"></i> Ready
+                        <svg class="bi bi-check-circle-fill text-success" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle-fill"></use></svg> Ready
                     </span>
                 </div>
                 <div class="tcode-action-bar-right">
@@ -191,7 +191,7 @@ else
                                 @(action.Confirm ? $"data-confirm='{action.ConfirmMessage}'" : "")>
                             @if (!string.IsNullOrEmpty(action.Icon))
                             {
-                                <i class="bi @action.Icon"></i>
+                                <svg class="bi @action.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@action.Icon"></use></svg>
                             }
                             @action.Label
                         </button>

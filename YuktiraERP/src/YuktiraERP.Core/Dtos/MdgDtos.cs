@@ -45,3 +45,49 @@ public class MdgValidationResult
     public List<string> Errors { get; set; } = new();
     public List<string> Warnings { get; set; } = new();
 }
+
+public class MdgCreateDraftRequest
+{
+    public string EntityName { get; set; } = "";
+    public string StagingPayload { get; set; } = "{}";
+    public string? Notes { get; set; }
+    public string? RequestedBy { get; set; }
+}
+
+public class MdgPagedResult<T>
+{
+    public List<T> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+}
+
+public class MdgDiffDto
+{
+    public string OriginalJson { get; set; } = "{}";
+    public string ProposedJson { get; set; } = "{}";
+    public List<MdgFieldChangeDto> Changes { get; set; } = new();
+}
+
+public class MdgFieldChangeDto
+{
+    public string Field { get; set; } = "";
+    public string? From { get; set; }
+    public string? To { get; set; }
+    public string ChangeType { get; set; } = "";
+}
+
+public class MdgAuditTrailDto
+{
+    public Guid Id { get; set; }
+    public Guid ChangeRequestId { get; set; }
+    public string Action { get; set; } = "";
+    public string Actor { get; set; } = "";
+    public DateTime Timestamp { get; set; }
+    public string? OldValue { get; set; }
+    public string? NewValue { get; set; }
+    public string Comment { get; set; } = "";
+    public string Hash { get; set; } = "";
+    public string? PreviousHash { get; set; }
+    public DateTime CreatedAt { get; set; }
+}

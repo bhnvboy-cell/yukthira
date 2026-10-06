@@ -1,8 +1,8 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.MM.GRN.CreateModel
 @{ ViewData["Title"] = "Create Goods Receipt"; }
 <div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Goods Receipt Note</h5></div>
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><svg class="bi bi-plus-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create Goods Receipt Note</h5></div>
 <div class="card-body">
 <form method="post">
 <div class="row mb-3">
@@ -20,7 +20,7 @@
 <div class="col-md-4"><label class="form-label">Quality Inspection Required</label><select name="QualityInspectionRequired" class="form-select"><option value="false">No</option><option value="true">Yes</option></select></div>
 <div class="col-md-4"><label asp-for="Receipt.GrnNumber" class="form-label"></label><input asp-for="Receipt.GrnNumber" class="form-control" placeholder="Auto-generated" /></div>
 </div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button><a asp-page="/MM/GRN/List" class="btn btn-outline-secondary">Cancel</a></div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button><a asp-page="/MM/GRN/List" class="btn btn-outline-secondary">Cancel</a></div>
 </form>
 </div></div>
 </div></div>

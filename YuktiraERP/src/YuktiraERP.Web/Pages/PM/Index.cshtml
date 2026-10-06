@@ -5,50 +5,50 @@
 <div class="module-root" data-module-root="pm">
     <div class="module-header">
         <div class="module-header-left">
-            <h2><i class="bi bi-tools me-2"></i>Plant Maintenance</h2>
+            <h2><svg class="bi bi-tools me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-tools"></use></svg>Plant Maintenance</h2>
             <span class="module-badge">PM</span>
         </div>
         <div class="module-header-right">
-            <a asp-page="/PM/Equipment/Create" class="btn btn-primary module-action-btn" data-action-tab="equipment"><i class="bi bi-plus-circle me-1"></i> Create Equipment</a>
-            <a asp-page="/PM/Location/Create" class="btn btn-primary module-action-btn" data-action-tab="locations" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Location</a>
-            <a asp-page="/PM/Notification/Create" class="btn btn-primary module-action-btn" data-action-tab="notifications" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Notification</a>
-            <a asp-page="/PM/Order/Create" class="btn btn-primary module-action-btn" data-action-tab="orders" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Order</a>
-            <a asp-page="/PM/Plan/Create" class="btn btn-primary module-action-btn" data-action-tab="plans" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Plan</a>
-            <a asp-page="/PM/Spares/Create" class="btn btn-primary module-action-btn" data-action-tab="spares" style="display:none"><i class="bi bi-plus-circle me-1"></i> Issue Spares</a>
+            <a asp-page="/PM/Equipment/Create" class="btn btn-primary module-action-btn" data-action-tab="equipment"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Equipment</a>
+            <a asp-page="/PM/Location/Create" class="btn btn-primary module-action-btn" data-action-tab="locations" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Location</a>
+            <a asp-page="/PM/Notification/Create" class="btn btn-primary module-action-btn" data-action-tab="notifications" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Notification</a>
+            <a asp-page="/PM/Order/Create" class="btn btn-primary module-action-btn" data-action-tab="orders" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Order</a>
+            <a asp-page="/PM/Plan/Create" class="btn btn-primary module-action-btn" data-action-tab="plans" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Plan</a>
+            <a asp-page="/PM/Spares/Create" class="btn btn-primary module-action-btn" data-action-tab="spares" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Issue Spares</a>
         </div>
     </div>
 
     <div class="module-kpi-grid">
         <div class="module-kpi-card">
-            <div class="module-kpi-icon blue"><i class="bi bi-gear"></i></div>
+            <div class="module-kpi-icon blue"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.ActiveEquipmentCount</div>
                 <div class="module-kpi-label">Active Equipment Assets</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon amber"><i class="bi bi-clipboard-check"></i></div>
+            <div class="module-kpi-icon amber"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.OpenOrdersCount</div>
                 <div class="module-kpi-label">Open Maintenance Orders</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="module-kpi-icon red"><svg class="bi bi-exclamation-triangle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.OverduePlansCount</div>
                 <div class="module-kpi-label">Overdue Preventive Plans</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon orange"><i class="bi bi-clock-history"></i></div>
+            <div class="module-kpi-icon orange"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.BreakdownHours</div>
                 <div class="module-kpi-label">Breakdown Downtime (hrs)</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon teal"><i class="bi bi-box-seam"></i></div>
+            <div class="module-kpi-icon teal"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@String.Format("{0:N0}", Model.SparesValue)</div>
                 <div class="module-kpi-label">Spares Consumption Value</div>
@@ -57,12 +57,12 @@
     </div>
 
     <div class="module-tabs" id="pmTabs">
-        <button type="button" class="module-tab active" data-tab="equipment"><i class="bi bi-gear"></i> Equipment Master <span class="tab-count">@Model.Equipments.Count</span></button>
-        <button type="button" class="module-tab" data-tab="locations"><i class="bi bi-geo-alt"></i> Functional Locations <span class="tab-count">@Model.Locations.Count</span></button>
-        <button type="button" class="module-tab" data-tab="notifications"><i class="bi bi-bell"></i> Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
-        <button type="button" class="module-tab" data-tab="orders"><i class="bi bi-clipboard-check"></i> Maintenance Orders <span class="tab-count">@Model.Orders.Count</span></button>
-        <button type="button" class="module-tab" data-tab="plans"><i class="bi bi-calendar-check"></i> Maintenance Plans <span class="tab-count">@Model.Plans.Count</span></button>
-        <button type="button" class="module-tab" data-tab="spares"><i class="bi bi-box-seam"></i> Spares & Parts <span class="tab-count">@Model.Spares.Count</span></button>
+        <button type="button" class="module-tab active" data-tab="equipment"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg> Equipment Master <span class="tab-count">@Model.Equipments.Count</span></button>
+        <button type="button" class="module-tab" data-tab="locations"><svg class="bi bi-geo-alt" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-geo-alt"></use></svg> Functional Locations <span class="tab-count">@Model.Locations.Count</span></button>
+        <button type="button" class="module-tab" data-tab="notifications"><svg class="bi bi-bell" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bell"></use></svg> Notifications <span class="tab-count">@Model.Notifications.Count</span></button>
+        <button type="button" class="module-tab" data-tab="orders"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg> Maintenance Orders <span class="tab-count">@Model.Orders.Count</span></button>
+        <button type="button" class="module-tab" data-tab="plans"><svg class="bi bi-calendar-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-check"></use></svg> Maintenance Plans <span class="tab-count">@Model.Plans.Count</span></button>
+        <button type="button" class="module-tab" data-tab="spares"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg> Spares & Parts <span class="tab-count">@Model.Spares.Count</span></button>
     </div>
 
     <!-- ═══ TAB: Equipment Master ═══ -->
@@ -70,7 +70,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search equipment..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search equipment..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -105,7 +105,7 @@
                                     <td><span class="status-badge @(e.Status=="Operational"?"success":e.Status=="Under Maintenance"?"warning":"danger")">@e.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/PM/Equipment/Display" asp-route-id="@e.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -113,7 +113,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-gear"></i><div>No equipment found</div></td></tr>
+                            <tr><td colspan="9" class="sheet-empty"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg><div>No equipment found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -130,7 +130,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search locations..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search locations..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -167,7 +167,7 @@
                                     <td><span class="status-badge @(l.Status=="Active"?"success":"warning")">@l.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -175,7 +175,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-geo-alt"></i><div>No functional locations found</div></td></tr>
+                            <tr><td colspan="10" class="sheet-empty"><svg class="bi bi-geo-alt" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-geo-alt"></use></svg><div>No functional locations found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -192,7 +192,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search notifications..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search notifications..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -229,7 +229,7 @@
                                     <td><span class="status-badge @(n.Status=="NEW"?"info":n.Status=="IN_PROGRESS"?"warning":n.Status=="COMPLETED"?"success":"info")">@n.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -237,7 +237,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-bell"></i><div>No notifications found</div></td></tr>
+                            <tr><td colspan="10" class="sheet-empty"><svg class="bi bi-bell" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bell"></use></svg><div>No notifications found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -254,7 +254,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search orders..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search orders..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -291,7 +291,7 @@
                                     <td><span class="status-badge @(o.Status=="Created"?"info":o.Status=="Released"?"warning":o.Status=="Confirmed"?"success":o.Status=="TECO Closed"?"purple":"danger")">@o.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/PM/Order/Display" asp-route-id="@o.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/PM/Order/Display" asp-route-id="@o.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -299,7 +299,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-clipboard-check"></i><div>No maintenance orders found</div></td></tr>
+                            <tr><td colspan="10" class="sheet-empty"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg><div>No maintenance orders found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -316,7 +316,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search plans..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search plans..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -353,7 +353,7 @@
                                     <td><span class="status-badge @(p.Status=="Active"?"success":"warning")">@p.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/PM/Plan/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/PM/Plan/Display" asp-route-id="@p.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -361,7 +361,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-calendar-check"></i><div>No maintenance plans found</div></td></tr>
+                            <tr><td colspan="10" class="sheet-empty"><svg class="bi bi-calendar-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-check"></use></svg><div>No maintenance plans found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -378,7 +378,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search spares..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search spares..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -415,7 +415,7 @@
                                     <td><span class="status-badge @(s.Status=="Reserved"?"info":s.Status=="Issued"?"success":"warning")">@s.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a href="javascript:void(0)" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a href="javascript:void(0)" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -423,7 +423,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-box-seam"></i><div>No spares or parts found</div></td></tr>
+                            <tr><td colspan="10" class="sheet-empty"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg><div>No spares or parts found</div></td></tr>
                         }
                     </tbody>
                 </table>

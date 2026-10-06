@@ -5,7 +5,7 @@
 <style>
     .mb-group{margin-bottom:16px}
     .mb-group-title{font-size:0.82rem;font-weight:700;color:#1a237e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #e8eaf6;display:flex;align-items:center;gap:6px}
-    .mb-group-title i{font-size:0.9rem}
+    .mb-group-title i,.mb-group-title svg.bi{font-size:0.9rem}
     .mb-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
     .mb-card{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;color:#333;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
     .mb-card:hover{border-color:#3f51b5;background:#e8eaf6;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,0.1)}
@@ -22,49 +22,49 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-box-seam me-2"></i>MB - Inventory Transaction Suite</h3>
+            <h3><svg class="bi bi-box-seam me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg>MB - Inventory Transaction Suite</h3>
             <span class="badge">SAP ECC</span>
         </div>
         <div class="actions">
-            <a asp-page="/MB/MB51Report" class="zqm-btn"><i class="bi bi-list-ul me-1"></i>MB51</a>
-            <a asp-page="/MB/MB52StockOverview" class="zqm-btn"><i class="bi bi-bar-chart me-1"></i>MB52</a>
-            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+            <a asp-page="/MB/MB51Report" class="zqm-btn"><svg class="bi bi-list-ul me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>MB51</a>
+            <a asp-page="/MB/MB52StockOverview" class="zqm-btn"><svg class="bi bi-bar-chart me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bar-chart"></use></svg>MB52</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Home</a>
         </div>
     </div>
 
     <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px">
         <div class="mb-group">
-            <div class="mb-group-title"><i class="bi bi-arrow-down-circle" style="color:#1565c0"></i>Goods Movements</div>
+            <div class="mb-group-title"><svg class="bi bi-arrow-down-circle" style="color:#1565c0" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-circle"></use></svg>Goods Movements</div>
             <div class="mb-card-grid">
-                <a href="/MB/PostGoodsReceipt" class="mb-card"><div class="icon icon-blue"><i class="bi bi-arrow-down-circle"></i></div><div class="info"><div class="tc">MB01</div><div class="desc">Goods Receipt (PO)</div></div></a>
-                <a href="/MB/PostGoodsIssue" class="mb-card"><div class="icon icon-blue"><i class="bi bi-arrow-up-circle"></i></div><div class="info"><div class="tc">MB1A</div><div class="desc">Goods Issue</div></div></a>
-                <a href="/MB/TransferPosting" class="mb-card"><div class="icon icon-blue"><i class="bi bi-arrow-left-right"></i></div><div class="info"><div class="tc">MB1B</div><div class="desc">Transfer Posting</div></div></a>
-                <a href="/MB/OtherGoodsReceipt" class="mb-card"><div class="icon icon-blue"><i class="bi bi-plus-circle"></i></div><div class="info"><div class="tc">MB1C</div><div class="desc">Other Goods Receipt</div></div></a>
+                <a href="/MB/PostGoodsReceipt" class="mb-card"><div class="icon icon-blue"><svg class="bi bi-arrow-down-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-circle"></use></svg></div><div class="info"><div class="tc">MB01</div><div class="desc">Goods Receipt (PO)</div></div></a>
+                <a href="/MB/PostGoodsIssue" class="mb-card"><div class="icon icon-blue"><svg class="bi bi-arrow-up-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-up-circle"></use></svg></div><div class="info"><div class="tc">MB1A</div><div class="desc">Goods Issue</div></div></a>
+                <a href="/MB/TransferPosting" class="mb-card"><div class="icon icon-blue"><svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg></div><div class="info"><div class="tc">MB1B</div><div class="desc">Transfer Posting</div></div></a>
+                <a href="/MB/OtherGoodsReceipt" class="mb-card"><div class="icon icon-blue"><svg class="bi bi-plus-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg></div><div class="info"><div class="tc">MB1C</div><div class="desc">Other Goods Receipt</div></div></a>
             </div>
         </div>
 
         <div class="mb-group">
-            <div class="mb-group-title"><i class="bi bi-bookmark-plus" style="color:#2e7d32"></i>Reservations</div>
+            <div class="mb-group-title"><svg class="bi bi-bookmark-plus" style="color:#2e7d32" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bookmark-plus"></use></svg>Reservations</div>
             <div class="mb-card-grid">
-                <a href="/MB/CreateReservation" class="mb-card"><div class="icon icon-green"><i class="bi bi-bookmark-plus"></i></div><div class="info"><div class="tc">MB21</div><div class="desc">Create Reservation</div></div></a>
-                <a href="/MB/DisplayReservation" class="mb-card"><div class="icon icon-green"><i class="bi bi-bookmark"></i></div><div class="info"><div class="tc">MB23/24</div><div class="desc">Display Reservation</div></div></a>
+                <a href="/MB/CreateReservation" class="mb-card"><div class="icon icon-green"><svg class="bi bi-bookmark-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bookmark-plus"></use></svg></div><div class="info"><div class="tc">MB21</div><div class="desc">Create Reservation</div></div></a>
+                <a href="/MB/DisplayReservation" class="mb-card"><div class="icon icon-green"><svg class="bi bi-bookmark" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bookmark"></use></svg></div><div class="info"><div class="tc">MB23/24</div><div class="desc">Display Reservation</div></div></a>
             </div>
         </div>
 
         <div class="mb-group">
-            <div class="mb-group-title"><i class="bi bi-file-earmark-text" style="color:#00695c"></i>Document Display</div>
+            <div class="mb-group-title"><svg class="bi bi-file-earmark-text" style="color:#00695c" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-text"></use></svg>Document Display</div>
             <div class="mb-card-grid">
-                <a href="/MB/DisplayMaterialDocument" class="mb-card"><div class="icon icon-teal"><i class="bi bi-file-earmark-text"></i></div><div class="info"><div class="tc">MB03</div><div class="desc">Material Document</div></div></a>
+                <a href="/MB/DisplayMaterialDocument" class="mb-card"><div class="icon icon-teal"><svg class="bi bi-file-earmark-text" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-text"></use></svg></div><div class="info"><div class="tc">MB03</div><div class="desc">Material Document</div></div></a>
             </div>
         </div>
 
         <div class="mb-group">
-            <div class="mb-group-title"><i class="bi bi-bar-chart-line" style="color:#f57f17"></i>Reports</div>
+            <div class="mb-group-title"><svg class="bi bi-bar-chart-line" style="color:#f57f17" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bar-chart-line"></use></svg>Reports</div>
             <div class="mb-card-grid">
-                <a href="/MB/MB51Report" class="mb-card"><div class="icon icon-amber"><i class="bi bi-list-ul"></i></div><div class="info"><div class="tc">MB51</div><div class="desc">Material Document List</div></div></a>
-                <a href="/MB/MB52StockOverview" class="mb-card"><div class="icon icon-amber"><i class="bi bi-bar-chart"></i></div><div class="info"><div class="tc">MB52</div><div class="desc">Stock Overview</div></div></a>
-                <a href="/MB/MB5BHistorical" class="mb-card"><div class="icon icon-amber"><i class="bi bi-calendar-range"></i></div><div class="info"><div class="tc">MB5B</div><div class="desc">Historical Stock</div></div></a>
-                <a href="/MB/MB5LReconciliation" class="mb-card"><div class="icon icon-amber"><i class="bi bi-balance"></i></div><div class="info"><div class="tc">MB5L</div><div class="desc">MM/FI Reconciliation</div></div></a>
+                <a href="/MB/MB51Report" class="mb-card"><div class="icon icon-amber"><svg class="bi bi-list-ul" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg></div><div class="info"><div class="tc">MB51</div><div class="desc">Material Document List</div></div></a>
+                <a href="/MB/MB52StockOverview" class="mb-card"><div class="icon icon-amber"><svg class="bi bi-bar-chart" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bar-chart"></use></svg></div><div class="info"><div class="tc">MB52</div><div class="desc">Stock Overview</div></div></a>
+                <a href="/MB/MB5BHistorical" class="mb-card"><div class="icon icon-amber"><svg class="bi bi-calendar-range" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-range"></use></svg></div><div class="info"><div class="tc">MB5B</div><div class="desc">Historical Stock</div></div></a>
+                <a href="/MB/MB5LReconciliation" class="mb-card"><div class="icon icon-amber"><svg class="bi bi-bank" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bank"></use></svg></div><div class="info"><div class="tc">MB5L</div><div class="desc">MM/FI Reconciliation</div></div></a>
             </div>
         </div>
     </div>

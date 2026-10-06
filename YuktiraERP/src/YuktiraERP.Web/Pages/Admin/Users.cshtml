@@ -5,7 +5,7 @@
     ViewData["Title"] = "User Management";
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-people me-2"></i>User Management</h2>
+    <h2><svg class="bi bi-people me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>User Management</h2>
     <span class="text-muted small">@Model.Users.Count user(s)</span>
 </div>
 
@@ -17,7 +17,7 @@
     </div>
 }
 
-<div class="card mb-4"><div class="card-header bg-primary text-white"><i class="bi bi-person-plus"></i> Create User</div><div class="card-body">
+<div class="card mb-4"><div class="card-header bg-primary text-white"><svg class="bi bi-person-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-plus"></use></svg> Create User</div><div class="card-body">
 <form method="post" asp-page-handler="Create">
     <div class="row g-2">
         <div class="col-md-3">
@@ -42,7 +42,7 @@
             <input class="form-control form-control-sm" asp-for="Input.Password" type="password" required />
         </div>
         <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-plus-lg"></i> Create</button>
+            <button type="submit" class="btn btn-primary btn-sm w-100"><svg class="bi bi-plus-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg> Create</button>
         </div>
     </div>
 </form>
@@ -76,7 +76,7 @@
                     <input type="checkbox" class="form-check-input" name="UpdateActive" value="true" checked="@u.IsActive" id="active_@u.Id" />
                     <label class="form-check-label small" for="active_@u.Id">Active</label>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Save role/active"><i class="bi bi-check-lg"></i></button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm" title="Save role/active"><svg class="bi bi-check-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-lg"></use></svg></button>
             </form>
         </td>
         <td>
@@ -91,27 +91,27 @@
                 {
                     <form method="post" asp-page-handler="Deactivate" class="d-inline">
                         <input type="hidden" name="DeactivateId" value="@u.Id" />
-                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Deactivate"><i class="bi bi-x-circle"></i></button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Deactivate"><svg class="bi bi-x-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg></button>
                     </form>
                 }
                 else
                 {
                     <form method="post" asp-page-handler="Activate" class="d-inline">
                         <input type="hidden" name="ActivateId" value="@u.Id" />
-                        <button type="submit" class="btn btn-outline-success btn-sm" title="Activate"><i class="bi bi-check-circle"></i></button>
+                        <button type="submit" class="btn btn-outline-success btn-sm" title="Activate"><svg class="bi bi-check-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg></button>
                     </form>
                 }
                 @if (u.IsLocked)
                 {
                     <form method="post" asp-page-handler="Unlock" class="d-inline">
                         <input type="hidden" name="UnlockId" value="@u.Id" />
-                        <button type="submit" class="btn btn-outline-warning btn-sm" title="Unlock"><i class="bi bi-unlock"></i></button>
+                        <button type="submit" class="btn btn-outline-warning btn-sm" title="Unlock"><svg class="bi bi-unlock" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-unlock"></use></svg></button>
                     </form>
                 }
                 <form method="post" asp-page-handler="ResetPassword" class="d-inline-flex align-items-center gap-1">
                     <input type="hidden" name="ResetId" value="@u.Id" />
                     <input type="password" name="NewPassword" class="form-control form-control-sm" style="width:150px;" placeholder="New password" required />
-                    <button type="submit" class="btn btn-outline-primary btn-sm" title="Reset password"><i class="bi bi-key"></i></button>
+                    <button type="submit" class="btn btn-outline-primary btn-sm" title="Reset password"><svg class="bi bi-key" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-key"></use></svg></button>
                 </form>
             </div>
         </td>

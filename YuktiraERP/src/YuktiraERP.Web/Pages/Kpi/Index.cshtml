@@ -7,10 +7,10 @@
 }
 
 <div class="kpi-drill-header">
-    <a href="/Dashboard" class="btn btn-outline-secondary btn-sm mb-2"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    <a href="/Dashboard" class="btn btn-outline-secondary btn-sm mb-2"><svg class="bi bi-arrow-left" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg> Back to Dashboard</a>
     <h1>
         <span class="kpi-icon" style="background:rgba(var(--kpi-color,37,99,235),0.15);color:var(--kpi-color,#2563eb);width:36px;height:36px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:16px">
-            <i class="bi @Model.CurrentKpi.Icon"></i>
+            <svg class="bi @Model.CurrentKpi.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@Model.CurrentKpi.Icon"></use></svg>
         </span>
         @Model.KpiName
         <span class="badge bg-@(colorClass == "green" ? "success" : colorClass == "yellow" ? "warning" : "danger")">
@@ -18,18 +18,18 @@
         </span>
     </h1>
     <div class="kpi-meta">
-        <span><i class="bi bi-grid-3x3-gap"></i> @Model.KpiCategory</span>
-        <span><i class="bi bi-arrow-@(Model.CurrentKpi.Trend)"></i> @Model.CurrentKpi.TrendLabel vs previous period</span>
+        <span><svg class="bi bi-grid-3x3-gap" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-grid-3x3-gap"></use></svg> @Model.KpiCategory</span>
+        <span><svg class="bi @trendIcon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@trendIcon"></use></svg> @Model.CurrentKpi.TrendLabel vs previous period</span>
         @if (Model.CurrentKpi.PreviousValue.HasValue)
         {
-            <span><i class="bi bi-clock-history"></i> Previous: @Model.CurrentKpi.PreviousValue.Value.ToString("N1")</span>
+            <span><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg> Previous: @Model.CurrentKpi.PreviousValue.Value.ToString("N1")</span>
         }
     </div>
 </div>
 
 <div class="kpi-drill-main">
     <div class="kpi-drill-chart">
-        <h3><i class="bi bi-graph-up"></i> 30-Day Trend</h3>
+        <h3><svg class="bi bi-graph-up" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg> 30-Day Trend</h3>
         <div style="position:relative;height:220px;display:flex;align-items:flex-end;gap:3px;padding-top:20px">
             @if (Model.History.Count > 0)
             {
@@ -56,21 +56,21 @@
 
     <div class="kpi-drill-sidebar">
         <div class="kpi-stat-card">
-            <div class="stat-icon" style="background:rgba(5,150,105,0.15);color:#059669"><i class="bi bi-@(trendIcon)"></i></div>
+            <div class="stat-icon" style="background:rgba(5,150,105,0.15);color:#059669"><svg class="bi @trendIcon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@trendIcon"></use></svg></div>
             <div>
                 <div class="stat-label">Trend</div>
                 <div class="stat-value" style="color:@(Model.CurrentKpi.Trend == "up" ? "#059669" : Model.CurrentKpi.Trend == "down" ? "#dc2626" : "var(--text-muted)")">@Model.CurrentKpi.TrendLabel</div>
             </div>
         </div>
         <div class="kpi-stat-card">
-            <div class="stat-icon" style="background:rgba(37,99,235,0.15);color:#2563eb"><i class="bi bi-calculator"></i></div>
+            <div class="stat-icon" style="background:rgba(37,99,235,0.15);color:#2563eb"><svg class="bi bi-calculator" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg></div>
             <div>
                 <div class="stat-label">Current Value</div>
                 <div class="stat-value">@Model.CurrentKpi.DisplayValue</div>
             </div>
         </div>
         <div class="kpi-stat-card">
-            <div class="stat-icon" style="background:rgba(217,119,6,0.15);color:#d97706"><i class="bi bi-clock-history"></i></div>
+            <div class="stat-icon" style="background:rgba(217,119,6,0.15);color:#d97706"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg></div>
             <div>
                 <div class="stat-label">Previous Period</div>
                 <div class="stat-value">@(Model.CurrentKpi.PreviousValue?.ToString("N1") ?? "N/A")</div>
@@ -79,7 +79,7 @@
         @if (!string.IsNullOrEmpty(Model.CurrentKpi.AlertMessage))
         {
             <div class="kpi-stat-card" style="border-left:3px solid #dc2626">
-                <div class="stat-icon" style="background:rgba(220,38,38,0.15);color:#dc2626"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="stat-icon" style="background:rgba(220,38,38,0.15);color:#dc2626"><svg class="bi bi-exclamation-triangle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg></div>
                 <div>
                     <div class="stat-label">Alert</div>
                     <div class="stat-value" style="color:#dc2626;font-size:13px">@Model.CurrentKpi.AlertMessage</div>
@@ -92,7 +92,7 @@
 @if (Model.IsAiLoaded && Model.AiPredictions.Count > 0)
 {
     <div class="kpi-ai-section">
-        <h3><i class="bi bi-cpu"></i> AI Predictions &amp; Forecast</h3>
+        <h3><svg class="bi bi-cpu" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg> AI Predictions &amp; Forecast</h3>
         <div class="kpi-ai-grid">
             @foreach (var p in Model.AiPredictions)
             {
@@ -109,7 +109,7 @@
 
 <div class="kpi-drill-footer">
     <div class="card mt-3">
-        <div class="card-header"><i class="bi bi-info-circle"></i> Root Cause Analysis</div>
+        <div class="card-header"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Root Cause Analysis</div>
         <div class="card-body" style="font-size:13px">
             @switch (Model.KpiCode)
             {

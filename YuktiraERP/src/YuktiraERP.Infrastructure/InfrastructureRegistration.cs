@@ -11,6 +11,7 @@ using YuktiraERP.Infrastructure.Services;
 using YuktiraERP.Infrastructure.Hubs;
 using YuktiraERP.Infrastructure.Services.Connectors;
 using YuktiraERP.Infrastructure.Caching;
+using YuktiraERP.Infrastructure.BackgroundServices;
 using YuktiraERP.PluginSdk;
 
 namespace YuktiraERP.Infrastructure;
@@ -154,6 +155,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IQualityManagementService, QualityManagementService>();
         services.AddScoped<ICustomerComplaintReturnService, CustomerComplaintReturnService>();
         services.AddScoped<ISoxComplianceService, SoxComplianceService>();
+        services.AddScoped<IAuthorizationTraceService, AuthorizationTraceService>();
         services.AddScoped<IUniversalJournalService, UniversalJournalService>();
         services.AddScoped<IRFWarehouseService, RFWarehouseService>();
         services.AddScoped<IWavePickService, WavePickService>();
@@ -237,6 +239,17 @@ public static class InfrastructureRegistration
         services.AddScoped<ISuccessionPlanningService, SuccessionPlanningService>();
         // MDG
         services.AddScoped<IMdgService, MdgService>();
+        // SPC
+        services.AddScoped<ISpcEngineService, SpcEngineService>();
+
+        // Exchange Rate Sync (background job + providers + status store)
+        services.Configure<ExchangeRateSyncOptions>(configuration.GetSection(ExchangeRateSyncOptions.SectionName));
+        services.AddHttpClient("fx", client => client.Timeout = TimeSpan.FromSeconds(30));
+        services.AddSingleton<IExchangeRateSyncStatusStore, ExchangeRateSyncStatusStore>();
+        services.AddSingleton<IExchangeRateProvider, EcbExchangeRateProvider>();
+        services.AddSingleton<IExchangeRateProvider, OpenExchangeRatesProvider>();
+        services.AddScoped<IExchangeRateSyncService, ExchangeRateSyncService>();
+        services.AddHostedService<ExchangeRateSyncJob>();
 
         RegisterRepositories(services);
 

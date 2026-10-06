@@ -1,0 +1,577 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.MdgGovernanceModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "MDG Governance";
+}
+
+<style>
+    .mdg-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 3px solid transparent; }
+    .mdg-tabs .nav-link.active { color: #1F497D; border-bottom-color: #1F497D; font-weight: 600; }
+    .mdg-tabs .nav-link:hover { border-bottom-color: #adb5bd; }
+    .mdg-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .mdg-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .mdg-table tbody tr:hover { background: #f0f4fa; }
+    .mdg-json { max-height: 300px; overflow: auto; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+    .mdg-audit-table th { background: #e9ecef; color: #212529; font-size: 11px; padding: 6px 8px; }
+    .mdg-audit-table td { font-size: 12px; padding: 5px 8px; }
+    .mdg-empty { padding: 24px 0; }
+</style>
+
+<h2><svg class="bi bi-shield-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>MDG Governance</h2>
+
+<div id="mdgAlert" class="alert alert-danger alert-dismissible fade show d-none mt-3" role="alert">
+    <span id="mdgAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<ul class="nav nav-tabs mdg-tabs mt-3" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tabPending" role="tab">
+            <svg class="bi bi-hourglass-split me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-hourglass-split"></use></svg>Pending Requests
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabDraft" role="tab">
+            <svg class="bi bi-pencil-square me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil-square"></use></svg>Draft Staging
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tabHistory" role="tab">
+            <svg class="bi bi-clock-history me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>Change History &amp; Audit
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+
+    <div class="tab-pane fade show active" id="tabPending" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <div class="input-group input-group-sm" style="max-width: 360px;">
+                <span class="input-group-text"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg></span>
+                <input type="text" class="form-control form-control-sm" id="pendingSearch" placeholder="Search request #, entity or requester" />
+                <button class="btn btn-outline-primary btn-sm" type="button" onclick="loadPending()">Search</button>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" type="button" onclick="loadPending()">
+                <svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg>Refresh
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mdg-table mb-0">
+                <thead>
+                    <tr><th>Request #</th><th>Entity</th><th>Status</th><th>Requested By</th><th>Created</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="pendingBody">
+                    <tr><td colspan="6" class="text-center text-muted mdg-empty">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tabDraft" role="tabpanel">
+        <div class="card mb-3">
+            <div class="card-header py-2 fw-semibold">
+                <svg class="bi bi-plus-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New Draft
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small" for="draftEntityName">Entity Name</label>
+                        <input type="text" class="form-control form-control-sm" id="draftEntityName" placeholder="e.g. MaterialMaster" />
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold small" for="draftNotes">Notes <span class="text-muted fw-normal">(optional)</span></label>
+                        <input type="text" class="form-control form-control-sm" id="draftNotes" placeholder="Why this change is being staged" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold small" for="draftPayload">Staging Payload (JSON)</label>
+                        <textarea class="form-control form-control-sm font-monospace" id="draftPayload" rows="6" oninput="validateDraftPayload()" placeholder="{&quot;Code&quot;:&quot;MAT-001&quot;,&quot;Name&quot;:&quot;New Material&quot;}"></textarea>
+                        <div class="form-text" id="payloadHint">Paste a JSON object.</div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary btn-sm" id="saveDraftBtn" type="button" onclick="saveDraft()" disabled>
+                            <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Draft
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mdg-table mb-0">
+                <thead>
+                    <tr><th>Request #</th><th>Entity</th><th>Status</th><th>Requested By</th><th>Created</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="draftBody">
+                    <tr><td colspan="6" class="text-center text-muted mdg-empty">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tabHistory" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mdg-table mb-0">
+                <thead>
+                    <tr><th>Request #</th><th>Entity</th><th>Status</th><th>Requested By</th><th>Created</th><th>Trail</th></tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr><td colspan="6" class="text-center text-muted mdg-empty">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="text-muted small" id="historyInfo"></span>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="historyPrev" onclick="loadHistory(historyPage - 1)">Prev</button>
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="historyNext" onclick="loadHistory(historyPage + 1)">Next</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="diffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <svg class="bi bi-arrow-left-right me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>Change Diff
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Original (live record)</h6>
+                        <pre id="diffOriginal" class="border rounded p-2 bg-light mdg-json mb-0">{}</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Proposed (staging payload)</h6>
+                        <pre id="diffProposed" class="border rounded p-2 bg-light mdg-json mb-0">{}</pre>
+                    </div>
+                </div>
+                <h6 class="mt-3">Changed Fields</h6>
+                <div id="diffChanges"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="decisionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="decisionTitle">Approve Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Request <strong id="decisionRequest"></strong></p>
+                <label class="form-label fw-bold small" for="decisionComment">
+                    Comment <span class="text-danger">*</span>
+                    <span class="fw-normal text-muted">(required for SOX compliance)</span>
+                </label>
+                <textarea class="form-control" id="decisionComment" rows="3" oninput="syncDecisionButton()" placeholder="Documented reason for this decision..."></textarea>
+                <div class="form-text" id="decisionHint">A non-empty comment is required to confirm.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="decisionConfirm" disabled onclick="submitDecision()">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var MDG_ACTOR = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(User.Identity?.Name ?? ""));
+    var historyPage = 1;
+    var historyPageSize = 10;
+    var decisionState = { id: null, action: null };
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function fmtDate(value) {
+        if (!value) return '-';
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return esc(value);
+        return d.toLocaleString();
+    }
+
+    function emptyRow(colspan, message) {
+        return '<tr><td colspan="' + colspan + '" class="text-center text-muted mdg-empty">' + esc(message) + '</td></tr>';
+    }
+
+    function statusBadge(status) {
+        var cls = 'bg-secondary';
+        if (status === 'PendingApproval') cls = 'bg-warning text-dark';
+        else if (status === 'Approved') cls = 'bg-info';
+        else if (status === 'Activated') cls = 'bg-success';
+        else if (status === 'Rejected') cls = 'bg-danger';
+        else if (status === 'Draft') cls = 'bg-secondary';
+        return '<span class="badge ' + cls + '">' + esc(status) + '</span>';
+    }
+
+    function changeBadge(type) {
+        if (type === 'Added') return '<span class="badge bg-success">Added</span>';
+        if (type === 'Removed') return '<span class="badge bg-danger">Removed</span>';
+        return '<span class="badge bg-warning text-dark">Modified</span>';
+    }
+
+    function shortHash(hash) {
+        if (!hash) return '-';
+        return '<code title="' + esc(hash) + '">' + esc(hash.substring(0, 12)) + '</code>';
+    }
+
+    function showMdgAlert(message, success) {
+        var box = document.getElementById('mdgAlert');
+        document.getElementById('mdgAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showMdgAlert._timer);
+            showMdgAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    async function mdgFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    function actionButtons(id, requestNumber) {
+        return '' +
+            '<button type="button" class="btn btn-outline-primary btn-sm" title="View diff" onclick="openDiff(\'' + id + '\')">' +
+            '<svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg> Diff</button> ' +
+            '<button type="button" class="btn btn-outline-success btn-sm" title="Approve" onclick="openDecision(\'' + id + '\', \'approve\', \'' + esc(requestNumber) + '\')">' +
+            '<svg class="bi bi-check-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg> Approve</button> ' +
+            '<button type="button" class="btn btn-outline-danger btn-sm" title="Reject" onclick="openDecision(\'' + id + '\', \'reject\', \'' + esc(requestNumber) + '\')">' +
+            '<svg class="bi bi-x-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg> Reject</button>';
+    }
+
+    async function loadPending() {
+        var body = document.getElementById('pendingBody');
+        body.innerHTML = emptyRow(6, 'Loading...');
+        try {
+            var search = document.getElementById('pendingSearch').value.trim();
+            var url = '/api/v1/mdg/requests?status=PendingApproval&pageSize=100';
+            if (search) url += '&search=' + encodeURIComponent(search);
+            var res = await mdgFetch(url);
+            var items = (res && res.data && res.data.items) || [];
+            if (!items.length) {
+                body.innerHTML = emptyRow(6, 'No pending requests awaiting approval');
+                return;
+            }
+            var html = '';
+            items.forEach(function (r) {
+                html += '<tr>' +
+                    '<td><strong>' + esc(r.requestNumber) + '</strong></td>' +
+                    '<td>' + esc(r.entityName) + '</td>' +
+                    '<td>' + statusBadge(r.status) + '</td>' +
+                    '<td>' + esc(r.requestedBy) + '</td>' +
+                    '<td>' + fmtDate(r.createdAt) + '</td>' +
+                    '<td class="text-nowrap">' + actionButtons(r.id, r.requestNumber) + '</td>' +
+                    '</tr>';
+            });
+            body.innerHTML = html;
+        } catch (e) {
+            body.innerHTML = emptyRow(6, 'Pending requests could not be loaded');
+            showMdgAlert(e.message);
+        }
+    }
+
+    async function loadDrafts() {
+        var body = document.getElementById('draftBody');
+        body.innerHTML = emptyRow(6, 'Loading...');
+        try {
+            var res = await mdgFetch('/api/v1/mdg/requests?status=Draft&pageSize=100');
+            var items = (res && res.data && res.data.items) || [];
+            if (!items.length) {
+                body.innerHTML = emptyRow(6, 'No draft requests staged');
+                return;
+            }
+            var html = '';
+            items.forEach(function (r) {
+                html += '<tr>' +
+                    '<td><strong>' + esc(r.requestNumber) + '</strong></td>' +
+                    '<td>' + esc(r.entityName) + '</td>' +
+                    '<td>' + statusBadge(r.status) + '</td>' +
+                    '<td>' + esc(r.requestedBy) + '</td>' +
+                    '<td>' + fmtDate(r.createdAt) + '</td>' +
+                    '<td class="text-nowrap">' +
+                    '<button type="button" class="btn btn-outline-primary btn-sm" title="View diff" onclick="openDiff(\'' + r.id + '\')">' +
+                    '<svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg> Diff</button> ' +
+                    '<button type="button" class="btn btn-outline-success btn-sm" title="Submit for approval" onclick="submitDraft(\'' + r.id + '\')">' +
+                    '<svg class="bi bi-send" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-send"></use></svg> Submit</button>' +
+                    '</td>' +
+                    '</tr>';
+            });
+            body.innerHTML = html;
+        } catch (e) {
+            body.innerHTML = emptyRow(6, 'Drafts could not be loaded');
+            showMdgAlert(e.message);
+        }
+    }
+
+    function validateDraftPayload() {
+        var raw = document.getElementById('draftPayload').value.trim();
+        var hint = document.getElementById('payloadHint');
+        var button = document.getElementById('saveDraftBtn');
+        if (!raw) {
+            hint.textContent = 'StagingPayload is required (JSON object).';
+            hint.className = 'form-text text-muted';
+            button.disabled = true;
+            return null;
+        }
+        try {
+            var parsed = JSON.parse(raw);
+            if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                throw new Error('Payload must be a JSON object.');
+            }
+            hint.textContent = 'Valid JSON object.';
+            hint.className = 'form-text text-success';
+            button.disabled = false;
+            return raw;
+        } catch (e) {
+            hint.textContent = 'Invalid JSON: ' + e.message;
+            hint.className = 'form-text text-danger';
+            button.disabled = true;
+            return null;
+        }
+    }
+
+    async function saveDraft() {
+        var entityName = document.getElementById('draftEntityName').value.trim();
+        var notes = document.getElementById('draftNotes').value.trim();
+        if (!entityName) {
+            showMdgAlert('Entity Name is required to stage a draft.');
+            return;
+        }
+        var payload = validateDraftPayload();
+        if (!payload) {
+            showMdgAlert('Staging Payload must be a valid JSON object.');
+            return;
+        }
+        var button = document.getElementById('saveDraftBtn');
+        button.disabled = true;
+        try {
+            await mdgFetch('/api/v1/mdg/requests/draft', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ entityName: entityName, stagingPayload: payload, notes: notes, requestedBy: MDG_ACTOR })
+            });
+            document.getElementById('draftPayload').value = '';
+            document.getElementById('draftNotes').value = '';
+            validateDraftPayload();
+            showMdgAlert('Draft saved and staged for review.', true);
+            loadDrafts();
+            loadHistory(historyPage);
+        } catch (e) {
+            showMdgAlert(e.message);
+        } finally {
+            validateDraftPayload();
+        }
+    }
+
+    async function submitDraft(id) {
+        try {
+            await mdgFetch('/api/v1/mdg/requests/' + id + '/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            showMdgAlert('Draft submitted for approval.', true);
+            loadDrafts();
+            loadPending();
+            loadHistory(historyPage);
+        } catch (e) {
+            showMdgAlert(e.message);
+        }
+    }
+
+    function openDecision(id, action, requestNumber) {
+        decisionState = { id: id, action: action };
+        document.getElementById('decisionTitle').textContent = action === 'approve' ? 'Approve Request' : 'Reject Request';
+        document.getElementById('decisionRequest').textContent = requestNumber || id;
+        document.getElementById('decisionComment').value = '';
+        document.getElementById('decisionHint').textContent = action === 'approve'
+            ? 'Approval requires a documented comment (SOX).'
+            : 'Rejection requires a documented comment (SOX).';
+        document.getElementById('decisionConfirm').disabled = true;
+        new bootstrap.Modal(document.getElementById('decisionModal')).show();
+    }
+
+    function syncDecisionButton() {
+        var comment = document.getElementById('decisionComment').value;
+        document.getElementById('decisionConfirm').disabled = comment.trim().length === 0;
+    }
+
+    async function submitDecision() {
+        var id = decisionState.id;
+        var action = decisionState.action;
+        var comment = document.getElementById('decisionComment').value.trim();
+        if (!comment || !id || !action) return;
+
+        var confirm = document.getElementById('decisionConfirm');
+        confirm.disabled = true;
+        try {
+            var url = '/api/v1/mdg/requests/' + id + '/' + action;
+            var payload = action === 'approve'
+                ? { approvedBy: MDG_ACTOR, notes: comment }
+                : { rejectedBy: MDG_ACTOR, reason: comment };
+            await mdgFetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            var modal = bootstrap.Modal.getInstance(document.getElementById('decisionModal'));
+            if (modal) modal.hide();
+            showMdgAlert(action === 'approve' ? 'Request approved.' : 'Request rejected.', true);
+            loadPending();
+            loadDrafts();
+            loadHistory(historyPage);
+        } catch (e) {
+            showMdgAlert(e.message);
+        } finally {
+            syncDecisionButton();
+        }
+    }
+
+    function prettyJson(json) {
+        try { return JSON.stringify(JSON.parse(json), null, 2); }
+        catch (e) { return json || '{}'; }
+    }
+
+    async function openDiff(id) {
+        try {
+            var res = await mdgFetch('/api/v1/mdg/requests/' + id + '/diff');
+            var diff = (res && res.data) || {};
+            document.getElementById('diffOriginal').textContent = prettyJson(diff.originalJson);
+            document.getElementById('diffProposed').textContent = prettyJson(diff.proposedJson);
+            renderChanges(diff.changes || []);
+            new bootstrap.Modal(document.getElementById('diffModal')).show();
+        } catch (e) {
+            showMdgAlert(e.message);
+        }
+    }
+
+    function renderChanges(changes) {
+        var host = document.getElementById('diffChanges');
+        if (!changes.length) {
+            host.innerHTML = '<p class="text-muted mb-0">No field differences detected.</p>';
+            return;
+        }
+        var html = '<div class="table-responsive"><table class="table table-sm align-middle mb-0">' +
+            '<thead><tr><th>Field</th><th>From</th><th>To</th><th>Change</th></tr></thead><tbody>';
+        changes.forEach(function (c) {
+            html += '<tr>' +
+                '<td><code>' + esc(c.field) + '</code></td>' +
+                '<td>' + esc(c.from) + '</td>' +
+                '<td>' + esc(c.to) + '</td>' +
+                '<td>' + changeBadge(c.changeType) + '</td>' +
+                '</tr>';
+        });
+        html += '</tbody></table></div>';
+        host.innerHTML = html;
+    }
+
+    async function loadHistory(page) {
+        page = page || 1;
+        if (page < 1) page = 1;
+        var body = document.getElementById('historyBody');
+        body.innerHTML = emptyRow(6, 'Loading...');
+        try {
+            var res = await mdgFetch('/api/v1/mdg/requests?page=' + page + '&pageSize=' + historyPageSize);
+            var data = (res && res.data) || {};
+            var items = data.items || [];
+            var totalCount = data.totalCount || 0;
+            var totalPages = Math.max(1, Math.ceil(totalCount / (data.pageSize || historyPageSize)));
+            if (page > totalPages) return loadHistory(totalPages);
+            historyPage = data.page || page;
+
+            if (!items.length) {
+                body.innerHTML = emptyRow(6, 'No change requests found');
+            } else {
+                var html = '';
+                items.forEach(function (r) {
+                    html += '<tr>' +
+                        '<td><strong>' + esc(r.requestNumber) + '</strong></td>' +
+                        '<td>' + esc(r.entityName) + '</td>' +
+                        '<td>' + statusBadge(r.status) + '</td>' +
+                        '<td>' + esc(r.requestedBy) + '</td>' +
+                        '<td>' + fmtDate(r.createdAt) + '</td>' +
+                        '<td><button type="button" class="btn btn-outline-secondary btn-sm" title="Show audit trail" onclick="toggleAudit(\'' + r.id + '\')">' +
+                        '<svg class="bi bi-chevron-down" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-down"></use></svg> Trail</button></td>' +
+                        '</tr>' +
+                        '<tr class="d-none" id="auditRow-' + r.id + '"><td colspan="6" class="bg-light p-3" id="auditPanel-' + r.id + '"></td></tr>';
+                });
+                body.innerHTML = html;
+            }
+
+            document.getElementById('historyInfo').textContent = 'Page ' + historyPage + ' of ' + totalPages + ' (' + totalCount + ' requests)';
+            document.getElementById('historyPrev').disabled = historyPage <= 1;
+            document.getElementById('historyNext').disabled = historyPage >= totalPages;
+        } catch (e) {
+            body.innerHTML = emptyRow(6, 'Change history could not be loaded');
+            showMdgAlert(e.message);
+        }
+    }
+
+    async function toggleAudit(id) {
+        var row = document.getElementById('auditRow-' + id);
+        if (!row) return;
+        if (!row.classList.contains('d-none')) {
+            row.classList.add('d-none');
+            return;
+        }
+        row.classList.remove('d-none');
+        var panel = document.getElementById('auditPanel-' + id);
+        panel.innerHTML = '<span class="text-muted">Loading audit trail...</span>';
+        try {
+            var res = await mdgFetch('/api/v1/mdg/requests/' + id + '/audit');
+            var entries = res.data || [];
+            if (!entries.length) {
+                panel.innerHTML = '<span class="text-muted">No audit entries recorded for this request.</span>';
+                return;
+            }
+            var latest = entries[entries.length - 1];
+            var html = '<div class="mb-2 small"><span class="text-muted">Request hash:</span> ' + shortHash(latest.hash) + '</div>';
+            html += '<div class="table-responsive"><table class="table table-sm mb-0 mdg-audit-table">' +
+                '<thead><tr><th>Action</th><th>Actor</th><th>Timestamp</th><th>Status</th><th>Comment</th><th>Hash</th><th>Prev Hash</th></tr></thead><tbody>';
+            entries.forEach(function (a) {
+                html += '<tr>' +
+                    '<td><span class="badge bg-secondary">' + esc(a.action) + '</span></td>' +
+                    '<td>' + esc(a.actor) + '</td>' +
+                    '<td>' + fmtDate(a.timestamp) + '</td>' +
+                    '<td>' + esc(a.oldValue || '-') + ' &rarr; ' + esc(a.newValue || '-') + '</td>' +
+                    '<td>' + esc(a.comment || '-') + '</td>' +
+                    '<td>' + shortHash(a.hash) + '</td>' +
+                    '<td>' + (a.previousHash ? shortHash(a.previousHash) : '-') + '</td>' +
+                    '</tr>';
+            });
+            html += '</tbody></table></div>';
+            panel.innerHTML = html;
+        } catch (e) {
+            panel.innerHTML = '<span class="text-danger">' + esc(e.message) + '</span>';
+        }
+    }
+
+    loadPending();
+    loadDrafts();
+    loadHistory(1);
+</script>

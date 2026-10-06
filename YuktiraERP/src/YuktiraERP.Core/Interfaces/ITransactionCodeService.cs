@@ -57,6 +57,15 @@ public class TransactionPermissionDto
     public bool CanAccess { get; set; } = true;
 }
 
+public class AccessCheckResult
+{
+    public bool Allowed { get; set; }
+    public string RuleSource { get; set; } = string.Empty;
+    public string Reason { get; set; } = string.Empty;
+    public string EffectiveRole { get; set; } = string.Empty;
+    public string RequiredRole { get; set; } = string.Empty;
+}
+
 public interface ITransactionCodeService
 {
     Task<List<TransactionCodeDto>> GetAllAsync(string? module = null, TransactionGroup? group = null, string? search = null);
@@ -72,6 +81,7 @@ public interface ITransactionCodeService
     Task<List<TransactionCodeDto>> GetRecentAsync(Guid userId, int count = 10);
     Task<List<TransactionCodeDto>> GetPermittedCodesAsync(Guid? userId, string? role);
     Task<bool> ValidateAccessAsync(string code, Guid? userId, string? role);
+    Task<AccessCheckResult> CheckAccessDetailedAsync(string code, Guid? userId, string? role);
     Task<TransactionPermissionDto?> SetPermissionAsync(TransactionPermissionDto dto);
     Task<List<TransactionPermissionDto>> GetPermissionsAsync(Guid transactionCodeId);
     Task<List<TransactionLogDto>> GetLogAsync(Guid? userId = null, string? code = null, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 50);

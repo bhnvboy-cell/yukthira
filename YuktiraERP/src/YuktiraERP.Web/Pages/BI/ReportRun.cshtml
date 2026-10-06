@@ -2,13 +2,13 @@
 @model YuktiraERP.Web.Pages.BI.ReportRunModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Report Run (BI02)"; }
-<h2><i class="bi bi-file-earmark-bar-graph me-2"></i>Run Report</h2>
+<h2><svg class="bi bi-file-earmark-bar-graph me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-bar-graph"></use></svg>Run Report</h2>
 <form method="post" asp-page-handler="Run" class="row g-3 mb-3">
 <div class="col-auto"><select name="ReportId" class="form-select">
 <option value="">-- Select Report --</option>
 @foreach (var r in Model.Reports) { <option value="@r.ReportId">@r.ReportName</option> }
 </select></div>
-<div class="col-auto"><button type="submit" class="btn btn-primary"><i class="bi bi-play me-1"></i>Run</button></div>
+<div class="col-auto"><button type="submit" class="btn btn-primary"><svg class="bi bi-play me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play"></use></svg>Run</button></div>
 </form>
 @if (!string.IsNullOrEmpty(Model.ResultHtml)) { @Html.Raw(Model.ResultHtml) }
 <div class="card"><div class="card-body">

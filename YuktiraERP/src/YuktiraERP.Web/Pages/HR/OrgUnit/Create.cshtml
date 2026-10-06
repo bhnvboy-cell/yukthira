@@ -3,15 +3,15 @@
 @{ ViewData["Title"] = "Create Organizational Unit"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-diagram-3 me-2"></i>Create Org Unit</h2>
+        <h2><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Create Org Unit</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="orgForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="orgForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
 
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-diagram-3"></i></div>
+        <div class="banner-icon"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg></div>
         <div class="banner-info">
             <h5>Create Org Unit</h5>
             <span>Define organizational structure</span>
@@ -27,7 +27,7 @@
     <form id="orgForm" method="post">
         <div class="ent-form-panel active" data-panel="tabDetails">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Unit Information</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg><h6>Unit Information</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label asp-for="OrgUnit.UnitCode" class="ent-label">Unit Code</label>
@@ -66,7 +66,7 @@
 
         <div class="ent-form-panel" data-panel="tabManagement" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-people"></i><h6>Management &amp; Structure</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-people" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg><h6>Management &amp; Structure</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label asp-for="OrgUnit.ParentUnit" class="ent-label">Parent Unit</label>
@@ -94,7 +94,7 @@
             <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
             <div class="footer-actions">
                 <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             </div>
         </div>
     </form>

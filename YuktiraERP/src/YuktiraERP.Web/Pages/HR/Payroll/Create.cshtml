@@ -1,8 +1,8 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.HR.Payroll.CreateModel
 @{ ViewData["Title"] = "Create Payroll Entry"; }
 <div class="row justify-content-center"><div class="col-lg-8">
-<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Payroll Entry</h5></div>
+<div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0"><svg class="bi bi-plus-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create Payroll Entry</h5></div>
 <div class="card-body">
 <form method="post">
 <div class="row mb-3">
@@ -22,8 +22,8 @@
 <div class="col-md-3"><label asp-for="Calculation.OtherAllowance" class="form-label">Other Allowance</label><input asp-for="Calculation.OtherAllowance" type="number" step="0.01" class="form-control" /></div>
 <div class="col-md-3"><label asp-for="Calculation.Bonus" class="form-label">Bonus</label><input asp-for="Calculation.Bonus" type="number" step="0.01" class="form-control" /></div>
 </div>
-<div class="alert alert-info py-2 mb-3"><i class="bi bi-calculator me-1"></i>PF (12% of basic, cap ₹15,000), ESI (0.75% if gross ≤ ₹21,000), Professional Tax and TDS are computed automatically.</div>
-<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Calculate &amp; Save</button><a asp-page="/HR/Payroll/List" class="btn btn-outline-secondary">Cancel</a></div>
+<div class="alert alert-info py-2 mb-3"><svg class="bi bi-calculator me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>PF (12% of basic, cap ₹15,000), ESI (0.75% if gross ≤ ₹21,000), Professional Tax and TDS are computed automatically.</div>
+<div class="d-flex gap-2"><button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Calculate &amp; Save</button><a asp-page="/HR/Payroll/List" class="btn btn-outline-secondary">Cancel</a></div>
 </form>
 </div></div>
 </div></div>

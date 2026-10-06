@@ -7,19 +7,19 @@
     <form method="post" id="zqmForm">
         <div class="zqm-toolbar">
             <div style="display:flex;align-items:center;gap:10px">
-                <h3><i class="bi bi-clipboard-plus me-2"></i>Auto Inspection Lot Generator</h3>
+                <h3><svg class="bi bi-clipboard-plus me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-plus"></use></svg>Auto Inspection Lot Generator</h3>
                 <span class="badge">ZQM01</span>
             </div>
             <div class="actions">
-                <button type="button" class="zqm-btn" onclick="generateLot()" title="Generate Lot"><i class="bi bi-gear-fill me-1"></i>Generate</button>
-                <button type="button" class="zqm-btn" onclick="resetForm()" title="Clear all fields"><i class="bi bi-x-circle me-1"></i>Clear</button>
-                <button type="button" class="zqm-btn" onclick="window.print()" title="Print"><i class="bi bi-printer me-1"></i>Print</button>
-                <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back" title="Back to QM"><i class="bi bi-arrow-left me-1"></i>Back</a>
+                <button type="button" class="zqm-btn" onclick="generateLot()" title="Generate Lot"><svg class="bi bi-gear-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear-fill"></use></svg>Generate</button>
+                <button type="button" class="zqm-btn" onclick="resetForm()" title="Clear all fields"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+                <button type="button" class="zqm-btn" onclick="window.print()" title="Print"><svg class="bi bi-printer me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-printer"></use></svg>Print</button>
+                <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back" title="Back to QM"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
             </div>
         </div>
 
         <div class="zqm-filter">
-            <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Material & Source Data</div>
+            <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Material & Source Data</div>
             <div class="zqm-row cols-4">
                 <div class="zqm-field"><label>Material Code <span class="sub">(required)</span></label><input id="materialCode" required placeholder="e.g. RAW-001" /></div>
                 <div class="zqm-field"><label>Material Name</label><input id="materialName" /></div>
@@ -41,7 +41,7 @@
 
         <div class="zqm-results">
             <div class="zqm-results-header">
-                <h4><i class="bi bi-clipboard-data me-1"></i>Generated Inspection Lot</h4>
+                <h4><svg class="bi bi-clipboard-data me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-data"></use></svg>Generated Inspection Lot</h4>
                 <span class="count" id="resultCount"></span>
             </div>
             <div id="alertBox" class="zqm-alert"></div>
@@ -57,7 +57,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="zqm-empty" id="emptyState"><i class="bi bi-clipboard-plus"></i><div>Fill in material data and click Generate to create an inspection lot</div></div>
+            <div class="zqm-empty" id="emptyState"><svg class="bi bi-clipboard-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-plus"></use></svg><div>Fill in material data and click Generate to create an inspection lot</div></div>
         </div>
     </form>
 </div>

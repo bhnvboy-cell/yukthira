@@ -8,18 +8,18 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-people me-2"></i>Trading Partners</h3>
+            <h3><svg class="bi bi-people me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Trading Partners</h3>
             <span class="badge">Partners</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" id="btnCreate" onclick="showCreateForm()"><i class="bi bi-plus-circle me-1"></i>Create</button>
-            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" id="btnCreate" onclick="showCreateForm()"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create</button>
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <!-- Filter -->
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Search</div>
         <div class="zqm-row cols-2">
             <div class="zqm-field"><label>Partner Code</label><input id="searchCode" placeholder="Filter by code..." oninput="filterTable()" /></div>
             <div class="zqm-field"><label>Partner Name</label><input id="searchName" placeholder="Filter by name..." oninput="filterTable()" /></div>
@@ -28,7 +28,7 @@
 
     <!-- Create/Edit Form -->
     <div class="zqm-filter" id="partnerForm" style="display:none;border-left:3px solid #1565c0">
-        <div class="zqm-section-title"><i class="bi bi-pencil me-1"></i><span id="formTitle">Create Partner</span></div>
+        <div class="zqm-section-title"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg><span id="formTitle">Create Partner</span></div>
         <form id="partnerFormEl" onsubmit="return false;">
             <input type="hidden" id="partnerId" value="" />
             <div class="zqm-row cols-4">
@@ -61,8 +61,8 @@
                 </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:8px">
-                <button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0" onclick="savePartner()"><i class="bi bi-check-circle me-1"></i>Save</button>
-                <button type="button" class="zqm-btn" onclick="hideForm()"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                <button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0" onclick="savePartner()"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Save</button>
+                <button type="button" class="zqm-btn" onclick="hideForm()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Cancel</button>
             </div>
         </form>
     </div>
@@ -88,7 +88,7 @@
                     </tr>
                 </thead>
                 <tbody id="partnerTableBody">
-                    <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>Loading partners...</div></td></tr>
+                    <tr><td colspan="8" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>Loading partners...</div></td></tr>
                 </tbody>
             </table>
         </div>
@@ -100,8 +100,8 @@ var token = document.querySelector('input[name="__RequestVerificationToken"]');
 var partners = [];
 
 function loadPartners() {
-    fetch('/api/integration/edi/partners').then(function(r) { return r.json(); }).then(function(data) {
-        partners = Array.isArray(data) ? data : [];
+    fetch('/api/v1/integration/edi/partners').then(function(r) { return r.json(); }).then(function(data) {
+        partners = (data && Array.isArray(data.data)) ? data.data : [];
         renderTable(partners);
     }).catch(function() {
         partners = [];
@@ -112,7 +112,7 @@ function loadPartners() {
 function renderTable(list) {
     var tbody = document.getElementById('partnerTableBody');
     if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No trading partners found</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No trading partners found</div></td></tr>';
     } else {
         tbody.innerHTML = list.map(function(p) {
             var badgeClass = p.isActive ? 'passed' : 'closed';
@@ -126,8 +126,8 @@ function renderTable(list) {
                 '<td>' + (p.documentTypes||'') + '</td>' +
                 '<td><span class="zqm-badge ' + badgeClass + '">' + statusText + '</span></td>' +
                 '<td>' +
-                    '<a href="javascript:editPartner(\'' + p.id + '\')" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a> ' +
-                    '<a href="javascript:deletePartner(\'' + p.id + '\')" class="zqm-act" title="Delete" style="color:#c62828"><i class="bi bi-trash"></i></a>' +
+                    '<a href="javascript:editPartner(\'' + p.id + '\')" class="zqm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a> ' +
+                    '<a href="javascript:deletePartner(\'' + p.id + '\')" class="zqm-act" title="Delete" style="color:#c62828"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></a>' +
                 '</td></tr>';
         }).join('');
     }
@@ -186,7 +186,7 @@ function editPartner(id) {
     document.getElementById('testIndicator').value = p.testIndicator || 'P';
     document.getElementById('endpointUrl').value = p.endpointUrl || '';
     document.getElementById('authType').value = p.authType || 'None';
-    document.getElementById('authConfig').value = p.authConfig || '';
+    document.getElementById('authConfig').value = p.authConfigJson || '';
     document.getElementById('documentTypes').value = p.documentTypes || '';
     document.getElementById('isActive').checked = p.isActive !== false;
     document.getElementById('formTitle').textContent = 'Edit Partner';
@@ -207,12 +207,12 @@ function savePartner() {
         testIndicator: document.getElementById('testIndicator').value,
         endpointUrl: document.getElementById('endpointUrl').value,
         authType: document.getElementById('authType').value,
-        authConfig: document.getElementById('authConfig').value,
+        authConfigJson: document.getElementById('authConfig').value,
         documentTypes: document.getElementById('documentTypes').value,
         isActive: document.getElementById('isActive').checked
     };
 
-    var url = id ? '/api/integration/edi/partners/' + id : '/api/integration/edi/partners';
+    var url = id ? '/api/v1/integration/edi/partners/' + id : '/api/v1/integration/edi/partners';
     var method = id ? 'PUT' : 'POST';
 
     var headers = { 'Content-Type': 'application/json' };
@@ -221,7 +221,13 @@ function savePartner() {
     fetch(url, { method: method, headers: headers, body: JSON.stringify(payload) })
     .then(function(r) {
         if (r.ok) { hideForm(); loadPartners(); }
-        else { alert('Error saving partner'); }
+        else {
+            r.text().then(function(text) {
+                var message = text;
+                try { var parsed = JSON.parse(text); if (parsed && parsed.message) message = parsed.message; } catch (e) {}
+                alert('Error saving partner: ' + message);
+            });
+        }
     }).catch(function() { alert('Network error'); });
 }
 
@@ -230,7 +236,7 @@ function deletePartner(id) {
     var headers = {};
     if (token) { headers['RequestVerificationToken'] = token.value; }
 
-    fetch('/api/integration/edi/partners/' + id, { method: 'DELETE', headers: headers })
+    fetch('/api/v1/integration/edi/partners/' + id, { method: 'DELETE', headers: headers })
     .then(function(r) {
         if (r.ok) { loadPartners(); }
         else { alert('Error deleting partner'); }

@@ -7,30 +7,30 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-cpu me-2"></i>MRP & Capacity Planning</h3>
+            <h3><svg class="bi bi-cpu me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg>MRP & Capacity Planning</h3>
             <span class="badge">MRP</span>
         </div>
         <div class="actions">
-            <a asp-page="/PP/MrpRun" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-play-circle me-1"></i>Run MRP</a>
-            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/PP/MrpRun" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-play-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-circle"></use></svg>Run MRP</a>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-tabs">
-        <button type="button" class="zqm-tab-btn @(Model.Tab=="mrp"||string.IsNullOrEmpty(Model.Tab)?"active":"")" data-tab="mrp"><i class="bi bi-diagram-3 me-1"></i>MRP Explosion</button>
-        <button type="button" class="zqm-tab-btn @(Model.Tab=="capacity"?"active":"")" data-tab="capacity"><i class="bi bi-speedometer me-1"></i>Capacity Load</button>
-        <button type="button" class="zqm-tab-btn @(Model.Tab=="forecast"?"active":"")" data-tab="forecast"><i class="bi bi-graph-up me-1"></i>Forecast & Safety Stock</button>
+        <button type="button" class="zqm-tab-btn @(Model.Tab=="mrp"||string.IsNullOrEmpty(Model.Tab)?"active":"")" data-tab="mrp"><svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>MRP Explosion</button>
+        <button type="button" class="zqm-tab-btn @(Model.Tab=="capacity"?"active":"")" data-tab="capacity"><svg class="bi bi-speedometer me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer"></use></svg>Capacity Load</button>
+        <button type="button" class="zqm-tab-btn @(Model.Tab=="forecast"?"active":"")" data-tab="forecast"><svg class="bi bi-graph-up me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>Forecast & Safety Stock</button>
     </div>
 
     <!-- TAB: MRP Explosion -->
     <div class="zqm-tab-panel @(Model.Tab=="mrp"||string.IsNullOrEmpty(Model.Tab)?"active":"")" data-panel="mrp">
         <div class="zqm-filter" style="border-radius:0">
-            <div class="zqm-section-title"><i class="bi bi-diagram-3 me-1"></i>BOM Explosion</div>
+            <div class="zqm-section-title"><svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>BOM Explosion</div>
             <form method="post" asp-page-handler="Explode">
                 <div class="zqm-row cols-4">
                     <div class="zqm-field"><label>Product</label><select asp-for="ProductName" asp-items="@(new SelectList(Model.Products))"><option value="">-- Select --</option></select></div>
                     <div class="zqm-field"><label>Quantity</label><input asp-for="Quantity" type="number" min="1" /></div>
-                    <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-calculator me-1"></i>Explode BOM</button></div>
+                    <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-calculator me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Explode BOM</button></div>
                 </div>
             </form>
         </div>
@@ -57,11 +57,11 @@
                                     <td>
                                         @if (isShort)
                                         {
-                                            <button class="zqm-btn" style="font-size:0.75rem;padding:3px 8px;background:#1565c0;border-color:#1565c0" onclick="alert('Create @r.SuggestionType order for @r.SuggestedQty')"><i class="bi bi-plus me-1"></i>Order @r.SuggestedQty.ToString("N0")</button>
+                                            <button class="zqm-btn" style="font-size:0.75rem;padding:3px 8px;background:#1565c0;border-color:#1565c0" onclick="alert('Create @r.SuggestionType order for @r.SuggestedQty')"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>Order @r.SuggestedQty.ToString("N0")</button>
                                         }
                                         else
                                         {
-                                            <span class="zqm-badge passed"><i class="bi bi-check-circle me-1"></i>Covered</span>
+                                            <span class="zqm-badge passed"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Covered</span>
                                         }
                                     </td>
                                 </tr>
@@ -72,12 +72,12 @@
             }
             else
             {
-                <div class="zqm-alert info" style="display:block"><i class="bi bi-info-circle me-1"></i>Select a product and quantity above, then click "Explode BOM" to see material requirements.</div>
+                <div class="zqm-alert info" style="display:block"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Select a product and quantity above, then click "Explode BOM" to see material requirements.</div>
             }
 
             @if (Model.StockAlerts.Any(a => a.CurrentStock <= a.ReorderPoint))
             {
-                <div style="padding:12px 16px"><div class="zqm-section-title" style="color:#c62828;border-bottom-color:#ffcdd2"><i class="bi bi-exclamation-triangle me-1"></i>Stock Shortage Alerts</div></div>
+                <div style="padding:12px 16px"><div class="zqm-section-title" style="color:#c62828;border-bottom-color:#ffcdd2"><svg class="bi bi-exclamation-triangle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>Stock Shortage Alerts</div></div>
                 <div class="zqm-table-wrap">
                     <table class="zqm-table">
                         <thead><tr><th>Material</th><th>Stock</th><th>Reorder Point</th><th>Safety Stock</th><th>Status</th></tr></thead>
@@ -129,7 +129,7 @@
             }
             else
             {
-                <div class="zqm-empty" style="padding:40px"><i class="bi bi-speedometer"></i><div>No work center load data available. Create work centers, routings, and production orders first.</div></div>
+                <div class="zqm-empty" style="padding:40px"><svg class="bi bi-speedometer" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer"></use></svg><div>No work center load data available. Create work centers, routings, and production orders first.</div></div>
             }
         </div>
     </div>
@@ -137,12 +137,12 @@
     <!-- TAB: Forecast & Safety Stock -->
     <div class="zqm-tab-panel @(Model.Tab=="forecast"?"active":"")" data-panel="forecast">
         <div class="zqm-filter" style="border-radius:0">
-            <div class="zqm-section-title"><i class="bi bi-graph-up me-1"></i>Demand Forecast</div>
+            <div class="zqm-section-title"><svg class="bi bi-graph-up me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>Demand Forecast</div>
             <form method="post" asp-page-handler="Forecast">
                 <div class="zqm-row cols-4">
                     <div class="zqm-field"><label>Material</label><select name="materialId" asp-items="@(new SelectList(Model.Products))"><option value="">-- Select --</option></select></div>
                     <div class="zqm-field"><label>Forecast Model</label><select asp-for="ForecastModel"><option value="MovingAverage">Moving Average</option><option value="WeightedMovingAverage">Weighted Moving Average</option><option value="ExponentialSmoothing">Exponential Smoothing</option><option value="LinearRegression">Linear Regression</option><option value="SeasonalDecomposition">Seasonal Decomposition</option></select></div>
-                    <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-graph-up me-1"></i>Forecast</button></div>
+                    <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-graph-up me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>Forecast</button></div>
                 </div>
             </form>
         </div>
@@ -177,7 +177,7 @@
                 </div>
             }
 
-            <div style="padding:12px 16px"><div class="zqm-section-title"><i class="bi bi-shield-check me-1"></i>Safety Stock & Reorder Points</div></div>
+            <div style="padding:12px 16px"><div class="zqm-section-title"><svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>Safety Stock & Reorder Points</div></div>
             @if (Model.StockAlerts.Any())
             {
                 <div class="zqm-table-wrap">
@@ -205,7 +205,7 @@
             }
             else
             {
-                <div class="zqm-empty" style="padding:24px"><i class="bi bi-shield-check"></i><div>No safety stock data available.</div></div>
+                <div class="zqm-empty" style="padding:24px"><svg class="bi bi-shield-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg><div>No safety stock data available.</div></div>
             }
         </div>
     </div>

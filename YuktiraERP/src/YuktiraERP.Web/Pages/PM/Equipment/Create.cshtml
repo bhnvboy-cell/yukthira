@@ -3,9 +3,9 @@
 @{ ViewData["Title"] = "Create Equipment"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-gear me-2"></i>Create Equipment Master</h2>
+        <h2><svg class="bi bi-gear me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Create Equipment Master</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="equipForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="equipForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -17,7 +17,7 @@
     <form id="equipForm" method="post">
         <div class="ent-form-panel active" data-panel="tabGeneral">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Equipment Identification</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Equipment Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Equipment.EquipmentCode" class="ent-label required">Equipment Number</label>
@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-calendar"></i> Installation</div>
+                <div class="ent-section-title"><svg class="bi bi-calendar" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar"></use></svg> Installation</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Equipment.InstallationDate" class="ent-label">Installation Date</label>
@@ -79,7 +79,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabLocation" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-geo-alt"></i> Location & Organization</div>
+                <div class="ent-section-title"><svg class="bi bi-geo-alt" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-geo-alt"></use></svg> Location & Organization</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Equipment.FunctionalLocationCode" class="ent-label">Functional Location</label>
@@ -116,7 +116,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabManufacturer" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-building"></i> Manufacturer & Technical Data</div>
+                <div class="ent-section-title"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg> Manufacturer & Technical Data</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Equipment.Manufacturer" class="ent-label">Manufacturer Name</label>

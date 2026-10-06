@@ -46,9 +46,9 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Role & T-Code Manager</h2>
+    <h2 class="mb-0"><svg class="bi bi-shield-lock me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-lock"></use></svg>Role & T-Code Manager</h2>
     <button class="btn btn-sm btn-outline-secondary expand-all-btn" onclick="toggleAllNodes()" id="btnExpandAll">
-        <i class="bi bi-arrows-expand me-1"></i>Expand All
+        <svg class="bi bi-arrows-expand me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrows-expand"></use></svg>Expand All
     </button>
 </div>
 
@@ -90,22 +90,22 @@
 <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="tab" href="#tabHierarchy">
-            <i class="bi bi-diagram-3 me-1"></i>Role Hierarchy
+            <svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Role Hierarchy
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#tabTcodes">
-            <i class="bi bi-key me-1"></i>T-Code Registry
+            <svg class="bi bi-key me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-key"></use></svg>T-Code Registry
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#tabAssign">
-            <i class="bi bi-person-check me-1"></i>Role Assignment
+            <svg class="bi bi-person-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-check"></use></svg>Role Assignment
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#tabImport">
-            <i class="bi bi-cloud-upload me-1"></i>Import
+            <svg class="bi bi-cloud-upload me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cloud-upload"></use></svg>Import
         </a>
     </li>
 </ul>
@@ -131,10 +131,10 @@
                 </div>
                 <div class="col-md-4 d-flex gap-2">
                     <button type="submit" asp-page-handler="Filter" class="btn btn-sm btn-primary">
-                        <i class="bi bi-funnel me-1"></i>Apply Filter
+                        <svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Apply Filter
                     </button>
                     <a asp-page="/Admin/RoleManager" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-x-circle me-1"></i>Clear
+                        <svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear
                     </a>
                 </div>
             </form>
@@ -148,7 +148,7 @@
                 {
                     <div class="tree-root" data-role-id="@composite.CompositeRoleId">
                         <div class="tree-item" onclick="toggleTreeNode(this)">
-                            <span class="toggle-icon"><i class="bi bi-chevron-right"></i></span>
+                            <span class="toggle-icon"><svg class="bi bi-chevron-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg></span>
                             <span class="role-badge badge-composite">COMPOSITE</span>
                             <strong>@composite.CompositeRoleName</strong>
                             <small class="text-muted ms-2">(@composite.CompositeRoleId)</small>
@@ -159,7 +159,7 @@
                             {
                                 <div class="tree-node">
                                     <div class="tree-item" onclick="toggleTreeNode(this)">
-                                        <span class="toggle-icon"><i class="bi bi-chevron-right"></i></span>
+                                        <span class="toggle-icon"><svg class="bi bi-chevron-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg></span>
                                         <span class="role-badge badge-derived">DERIVED</span>
                                         <span>@derived.DerivedRoleName</span>
                                         <small class="text-muted ms-2">(@derived.DerivedRoleId)</small>
@@ -186,7 +186,7 @@
             else
             {
                 <div class="text-center text-muted py-4">
-                    <i class="bi bi-inbox display-4"></i>
+                    <svg class="bi bi-inbox display-4" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg>
                     <p class="mt-2">No role hierarchy data found. Import roles using the Import tab.</p>
                 </div>
             }
@@ -229,9 +229,9 @@
             <table class="table table-sm table-bordered table-rm" id="tcodeTable">
                 <thead>
                     <tr>
-                        <th style="cursor:pointer" onclick="sortTable(0)">Code <i class="bi bi-arrow-down-up small"></i></th>
-                        <th style="cursor:pointer" onclick="sortTable(1)">Name <i class="bi bi-arrow-down-up small"></i></th>
-                        <th style="cursor:pointer" onclick="sortTable(2)">Module <i class="bi bi-arrow-down-up small"></i></th>
+                        <th style="cursor:pointer" onclick="sortTable(0)">Code <svg class="bi bi-arrow-down-up small" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-up"></use></svg></th>
+                        <th style="cursor:pointer" onclick="sortTable(1)">Name <svg class="bi bi-arrow-down-up small" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-up"></use></svg></th>
+                        <th style="cursor:pointer" onclick="sortTable(2)">Module <svg class="bi bi-arrow-down-up small" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-up"></use></svg></th>
                         <th>Group</th>
                         <th>Route</th>
                         <th>Status</th>
@@ -259,7 +259,7 @@
         @if (!Model.AllTcodes.Any())
         {
             <div class="text-center text-muted py-4">
-                <i class="bi bi-key display-4"></i>
+                <svg class="bi bi-key display-4" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-key"></use></svg>
                 <p class="mt-2">No T-Codes found.</p>
             </div>
         }
@@ -271,7 +271,7 @@
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="rm-header">
-                        <h5 class="mb-0"><i class="bi bi-person-plus me-2"></i>Assign Composite Role to User</h5>
+                        <h5 class="mb-0"><svg class="bi bi-person-plus me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-plus"></use></svg>Assign Composite Role to User</h5>
                     </div>
                     <div class="card-body">
                         <form method="post" asp-page-handler="Assign" id="assignForm">
@@ -292,10 +292,10 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="submit" asp-page-handler="Assign" class="btn btn-primary" id="btnAssign">
-                                    <i class="bi bi-check-circle me-1"></i>Assign Role
+                                    <svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Assign Role
                                 </button>
                                 <button type="reset" class="btn btn-outline-secondary">
-                                    <i class="bi bi-x-circle me-1"></i>Reset
+                                    <svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Reset
                                 </button>
                             </div>
                         </form>
@@ -305,7 +305,7 @@
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0"><i class="bi bi-info-circle me-1"></i>Assignment Guide</h6>
+                        <h6 class="mb-0"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Assignment Guide</h6>
                     </div>
                     <div class="card-body">
                         <h6 class="text-primary">How Role Assignment Works</h6>
@@ -334,7 +334,7 @@
             <div class="col-md-7">
                 <div class="card shadow-sm">
                     <div class="rm-header">
-                        <h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>Import Role Matrix Data</h5>
+                        <h5 class="mb-0"><svg class="bi bi-cloud-upload me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cloud-upload"></use></svg>Import Role Matrix Data</h5>
                     </div>
                     <div class="card-body">
                         <form method="post" asp-page-handler="Import">
@@ -352,10 +352,10 @@ SALES_SD&#9;Sales Manager&#9;SD&#9;SALES_REP&#9;Sales Rep&#9;VA03"
                             </div>
                             <div class="d-flex gap-2">
                                 <button type="submit" asp-page-handler="Import" class="btn btn-success" id="btnImport">
-                                    <i class="bi bi-upload me-1"></i>Import Role Matrix
+                                    <svg class="bi bi-upload me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-upload"></use></svg>Import Role Matrix
                                 </button>
                                 <button type="button" class="btn btn-outline-info" onclick="previewImport()">
-                                    <i class="bi bi-eye me-1"></i>Preview
+                                    <svg class="bi bi-eye me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>Preview
                                 </button>
                             </div>
                         </form>
@@ -374,7 +374,7 @@ SALES_SD&#9;Sales Manager&#9;SD&#9;SALES_REP&#9;Sales Rep&#9;VA03"
             <div class="col-md-5">
                 <div class="card shadow-sm">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0"><i class="bi bi-file-earmark-text me-1"></i>Import Format</h6>
+                        <h6 class="mb-0"><svg class="bi bi-file-earmark-text me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-text"></use></svg>Import Format</h6>
                     </div>
                     <div class="card-body">
                         <h6 class="text-primary">Expected Format</h6>
@@ -426,18 +426,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+function setTreeChevron(icon, name) {
+    if (!icon) return;
+    icon.setAttribute('class', 'bi ' + name);
+    var use = icon.querySelector('use');
+    if (use) use.setAttribute('href', '/images/sprite.svg#' + name);
+}
+
 function toggleTreeNode(el) {
     var children = el.nextElementSibling;
     if (!children || !children.classList.contains('tree-children')) return;
-    var icon = el.querySelector('.toggle-icon i');
+    var icon = el.querySelector('.toggle-icon svg');
     if (children.classList.contains('collapsed')) {
         children.classList.remove('collapsed');
         children.style.maxHeight = children.scrollHeight + 'px';
-        if (icon) { icon.className = 'bi bi-chevron-down'; }
+        setTreeChevron(icon, 'bi-chevron-down');
     } else {
         children.classList.add('collapsed');
         children.style.maxHeight = '0';
-        if (icon) { icon.className = 'bi bi-chevron-right'; }
+        setTreeChevron(icon, 'bi-chevron-right');
     }
 }
 
@@ -454,12 +461,12 @@ function toggleAllNodes() {
             c.style.maxHeight = '0';
         }
     });
-    document.querySelectorAll('#hierarchyTree .toggle-icon i').forEach(function (i) {
-        i.className = allExpanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right';
+    document.querySelectorAll('#hierarchyTree .toggle-icon svg').forEach(function (icon) {
+        setTreeChevron(icon, allExpanded ? 'bi-chevron-down' : 'bi-chevron-right');
     });
     btn.innerHTML = allExpanded
-        ? '<i class="bi bi-arrows-collapse me-1"></i>Collapse All'
-        : '<i class="bi bi-arrows-expand me-1"></i>Expand All';
+        ? '<svg class="bi bi-arrows-collapse me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrows-collapse"></use></svg>Collapse All'
+        : '<svg class="bi bi-arrows-expand me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrows-expand"></use></svg>Expand All';
 }
 
 function filterTcodes() {

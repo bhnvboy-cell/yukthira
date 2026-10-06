@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.FI.FixedAsset.DisplayModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Fixed Asset Details"; }
@@ -7,12 +7,12 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-eye me-2"></i>Fixed Asset Details</h3>
+            <h3><svg class="bi bi-eye me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>Fixed Asset Details</h3>
             <span class="badge">@Model.Asset.AssetCode</span>
         </div>
         <div class="actions">
-            <a asp-page="/FI/FixedAsset/Edit" asp-route-id="@Model.Asset.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><i class="bi bi-pencil me-1"></i>Edit</a>
-            <a asp-page="/FI/FixedAsset/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/FI/FixedAsset/Edit" asp-route-id="@Model.Asset.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Edit</a>
+            <a asp-page="/FI/FixedAsset/List" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 

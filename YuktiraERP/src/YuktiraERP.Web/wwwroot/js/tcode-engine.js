@@ -31,9 +31,10 @@
     function $(sel, ctx) { return (ctx || document).querySelector(sel); }
     function $$(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
     function el(tag, attrs, text) {
-        var e = document.createElement(tag);
+        var svgTags = { svg: 1, use: 1, path: 1, g: 1, circle: 1, rect: 1 };
+        var e = svgTags[tag] ? document.createElementNS('http://www.w3.org/2000/svg', tag) : document.createElement(tag);
         if (attrs) Object.keys(attrs).forEach(function (k) {
-            if (k === 'className') e.className = attrs[k];
+            if (k === 'className') e.setAttribute('class', attrs[k]);
             else if (k === 'style' && typeof attrs[k] === 'object') Object.assign(e.style, attrs[k]);
             else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
             else e.setAttribute(k, attrs[k]);
@@ -49,7 +50,8 @@
                    type === 'error' ? 'bi-x-circle-fill text-danger' :
                    type === 'loading' ? 'bi-hourglass-split text-warning' :
                    'bi-check-circle-fill text-success';
-        s.innerHTML = '<i class="bi ' + icon + '"></i> ' + msg;
+        var iconId = (icon.match(/bi-[a-z0-9-]+/) || [''])[0];
+        s.innerHTML = '<svg class="bi ' + icon + '" aria-hidden="true"><use href="/images/sprite.svg#' + iconId + '"></use></svg> ' + msg;
     }
 
     /* ── API calls ── */
@@ -248,7 +250,7 @@
 
             if (status === 'COMPLETED') {
                 nodeEl.className += ' completed';
-                nodeEl.innerHTML = '<i class="bi bi-check-lg"></i>';
+                nodeEl.innerHTML = '<svg class="bi bi-check-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-lg"></use></svg>';
                 completedCount++;
             } else if (isCurrentTCode) {
                 nodeEl.className += ' current';
@@ -341,7 +343,7 @@
                 colspan: String(config.columns.filter(function (c) { return !c.fixed; }).length + 1),
                 className: 'text-center text-muted py-4'
             });
-            td.innerHTML = '<i class="bi bi-inbox fs-3 d-block mb-2"></i>No data to display';
+            td.innerHTML = '<svg class="bi bi-inbox fs-3 d-block mb-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg>No data to display';
             tr.appendChild(td);
             tbody.appendChild(tr);
             return;
@@ -462,7 +464,7 @@
                 var color = statusOpt ? statusOpt.color : 'secondary';
                 var badge = el('span', { className: 'tcode-badge tcode-badge-' + color });
                 var icon = statusOpt ? (color === 'success' ? 'bi-check-circle-fill' : color === 'danger' ? 'bi-x-circle-fill' : 'bi-exclamation-circle-fill') : 'bi-dash-circle';
-                badge.innerHTML = '<i class="bi ' + icon + '"></i> ' + (statusOpt ? statusOpt.label : iconVal);
+                badge.innerHTML = '<svg class="bi ' + icon + '" aria-hidden="true"><use href="/images/sprite.svg#' + icon + '"></use></svg> ' + (statusOpt ? statusOpt.label : iconVal);
                 td.appendChild(badge);
                 break;
 
@@ -477,24 +479,26 @@
 
             case 'validation_icon':
                 var isValid = validateRow(row);
-                var iconEl = el('i', {
-                    className: 'tcode-validation-icon ' + (isValid ? 'valid' : 'invalid'),
+                var validName = isValid ? 'bi-check-circle-fill' : 'bi-x-circle-fill';
+                var iconEl = el('svg', {
+                    className: 'tcode-validation-icon ' + (isValid ? 'valid' : 'invalid') + ' ' + validName,
+                    'aria-hidden': 'true',
                     'data-row-index': String(row.__idx)
                 });
-                iconEl.className = 'tcode-validation-icon ' + (isValid ? 'valid bi-check-circle-fill' : 'invalid bi-x-circle-fill');
+                iconEl.appendChild(el('use', { href: '/images/sprite.svg#' + validName }));
                 td.appendChild(iconEl);
                 break;
 
             case 'mandatory_icon':
                 var required = col.required || (col.key === 'material');
                 if (required) {
-                    td.innerHTML = '<i class="bi bi-asterisk text-danger" style="font-size:0.6rem"></i>';
+                    td.innerHTML = '<svg class="bi bi-asterisk text-danger" style="font-size:0.6rem" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-asterisk"></use></svg>';
                 }
                 break;
 
             case 'changed_icon':
                 if (row.__dirty && row.__dirty[col.key]) {
-                    td.innerHTML = '<i class="bi bi-pencil-fill text-primary" style="font-size:0.65rem"></i>';
+                    td.innerHTML = '<svg class="bi bi-pencil-fill text-primary" style="font-size:0.65rem" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil-fill"></use></svg>';
                 }
                 break;
 
@@ -536,7 +540,10 @@
             var valid = v !== undefined && v !== null && v !== '';
             var valIcon = engine.querySelector('.tcode-validation-icon[data-row-index="' + row.__idx + '"]');
             if (valIcon) {
-                valIcon.className = 'tcode-validation-icon ' + (valid ? 'valid bi-check-circle-fill' : 'invalid bi-x-circle-fill');
+                var vName = valid ? 'bi-check-circle-fill' : 'bi-x-circle-fill';
+                valIcon.setAttribute('class', 'tcode-validation-icon ' + (valid ? 'valid' : 'invalid') + ' ' + vName);
+                var vUse = valIcon.querySelector('use');
+                if (vUse) vUse.setAttribute('href', '/images/sprite.svg#' + vName);
             }
         }
     }

@@ -114,8 +114,8 @@ public class KpiService : IKpiService
         {
             new() { ModuleCode = "MM", Label = "Stock Alerts", Value = alerts.ToString(), Color = alerts > 5 ? "red" : alerts > 2 ? "yellow" : "green", Trend = alerts > 5 ? "up" : "flat" },
             new() { ModuleCode = "APP", Label = "Pending", Value = pendingApprovals.ToString(), Color = pendingApprovals > 10 ? "red" : pendingApprovals > 3 ? "yellow" : "green", Trend = "flat" },
-            new() { ModuleCode = "PP", Label = "Efficiency", Value = $"%{efficiency:F0}", Color = efficiency >= 90 ? "green" : efficiency >= 70 ? "yellow" : "red", Trend = efficiency >= 90 ? "up" : "down" },
-            new() { ModuleCode = "QM", Label = "QC Pass", Value = $"%{qcPass:F0}", Color = qcPass >= 95 ? "green" : qcPass >= 80 ? "yellow" : "red", Trend = qcPass >= 95 ? "up" : "down" },
+            new() { ModuleCode = "PP", Label = "Efficiency", Value = $"{efficiency:F0}%", Color = efficiency >= 90 ? "green" : efficiency >= 70 ? "yellow" : "red", Trend = efficiency >= 90 ? "up" : "down" },
+            new() { ModuleCode = "QM", Label = "QC Pass", Value = $"{qcPass:F0}%", Color = qcPass >= 95 ? "green" : qcPass >= 80 ? "yellow" : "red", Trend = qcPass >= 95 ? "up" : "down" },
             new() { ModuleCode = "LIMS", Label = "TAT", Value = $"{tat:F1}h", Color = tat <= 24 ? "green" : tat <= 48 ? "yellow" : "red", Trend = tat <= 24 ? "down" : "up" },
             new() { ModuleCode = "PO", Label = "Open", Value = pendingPos.ToString(), Color = pendingPos > 10 ? "yellow" : "green", Trend = "flat" },
         };
@@ -191,7 +191,7 @@ public class KpiService : IKpiService
              : "red";
     }
 
-    // ── Private helpers ──
+    // â”€â”€ Private helpers â”€â”€
 
     private async Task<decimal> GetPreviousSnapshotAsync(Guid tenantId, string kpiCode)
     {
@@ -209,7 +209,7 @@ public class KpiService : IKpiService
         return code switch
         {
             "InventoryHealth" => (
-                $"%{value:F1}",
+                $"{value:F1}%",
                 "%",
                 "bi-boxes",
                 "Inventory",
@@ -227,7 +227,7 @@ public class KpiService : IKpiService
                 value < 5000 ? "Sales below daily target" : null
             ),
             "ProductionEfficiency" => (
-                $"%{value:F1}",
+                $"{value:F1}%",
                 "%",
                 "bi-gear",
                 "Production",
@@ -236,7 +236,7 @@ public class KpiService : IKpiService
                 value < 75 ? "Efficiency below threshold" : null
             ),
             "QcPassRate" => (
-                $"%{value:F1}",
+                $"{value:F1}%",
                 "%",
                 "bi-clipboard-check",
                 "Quality",
@@ -247,7 +247,7 @@ public class KpiService : IKpiService
             "LimsSampleTat" => (
                 $"{value:F1}h",
                 "Hours",
-                "bi-flask",
+                "bi-clipboard2-pulse",
                 "LIMS",
                 value <= thresholds.GetValueOrDefault("LimsSampleTat_Green", 24) ? "green"
                     : value <= thresholds.GetValueOrDefault("LimsSampleTat_Yellow", 48) ? "yellow" : "red",
@@ -257,7 +257,7 @@ public class KpiService : IKpiService
         };
     }
 
-    // ── KPI calculation methods ──
+    // â”€â”€ KPI calculation methods â”€â”€
 
     private async Task<decimal> CalculateInventoryHealthAsync(Guid tenantId)
     {

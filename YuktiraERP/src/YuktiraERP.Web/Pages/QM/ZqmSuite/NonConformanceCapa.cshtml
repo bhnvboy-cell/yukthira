@@ -6,22 +6,22 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-exclamation-triangle me-2"></i>Non-Conformance & CAPA</h3>
+            <h3><svg class="bi bi-exclamation-triangle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>Non-Conformance & CAPA</h3>
             <span class="badge">ZQM07</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="createNC()"><i class="bi bi-plus-circle me-1"></i>Create NC</button>
-            <button type="button" class="zqm-btn" onclick="createCapa()"><i class="bi bi-plus-circle me-1"></i>Create CAPA</button>
-            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="createNC()"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create NC</button>
+            <button type="button" class="zqm-btn" onclick="createCapa()"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>Create CAPA</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
         <div class="zqm-tabs">
-            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-nc')"><i class="bi bi-exclamation-triangle"></i> Create NC</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-capa')"><i class="bi bi-shield-check"></i> Create CAPA</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-nc-list')"><i class="bi bi-list-ul"></i> NC List</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-capa-list')"><i class="bi bi-list-ul"></i> CAPA List</button>
+            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-nc')"><svg class="bi bi-exclamation-triangle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg> Create NC</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-capa')"><svg class="bi bi-shield-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg> Create CAPA</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-nc-list')"><svg class="bi bi-list-ul" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg> NC List</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-capa-list')"><svg class="bi bi-list-ul" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg> CAPA List</button>
         </div>
 
         <div class="zqm-tab-panel active" id="tab-nc">
@@ -81,7 +81,7 @@
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Filter by Status</label><select id="nc-filter"><option value="">All</option><option>OPEN</option><option>IN_PROGRESS</option><option>CONTAINMENT</option><option>CLOSED</option></select></div>
                 </div>
-                <button class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0;margin-top:8px" onclick="loadNCList()"><i class="bi bi-search me-1"></i>Load NCs</button>
+                <button class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0;margin-top:8px" onclick="loadNCList()"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Load NCs</button>
             </div>
         </div>
 
@@ -90,7 +90,7 @@
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Filter by Status</label><select id="capa-filter"><option value="">All</option><option>OPEN</option><option>IN_PROGRESS</option><option>COMPLETED</option><option>VERIFIED</option></select></div>
                 </div>
-                <button class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0;margin-top:8px" onclick="loadCapaList()"><i class="bi bi-search me-1"></i>Load CAPAs</button>
+                <button class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0;margin-top:8px" onclick="loadCapaList()"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Load CAPAs</button>
             </div>
         </div>
     </div>
@@ -98,7 +98,7 @@
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-results" id="listSection" style="display:none">
-        <div class="zqm-results-header"><h4 id="listTitle"><i class="bi bi-table me-1"></i>Results</h4><span class="count" id="resultCount"></span></div>
+        <div class="zqm-results-header"><h4 id="listTitle"><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Results</h4><span class="count" id="resultCount"></span></div>
         <div class="zqm-table-wrap"><table class="zqm-table"><thead id="listHead"></thead><tbody id="listBody"></tbody></table></div>
     </div>
 </div>
@@ -114,7 +114,7 @@ function switchTab(btn, id) {
 }
 async function api(url, opts) { try { var r = await fetch(url, Object.assign({headers:{'Content-Type':'application/json'}}, opts||{})); return {ok:r.ok, data:r.ok ? await r.json().catch(()=>({})) : await r.text()}; } catch(e) { return {ok:false, data:e.message}; } }
 function renderList(title, head, rows) {
-    document.getElementById('listTitle').innerHTML = '<i class="bi bi-table me-1"></i>' + title;
+    document.getElementById('listTitle').innerHTML = '<svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>' + title;
     document.getElementById('listHead').innerHTML = '<tr>' + head.map(function(h){return '<th>'+h+'</th>'}).join('') + '</tr>';
     document.getElementById('listBody').innerHTML = rows.map(function(r){return '<tr>' + r.map(function(c){return '<td>'+c+'</td>'}).join('') + '</tr>'}).join('');
     document.getElementById('resultCount').textContent = rows.length + ' records';
@@ -135,7 +135,7 @@ async function loadNCList() {
     var url = '/api/v1/zqm/non-conformances' + (status ? '?status=' + status : '');
     var r = await api(url);
     if (r.ok && Array.isArray(r.data)) {
-        renderList('Non-Conformances', ['NC #','Type','Severity','Material','Plant','Lot','Status','Actions'], r.data.map(function(n){return [n.ncNumber||n.id||'',n.ncType||'',n.severity||'',n.materialCode||'',n.plant||'',n.lotNumber||'','<span class="zqm-badge '+(n.status==='OPEN'?'open':n.status==='CLOSED'?'completed':'in-progress')+'">'+(n.status||'')+'</span>','<button class="zqm-act" onclick="containment(\''+n.id+'\')"><i class="bi bi-shield-check"></i></button>']}));
+        renderList('Non-Conformances', ['NC #','Type','Severity','Material','Plant','Lot','Status','Actions'], r.data.map(function(n){return [n.ncNumber||n.id||'',n.ncType||'',n.severity||'',n.materialCode||'',n.plant||'',n.lotNumber||'','<span class="zqm-badge '+(n.status==='OPEN'?'open':n.status==='CLOSED'?'completed':'in-progress')+'">'+(n.status||'')+'</span>','<button class="zqm-act" onclick="containment(\''+n.id+'\')"><svg class="bi bi-shield-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg></button>']}));
     } else { show('No NCs found', 'info'); }
 }
 async function loadCapaList() {
@@ -143,7 +143,7 @@ async function loadCapaList() {
     var url = '/api/v1/zqm/capas' + (status ? '?status=' + status : '');
     var r = await api(url);
     if (r.ok && Array.isArray(r.data)) {
-        renderList('CAPAs', ['CAPA #','Type','Title','Related NC','Status','Actions'], r.data.map(function(c){return [c.capaNumber||c.id||'',c.capaType||'',c.title||'',c.relatedNcNumber||'','<span class="zqm-badge '+(c.status==='COMPLETED'?'completed':c.status==='VERIFIED'?'passed':'open')+'">'+(c.status||'')+'</span>','<button class="zqm-act" onclick="completeCapa(\''+c.id+'\')"><i class="bi bi-check-circle"></i></button>']}));
+        renderList('CAPAs', ['CAPA #','Type','Title','Related NC','Status','Actions'], r.data.map(function(c){return [c.capaNumber||c.id||'',c.capaType||'',c.title||'',c.relatedNcNumber||'','<span class="zqm-badge '+(c.status==='COMPLETED'?'completed':c.status==='VERIFIED'?'passed':'open')+'">'+(c.status||'')+'</span>','<button class="zqm-act" onclick="completeCapa(\''+c.id+'\')"><svg class="bi bi-check-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg></button>']}));
     } else { show('No CAPAs found', 'info'); }
 }
 async function containment(ncId) {

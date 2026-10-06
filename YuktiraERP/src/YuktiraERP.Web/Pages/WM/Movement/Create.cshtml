@@ -4,7 +4,7 @@
 
 <div class="ent-form-wrapper">
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-box-arrow-in-right"></i></div>
+        <div class="banner-icon"><svg class="bi bi-box-arrow-in-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-in-right"></use></svg></div>
         <div class="banner-info">
             <h5>Post Goods Movement</h5>
             <span>WM05 — Stock Movement Posting</span>
@@ -18,17 +18,17 @@
 
         <div class="ent-form-tabs">
             <button type="button" class="ent-form-tab active" data-tab="movement-type">
-                <i class="bi bi-diagram-3 tab-icon"></i> Movement Type
+                <svg class="bi bi-diagram-3 tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg> Movement Type
             </button>
             <button type="button" class="ent-form-tab" data-tab="movement-details">
-                <i class="bi bi-box-seam tab-icon"></i> Material & Quantity
+                <svg class="bi bi-box-seam tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg> Material & Quantity
             </button>
         </div>
 
         <!-- ═══ TAB: Movement Type ═══ -->
         <div class="ent-form-panel active" data-panel="movement-type">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Movement Configuration (SAP MVT Types)</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg><h6>Movement Configuration (SAP MVT Types)</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Movement Number</label>
@@ -80,7 +80,7 @@
         <!-- ═══ TAB: Material & Quantity ═══ -->
         <div class="ent-form-panel" data-panel="movement-details">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-box-seam"></i><h6>Material Details</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg><h6>Material Details</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Material Code <span class="required">*</span></label>
@@ -155,11 +155,11 @@
 
         <div class="ent-form-footer">
             <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>Stock movements are SOX-audit logged
+                <svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>Stock movements are SOX-audit logged
             </div>
             <div class="footer-actions">
-                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Post Movement</button>
+                <a asp-page="/WM/Index" class="btn btn-outline-secondary"><svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Post Movement</button>
             </div>
         </div>
     </form>

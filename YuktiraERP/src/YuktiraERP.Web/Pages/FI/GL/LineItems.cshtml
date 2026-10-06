@@ -7,17 +7,17 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-list-columns me-2"></i>G/L Line Items</h3>
+            <h3><svg class="bi bi-list-columns me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-columns"></use></svg>G/L Line Items</h3>
             <span class="badge">FAGLL03</span>
         </div>
         <div class="actions">
-            <a asp-page="/FI/GL/Display" class="zqm-btn"><i class="bi bi-book me-1"></i>GL Account Display</a>
-            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/FI/GL/Display" class="zqm-btn"><svg class="bi bi-book me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-book"></use></svg>GL Account Display</a>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Search</div>
         <div class="zqm-row cols-4">
             <div class="zqm-field"><label>Document #</label><input id="searchDoc" placeholder="Filter by doc #" oninput="filterTable()" /></div>
             <div class="zqm-field"><label>Account</label><input id="searchAccount" placeholder="Filter by account..." oninput="filterTable()" /></div>
@@ -46,7 +46,7 @@
                             <td><span class="zqm-badge @(e.IsPosted?"passed":"info")">@(e.IsPosted?"Posted":"Draft")</span></td>
                         </tr>
                     }
-                    @if (!Model.Entries.Any()) { <tr><td colspan="9" class="zqm-empty"><i class="bi bi-inbox"></i><div>No GL line items found</div></td></tr> }
+                    @if (!Model.Entries.Any()) { <tr><td colspan="9" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No GL line items found</div></td></tr> }
                 </tbody>
             </table>
         </div>

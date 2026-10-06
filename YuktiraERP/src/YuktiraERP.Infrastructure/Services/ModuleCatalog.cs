@@ -15,7 +15,7 @@ public class ModuleCatalog : IModuleCatalog
 
     public IReadOnlyList<ModuleDefinition> Modules { get; } = new List<ModuleDefinition>
     {
-        // ── Operations ──
+        // â”€â”€ Operations â”€â”€
         new() { Code = "MM", Name = "Materials Management",  Category = "Operations", BaseRoute = "/MM", Icon = "bi-boxes",               Color = "#2563eb" },
         new() { Code = "SD", Name = "Sales & Distribution",  Category = "Operations", BaseRoute = "/SD", Icon = "bi-cart3",              Color = "#059669" },
         new() { Code = "WM", Name = "Warehouse Management",  Category = "Operations", BaseRoute = "/WM", Icon = "bi-house-door",         Color = "#d97706" },
@@ -27,30 +27,30 @@ public class ModuleCatalog : IModuleCatalog
         new() { Code = "WV", Name = "Wave Pick",             Category = "Operations", BaseRoute = "/Transactions/Engine/WAVEPK", Icon = "bi-water", Color = "#2563eb" },
         new() { Code = "VS", Name = "Velocity Slotting",     Category = "Operations", BaseRoute = "/Transactions/Engine/VSLOTT", Icon = "bi-speedometer2", Color = "#d97706" },
 
-        // ── Finance ──
+        // â”€â”€ Finance â”€â”€
         new() { Code = "FI", Name = "Finance",               Category = "Finance",    BaseRoute = "/FI", Icon = "bi-calculator",         Color = "#059669" },
         new() { Code = "CO", Name = "Controlling",           Category = "Finance",    BaseRoute = "/CO", Icon = "bi-pie-chart",          Color = "#ca8a04" },
         new() { Code = "UJ", Name = "Universal Journal",     Category = "Finance",    BaseRoute = "/Transactions/Engine/UNIJRN", Icon = "bi-journal-richtext", Color = "#059669" },
         new() { Code = "TX", Name = "Tax Management",        Category = "Finance",    BaseRoute = "/Transactions/Engine/TAXRET", Icon = "bi-receipt", Color = "#ca8a04" },
         new() { Code = "CN", Name = "Consolidation",         Category = "Finance",    BaseRoute = "/Transactions/Engine/CONSOL", Icon = "bi-diagram-3", Color = "#4f46e5" },
 
-        // ── People ──
+        // â”€â”€ People â”€â”€
         new() { Code = "HR", Name = "Human Resources",       Category = "People",     BaseRoute = "/HR", Icon = "bi-people",             Color = "#db2777" },
         new() { Code = "CRM", Name = "Customer Relationship", Category = "People",    BaseRoute = "/CRM", Icon = "bi-person-lines-fill", Color = "#ea580c" },
 
-        // ── Projects & Labs ──
+        // â”€â”€ Projects & Labs â”€â”€
         new() { Code = "PS", Name = "Project System",        Category = "Projects & Labs", BaseRoute = "/PS", Icon = "bi-diagram-3", Color = "#4f46e5" },
-        new() { Code = "LIMS", Name = "Lab Information Mgmt", Category = "Projects & Labs", BaseRoute = "/LIMS", Icon = "bi-flask", Color = "#0d9488" },
+        new() { Code = "LIMS", Name = "Lab Information Mgmt", Category = "Projects & Labs", BaseRoute = "/LIMS", Icon = "bi-clipboard2-pulse", Color = "#0d9488" },
 
-        // ── Analytics ──
+        // â”€â”€ Analytics â”€â”€
         new() { Code = "BI", Name = "BI Reports",            Category = "Analytics",  BaseRoute = "/BI", Icon = "bi-graph-up",           Color = "#2563eb" },
         new() { Code = "AI", Name = "AI & Vision",           Category = "Analytics",  BaseRoute = "/AI", Icon = "bi-cpu", Color = "#9333ea" },
         new() { Code = "PD", Name = "PP/DS Scheduling",      Category = "Analytics",  BaseRoute = "/Transactions/Engine/PPDS", Icon = "bi-calendar-range", Color = "#7c3aed" },
 
-        // ── Compliance ──
+        // â”€â”€ Compliance â”€â”€
         new() { Code = "SX", Name = "SOX Compliance",        Category = "Compliance", BaseRoute = "/Transactions/Engine/SOXADM", Icon = "bi-shield-check", Color = "#dc2626" },
 
-        // ── System ──
+        // â”€â”€ System â”€â”€
         new() { Code = "WF", Name = "Workflows",             Category = "System",     BaseRoute = "/Workflow/Designer", Icon = "bi-arrow-repeat", Color = "#0891b2", IsSystem = true },
         new() { Code = "APP", Name = "Approvals",            Category = "System",     BaseRoute = "/Approval", Icon = "bi-check2-square", Color = "#ca8a04", IsSystem = true },
         new() { Code = "NOT", Name = "Notifications",        Category = "System",     BaseRoute = "/Notifications", Icon = "bi-bell", Color = "#db2777", IsSystem = true },
@@ -97,7 +97,7 @@ public class ModuleCatalog : IModuleCatalog
         "Operations"      => "bi-boxes",
         "Finance"         => "bi-calculator",
         "People"          => "bi-people",
-        "Projects & Labs" => "bi-flask",
+        "Projects & Labs" => "bi-clipboard2-pulse",
         "Analytics"       => "bi-graph-up",
         "Compliance"      => "bi-shield-check",
         "System"          => "bi-gear-wide",

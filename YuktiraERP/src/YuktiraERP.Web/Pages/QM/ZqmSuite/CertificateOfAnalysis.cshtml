@@ -6,20 +6,20 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-file-earmark-medical me-2"></i>Certificate of Analysis</h3>
+            <h3><svg class="bi bi-file-earmark-medical me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-medical"></use></svg>Certificate of Analysis</h3>
             <span class="badge">ZQM09</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="generateCoa()"><i class="bi bi-file-earmark-check me-1"></i>Generate CoA</button>
-            <button type="button" class="zqm-btn" onclick="loadHistory()"><i class="bi bi-clock-history me-1"></i>History</button>
-            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="generateCoa()"><svg class="bi bi-file-earmark-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-check"></use></svg>Generate CoA</button>
+            <button type="button" class="zqm-btn" onclick="loadHistory()"><svg class="bi bi-clock-history me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>History</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
         <div class="zqm-tabs">
-            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-gen')"><i class="bi bi-file-earmark-plus"></i> Generate CoA</button>
-            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-history')"><i class="bi bi-clock-history"></i> CoA History</button>
+            <button class="zqm-tab-btn active" onclick="switchTab(this,'tab-gen')"><svg class="bi bi-file-earmark-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-plus"></use></svg> Generate CoA</button>
+            <button class="zqm-tab-btn" onclick="switchTab(this,'tab-history')"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg> CoA History</button>
         </div>
 
         <div class="zqm-tab-panel active" id="tab-gen">
@@ -45,7 +45,7 @@
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-results" id="genResult" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-file-earmark-check me-1"></i>Generated Certificate</h4></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-file-earmark-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-check"></use></svg>Generated Certificate</h4></div>
         <div class="zqm-table-wrap">
             <table class="zqm-table"><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
                 <tr><td><strong>Certificate #</strong></td><td id="resCoaNumber">-</td></tr>
@@ -58,7 +58,7 @@
     </div>
 
     <div class="zqm-results" id="histSection" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-clock-history me-1"></i>CoA History</h4><span class="count" id="histCount"></span></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-clock-history me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>CoA History</h4><span class="count" id="histCount"></span></div>
         <div class="zqm-table-wrap"><table class="zqm-table"><thead><tr><th>Certificate #</th><th>Lot</th><th>Customer</th><th>Total Chars</th><th>Passed</th><th>Failed</th><th>Result</th><th>Generated</th></tr></thead><tbody id="histBody"></tbody></table></div>
     </div>
 </div>

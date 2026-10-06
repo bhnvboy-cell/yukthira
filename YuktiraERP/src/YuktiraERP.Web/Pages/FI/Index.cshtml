@@ -21,40 +21,40 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-calculator me-2"></i>Finance</h3>
+            <h3><svg class="bi bi-calculator me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Finance</h3>
             <span class="badge">FI Module</span>
         </div>
         <div class="actions">
-            <a asp-page="/FI/Ledger/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New Journal Entry</a>
-            <a asp-page="/FI/AR/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New AR Invoice</a>
-            <a asp-page="/FI/AP/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New AP Invoice</a>
-            <a asp-page="/FI/FixedAsset/Create" class="zqm-btn"><i class="bi bi-plus-circle me-1"></i>New Asset</a>
-            <a asp-page="/" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Home</a>
+            <a asp-page="/FI/Ledger/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New Journal Entry</a>
+            <a asp-page="/FI/AR/Create" class="zqm-btn"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New AR Invoice</a>
+            <a asp-page="/FI/AP/Create" class="zqm-btn"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New AP Invoice</a>
+            <a asp-page="/FI/FixedAsset/Create" class="zqm-btn"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New Asset</a>
+            <a asp-page="/" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Home</a>
         </div>
     </div>
 
     <div style="padding:16px 20px;background:#fff;border:1px solid #e0e0e0;border-bottom:none">
         <div class="fi-kpi-grid">
-            <div class="fi-kpi"><div class="kpi-icon kpi-blue"><i class="bi bi-bank"></i></div><div class="kpi-info"><div class="kpi-value">@entries.Count</div><div class="kpi-label">GL Entries</div><div class="kpi-sub">Journal records</div></div></div>
-            <div class="fi-kpi"><div class="kpi-icon kpi-teal"><i class="bi bi-arrow-up-circle"></i></div><div class="kpi-info"><div class="kpi-value">@(entries.Where(e=>e.Debit.HasValue).Sum(e=>e.Debit!.Value).ToString("C0"))</div><div class="kpi-label">Total Debit</div><div class="kpi-sub">Debit balance</div></div></div>
-            <div class="fi-kpi"><div class="kpi-icon kpi-amber"><i class="bi bi-arrow-down-circle"></i></div><div class="kpi-info"><div class="kpi-value">@(entries.Where(e=>e.Credit.HasValue).Sum(e=>e.Credit!.Value).ToString("C0"))</div><div class="kpi-label">Total Credit</div><div class="kpi-sub">Credit balance</div></div></div>
-            <div class="fi-kpi"><div class="kpi-icon kpi-green"><i class="bi bi-pc-display"></i></div><div class="kpi-info"><div class="kpi-value">@assets.Count</div><div class="kpi-label">Fixed Assets</div><div class="kpi-sub">Asset records</div></div></div>
-            <div class="fi-kpi"><div class="kpi-icon kpi-purple"><i class="bi bi-cash-stack"></i></div><div class="kpi-info"><div class="kpi-value">@(assets.Where(a=>a.Status=="Active").Sum(a=>a.Cost).ToString("C0"))</div><div class="kpi-label">Asset Value</div><div class="kpi-sub">Acquisition cost</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-blue"><svg class="bi bi-bank" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bank"></use></svg></div><div class="kpi-info"><div class="kpi-value">@entries.Count</div><div class="kpi-label">GL Entries</div><div class="kpi-sub">Journal records</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-teal"><svg class="bi bi-arrow-up-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-up-circle"></use></svg></div><div class="kpi-info"><div class="kpi-value">@(entries.Where(e=>e.Debit.HasValue).Sum(e=>e.Debit!.Value).ToString("C0"))</div><div class="kpi-label">Total Debit</div><div class="kpi-sub">Debit balance</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-amber"><svg class="bi bi-arrow-down-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-circle"></use></svg></div><div class="kpi-info"><div class="kpi-value">@(entries.Where(e=>e.Credit.HasValue).Sum(e=>e.Credit!.Value).ToString("C0"))</div><div class="kpi-label">Total Credit</div><div class="kpi-sub">Credit balance</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-green"><svg class="bi bi-pc-display" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pc-display"></use></svg></div><div class="kpi-info"><div class="kpi-value">@assets.Count</div><div class="kpi-label">Fixed Assets</div><div class="kpi-sub">Asset records</div></div></div>
+            <div class="fi-kpi"><div class="kpi-icon kpi-purple"><svg class="bi bi-cash-stack" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-stack"></use></svg></div><div class="kpi-info"><div class="kpi-value">@(assets.Where(a=>a.Status=="Active").Sum(a=>a.Cost).ToString("C0"))</div><div class="kpi-label">Asset Value</div><div class="kpi-sub">Acquisition cost</div></div></div>
         </div>
     </div>
 
     <div style="background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px;overflow:hidden">
         <div class="zqm-tabs" id="fiTabs">
-            <button class="zqm-tab-btn active" data-tab="tab-gl"><i class="bi bi-journal-text me-1"></i>General Ledger <span class="zqm-badge info" style="margin-left:4px">@entries.Count</span></button>
-            <button class="zqm-tab-btn" data-tab="tab-ar"><i class="bi bi-arrow-up-right me-1"></i>Accounts Receivable</button>
-            <button class="zqm-tab-btn" data-tab="tab-ap"><i class="bi bi-arrow-down-left me-1"></i>Accounts Payable</button>
-            <button class="zqm-tab-btn" data-tab="tab-assets"><i class="bi bi-pc-display me-1"></i>Fixed Assets <span class="zqm-badge info" style="margin-left:4px">@assets.Count</span></button>
-            <button class="zqm-tab-btn" data-tab="tab-reports"><i class="bi bi-file-earmark-bar-graph me-1"></i>Financial Reports</button>
+            <button class="zqm-tab-btn active" data-tab="tab-gl"><svg class="bi bi-journal-text me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-text"></use></svg>General Ledger <span class="zqm-badge info" style="margin-left:4px">@entries.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-ar"><svg class="bi bi-arrow-up-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-up-right"></use></svg>Accounts Receivable</button>
+            <button class="zqm-tab-btn" data-tab="tab-ap"><svg class="bi bi-arrow-down-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-down-left"></use></svg>Accounts Payable</button>
+            <button class="zqm-tab-btn" data-tab="tab-assets"><svg class="bi bi-pc-display me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pc-display"></use></svg>Fixed Assets <span class="zqm-badge info" style="margin-left:4px">@assets.Count</span></button>
+            <button class="zqm-tab-btn" data-tab="tab-reports"><svg class="bi bi-file-earmark-bar-graph me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-bar-graph"></use></svg>Financial Reports</button>
         </div>
 
         <!-- GL Tab -->
         <div class="zqm-tab-panel active" id="tab-gl">
-            <div class="zqm-results-header"><h4>General Ledger Entries</h4><div><a asp-page="/FI/Ledger/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New Entry</a> <a asp-page="/FI/Ledger/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a> <a asp-page="/FI/GL/LineItems" class="zqm-btn"><i class="bi bi-list-columns me-1"></i>Line Items</a></div></div>
+            <div class="zqm-results-header"><h4>General Ledger Entries</h4><div><a asp-page="/FI/Ledger/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>New Entry</a> <a asp-page="/FI/Ledger/List" class="zqm-btn"><svg class="bi bi-list me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list"></use></svg>View All</a> <a asp-page="/FI/GL/LineItems" class="zqm-btn"><svg class="bi bi-list-columns me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-columns"></use></svg>Line Items</a></div></div>
             <div class="zqm-table-wrap">
                 <table class="zqm-table">
                     <thead><tr><th>Date</th><th>Document #</th><th>Account</th><th>Debit</th><th>Credit</th><th>Reference</th><th>Actions</th></tr></thead>
@@ -68,10 +68,10 @@
                                 <td>@(e.Debit.HasValue ? e.Debit.Value.ToString("C2") : "--")</td>
                                 <td>@(e.Credit.HasValue ? e.Credit.Value.ToString("C2") : "--")</td>
                                 <td>@e.Reference</td>
-                                <td><a asp-page="/FI/Ledger/Display" asp-route-id="@e.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a></td>
+                                <td><a asp-page="/FI/Ledger/Display" asp-route-id="@e.Id" class="zqm-act"><svg class="bi bi-eye me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>View</a></td>
                             </tr>
                         }
-                        @if (!entries.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No journal entries found</div></td></tr> }
+                        @if (!entries.Any()) { <tr><td colspan="7" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No journal entries found</div></td></tr> }
                     </tbody>
                 </table>
             </div>
@@ -79,23 +79,23 @@
 
         <!-- AR Tab -->
         <div class="zqm-tab-panel" id="tab-ar">
-            <div class="zqm-results-header"><h4>Accounts Receivable</h4><div><a asp-page="/FI/AR/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New AR Entry</a> <a asp-page="/FI/AR/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a> <a asp-page="/FI/AR/InvoiceCreate" class="zqm-btn"><i class="bi bi-receipt me-1"></i>Quick Invoice</a> <a asp-page="/FI/AR/Payment" class="zqm-btn"><i class="bi bi-credit-card me-1"></i>Record Payment</a></div></div>
+            <div class="zqm-results-header"><h4>Accounts Receivable</h4><div><a asp-page="/FI/AR/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>New AR Entry</a> <a asp-page="/FI/AR/List" class="zqm-btn"><svg class="bi bi-list me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list"></use></svg>View All</a> <a asp-page="/FI/AR/InvoiceCreate" class="zqm-btn"><svg class="bi bi-receipt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg>Quick Invoice</a> <a asp-page="/FI/AR/Payment" class="zqm-btn"><svg class="bi bi-credit-card me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg>Record Payment</a></div></div>
             <div style="padding:20px;color:#666;font-size:0.88rem">
-                <i class="bi bi-info-circle me-1"></i>Customer invoices, incoming payments, credit management, and aging reports. Use the buttons above to create or manage AR documents.
+                <svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Customer invoices, incoming payments, credit management, and aging reports. Use the buttons above to create or manage AR documents.
             </div>
         </div>
 
         <!-- AP Tab -->
         <div class="zqm-tab-panel" id="tab-ap">
-            <div class="zqm-results-header"><h4>Accounts Payable</h4><div><a asp-page="/FI/AP/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New AP Entry</a> <a asp-page="/FI/AP/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a> <a asp-page="/FI/AP/InvoiceCreate" class="zqm-btn"><i class="bi bi-receipt me-1"></i>Quick Invoice</a> <a asp-page="/FI/AP/Payment" class="zqm-btn"><i class="bi bi-credit-card me-1"></i>Record Payment</a></div></div>
+            <div class="zqm-results-header"><h4>Accounts Payable</h4><div><a asp-page="/FI/AP/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>New AP Entry</a> <a asp-page="/FI/AP/List" class="zqm-btn"><svg class="bi bi-list me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list"></use></svg>View All</a> <a asp-page="/FI/AP/InvoiceCreate" class="zqm-btn"><svg class="bi bi-receipt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg>Quick Invoice</a> <a asp-page="/FI/AP/Payment" class="zqm-btn"><svg class="bi bi-credit-card me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg>Record Payment</a></div></div>
             <div style="padding:20px;color:#666;font-size:0.88rem">
-                <i class="bi bi-info-circle me-1"></i>Vendor invoice processing, payment runs, aging analysis, and dunning. Use the buttons above to create or manage AP documents.
+                <svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Vendor invoice processing, payment runs, aging analysis, and dunning. Use the buttons above to create or manage AP documents.
             </div>
         </div>
 
         <!-- Fixed Assets Tab -->
         <div class="zqm-tab-panel" id="tab-assets">
-            <div class="zqm-results-header"><h4>Fixed Assets</h4><div><a asp-page="/FI/FixedAsset/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-plus me-1"></i>New Asset</a> <a asp-page="/FI/FixedAsset/List" class="zqm-btn"><i class="bi bi-list me-1"></i>View All</a></div></div>
+            <div class="zqm-results-header"><h4>Fixed Assets</h4><div><a asp-page="/FI/FixedAsset/Create" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg>New Asset</a> <a asp-page="/FI/FixedAsset/List" class="zqm-btn"><svg class="bi bi-list me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list"></use></svg>View All</a></div></div>
             <div class="zqm-table-wrap">
                 <table class="zqm-table">
                     <thead><tr><th>Asset Code</th><th>Name</th><th>Category</th><th>Purchase Date</th><th>Cost</th><th>Life (Yrs)</th><th>Status</th><th>Actions</th></tr></thead>
@@ -110,10 +110,10 @@
                                 <td>@a.Cost.ToString("C0")</td>
                                 <td>@a.UsefulLifeYears</td>
                                 <td><span class="zqm-badge @(a.Status=="Active"?"passed":"warning")">@a.Status</span></td>
-                                <td><a asp-page="/FI/FixedAsset/Display" asp-route-id="@a.Id" class="zqm-act"><i class="bi bi-eye me-1"></i>View</a> <a asp-page="/FI/FixedAsset/Edit" asp-route-id="@a.Id" class="zqm-act"><i class="bi bi-pencil me-1"></i>Edit</a></td>
+                                <td><a asp-page="/FI/FixedAsset/Display" asp-route-id="@a.Id" class="zqm-act"><svg class="bi bi-eye me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>View</a> <a asp-page="/FI/FixedAsset/Edit" asp-route-id="@a.Id" class="zqm-act"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Edit</a></td>
                             </tr>
                         }
-                        @if (!assets.Any()) { <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No fixed assets found</div></td></tr> }
+                        @if (!assets.Any()) { <tr><td colspan="8" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No fixed assets found</div></td></tr> }
                     </tbody>
                 </table>
             </div>
@@ -124,19 +124,19 @@
             <div class="zqm-results-header"><h4>Financial Reports</h4></div>
             <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
                 <a asp-page="/FI/Reports/BalanceSheet" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
-                    <i class="bi bi-file-earmark-bar-graph" style="font-size:1.5rem;color:#1a237e"></i>
+                    <svg class="bi bi-file-earmark-bar-graph" style="font-size:1.5rem;color:#1a237e" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-bar-graph"></use></svg>
                     <div><div style="font-weight:600;font-size:0.88rem">Balance Sheet</div><div style="font-size:0.75rem;color:#888">F.01 — Period snapshot</div></div>
                 </a>
                 <a asp-page="/FI/Reports/ProfitLoss" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
-                    <i class="bi bi-graph-up" style="font-size:1.5rem;color:#2e7d32"></i>
+                    <svg class="bi bi-graph-up" style="font-size:1.5rem;color:#2e7d32" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>
                     <div><div style="font-weight:600;font-size:0.88rem">Profit & Loss</div><div style="font-size:0.75rem;color:#888">F.02 — Income statement</div></div>
                 </a>
                 <a asp-page="/FI/GL/Display" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
-                    <i class="bi bi-book" style="font-size:1.5rem;color:#f57f17"></i>
+                    <svg class="bi bi-book" style="font-size:1.5rem;color:#f57f17" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-book"></use></svg>
                     <div><div style="font-weight:600;font-size:0.88rem">GL Account Display</div><div style="font-size:0.75rem;color:#888">FS10N — Account balance</div></div>
                 </a>
                 <a asp-page="/FI/GL/LineItems" style="display:flex;align-items:center;gap:12px;padding:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;transition:all 0.2s" onmouseover="this.style.borderColor='#3f51b5'" onmouseout="this.style.borderColor='#e0e0e0'">
-                    <i class="bi bi-list-columns" style="font-size:1.5rem;color:#7b1fa2"></i>
+                    <svg class="bi bi-list-columns" style="font-size:1.5rem;color:#7b1fa2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-columns"></use></svg>
                     <div><div style="font-weight:600;font-size:0.88rem">GL Line Items</div><div style="font-size:0.75rem;color:#888">FAGLL03 — Posting items</div></div>
                 </a>
             </div>

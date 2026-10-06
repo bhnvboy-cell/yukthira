@@ -8,16 +8,16 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-arrow-left-circle me-2"></i>EDI Message Parser</h3>
+            <h3><svg class="bi bi-arrow-left-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-circle"></use></svg>EDI Message Parser</h3>
             <span class="badge">Parse</span>
         </div>
         <div class="actions">
-            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Parse Parameters</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Parse Parameters</div>
         <div class="zqm-row cols-1">
             <div class="zqm-field">
                 <label>Standard *</label>
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px">
-            <button type="button" class="zqm-btn" style="background:#00695c;border-color:#00695c" onclick="doParse()"><i class="bi bi-arrow-left-circle me-1"></i>Parse</button>
+            <button type="button" class="zqm-btn" style="background:#00695c;border-color:#00695c" onclick="doParse()"><svg class="bi bi-arrow-left-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-circle"></use></svg>Parse</button>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
             <div class="zqm-alert error" id="parseError" style="display:none"></div>
             <textarea id="parseOutput" rows="18" readonly style="width:100%;font-family:Consolas,monospace;font-size:0.82rem;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;padding:12px;resize:vertical"></textarea>
             <div style="margin-top:8px">
-                <button type="button" class="zqm-btn" onclick="copyOutput()" id="btnCopy" style="display:none"><i class="bi bi-clipboard me-1"></i>Copy JSON</button>
+                <button type="button" class="zqm-btn" onclick="copyOutput()" id="btnCopy" style="display:none"><svg class="bi bi-clipboard me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard"></use></svg>Copy JSON</button>
             </div>
         </div>
     </div>
@@ -73,7 +73,7 @@ function doParse() {
     var headers = { 'Content-Type': 'application/json' };
     if (token) { headers['RequestVerificationToken'] = token.value; }
 
-    fetch('/api/integration/edi/parse/' + standard, {
+    fetch('/api/v1/integration/edi/parse/' + standard, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ content: content })
@@ -81,7 +81,10 @@ function doParse() {
         return r.text().then(function(text) {
             if (r.ok) {
                 var pretty = text;
-                try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch(e) {}
+                try {
+                    var parsed = JSON.parse(text);
+                    pretty = JSON.stringify(parsed && parsed.parsed !== undefined ? parsed.parsed : parsed, null, 2);
+                } catch (e) {}
                 document.getElementById('parseOutput').value = pretty;
                 document.getElementById('parseSuccess').textContent = 'Parse successful (' + standard + ')';
                 document.getElementById('parseSuccess').style.display = '';
@@ -104,7 +107,7 @@ function copyOutput() {
     output.select();
     document.execCommand('copy');
     var btn = document.getElementById('btnCopy');
-    btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
-    setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copy JSON'; }, 2000);
+    btn.innerHTML = '<svg class="bi bi-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check"></use></svg>Copied!';
+    setTimeout(function() { btn.innerHTML = '<svg class="bi bi-clipboard me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard"></use></svg>Copy JSON'; }, 2000);
 }
 </script>

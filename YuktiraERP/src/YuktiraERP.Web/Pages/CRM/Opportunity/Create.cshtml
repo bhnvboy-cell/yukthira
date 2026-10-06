@@ -4,7 +4,7 @@
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
         <div class="ent-form-header-content">
-            <div class="ent-form-header-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="ent-form-header-icon"><svg class="bi bi-graph-up-arrow" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up-arrow"></use></svg></div>
             <div>
                 <h2>Create Opportunity</h2>
                 <p class="ent-form-subtitle">Track and manage sales opportunities</p>
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="ent-form-header-actions">
-            <button type="submit" form="oppForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Opportunity</button>
+            <button type="submit" form="oppForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Opportunity</button>
             <a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -24,7 +24,7 @@
     <form id="oppForm" method="post">
         <div class="ent-form-panel active" data-panel="tabDetails">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> General</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> General</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Opportunity.OpportunityName" class="ent-label required">Opportunity Name</label>
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-text-left"></i> Description</div>
+                <div class="ent-section-title"><svg class="bi bi-text-left" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-text-left"></use></svg> Description</div>
                 <div class="ent-field">
                     <label asp-for="Opportunity.ProductItems" class="ent-label">Product Items</label>
                     <textarea asp-for="Opportunity.ProductItems" class="ent-input" rows="3" placeholder="Describe product items or services involved"></textarea>
@@ -56,7 +56,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabSales" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-diagram-3"></i> Sales Structure</div>
+                <div class="ent-section-title"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg> Sales Structure</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Opportunity.SalesOrg" class="ent-label">Sales Organization</label>
@@ -86,7 +86,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-building"></i> Account &amp; Company</div>
+                <div class="ent-section-title"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg> Account &amp; Company</div>
                 <div class="ent-field">
                     <label asp-for="Opportunity.Company" class="ent-label">Company</label>
                     <input asp-for="Opportunity.Company" class="ent-input" placeholder="Enter company name" />
@@ -95,7 +95,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabFinancial" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-currency-dollar"></i> Value &amp; Probability</div>
+                <div class="ent-section-title"><svg class="bi bi-currency-dollar" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-currency-dollar"></use></svg> Value &amp; Probability</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Opportunity.Value" class="ent-label">Value</label>
@@ -112,7 +112,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-calendar-event"></i> Timeline</div>
+                <div class="ent-section-title"><svg class="bi bi-calendar-event" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-event"></use></svg> Timeline</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Opportunity.ExpectedCloseDate" class="ent-label">Expected Close Date</label>

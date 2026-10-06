@@ -3,9 +3,9 @@
 @{ ViewData["Title"] = "Create Inspection Lot"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-clipboard-plus me-2"></i>Create Inspection Lot</h2>
+        <h2><svg class="bi bi-clipboard-plus me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-plus"></use></svg>Create Inspection Lot</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="inspLotForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="inspLotForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/QM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -17,7 +17,7 @@
     <form id="inspLotForm" method="post">
         <div class="ent-form-panel active" data-panel="tabGeneral">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Lot Identification</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Lot Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Lot.LotNumber" class="ent-label required">Inspection Lot Number</label>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-box-seam"></i> Material & Plant</div>
+                <div class="ent-section-title"><svg class="bi bi-box-seam" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg> Material & Plant</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Lot.MaterialCode" class="ent-label required">Material Code</label>
@@ -92,7 +92,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabSource" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-link-45deg"></i> Reference Data</div>
+                <div class="ent-section-title"><svg class="bi bi-link-45deg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-link-45deg"></use></svg> Reference Data</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Lot.ReferenceOrderNumber" class="ent-label">Reference Order Number</label>
@@ -107,7 +107,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabSample" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-layers"></i> Sampling</div>
+                <div class="ent-section-title"><svg class="bi bi-layers" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-layers"></use></svg> Sampling</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Lot.Quantity" class="ent-label">Lot Quantity</label>

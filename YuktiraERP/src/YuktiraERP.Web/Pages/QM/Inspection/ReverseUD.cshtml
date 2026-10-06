@@ -49,22 +49,22 @@
 </style>
 
 <div class="ud-reversal-header">
-    <h2><i class="bi bi-arrow-counterclockwise me-2"></i>Usage Decision Reversal & Stock Reversion</h2>
+    <h2><svg class="bi bi-arrow-counterclockwise me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-counterclockwise"></use></svg>Usage Decision Reversal & Stock Reversion</h2>
     <p>Reverse a completed Usage Decision and return stock from Unrestricted/Blocked to Quality Inspection (Movement Type 322)</p>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-    <div class="alert alert-error"><i class="bi bi-exclamation-triangle me-2"></i>@Model.ErrorMessage</div>
+    <div class="alert alert-error"><svg class="bi bi-exclamation-triangle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>@Model.ErrorMessage</div>
 }
 @if (!string.IsNullOrEmpty(Model.SuccessMessage))
 {
-    <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>@Model.SuccessMessage</div>
+    <div class="alert alert-success"><svg class="bi bi-check-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>@Model.SuccessMessage</div>
 }
 
 <form method="post">
     <div class="section-card">
-        <h5><i class="bi bi-search me-2"></i>Step 1: Validate Inspection Lot</h5>
+        <h5><svg class="bi bi-search me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Step 1: Validate Inspection Lot</h5>
         <div class="form-row">
             <div class="form-group">
                 <label>Inspection Lot ID (GUID)</label>
@@ -73,7 +73,7 @@
             <div class="form-group">
                 <label>&nbsp;</label>
                 <button type="submit" asp-page-handler="Validate" class="btn btn-validate">
-                    <i class="bi bi-search"></i> Validate Lot
+                    <svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg> Validate Lot
                 </button>
             </div>
         </div>
@@ -83,7 +83,7 @@
 @if (Model.FoundLot != null)
 {
     <div class="section-card">
-        <h5><i class="bi bi-info-circle me-2"></i>Inspection Lot Details</h5>
+        <h5><svg class="bi bi-info-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Inspection Lot Details</h5>
         <div class="lot-info-grid">
             <div class="lot-info-item">
                 <div class="label">Lot Number</div>
@@ -148,13 +148,13 @@
             @if (Model.CurrentUD != null)
             {
                 <button type="submit" asp-page-handler="Reverse" class="btn btn-reverse">
-                    <i class="bi bi-arrow-counterclockwise"></i> Execute UD Reversal
+                    <svg class="bi bi-arrow-counterclockwise" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-counterclockwise"></use></svg> Execute UD Reversal
                 </button>
             }
             else
             {
                 <button type="button" class="btn btn-reverse" disabled>
-                    <i class="bi bi-arrow-counterclockwise"></i> Execute UD Reversal
+                    <svg class="bi bi-arrow-counterclockwise" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-counterclockwise"></use></svg> Execute UD Reversal
                 </button>
             }
         </form>
@@ -164,7 +164,7 @@
 @if (Model.ReversalResult != null && Model.ReversalResult.Success)
 {
     <div class="reversal-summary">
-        <h6><i class="bi bi-check-circle me-2"></i>Reversal Completed Successfully</h6>
+        <h6><svg class="bi bi-check-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Reversal Completed Successfully</h6>
         <div class="reversal-step">
             <div class="step-icon step-from">1</div>
             <div><strong>From:</strong> @Model.ReversalResult.PreviousUDCode stock (@Model.ReversalResult.StockFromType)</div>
@@ -186,7 +186,7 @@
 }
 
 <div class="section-card">
-    <h5><i class="bi bi-table me-2"></i>Current Stock Balances</h5>
+    <h5><svg class="bi bi-table me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Current Stock Balances</h5>
     <table class="stock-table">
         <thead>
             <tr>

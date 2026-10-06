@@ -6,24 +6,24 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-bookmark me-2"></i>MB23/24 - Display Reservation</h3>
+            <h3><svg class="bi bi-bookmark me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bookmark"></use></svg>MB23/24 - Display Reservation</h3>
             <span class="badge">Search</span>
         </div>
         <div class="actions">
-            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search Criteria</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Search Criteria</div>
         <form method="get">
             <div class="zqm-row cols-3">
                 <div class="zqm-field"><label>Material Code</label><input asp-for="MaterialCode" placeholder="Optional" /></div>
                 <div class="zqm-field"><label>Plant</label><input asp-for="Plant" placeholder="Optional" /></div>
                 <div class="zqm-field" style="display:flex;align-items:end;gap:8px">
-                    <button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
+                    <button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Search</button>
                 </div>
             </div>
         </form>
@@ -33,7 +33,7 @@
     {
         <div class="zqm-results">
             <div class="zqm-results-header">
-                <h4><i class="bi bi-list-ul me-1"></i>Reservations</h4>
+                <h4><svg class="bi bi-list-ul me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>Reservations</h4>
                 <span class="count">@Model.Reservations.Count found</span>
             </div>
             <div class="zqm-table-wrap">
@@ -68,7 +68,7 @@
     else if (Model.Reservations != null)
     {
         <div class="zqm-results">
-            <div class="zqm-empty"><i class="bi bi-inbox"></i><div>No reservations found matching criteria.</div></div>
+            <div class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No reservations found matching criteria.</div></div>
         </div>
     }
 </div>

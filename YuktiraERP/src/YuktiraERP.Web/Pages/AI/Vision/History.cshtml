@@ -6,17 +6,17 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-clock-history me-2"></i>Inspection History</h3>
+            <h3><svg class="bi bi-clock-history me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>Inspection History</h3>
             <span class="badge">Report</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="exportHistory()"><i class="bi bi-download me-1"></i>Export</button>
-            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="exportHistory()"><svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export</button>
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filter Criteria</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Filter Criteria</div>
         <form method="get">
             <div class="zqm-row cols-4">
                 <div class="zqm-field"><label>From Date</label><input asp-for="FromDate" type="date" /></div>
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div style="margin-top:10px">
-                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
+                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Search</button>
             </div>
         </form>
     </div>
@@ -44,7 +44,7 @@
     {
         <div class="zqm-results">
             <div class="zqm-results-header">
-                <h4><i class="bi bi-table me-1"></i>Inspection Records</h4>
+                <h4><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Inspection Records</h4>
                 <span class="count">@Model.Records.Count records</span>
             </div>
             <div class="zqm-table-wrap">
@@ -81,7 +81,7 @@
     }
     else
     {
-        <div class="zqm-empty"><i class="bi bi-clock-history"></i><div>Set date range and filters, then click Search to view history</div></div>
+        <div class="zqm-empty"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg><div>Set date range and filters, then click Search to view history</div></div>
     }
 </div>
 

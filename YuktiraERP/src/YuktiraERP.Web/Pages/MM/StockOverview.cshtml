@@ -40,8 +40,8 @@
     .mmbe-tree tr.level-sl td:first-child { font-weight: 500; background: #fffbeb; padding-left: 44px; }
     .mmbe-tree tr.level-batch td:first-child { font-weight: 400; padding-left: 64px; }
     .mmbe-tree .toggle { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px; }
-    .mmbe-tree .toggle i { font-size: 10px; transition: transform 0.15s; width: 14px; text-align: center; }
-    .mmbe-tree .toggle.collapsed i { transform: rotate(-90deg); }
+    .mmbe-tree .toggle i, .mmbe-tree .toggle svg.bi { font-size: 10px; transition: transform 0.15s; width: 14px; text-align: center; }
+    .mmbe-tree .toggle.collapsed i, .mmbe-tree .toggle.collapsed svg.bi { transform: rotate(-90deg); }
     .mmbe-tree .badge { font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; font-weight: 600; }
     .mmbe-tree .badge-plant { background: #dcfce7; color: #166534; }
     .mmbe-tree .badge-sl { background: #fef3c7; color: #92400e; }
@@ -54,7 +54,7 @@
 </style>
 
 <div class="mmbe-header">
-    <h2><i class="bi bi-box-seam me-2"></i>Stock Overview: Basic List</h2>
+    <h2><svg class="bi bi-box-seam me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg>Stock Overview: Basic List</h2>
     <p>TCode MMBE | Multi-Level Hierarchical Inventory Balances</p>
 </div>
 
@@ -87,7 +87,7 @@
             <div>
                 <label>&nbsp;</label>
                 <button type="submit" class="btn btn-primary" style="font-size:12px;padding:6px 16px;">
-                    <i class="bi bi-search"></i> Execute (F8)
+                    <svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg> Execute (F8)
                 </button>
             </div>
         </div>
@@ -95,10 +95,10 @@
 </form>
 
 <div class="mmbe-toolbar">
-    <button onclick="window.location.href='/MM/StockOverview'" title="New Selection"><i class="bi bi-arrow-clockwise"></i> New Selection</button>
-    <button onclick="expandAll()" title="Expand All"><i class="bi bi-expand"></i> Expand All</button>
-    <button onclick="collapseAll()" title="Collapse All"><i class="bi bi-arrows-collapse"></i> Collapse All</button>
-    <button onclick="exportCSV()" title="Export CSV"><i class="bi bi-download"></i> Export</button>
+    <button onclick="window.location.href='/MM/StockOverview'" title="New Selection"><svg class="bi bi-arrow-clockwise" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg> New Selection</button>
+    <button onclick="expandAll()" title="Expand All"><svg class="bi bi-arrows-expand" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrows-expand"></use></svg> Expand All</button>
+    <button onclick="collapseAll()" title="Collapse All"><svg class="bi bi-arrows-collapse" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrows-collapse"></use></svg> Collapse All</button>
+    <button onclick="exportCSV()" title="Export CSV"><svg class="bi bi-download" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg> Export</button>
 </div>
 
 <div class="mmbe-kpis">
@@ -191,13 +191,13 @@
                         <span class="toggle @toggleClass" onclick="toggleNode('@node.Id')" data-id="@node.Id">
                             @if (node.HasChildren)
                             {
-                                <i class="bi @toggleIcon"></i>
+                                <svg class="bi @toggleIcon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@toggleIcon"></use></svg>
                             }
                             else
                             {
-                                <i class="bi bi-dash" style="opacity:0.3"></i>
+                                <svg class="bi bi-dash" style="opacity:0.3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-dash"></use></svg>
                             }
-                            <span>@node.EntityCode — @node.EntityName</span>
+                            <span>@node.EntityCode â€” @node.EntityName</span>
                             @if (!string.IsNullOrEmpty(badgeText))
                             {
                                 <span class="badge @badgeClass">@badgeText</span>
@@ -231,16 +231,20 @@
 </div>
 
 <script>
+    function setTreeChevron(icon, name) {
+        if (!icon) return;
+        icon.setAttribute('class', 'bi ' + name);
+        var use = icon.querySelector('use');
+        if (use) use.setAttribute('href', '/images/sprite.svg#' + name);
+    }
     function toggleNode(id) {
         var row = document.querySelector('tr[data-id="' + id + '"]');
         if (!row) return;
         var isExpanded = row.getAttribute('data-expanded') === 'true';
         row.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
 
-        var icon = row.querySelector('.toggle i');
-        if (icon) {
-            icon.className = isExpanded ? 'bi bi-chevron-right' : 'bi bi-chevron-down';
-        }
+        var icon = row.querySelector('.toggle svg');
+        setTreeChevron(icon, isExpanded ? 'bi-chevron-right' : 'bi-chevron-down');
         var toggle = row.querySelector('.toggle');
         if (toggle) toggle.classList.toggle('collapsed', isExpanded);
 
@@ -254,8 +258,7 @@
         document.querySelectorAll('tr[data-expanded="false"]').forEach(function(row) {
             var id = row.getAttribute('data-id');
             row.setAttribute('data-expanded', 'true');
-            var icon = row.querySelector('.toggle i');
-            if (icon) icon.className = 'bi bi-chevron-down';
+            setTreeChevron(row.querySelector('.toggle svg'), 'bi-chevron-down');
             var toggle = row.querySelector('.toggle');
             if (toggle) toggle.classList.remove('collapsed');
             document.querySelectorAll('tr[data-parent="' + id + '"]').forEach(function(c) {
@@ -268,8 +271,7 @@
         document.querySelectorAll('tr[data-level!="3"][data-expanded="true"]').forEach(function(row) {
             var id = row.getAttribute('data-id');
             row.setAttribute('data-expanded', 'false');
-            var icon = row.querySelector('.toggle i');
-            if (icon) icon.className = 'bi bi-chevron-right';
+            setTreeChevron(row.querySelector('.toggle svg'), 'bi-chevron-right');
             var toggle = row.querySelector('.toggle');
             if (toggle) toggle.classList.add('collapsed');
             document.querySelectorAll('tr[data-parent="' + id + '"]').forEach(function(c) {

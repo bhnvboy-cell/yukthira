@@ -24,6 +24,7 @@ var InlineEdit = (function () {
             var field = cell.getAttribute('data-field');
             var currentVal = cell.getAttribute('data-value') || cell.textContent.trim();
             var entityType = cell.getAttribute('data-type') || 'text';
+            if (entityType === 'number') currentVal = currentVal.replace(/[^0-9.\-]/g, '');
             var input = document.createElement('input');
             input.type = entityType === 'number' ? 'number' : 'text';
             input.value = currentVal;
@@ -42,8 +43,8 @@ var InlineEdit = (function () {
         if (actionsCell) {
             actionsCell.setAttribute('data-original', actionsCell.innerHTML);
             actionsCell.innerHTML =
-                '<button type="button" class="btn btn-sm btn-success me-1" onclick="InlineEdit.saveRow(this)" title="Save"><i class="bi bi-check-lg"></i></button>' +
-                '<button type="button" class="btn btn-sm btn-secondary" onclick="InlineEdit.cancelRow(this)" title="Cancel"><i class="bi bi-x-lg"></i></button>';
+                '<button type="button" class="btn btn-sm btn-success me-1" onclick="InlineEdit.saveRow(this)" title="Save"><svg class="bi bi-check-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-lg"></use></svg></button>' +
+                '<button type="button" class="btn btn-sm btn-secondary" onclick="InlineEdit.cancelRow(this)" title="Cancel"><svg class="bi bi-x-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-lg"></use></svg></button>';
         }
 
         var firstInput = row.querySelector('td[data-field] input');
@@ -135,7 +136,7 @@ var InlineEdit = (function () {
             row.style.background = 'rgba(220,38,38,0.06)';
             setTimeout(function () { row.style.background = ''; }, 2000);
             saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            saveBtn.innerHTML = '<svg class="bi bi-check-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-lg"></use></svg>';
         });
     }
 
@@ -146,6 +147,17 @@ var InlineEdit = (function () {
                 cell.setAttribute('data-value', cell.textContent.trim());
             });
         });
+        if (!tableEl.getAttribute('data-inline-edit-bound')) {
+            tableEl.setAttribute('data-inline-edit-bound', '1');
+            tableEl.addEventListener('click', function (e) {
+                if (e.target.closest('input, button, a')) return;
+                var td = e.target.closest('td.inline-edit-col[data-field]');
+                if (!td) return;
+                var row = td.closest('tr');
+                if (!row || row.classList.contains('editing')) return;
+                toggleEditRow(td);
+            });
+        }
     }
 
     return {

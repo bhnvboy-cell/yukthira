@@ -76,7 +76,7 @@
     padding-bottom: 0.4rem;
     border-bottom: 1px solid var(--border);
 }
-.ent-section-header i {
+.ent-section-header i, .ent-section-header svg.bi {
     color: var(--primary);
     font-size: 0.9rem;
 }
@@ -376,7 +376,8 @@
     color: var(--primary);
     background: rgba(79,70,229,0.04);
 }
-.erp-zoom-trigger i:first-child {
+.erp-zoom-trigger i:first-child,
+.erp-zoom-trigger svg.bi:first-child {
     font-size: 13px;
     opacity: 0.7;
 }

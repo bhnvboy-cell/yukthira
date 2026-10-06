@@ -4,7 +4,7 @@
 
 <div class="ent-form-wrapper">
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-cart-plus"></i></div>
+        <div class="banner-icon"><svg class="bi bi-cart-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cart-plus"></use></svg></div>
         <div class="banner-info">
             <h5>Create Purchase Order</h5>
             <span>ME21N — Purchase Order</span>
@@ -19,21 +19,21 @@
 
         <div class="ent-form-tabs">
             <button type="button" class="ent-form-tab active" data-tab="header">
-                <i class="bi bi-building tab-icon"></i> Header
+                <svg class="bi bi-building tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg> Header
             </button>
             <button type="button" class="ent-form-tab" data-tab="items">
-                <i class="bi bi-list-ul tab-icon"></i> Line Items
+                <svg class="bi bi-list-ul tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg> Line Items
                 <span class="tab-badge" id="lineCountBadge">0</span>
             </button>
             <button type="button" class="ent-form-tab" data-tab="delivery">
-                <i class="bi bi-truck tab-icon"></i> Delivery & Terms
+                <svg class="bi bi-truck tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-truck"></use></svg> Delivery & Terms
             </button>
         </div>
 
         <!-- ═══ TAB: Header ═══ -->
         <div class="ent-form-panel active" data-panel="header">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Vendor & Organization</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg><h6>Vendor & Organization</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>PO Number</label>
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Vendor Information</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-person" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg><h6>Vendor Information</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Vendor Name <span class="required">*</span></label>
@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-credit-card"></i><h6>Financial Assignment</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-credit-card" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg><h6>Financial Assignment</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Cost Center</label>
@@ -105,9 +105,9 @@
         <div class="ent-form-panel" data-panel="items">
             <div class="ent-line-items-wrap">
                 <div class="ent-line-items-header">
-                    <h6><i class="bi bi-list-ul"></i> Purchase Order Items — <span class="line-count">0</span> lines</h6>
+                    <h6><svg class="bi bi-list-ul" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg> Purchase Order Items — <span class="line-count">0</span> lines</h6>
                     <button type="button" class="btn btn-outline-success btn-sm ent-add-line-btn" data-target="poLineTable">
-                        <i class="bi bi-plus"></i> Add Line
+                        <svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Line
                     </button>
                 </div>
                 <div style="overflow-x:auto">
@@ -147,7 +147,7 @@
                                     <td><input asp-for="LineItems[i].DeliveryDate" class="form-control form-control-sm" type="date" /></td>
                                     <td><select asp-for="LineItems[i].DepartmentKey" class="form-select form-select-sm" asp-items="Model.DepartmentKeyOptions"><option value="">--</option></select></td>
                                     <td><input asp-for="LineItems[i].BatchNo" class="form-control form-control-sm" /></td>
-                                    <td><button type="button" class="line-remove" onclick="removeLineItem(this)" title="Remove"><i class="bi bi-trash"></i></button></td>
+                                    <td><button type="button" class="line-remove" onclick="removeLineItem(this)" title="Remove"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td>
                                 </tr>
                             }
                         </tbody>
@@ -169,7 +169,7 @@
         <!-- ═══ TAB: Delivery & Terms ═══ -->
         <div class="ent-form-panel" data-panel="delivery">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-credit-card-2-front"></i><h6>Payment & Incoterms</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-credit-card-2-front" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card-2-front"></use></svg><h6>Payment & Incoterms</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Payment Terms</label>
@@ -198,7 +198,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-truck"></i><h6>Delivery Schedule</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-truck" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-truck"></use></svg><h6>Delivery Schedule</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label>Requested Delivery Date</label>
@@ -226,11 +226,11 @@
 
         <div class="ent-form-footer">
             <div class="footer-info">
-                <i class="bi bi-shield-check me-1"></i>PO auto-numbered via Number Range MM/PO
+                <svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>PO auto-numbered via Number Range MM/PO
             </div>
             <div class="footer-actions">
-                <a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Purchase Order</button>
+                <a asp-page="/MM/Index" class="btn btn-outline-secondary"><svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Purchase Order</button>
             </div>
         </div>
     </form>

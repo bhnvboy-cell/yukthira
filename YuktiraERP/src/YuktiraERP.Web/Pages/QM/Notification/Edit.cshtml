@@ -3,15 +3,15 @@
 @{ ViewData["Title"] = "Edit Quality Notification"; }
 <link rel="stylesheet" href="~/css/enterprise-form.css" />
 <div class="ent-form-wrapper">
-    <div class="ent-form-header"><h3><i class="bi bi-bell me-2"></i>Edit Quality Notification</h3><span class="badge">QM</span></div>
+    <div class="ent-form-header"><h3><svg class="bi bi-bell me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bell"></use></svg>Edit Quality Notification</h3><span class="badge">QM</span></div>
     <form method="post">
         <input type="hidden" asp-for="Notification.Id" />
         <div class="ent-form-tabs">
-            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
-            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-defect')"><i class="bi bi-exclamation-triangle tab-icon"></i> Defect Details</button>
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><svg class="bi bi-info-circle tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-defect')"><svg class="bi bi-exclamation-triangle tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg> Defect Details</button>
         </div>
         <div class="ent-form-panel active" id="tab-general">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Notification Identification</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-tag" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-tag"></use></svg> Notification Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field"><label>Notification #</label><input asp-for="Notification.NotificationNumber" class="ent-input" readonly /></div>
                     <div class="ent-field"><label>Type</label><select asp-for="Notification.NotificationType" class="ent-select"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>Q5</option></select></div>
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="ent-form-panel" id="tab-defect">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-exclamation-triangle"></i> Defect Information</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-exclamation-triangle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg> Defect Information</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field"><label>Defect Code</label><input asp-for="Notification.DefectCode" class="ent-input" /></div>
                     <div class="ent-field"><label>Defect Type</label><input asp-for="Notification.DefectType" class="ent-input" /></div>
@@ -46,7 +46,7 @@
                 <div class="ent-field"><label>Long Text</label><textarea asp-for="Notification.LongText" class="ent-input" rows="3"></textarea></div>
             </div>
         </div>
-        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg> Back</a><button type="submit" class="ent-btn ent-btn-primary"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg> Save Changes</button></div>
     </form>
 </div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

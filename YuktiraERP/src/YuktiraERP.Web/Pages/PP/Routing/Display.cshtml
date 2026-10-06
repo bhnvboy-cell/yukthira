@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.PP.Routing.DisplayModel
 @{ ViewData["Title"] = "Production Routing Details"; }
 <link rel="stylesheet" href="~/css/zqm-classic.css" />
@@ -6,19 +6,19 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-eye me-2"></i>Production Routing Details</h3>
+            <h3><svg class="bi bi-eye me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>Production Routing Details</h3>
             <span class="badge">@Model.Routing.RoutingId</span>
         </div>
         <div class="actions">
-            <a asp-page="/PP/Routing/Edit" asp-route-id="@Model.Routing.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><i class="bi bi-pencil me-1"></i>Edit</a>
-            <a asp-page="/PP/Routing/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/PP/Routing/Edit" asp-route-id="@Model.Routing.Id" class="zqm-btn" style="background:#ff9800;border-color:#ff9800"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Edit</a>
+            <a asp-page="/PP/Routing/List" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-results">
         <div class="zqm-results-header"><h4>Routing Information</h4></div>
         <div style="padding:16px">
-            <div class="zqm-section-title"><i class="bi bi-info-circle me-1"></i>Routing Header</div>
+            <div class="zqm-section-title"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Routing Header</div>
             <div class="zqm-row cols-3">
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Routing ID</label><div class="zqm-ro" style="font-weight:600;color:#1565c0">@Model.Routing.RoutingId</div></div>
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Routing Group</label><div class="zqm-ro">@Model.Routing.RoutingGroup</div></div>
@@ -29,13 +29,13 @@
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Control Key</label><div class="zqm-ro">@Model.Routing.ControlKey</div></div>
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Status</label><div class="zqm-ro"><span class="zqm-badge @(Model.Routing.Status=="Active"?"passed":"warning")">@Model.Routing.Status</span></div></div>
             </div>
-            <div class="zqm-section-title" style="margin-top:16px"><i class="bi bi-gear me-1"></i>Operation</div>
+            <div class="zqm-section-title" style="margin-top:16px"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Operation</div>
             <div class="zqm-row cols-3">
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Operation No</label><div class="zqm-ro" style="font-weight:600">@Model.Routing.OperationNo</div></div>
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Operation Description</label><div class="zqm-ro">@Model.Routing.OperationDescription</div></div>
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Work Center</label><div class="zqm-ro" style="font-weight:600">@Model.Routing.WorkCenter</div></div>
             </div>
-            <div class="zqm-section-title" style="margin-top:16px"><i class="bi bi-clock me-1"></i>Standard Times</div>
+            <div class="zqm-section-title" style="margin-top:16px"><svg class="bi bi-clock me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock"></use></svg>Standard Times</div>
             <div class="zqm-row cols-3">
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Setup Time (hrs)</label><div class="zqm-ro">@Model.Routing.SetupTimeHrs</div></div>
                 <div><label style="font-size:0.68rem;font-weight:600;color:#888;text-transform:uppercase">Machine Time (hrs)</label><div class="zqm-ro">@Model.Routing.MachineTimeHrs</div></div>

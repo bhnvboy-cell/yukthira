@@ -3,9 +3,9 @@
 @{ ViewData["Title"] = "Create Functional Location"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-geo-alt me-2"></i>Create Functional Location</h2>
+        <h2><svg class="bi bi-geo-alt me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-geo-alt"></use></svg>Create Functional Location</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="locForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="locForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -16,7 +16,7 @@
     <form id="locForm" method="post">
         <div class="ent-form-panel active" data-panel="tabGeneral">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Location Identification</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Location Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Location.LocationCode" class="ent-label required">Location Code</label>
@@ -59,7 +59,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabOrg" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-building"></i> Organization</div>
+                <div class="ent-section-title"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg> Organization</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Location.Plant" class="ent-label">Plant</label>

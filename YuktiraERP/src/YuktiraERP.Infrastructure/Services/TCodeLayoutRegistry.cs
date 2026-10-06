@@ -358,7 +358,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         Tabs = new()
         {
             new() { Id = "lineItems", Label = "Line Items", Icon = "bi-list-ol", Active = true },
-            new() { Id = "balanceCheck", Label = "Balance Check", Icon = "bi-scale" },
+            new() { Id = "balanceCheck", Label = "Balance Check", Icon = "bi-calculator" },
         },
         Columns = new()
         {
@@ -386,7 +386,7 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
             ShowSearch = false, ShowFilter = false, ShowExport = true, ShowAddRow = true, ShowDeleteRow = true,
             CustomActions = new()
             {
-                new() { Id = "balance", Label = "Balance", Icon = "bi-scale", Style = "default", Handler = "balanceCheck" },
+                new() { Id = "balance", Label = "Balance", Icon = "bi-calculator", Style = "default", Handler = "balanceCheck" },
             }
         }
     };
@@ -2988,9 +2988,9 @@ public class TCodeLayoutRegistry : ITCodeLayoutRegistry
         TableToolbar = new() { ShowSearch = false, ShowFilter = false, ShowExport = false, ShowAddRow = false, ShowDeleteRow = false }
     };
 
-    // ══════════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // Customer Complaint & Return with Supplier Pass-Through Claim
-    // ══════════════════════════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     private static TCodeLayoutConfig CRRETURN() => new()
     {

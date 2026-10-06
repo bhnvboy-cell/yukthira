@@ -8,8 +8,10 @@
     <link rel="manifest" href="~/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="~/images/icon.svg" />
     <title>@ViewData["Title"] - Yuktira ERP</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/yuktira.css" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -20,7 +22,7 @@
         {
             <nav class="hybrid-sidebar" id="appSidebar" role="navigation" aria-label="Main navigation" tabindex="0">
                 <div class="sidebar-header">
-                    <i class="bi bi-cpu" aria-hidden="true"></i>
+                    <svg class="bi bi-cpu" aria-hidden="true"><use href="/images/sprite.svg#bi-cpu"></use></svg>
                     <span class="sidebar-text">Yuktira</span>
                 </div>
 
@@ -34,21 +36,20 @@
                                 <div class="nav-category sidebar-text" role="presentation">@m.Category</div>
                                 lastCat = m.Category;
                             }
-                            <a href="@m.BaseRoute" class="nav-item" title="@m.Name" aria-label="@m.Name module"><i class="bi @m.Icon" aria-hidden="true"></i><span class="sidebar-text">@m.Code</span></a>
+                            <a href="@m.BaseRoute" class="nav-item" title="@m.Name" aria-label="@m.Name module"><svg class="bi @m.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@m.Icon"></use></svg><span class="sidebar-text">@m.Code</span></a>
                         }
                     }
                 </div>
 
                 <div class="sidebar-footer">
-                    <div class="theme-dots" id="sidebarThemeDots" role="radiogroup" aria-label="Theme selection">
-                        <button class="theme-btn" data-theme="modern" title="Modern theme" aria-label="Modern theme" role="radio" aria-checked="false"><span class="theme-label">Modern</span></button>
-                        <button class="theme-btn" data-theme="classic" title="Classical theme" aria-label="Classical theme" role="radio" aria-checked="false"><span class="theme-label">Classical</span></button>
-                        <button class="theme-btn" data-theme="minimal" title="Minimal theme" aria-label="Minimal theme" role="radio" aria-checked="false"><span class="theme-label">Minimal</span></button>
-                        <button class="theme-btn" data-theme="futuristic" title="Futuristic theme" aria-label="Futuristic theme" role="radio" aria-checked="false"><span class="theme-label">Futuristic</span></button>
-                    </div>
-                    <div class="sidebar-text" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-                        <div class="avatar" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent-light),var(--accent));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0" aria-hidden="true">@(Context.User.Identity.Name?.Substring(0,1).ToUpper()??"U")</div>
-                        <span style="font-size:12px;color:var(--sidebar-text-hover);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@Context.User.Identity.Name</span>
+                    <button type="button" class="theme-toggle" id="sidebarThemeToggle" role="switch" aria-checked="false" title="Toggle light / dark mode" aria-label="Toggle light / dark mode">
+                        <svg class="bi bi-sun theme-icon-light" aria-hidden="true"><use href="/images/sprite.svg#bi-sun"></use></svg>
+                        <svg class="bi bi-moon-stars theme-icon-dark" aria-hidden="true"><use href="/images/sprite.svg#bi-moon-stars"></use></svg>
+                        <span class="theme-toggle-label sidebar-text">Light mode</span>
+                    </button>
+                    <div class="sidebar-user">
+                        <div class="avatar" aria-hidden="true">@(Context.User.Identity.Name?.Substring(0,1).ToUpper()??"U")</div>
+                        <span class="sidebar-username sidebar-text">@Context.User.Identity.Name</span>
                     </div>
                 </div>
             </nav>
@@ -57,10 +58,10 @@
 
             <div class="app-main-area">
                 <header class="top-bar" role="banner">
-                    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation menu"><i class="bi bi-list" aria-hidden="true"></i></button>
+                    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation menu"><svg class="bi bi-list" aria-hidden="true"><use href="/images/sprite.svg#bi-list"></use></svg></button>
                     <div class="top-bar-center">
                         <div class="top-bar-search">
-                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <svg class="bi bi-search" aria-hidden="true"><use href="/images/sprite.svg#bi-search"></use></svg>
                             <input type="text" id="globalSearch" placeholder="@L["SearchPlaceholder"]" autocomplete="off" aria-label="Search transactions">
                             <button type="button" class="top-bar-search-btn" id="globalSearchBtn" title="Execute (Enter)" aria-label="Execute search"><span class="btn-go-text">Go</span><span class="btn-go-enter">&#x23CE;</span></button>
                             <div id="globalSearchResults" class="search-results" style="display:none" role="listbox" aria-label="Search results"></div>
@@ -69,9 +70,9 @@
                     <div class="top-bar-right">
                         <div class="erp-zoom-control" id="erpZoomControl" role="group" aria-label="Screen zoom level">
                             <button type="button" class="erp-zoom-trigger" id="erpZoomTrigger" title="Screen zoom" aria-haspopup="listbox" aria-expanded="false">
-                                <i class="bi bi-aspect-ratio" aria-hidden="true"></i>
+                                <svg class="bi bi-aspect-ratio" aria-hidden="true"><use href="/images/sprite.svg#bi-aspect-ratio"></use></svg>
                                 <span class="erp-zoom-label" id="erpZoomLabel">100%</span>
-                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                                <svg class="bi bi-chevron-down" aria-hidden="true"><use href="/images/sprite.svg#bi-chevron-down"></use></svg>
                             </button>
                             <div class="erp-zoom-dropdown" id="erpZoomDropdown" role="listbox" aria-label="Select zoom level">
                                 <button type="button" class="erp-zoom-option" data-zoom="0.8" role="option">80%<span class="erp-zoom-tag">Compact</span></button>
@@ -81,13 +82,13 @@
                                 <button type="button" class="erp-zoom-option" data-zoom="1.2" role="option">120%<span class="erp-zoom-tag">Extra Large</span></button>
                             </div>
                         </div>
-                        <button type="button" class="top-bar-icon" id="darkModeToggle" title="@L["ToggleDarkMode"]" aria-label="@L["ToggleDarkMode"]"><i class="bi bi-moon-stars"></i></button>
+                        <button type="button" class="top-bar-icon" id="darkModeToggle" title="@L["ToggleDarkMode"]" aria-label="@L["ToggleDarkMode"]"><svg class="bi bi-moon-stars" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-moon-stars"></use></svg></button>
                         <a href="/Notifications" class="top-bar-icon" title="@L["Notifications"]" aria-label="@L["Notifications"]">
-                            <i class="bi bi-bell" aria-hidden="true"></i>
+                            <svg class="bi bi-bell" aria-hidden="true"><use href="/images/sprite.svg#bi-bell"></use></svg>
                             <span class="badge bg-danger" id="notifCount" style="display:none" aria-live="polite">0</span>
                         </a>
-                        <a href="/Dashboard" class="top-bar-icon" title="@L["Home"]" aria-label="@L["Home"]"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i></a>
-                        <a href="/Settings" class="top-bar-icon" title="@L["Settings"]" aria-label="@L["Settings"]"><i class="bi bi-gear" aria-hidden="true"></i></a>
+                        <a href="/Dashboard" class="top-bar-icon" title="@L["Home"]" aria-label="@L["Home"]"><svg class="bi bi-grid-3x3-gap" aria-hidden="true"><use href="/images/sprite.svg#bi-grid-3x3-gap"></use></svg></a>
+                        <a href="/Settings" class="top-bar-icon" title="@L["Settings"]" aria-label="@L["Settings"]"><svg class="bi bi-gear" aria-hidden="true"><use href="/images/sprite.svg#bi-gear"></use></svg></a>
                         <form asp-controller="Home" asp-action="SetLanguage" method="post" class="top-bar-icon lang-form" style="margin:0;display:inline-flex">
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
                             <select name="culture" onchange="this.form.submit()" class="lang-select" title="@L["SelectLanguage"]" aria-label="@L["SelectLanguage"]">
@@ -99,8 +100,8 @@
                                 <option value="es" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "es")">ES</option>
                             </select>
                         </form>
-                        <a href="#" class="top-bar-icon" id="printBtn" title="@L["Print"] (Ctrl+P)" aria-label="@L["Print"]"><i class="bi bi-printer" aria-hidden="true"></i></a>
-                        <a href="/Auth/Logout" class="top-bar-icon text-danger" title="@L["Logout"]" aria-label="@L["Logout"]"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
+                        <a href="#" class="top-bar-icon" id="printBtn" title="@L["Print"] (Ctrl+P)" aria-label="@L["Print"]"><svg class="bi bi-printer" aria-hidden="true"><use href="/images/sprite.svg#bi-printer"></use></svg></a>
+                        <a href="/Auth/Logout" class="top-bar-icon text-danger" title="@L["Logout"]" aria-label="@L["Logout"]"><svg class="bi bi-box-arrow-right" aria-hidden="true"><use href="/images/sprite.svg#bi-box-arrow-right"></use></svg></a>
                     </div>
                 </header>
                 <main class="app-main" id="main-content" role="main">
@@ -125,52 +126,51 @@
             locale: '@(System.Globalization.CultureInfo.CurrentCulture.Name)'
         };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/sortablejs/Sortable.min.js" asp-append-version="true"></script>
+    <script src="~/lib/signalr/signalr.min.js" asp-append-version="true"></script>
     <script src="~/js/yuktira.js"></script>
     <script src="~/js/enterprise-form.js" asp-append-version="true"></script>
     <script>
-        // ── Theme engine ──
+        // ── Theme engine (Light + Dark only) ──
         (function() {
-            var saved = localStorage.getItem('yuktira_theme');
-            if (!saved) saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'modern';
-            document.documentElement.setAttribute('data-theme', saved);
-            document.querySelectorAll('.theme-btn').forEach(function(btn) {
-                if (btn.getAttribute('data-theme') === saved) {
-                    btn.style.borderColor = '#fff';
-                    btn.setAttribute('aria-checked', 'true');
+            var THEMES = ['modern', 'dark'];
+            function applyTheme(theme) {
+                if (THEMES.indexOf(theme) === -1) theme = 'modern';
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('yuktira_theme', theme);
+                var dark = theme === 'dark';
+                var dt = document.getElementById('darkModeToggle');
+                if (dt) {
+                    dt.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+                    var dtUse = dt.querySelector('use');
+                    if (dtUse) dtUse.setAttribute('href', '/images/sprite.svg#' + (dark ? 'bi-sun' : 'bi-moon-stars'));
                 }
-                btn.addEventListener('click', function() {
-                    var theme = this.getAttribute('data-theme');
-                    document.documentElement.setAttribute('data-theme', theme);
-                    localStorage.setItem('yuktira_theme', theme);
-                    document.querySelectorAll('.theme-btn').forEach(function(b) {
-                        b.style.borderColor = 'transparent';
-                        b.setAttribute('aria-checked', 'false');
-                    });
-                    this.style.borderColor = '#fff';
-                    this.setAttribute('aria-checked', 'true');
-                    document.getElementById('darkModeToggle').setAttribute('aria-label',
-                        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-                });
-            });
-
-            // Dark mode toggle button
-            var darkToggle = document.getElementById('darkModeToggle');
-            if (darkToggle) {
-                darkToggle.addEventListener('click', function() {
-                    var current = document.documentElement.getAttribute('data-theme');
-                    var next = current === 'dark' ? 'modern' : 'dark';
-                    document.documentElement.setAttribute('data-theme', next);
-                    localStorage.setItem('yuktira_theme', next);
-                    document.querySelectorAll('.theme-btn').forEach(function(b) {
-                        b.style.borderColor = b.getAttribute('data-theme') === next ? '#fff' : 'transparent';
-                        b.setAttribute('aria-checked', b.getAttribute('data-theme') === next ? 'true' : 'false');
-                    });
+                var st = document.getElementById('sidebarThemeToggle');
+                if (st) {
+                    st.setAttribute('aria-checked', dark ? 'true' : 'false');
+                    var lbl = st.querySelector('.theme-toggle-label');
+                    if (lbl) lbl.textContent = dark ? 'Dark mode' : 'Light mode';
+                }
+                document.querySelectorAll('.settings-theme-card').forEach(function(c) {
+                    c.classList.toggle('active', c.getAttribute('data-theme') === theme);
                 });
             }
+            function toggleTheme() {
+                var cur = document.documentElement.getAttribute('data-theme');
+                applyTheme(cur === 'dark' ? 'modern' : 'dark');
+            }
+            var saved = localStorage.getItem('yuktira_theme');
+            if (THEMES.indexOf(saved) === -1) {
+                saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'modern';
+            }
+            applyTheme(saved);
+            var darkToggle = document.getElementById('darkModeToggle');
+            if (darkToggle) darkToggle.addEventListener('click', toggleTheme);
+            var sideToggle = document.getElementById('sidebarThemeToggle');
+            if (sideToggle) sideToggle.addEventListener('click', toggleTheme);
+            window.yuktiraApplyTheme = applyTheme;
         })();
 
         // ── System preference detection ──
@@ -243,7 +243,7 @@
                 data.forEach(function(t) {
                     var route = t.route && t.route !== '#' ? t.route : '/Transactions/Engine/' + encodeURIComponent(t.code);
                     html += '<button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 py-2" role="option" onclick="window.location.href=\'' + route + '\'">';
-                    html += '<i class="bi ' + t.icon + ' text-primary" aria-hidden="true"></i>';
+                    html += '<svg class="bi ' + t.icon + ' text-primary" aria-hidden="true"><use href="/images/sprite.svg#' + t.icon + '"></use></svg>';
                     html += '<div class="small"><strong>' + t.code + '</strong> <span class="text-muted">- ' + t.name + '</span></div>';
                     html += '</button>';
                 });
@@ -399,17 +399,17 @@
     <div id="sessionTimeoutModal" class="session-timeout-overlay" style="display:none">
         <div class="session-timeout-dialog">
             <div class="session-timeout-icon">
-                <i class="bi bi-clock-history"></i>
+                <svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>
             </div>
             <h3>@L["SessionExpiring"]</h3>
             <p>Your session will expire in <span id="timeoutCountdown">60</span> seconds.</p>
             <p class="session-timeout-sub">@L["SessionContinueQ"]</p>
             <div class="session-timeout-actions">
                 <button type="button" class="btn-timeout btn-timeout-continue" id="sessionContinueBtn">
-                    <i class="bi bi-play-circle"></i> @L["ContinueSession"]
+                    <svg class="bi bi-play-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-circle"></use></svg> @L["ContinueSession"]
                 </button>
                 <button type="button" class="btn-timeout btn-timeout-logoff" id="sessionLogoffBtn">
-                    <i class="bi bi-box-arrow-right"></i> @L["LogOff"]
+                    <svg class="bi bi-box-arrow-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-right"></use></svg> @L["LogOff"]
                 </button>
             </div>
             <div class="session-timeout-progress">

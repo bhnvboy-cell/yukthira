@@ -274,7 +274,7 @@
     background: var(--tcode-primary-light);
 }
 
-.tcode-tab i {
+.tcode-tab i, .tcode-tab svg.bi {
     font-size: 0.85rem;
 }
 
@@ -323,7 +323,7 @@
     box-shadow: 0 0 0 3px var(--tcode-primary-light);
 }
 
-.tcode-table-search i {
+.tcode-table-search i, .tcode-table-search svg.bi {
     color: var(--tcode-text-muted);
     font-size: 0.8rem;
 }
@@ -534,7 +534,7 @@
 .tcode-badge-info    { background: #e8f4fd; color: #0a6ed1; }
 .tcode-badge-secondary { background: #ebedef; color: #6a6d70; }
 
-.tcode-badge i {
+.tcode-badge i, .tcode-badge svg.bi {
     font-size: 0.65rem;
 }
 
@@ -550,7 +550,7 @@
     accent-color: var(--tcode-primary);
 }
 
-.tcode-validation-icon {
+.tcode-validation-icon.tcode-validation-icon {
     width: 20px;
     height: 20px;
     display: inline-flex;
@@ -569,7 +569,7 @@
     color: var(--tcode-danger);
 }
 
-.tcode-badge i {
+.tcode-badge i, .tcode-badge svg.bi {
     font-size: 0.65rem;
 }
 
@@ -584,7 +584,7 @@
     height: 15px;
 }
 
-.tcode-validation-icon {
+.tcode-validation-icon.tcode-validation-icon {
     width: 20px;
     height: 20px;
     display: inline-flex;

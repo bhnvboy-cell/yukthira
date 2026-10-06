@@ -1,0 +1,285 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.AccessMatrixModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Access Matrix";
+}
+
+<style>
+    .am-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .am-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .am-table tbody tr:hover { background: #f0f4fa; }
+    .am-expand { cursor: pointer; }
+    .am-caret { transition: transform .15s; display: inline-block; }
+    .am-caret.open { transform: rotate(180deg); }
+    .am-chips { display: flex; flex-wrap: wrap; gap: 4px; max-height: 200px; overflow: auto; }
+    .am-chip { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e8eef6; color: #1F497D; font-family: monospace; }
+    .filter-bar { background: #f8f9fa; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0"><svg class="bi bi-grid-3x3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-grid-3x3"></use></svg>Access Matrix</h2>
+</div>
+<p class="text-muted mb-3">Which users and roles may run which transaction codes, with permitted and denied counts per row.</p>
+
+<div id="pageAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="pageAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div id="pageSpinner" class="text-center py-3 d-none" role="status">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
+
+<div class="filter-bar">
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <span class="form-label fw-bold small mb-1 d-block">View</span>
+            <div class="btn-group" role="group" aria-label="Matrix view">
+                <button type="button" class="btn btn-sm btn-outline-secondary active" id="btnByUser" onclick="setBy('user')">By User</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnByRole" onclick="setBy('role')">By Role</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold small mb-1" for="mxModule">Module</label>
+            <select id="mxModule" class="form-select form-select-sm" onchange="resetAndLoad()">
+                <option value="">All modules</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold small mb-1" for="mxSearch">Search</label>
+            <input type="text" id="mxSearch" class="form-control form-control-sm" placeholder="Name, login or role" oninput="debouncedSearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();resetAndLoad();}" />
+        </div>
+        <div class="col-md-4 d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetAndLoad()">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportCsv()">
+                <svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export CSV
+            </button>
+            <span class="text-muted small ms-auto align-self-center" id="mxSummary"></span>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover am-table mb-0" id="mxTable">
+        <thead>
+            <tr>
+                <th id="thLabel">User</th>
+                <th id="thSecondary">Secondary</th>
+                <th>Role</th>
+                <th>Access</th>
+                <th style="width: 36px"></th>
+            </tr>
+        </thead>
+        <tbody id="mxBody">
+            <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <span class="text-muted small" id="mxPageInfo"></span>
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="mxPrev" onclick="prevPage()">
+            <svg class="bi bi-chevron-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg>Prev
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="mxNext" onclick="nextPage()">
+            Next<svg class="bi bi-chevron-right ms-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    var mxBy = 'user';
+    var mxPage = 1;
+    var mxPageSize = 25;
+    var mxTotal = 0;
+    var mxTcodeCount = 0;
+    var mxSearchTimer = null;
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function emptyRow(colspan, message) {
+        return '<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">' + esc(message) + '</td></tr>';
+    }
+
+    function showAlert(message, success) {
+        var box = document.getElementById('pageAlert');
+        document.getElementById('pageAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showAlert._timer);
+            showAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    function buildQuery() {
+        var q = '?by=' + encodeURIComponent(mxBy) + '&page=' + mxPage + '&pageSize=' + mxPageSize;
+        var module = document.getElementById('mxModule').value;
+        if (module) q += '&module=' + encodeURIComponent(module);
+        var search = document.getElementById('mxSearch').value.trim();
+        if (search) q += '&search=' + encodeURIComponent(search);
+        return q;
+    }
+
+    function populateModules(modules) {
+        var select = document.getElementById('mxModule');
+        var current = select.value;
+        var html = '<option value="">All modules</option>';
+        modules.forEach(function (m) {
+            html += '<option value="' + esc(m) + '">' + esc(m) + '</option>';
+        });
+        select.innerHTML = html;
+        if (current && modules.indexOf(current) >= 0) select.value = current;
+    }
+
+    async function loadMatrix() {
+        var body = document.getElementById('mxBody');
+        body.innerHTML = emptyRow(5, 'Loading...');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/security/matrix/roles-tcodes' + buildQuery());
+            var rows = (data && Array.isArray(data.rows)) ? data.rows : [];
+            mxTotal = (data && typeof data.totalCount === 'number') ? data.totalCount : rows.length;
+            mxTcodeCount = (data && typeof data.tcodeCount === 'number') ? data.tcodeCount : 0;
+            populateModules((data && Array.isArray(data.modules)) ? data.modules : []);
+            renderRows(rows);
+            updateSummary();
+            updatePagination();
+        } catch (e) {
+            body.innerHTML = emptyRow(5, 'The access matrix could not be loaded.');
+            document.getElementById('mxSummary').textContent = '';
+            document.getElementById('mxPageInfo').textContent = '';
+            document.getElementById('mxPrev').disabled = true;
+            document.getElementById('mxNext').disabled = true;
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function renderRows(rows) {
+        var body = document.getElementById('mxBody');
+        if (!rows.length) {
+            body.innerHTML = emptyRow(5, 'No matrix entries match the current filters.');
+            return;
+        }
+        var html = '';
+        rows.forEach(function (r, idx) {
+            var permitted = Array.isArray(r.permitted) ? r.permitted : [];
+            var limit = Math.min(permitted.length, 300);
+            var chips = '';
+            for (var i = 0; i < limit; i++) chips += '<span class="am-chip">' + esc(permitted[i]) + '</span>';
+            if (permitted.length > limit) chips += '<span class="badge bg-secondary">+' + (permitted.length - limit) + ' more</span>';
+            if (!permitted.length) chips = '<span class="text-muted small">No permitted transaction codes</span>';
+            html += '<tr class="am-expand" onclick="toggleChips(' + idx + ')">' +
+                '<td class="fw-semibold">' + esc(r.label) + '</td>' +
+                '<td class="small text-muted mx-secondary">' + esc(r.secondary) + '</td>' +
+                '<td>' + (r.role ? '<span class="badge bg-secondary">' + esc(r.role) + '</span>' : '<span class="text-muted">&mdash;</span>') + '</td>' +
+                '<td class="small">' + esc(r.permittedCount) + ' allowed / ' + esc(r.deniedCount) + ' denied</td>' +
+                '<td class="text-center"><svg class="bi bi-chevron-down am-caret" id="mxCaret-' + idx + '" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-down"></use></svg></td>' +
+                '</tr>' +
+                '<tr class="d-none" id="mxChips-' + idx + '"><td colspan="5" class="bg-light"><div class="am-chips">' + chips + '</div></td></tr>';
+        });
+        body.innerHTML = html;
+        applySecondaryVisibility();
+    }
+
+    function toggleChips(idx) {
+        var row = document.getElementById('mxChips-' + idx);
+        var caret = document.getElementById('mxCaret-' + idx);
+        if (!row) return;
+        row.classList.toggle('d-none');
+        if (caret) caret.classList.toggle('open');
+    }
+
+    function applySecondaryVisibility() {
+        var hidden = mxBy === 'role';
+        document.getElementById('thSecondary').style.display = hidden ? 'none' : '';
+        document.querySelectorAll('.mx-secondary').forEach(function (cell) {
+            cell.style.display = hidden ? 'none' : '';
+        });
+        document.getElementById('thLabel').textContent = hidden ? 'Role' : 'User';
+    }
+
+    function updateSummary() {
+        var unit = mxBy === 'role' ? 'roles' : 'users';
+        document.getElementById('mxSummary').textContent = mxTotal + ' ' + unit + ' · ' + mxTcodeCount + ' transaction codes';
+    }
+
+    function updatePagination() {
+        var pages = Math.max(1, Math.ceil(mxTotal / mxPageSize));
+        document.getElementById('mxPageInfo').textContent = 'Page ' + mxPage + ' of ' + pages + ' · ' + mxTotal + ' entries';
+        document.getElementById('mxPrev').disabled = mxPage <= 1;
+        document.getElementById('mxNext').disabled = mxPage >= pages;
+    }
+
+    function setBy(mode) {
+        if (mxBy === mode) return;
+        mxBy = mode;
+        mxPage = 1;
+        document.getElementById('btnByUser').classList.toggle('active', mode === 'user');
+        document.getElementById('btnByRole').classList.toggle('active', mode === 'role');
+        loadMatrix();
+    }
+
+    function resetAndLoad() {
+        mxPage = 1;
+        loadMatrix();
+    }
+
+    function debouncedSearch() {
+        window.clearTimeout(mxSearchTimer);
+        mxSearchTimer = window.setTimeout(resetAndLoad, 350);
+    }
+
+    function prevPage() {
+        if (mxPage > 1) { mxPage--; loadMatrix(); }
+    }
+
+    function nextPage() {
+        var pages = Math.max(1, Math.ceil(mxTotal / mxPageSize));
+        if (mxPage < pages) { mxPage++; loadMatrix(); }
+    }
+
+    async function exportCsv() {
+        try {
+            var url = '/api/v1/security/matrix/export?by=' + encodeURIComponent(mxBy);
+            var module = document.getElementById('mxModule').value;
+            if (module) url += '&module=' + encodeURIComponent(module);
+            var r = await fetch(url, { credentials: 'same-origin' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            var blob = await r.blob();
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'access-matrix-' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+        } catch (e) {
+            showAlert('Export failed: ' + e.message);
+        }
+    }
+
+    loadMatrix();
+</script>

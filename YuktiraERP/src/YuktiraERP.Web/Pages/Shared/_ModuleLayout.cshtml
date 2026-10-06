@@ -21,7 +21,7 @@
                class="btn btn-sm btn-primary module-action-btn"
                data-action-tab="@tab.Key"
                style="display:@(isActive ? "inline-flex" : "none");align-items:center;gap:0.35rem;border-radius:6px;font-weight:600">
-                <i class="bi @tab.PrimaryAction!.Icon"></i> @tab.PrimaryAction!.Label
+                <svg class="bi @tab.PrimaryAction!.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@tab.PrimaryAction!.Icon"></use></svg> @tab.PrimaryAction!.Label
             </a>
         }
         @if (Model.PrimaryAction != null)
@@ -29,7 +29,7 @@
             <a href="@Model.PrimaryAction.Href"
                class="btn btn-sm btn-primary module-action-btn module-action-fallback"
                style="display:inline-flex;align-items:center;gap:0.35rem;border-radius:6px;font-weight:600">
-                <i class="bi @Model.PrimaryAction.Icon"></i> @Model.PrimaryAction.Label
+                <svg class="bi @Model.PrimaryAction.Icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@Model.PrimaryAction.Icon"></use></svg> @Model.PrimaryAction.Label
             </a>
         }
     </div>
@@ -43,7 +43,7 @@
         {
             <div class="module-kpi-card">
                 <div class="module-kpi-icon @kpi.Type">
-                    <i class="bi @GetKpiIcon(kpi.Type)"></i>
+                    <svg class="bi @GetKpiIcon(kpi.Type)" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#@GetKpiIcon(kpi.Type)"></use></svg>
                 </div>
                 <div class="module-kpi-info">
                     <div class="module-kpi-value">@kpi.Value</div>
@@ -82,7 +82,7 @@
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
                     <div class="sheet-search">
-                        <i class="bi bi-search"></i>
+                        <svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>
                         <input type="text" class="sheet-search-input" placeholder="Filter rows..." />
                     </div>
                     <span class="sheet-selected-count"></span>
@@ -116,7 +116,7 @@
                             <tr>
                                 <td colspan="@(gridTab.Columns.Count(c => c.Visible) + 2)">
                                     <div class="sheet-empty">
-                                        <i class="bi bi-inbox"></i>
+                                        <svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg>
                                         <div>No records found</div>
                                     </div>
                                 </td>
@@ -158,7 +158,7 @@
                                             var editUrl = gridTab.EditHref(row);
                                             if (!string.IsNullOrEmpty(editUrl))
                                             {
-                                                <a href="@editUrl" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
+                                                <a href="@editUrl" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
                                             }
                                         }
                                         @if (gridTab.ViewHref != null)
@@ -166,7 +166,7 @@
                                             var viewUrl = gridTab.ViewHref(row);
                                             if (!string.IsNullOrEmpty(viewUrl))
                                             {
-                                                <a href="@viewUrl" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                                <a href="@viewUrl" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                             }
                                         }
                                     </div>
@@ -181,9 +181,9 @@
             <div class="sheet-pagination">
                 <span class="sheet-pagination-info">Showing @gridTab.Rows.Count rows</span>
                 <div class="sheet-pagination-controls">
-                    <button class="page-btn" data-dir="prev" disabled><i class="bi bi-chevron-left"></i></button>
+                    <button class="page-btn" data-dir="prev" disabled><svg class="bi bi-chevron-left" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg></button>
                     <button class="page-btn active" data-page="1">1</button>
-                    <button class="page-btn" data-dir="next" disabled><i class="bi bi-chevron-right"></i></button>
+                    <button class="page-btn" data-dir="next" disabled><svg class="bi bi-chevron-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg></button>
                 </div>
             </div>
         </div>

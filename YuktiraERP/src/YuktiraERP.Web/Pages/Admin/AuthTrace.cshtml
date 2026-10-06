@@ -1,0 +1,346 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.AuthTraceModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Authorization Trace";
+}
+
+<style>
+    .at-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .at-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .at-table tbody tr:hover { background: #f0f4fa; }
+    .at-row { cursor: pointer; }
+    .at-row.selected { background: #e8eef6; }
+    .at-detail dt { font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: #6c757d; }
+    .at-detail dd { font-size: .875rem; margin-bottom: 6px; word-break: break-word; }
+    .at-truncate { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+    .filter-bar { background: #f8f9fa; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0"><svg class="bi bi-clock-history me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>Authorization Trace</h2>
+</div>
+<p class="text-muted mb-3">Every allow and deny decision produced by navigation guards and transaction-code checks, with the rule that decided it.</p>
+
+<div id="pageAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="pageAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div id="pageSpinner" class="text-center py-3 d-none" role="status">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
+
+<div class="filter-bar">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-2">
+            <label class="form-label fw-bold small mb-1" for="trDecision">Decision</label>
+            <select id="trDecision" class="form-select form-select-sm" onchange="resetAndLoad()">
+                <option value="">All</option>
+                <option value="Allow">Allow</option>
+                <option value="Deny">Deny</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-bold small mb-1" for="trType">Resource Type</label>
+            <select id="trType" class="form-select form-select-sm" onchange="resetAndLoad()">
+                <option value="">All</option>
+                <option value="Page">Page</option>
+                <option value="TCode">TCode</option>
+                <option value="Api">Api</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-bold small mb-1" for="trUser">User contains</label>
+            <input type="text" id="trUser" class="form-control form-control-sm" placeholder="Login or name" oninput="debouncedLoad()" onkeydown="if(event.key==='Enter'){event.preventDefault();resetAndLoad();}" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-bold small mb-1" for="trResource">Resource contains</label>
+            <input type="text" id="trResource" class="form-control form-control-sm" placeholder="Page, code or path" oninput="debouncedLoad()" onkeydown="if(event.key==='Enter'){event.preventDefault();resetAndLoad();}" />
+        </div>
+        <div class="col-md-4 d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetAndLoad()">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportCsv()">
+                <svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export CSV
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="purgeTrace()">
+                <svg class="bi bi-trash me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg>Purge
+            </button>
+        </div>
+        <div class="col-12">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="trAuto" checked />
+                <label class="form-check-label small text-muted" for="trAuto">Auto-refresh every 10 seconds while this page is visible</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover at-table mb-0">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Resource</th>
+                <th>Decision</th>
+                <th>Rule</th>
+                <th>Reason</th>
+                <th>Path</th>
+            </tr>
+        </thead>
+        <tbody id="trBody">
+            <tr><td colspan="8" class="text-center text-muted py-3">Loading...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <span class="text-muted small" id="trPageInfo"></span>
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="trPrev" onclick="prevPage()">
+            <svg class="bi bi-chevron-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg>Prev
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="trNext" onclick="nextPage()">
+            Next<svg class="bi bi-chevron-right ms-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg>
+        </button>
+    </div>
+</div>
+
+<div class="card mt-3" id="trDetailCard">
+    <div class="card-header bg-light py-2 fw-semibold">
+        <svg class="bi bi-eye me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg>Decision Detail
+    </div>
+    <div class="card-body py-2">
+        <p class="text-muted small mb-0" id="trDetailEmpty">Select a row above to inspect the full decision record.</p>
+        <div class="row d-none at-detail" id="trDetail">
+            <div class="col-md-6">
+                <dl class="mb-0">
+                    <dt>Time</dt><dd id="dtCreatedAt"></dd>
+                    <dt>User</dt><dd id="dtUser"></dd>
+                    <dt>Role</dt><dd id="dtRole"></dd>
+                    <dt>Decision</dt><dd id="dtDecision"></dd>
+                    <dt>Rule Source</dt><dd id="dtRule"></dd>
+                    <dt>Reason</dt><dd id="dtReason"></dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="mb-0">
+                    <dt>Resource Type</dt><dd id="dtType"></dd>
+                    <dt>Resource</dt><dd id="dtResource"></dd>
+                    <dt>Request</dt><dd id="dtPath"></dd>
+                    <dt>Correlation Id</dt><dd id="dtCorrelation"></dd>
+                    <dt>IP Address</dt><dd id="dtIp"></dd>
+                    <dt>Record Id</dt><dd id="dtId"></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var trPage = 1;
+    var trPageSize = 50;
+    var trTotal = 0;
+    var trEntries = [];
+    var trSearchTimer = null;
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function emptyRow(colspan, message) {
+        return '<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">' + esc(message) + '</td></tr>';
+    }
+
+    function fmtDate(value) {
+        if (!value) return '&mdash;';
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return esc(value);
+        return d.toLocaleString();
+    }
+
+    function showAlert(message, success) {
+        var box = document.getElementById('pageAlert');
+        document.getElementById('pageAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showAlert._timer);
+            showAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    function buildQuery() {
+        var q = '?page=' + trPage + '&pageSize=' + trPageSize;
+        var decision = document.getElementById('trDecision').value;
+        if (decision) q += '&decision=' + encodeURIComponent(decision);
+        var type = document.getElementById('trType').value;
+        if (type) q += '&resourceType=' + encodeURIComponent(type);
+        var user = document.getElementById('trUser').value.trim();
+        if (user) q += '&userName=' + encodeURIComponent(user);
+        var resource = document.getElementById('trResource').value.trim();
+        if (resource) q += '&resource=' + encodeURIComponent(resource);
+        return q;
+    }
+
+    async function loadTrace(showLoading) {
+        var body = document.getElementById('trBody');
+        if (showLoading) body.innerHTML = emptyRow(8, 'Loading...');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/security/trace' + buildQuery());
+            trEntries = (data && Array.isArray(data.entries)) ? data.entries : [];
+            trTotal = (data && typeof data.totalCount === 'number') ? data.totalCount : trEntries.length;
+            renderRows();
+            updatePagination();
+        } catch (e) {
+            body.innerHTML = emptyRow(8, 'The authorization trace could not be loaded.');
+            document.getElementById('trPageInfo').textContent = '';
+            document.getElementById('trPrev').disabled = true;
+            document.getElementById('trNext').disabled = true;
+            if (showLoading) showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function decisionBadge(decision) {
+        var cls = decision === 'Allow' ? 'bg-success' : 'bg-danger';
+        return '<span class="badge ' + cls + '">' + esc(decision || 'Unknown') + '</span>';
+    }
+
+    function typeBadge(type) {
+        return '<span class="badge bg-secondary">' + esc(type || 'Unknown') + '</span>';
+    }
+
+    function truncate(value, length) {
+        var text = value === null || value === undefined ? '' : String(value);
+        if (text.length <= length) return esc(text);
+        return esc(text.substring(0, length)) + '&hellip;';
+    }
+
+    function renderRows() {
+        var body = document.getElementById('trBody');
+        if (!trEntries.length) {
+            body.innerHTML = emptyRow(8, 'No authorization decisions recorded yet. Decisions appear here as soon as navigation guards and transaction-code checks evaluate — try opening a restricted area in another tab.');
+            return;
+        }
+        var html = '';
+        trEntries.forEach(function (e, idx) {
+            html += '<tr class="at-row" id="trRow-' + idx + '" onclick="showDetail(' + idx + ')">' +
+                '<td class="small text-nowrap">' + fmtDate(e.createdAt) + '</td>' +
+                '<td><div class="fw-semibold">' + esc(e.userName) + '</div><small class="text-muted">' + esc(e.role) + '</small></td>' +
+                '<td>' + typeBadge(e.resourceType) + '</td>' +
+                '<td class="small">' + esc(e.resource) + '</td>' +
+                '<td>' + decisionBadge(e.decision) + '</td>' +
+                '<td class="small"><code>' + esc(e.ruleSource) + '</code></td>' +
+                '<td class="small"><span class="at-truncate text-muted" title="' + esc(e.reason) + '">' + truncate(e.reason, 80) + '</span></td>' +
+                '<td class="small text-muted"><span class="at-truncate" title="' + esc(e.httpMethod) + ' ' + esc(e.httpPath) + '">' + esc(e.httpMethod) + ' ' + esc(e.httpPath) + '</span></td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function showDetail(idx) {
+        var e = trEntries[idx];
+        if (!e) return;
+        document.querySelectorAll('.at-row').forEach(function (row) { row.classList.remove('selected'); });
+        var row = document.getElementById('trRow-' + idx);
+        if (row) row.classList.add('selected');
+        document.getElementById('trDetailEmpty').classList.add('d-none');
+        document.getElementById('trDetail').classList.remove('d-none');
+        document.getElementById('dtCreatedAt').innerHTML = fmtDate(e.createdAt);
+        document.getElementById('dtUser').textContent = e.userName || '';
+        document.getElementById('dtRole').textContent = e.role || '';
+        document.getElementById('dtDecision').innerHTML = decisionBadge(e.decision);
+        document.getElementById('dtRule').textContent = e.ruleSource || '';
+        document.getElementById('dtReason').textContent = e.reason || '';
+        document.getElementById('dtType').textContent = e.resourceType || '';
+        document.getElementById('dtResource').textContent = e.resource || '';
+        document.getElementById('dtPath').textContent = (e.httpMethod || '') + ' ' + (e.httpPath || '');
+        document.getElementById('dtCorrelation').textContent = e.correlationId || '';
+        document.getElementById('dtIp').textContent = e.ipAddress || '';
+        document.getElementById('dtId').textContent = e.id || '';
+    }
+
+    function updatePagination() {
+        var pages = Math.max(1, Math.ceil(trTotal / trPageSize));
+        document.getElementById('trPageInfo').textContent = 'Page ' + trPage + ' of ' + pages + ' · ' + trTotal + ' decisions';
+        document.getElementById('trPrev').disabled = trPage <= 1;
+        document.getElementById('trNext').disabled = trPage >= pages;
+    }
+
+    function resetAndLoad() {
+        trPage = 1;
+        loadTrace(true);
+    }
+
+    function debouncedLoad() {
+        window.clearTimeout(trSearchTimer);
+        trSearchTimer = window.setTimeout(resetAndLoad, 400);
+    }
+
+    function prevPage() {
+        if (trPage > 1) { trPage--; loadTrace(false); }
+    }
+
+    function nextPage() {
+        var pages = Math.max(1, Math.ceil(trTotal / trPageSize));
+        if (trPage < pages) { trPage++; loadTrace(false); }
+    }
+
+    async function exportCsv() {
+        try {
+            var r = await fetch('/api/v1/security/trace/export' + buildQuery(), { credentials: 'same-origin' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            var blob = await r.blob();
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'authorization-trace-' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+        } catch (e) {
+            showAlert('Export failed: ' + e.message);
+        }
+    }
+
+    async function purgeTrace() {
+        if (!confirm('Purge authorization decisions older than 7 days?')) return;
+        try {
+            var data = await apiFetch('/api/v1/security/trace?olderThanDays=7', { method: 'DELETE' });
+            var purged = (data && typeof data.purged === 'number') ? data.purged : 0;
+            showAlert('Purged ' + purged + ' older decisions.', true);
+            resetAndLoad();
+        } catch (e) {
+            showAlert(e.message);
+        }
+    }
+
+    window.setInterval(function () {
+        if (!document.getElementById('trAuto').checked) return;
+        if (document.visibilityState !== 'visible') return;
+        loadTrace(false);
+    }, 10000);
+
+    loadTrace(true);
+</script>

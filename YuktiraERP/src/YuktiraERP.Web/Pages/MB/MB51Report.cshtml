@@ -6,17 +6,17 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-list-ul me-2"></i>MB51 - Material Document List</h3>
+            <h3><svg class="bi bi-list-ul me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>MB51 - Material Document List</h3>
             <span class="badge">Report</span>
         </div>
         <div class="actions">
-            <button type="submit" form="mb51Form" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><i class="bi bi-search me-1"></i>Search</button>
-            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="mb51Form" class="zqm-btn" style="background:#1565c0;border-color:#1565c0"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Search</button>
+            <a asp-page="/MB/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filters</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Filters</div>
         <form method="get" id="mb51Form">
             <div class="zqm-row cols-4">
                 <div class="zqm-field"><label>Material Code</label><input asp-for="Filter.MaterialCode" /></div>
@@ -36,7 +36,7 @@
     {
         <div class="zqm-results">
             <div class="zqm-results-header">
-                <h4><i class="bi bi-list-ul me-1"></i>Results</h4>
+                <h4><svg class="bi bi-list-ul me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>Results</h4>
                 <span class="count">@Model.Documents.Count documents</span>
             </div>
             <div class="zqm-table-wrap">
@@ -81,7 +81,7 @@
     else if (Model.Documents != null)
     {
         <div class="zqm-results">
-            <div class="zqm-empty"><i class="bi bi-inbox"></i><div>No documents found matching criteria.</div></div>
+            <div class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No documents found matching criteria.</div></div>
         </div>
     }
 </div>

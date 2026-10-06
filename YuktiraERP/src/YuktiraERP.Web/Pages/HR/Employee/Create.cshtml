@@ -3,15 +3,15 @@
 @{ ViewData["Title"] = "Hire Employee"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-person-plus me-2"></i>Hire Employee</h2>
+        <h2><svg class="bi bi-person-plus me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-plus"></use></svg>Hire Employee</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="empForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Employee</button>
+            <button type="submit" form="empForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Employee</button>
             <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
 
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-person-plus"></i></div>
+        <div class="banner-icon"><svg class="bi bi-person-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-plus"></use></svg></div>
         <div class="banner-info">
             <h5>Hire Employee</h5>
             <span>Create new employee master record</span>
@@ -28,7 +28,7 @@
     <form id="empForm" method="post">
         <div class="ent-form-panel active" data-panel="tabPersonal">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Personal Information</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-person" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg><h6>Personal Information</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label asp-for="Employee.PersonnelNumber" class="ent-label">Personnel Number</label>
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-check2-square"></i><h6>Status</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-check2-square" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-square"></use></svg><h6>Status</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label asp-for="Employee.Status" class="ent-label">Status</label>
@@ -80,7 +80,7 @@
 
         <div class="ent-form-panel" data-panel="tabEmployment" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-building"></i><h6>Organization Assignment</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-building" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg><h6>Organization Assignment</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label asp-for="Employee.CompanyCode" class="ent-label">Company Code</label>
@@ -103,7 +103,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-diagram-3"></i><h6>Work Structure</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg><h6>Work Structure</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label asp-for="Employee.Department" class="ent-label">Department</label>
@@ -129,7 +129,7 @@
 
         <div class="ent-form-panel" data-panel="tabCompensation" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-cash-stack"></i><h6>Salary &amp; Payment</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-cash-stack" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-stack"></use></svg><h6>Salary &amp; Payment</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label asp-for="Employee.BasicSalary" class="ent-label">Basic Salary</label>
@@ -147,7 +147,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-sticky"></i><h6>Notes</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-sticky" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-sticky"></use></svg><h6>Notes</h6></div>
                 <div class="ent-field">
                     <label class="ent-label">Additional Notes</label>
                     <textarea class="form-control" rows="4" placeholder="Any additional notes about this employee..."></textarea>
@@ -159,7 +159,7 @@
             <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
             <div class="footer-actions">
                 <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Employee</button>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Employee</button>
             </div>
         </div>
     </form>

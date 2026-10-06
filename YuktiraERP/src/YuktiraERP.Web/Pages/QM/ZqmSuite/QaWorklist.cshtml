@@ -6,18 +6,18 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-list-task me-2"></i>QA Worklist</h3>
+            <h3><svg class="bi bi-list-task me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-task"></use></svg>QA Worklist</h3>
             <span class="badge">ZQM06</span>
         </div>
         <div class="actions">
-            <button type="button" class="zqm-btn" onclick="loadWorklist()"><i class="bi bi-play-fill me-1"></i>Execute</button>
-            <button type="button" class="zqm-btn" onclick="exportWorklist()"><i class="bi bi-download me-1"></i>Export</button>
-            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="button" class="zqm-btn" onclick="loadWorklist()"><svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Execute</button>
+            <button type="button" class="zqm-btn" onclick="exportWorklist()"><svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Selection Criteria</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Selection Criteria</div>
         <div class="zqm-row cols-4">
             <div class="zqm-field"><label>Plant</label><select id="wl-plant"><option value="">All Plants</option><option>1000</option><option>2000</option><option>3000</option></select></div>
             <div class="zqm-field"><label>Inspector</label><input id="wl-inspector" placeholder="Inspector ID" /></div>
@@ -29,7 +29,7 @@
     <div id="alertBox" class="zqm-alert"></div>
 
     <div class="zqm-results" id="resultsSection" style="display:none">
-        <div class="zqm-results-header"><h4><i class="bi bi-table me-1"></i>Worklist</h4><span class="count" id="resultCount"></span></div>
+        <div class="zqm-results-header"><h4><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Worklist</h4><span class="count" id="resultCount"></span></div>
         <div class="zqm-table-wrap">
             <table class="zqm-table" id="wlTable">
                 <thead><tr><th style="width:40px"><input type="checkbox" class="zqm-chk" id="wl-select-all" /></select></th><th>Task ID</th><th>Type</th><th>Lot #</th><th>Material</th><th>Plant</th><th>Inspector</th><th>Due Date</th><th>Priority</th><th>Status</th></tr></thead>
@@ -39,7 +39,7 @@
         <div class="zqm-footer"><span id="wlFooter">-</span><div></div></div>
     </div>
 
-    <div class="zqm-empty" id="emptyState"><i class="bi bi-list-task"></i><div>Set filters and click Execute to load worklist</div></div>
+    <div class="zqm-empty" id="emptyState"><svg class="bi bi-list-task" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-task"></use></svg><div>Set filters and click Execute to load worklist</div></div>
 </div>
 
 @section Scripts {

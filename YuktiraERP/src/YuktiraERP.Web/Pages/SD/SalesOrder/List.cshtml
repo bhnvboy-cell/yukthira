@@ -6,17 +6,17 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-file-text me-2"></i>Sales Order List</h3>
+            <h3><svg class="bi bi-file-text me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-text"></use></svg>Sales Order List</h3>
             <span class="badge">@Model.Orders.Count records</span>
         </div>
         <div class="actions">
-            <a asp-page="/SD/SalesOrder/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-plus-circle me-1"></i>New Sales Order</a>
-            <a asp-page="/SD/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/SD/SalesOrder/Create" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New Sales Order</a>
+            <a asp-page="/SD/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Search</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Search</div>
         <div class="zqm-row cols-3">
             <div class="zqm-field"><label>SO Number</label><input id="searchNumber" placeholder="Filter by number..." oninput="filterTable()" /></div>
             <div class="zqm-field"><label>Customer</label><input id="searchCustomer" placeholder="Filter by customer..." oninput="filterTable()" /></div>
@@ -40,12 +40,12 @@
                             <td>@o.Amount.ToString("C2")</td>
                             <td><span class="zqm-badge @(o.Status=="Completed"?"passed":o.Status=="Confirmed"||o.Status=="Pending"?"info":o.Status=="Cancelled"?"failed":"warning")">@o.Status</span></td>
                             <td>
-                                <a asp-page="/SD/SalesOrder/Display" asp-route-id="@o.Id" class="zqm-act" title="View"><i class="bi bi-eye"></i></a>
-                                <a asp-page="/SD/SalesOrder/Edit" asp-route-id="@o.Id" class="zqm-act" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <a asp-page="/SD/SalesOrder/Display" asp-route-id="@o.Id" class="zqm-act" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
+                                <a asp-page="/SD/SalesOrder/Edit" asp-route-id="@o.Id" class="zqm-act" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
                             </td>
                         </tr>
                     }
-                    @if (!Model.Orders.Any()) { <tr><td colspan="7" class="zqm-empty"><i class="bi bi-inbox"></i><div>No sales orders found</div></td></tr> }
+                    @if (!Model.Orders.Any()) { <tr><td colspan="7" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No sales orders found</div></td></tr> }
                 </tbody>
             </table>
         </div>

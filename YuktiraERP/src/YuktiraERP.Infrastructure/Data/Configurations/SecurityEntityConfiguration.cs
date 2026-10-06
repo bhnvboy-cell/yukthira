@@ -99,3 +99,44 @@ public class UserRoleAssignmentEntityConfiguration : IEntityTypeConfiguration<Us
         builder.Property(e => e.Status).HasMaxLength(20);
     }
 }
+
+public class AuthorizationTraceEntityConfiguration : IEntityTypeConfiguration<AuthorizationTraceEntity>
+{
+    public void Configure(EntityTypeBuilder<AuthorizationTraceEntity> builder)
+    {
+        builder.ToTable("authorization_traces", "yuktira_security");
+        builder.HasIndex(e => e.TenantId);
+        builder.HasIndex(e => new { e.TenantId, e.CreatedAt });
+        builder.HasIndex(e => new { e.TenantId, e.Decision });
+        builder.Property(e => e.UserId);
+        builder.Property(e => e.UserName).HasMaxLength(200);
+        builder.Property(e => e.Role).HasMaxLength(50);
+        builder.Property(e => e.SessionId).HasMaxLength(100);
+        builder.Property(e => e.CorrelationId).HasMaxLength(100);
+        builder.Property(e => e.ResourceType).HasMaxLength(20);
+        builder.Property(e => e.Resource).HasMaxLength(300);
+        builder.Property(e => e.Decision).HasMaxLength(10);
+        builder.Property(e => e.RuleSource).HasMaxLength(50);
+        builder.Property(e => e.Reason).HasMaxLength(1000);
+        builder.Property(e => e.HttpMethod).HasMaxLength(10);
+        builder.Property(e => e.HttpPath).HasMaxLength(500);
+        builder.Property(e => e.IpAddress).HasMaxLength(60);
+        builder.Property(e => e.UserAgent).HasMaxLength(500);
+    }
+}
+
+public class TCodeAuthCheckEntityConfiguration : IEntityTypeConfiguration<TCodeAuthCheckEntity>
+{
+    public void Configure(EntityTypeBuilder<TCodeAuthCheckEntity> builder)
+    {
+        builder.ToTable("tcode_auth_checks", "yuktira_security");
+        builder.HasIndex(e => e.TenantId);
+        builder.HasIndex(e => new { e.TCode, e.TenantId });
+        builder.Property(e => e.TCode).HasMaxLength(50);
+        builder.Property(e => e.CheckCode).HasMaxLength(50);
+        builder.Property(e => e.ActionType).HasMaxLength(20);
+        builder.Property(e => e.RequiredRole).HasMaxLength(50);
+        builder.Property(e => e.Enforcement).HasMaxLength(20);
+        builder.Property(e => e.Description).HasMaxLength(500);
+    }
+}

@@ -6,7 +6,8 @@ namespace YuktiraERP.Api.Controllers;
 
 [ApiController]
 [Route("api/tcode-generator")]
-[Authorize(Roles = "SUPER_USER,ADMIN")]
+[Authorize]
+[Authorize(Policy = "AdminOrAbove")]
 public class TCodeGeneratorController : ControllerBase
 {
     private readonly ITCodeGeneratorService _service;

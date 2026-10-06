@@ -1,0 +1,447 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.CurrencyRatesModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Exchange Rates";
+}
+
+<h2><svg class="bi bi-cash-coin me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cash-coin"></use></svg>Exchange Rates</h2>
+
+<div id="syncBanner" class="alert alert-secondary d-flex align-items-center gap-2 mt-3" role="alert">
+    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+    <span id="syncBannerText">Loading sync status...</span>
+</div>
+
+<div id="syncErrors" class="alert alert-danger" style="display:none;" role="alert">
+    <strong><svg class="bi bi-exclamation-triangle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>Last sync reported problems:</strong>
+    <ul id="syncErrorList" class="mb-0"></ul>
+</div>
+
+<div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+    <button type="button" class="btn btn-primary" id="btnSyncNow">
+        <svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg><span id="btnSyncNowText">Sync Now</span>
+    </button>
+    <span class="spinner-border spinner-border-sm text-primary" id="syncSpinner" style="display:none;" role="status" aria-label="Syncing"></span>
+    <span class="text-muted small">Scheduled sync refreshes base pairs and overwrites manual values on those pairs; overrides keep their audit trail.</span>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><svg class="bi bi-arrow-left-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>Rate Matrix</span>
+        <span class="text-muted small" id="matrixCount"></span>
+    </div>
+    <div class="card-body">
+        <div id="matrixLoading" class="text-muted">Loading exchange rates...</div>
+        <div id="matrixError" class="alert alert-danger" style="display:none;"></div>
+        <div id="matrixEmpty" class="text-muted" style="display:none;">
+            No exchange rates for this tenant yet. Run <strong>Sync Now</strong> or add a manual rate.
+        </div>
+        <div class="table-responsive" id="matrixWrap" style="display:none;">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th class="text-end">Rate</th>
+                        <th class="text-end">Inverse</th>
+                        <th>Source</th>
+                        <th>Effective From</th>
+                        <th>Updated</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <svg class="bi bi-calculator me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Conversion Simulator
+    </div>
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3 col-6">
+                <label class="form-label small text-muted" for="cvAmount">Amount</label>
+                <input type="number" class="form-control" id="cvAmount" value="100" min="0" step="any" />
+            </div>
+            <div class="col-md-3 col-6">
+                <label class="form-label small text-muted" for="cvFrom">From</label>
+                <select class="form-select" id="cvFrom"><option value="">-- select --</option></select>
+            </div>
+            <div class="col-md-3 col-6">
+                <label class="form-label small text-muted" for="cvTo">To</label>
+                <select class="form-select" id="cvTo"><option value="">-- select --</option></select>
+            </div>
+            <div class="col-md-3 col-6">
+                <button type="button" class="btn btn-outline-primary w-100" id="btnConvert">
+                    <svg class="bi bi-arrow-left-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>Convert
+                </button>
+            </div>
+        </div>
+        <div class="alert alert-success mt-3 mb-0" id="convertResult" style="display:none;"></div>
+        <div class="alert alert-danger mt-3 mb-0" id="convertError" style="display:none;"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="overrideModal" tabindex="-1" aria-labelledby="overrideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="overrideModalLabel">
+                    <svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Manual Rate Override
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small text-muted" for="ovFrom">From</label>
+                        <input class="form-control" id="ovFrom" readonly />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small text-muted" for="ovTo">To</label>
+                        <input class="form-control" id="ovTo" readonly />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted" for="ovRate">New rate</label>
+                    <input type="number" class="form-control" id="ovRate" step="any" min="0" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small text-muted" for="ovComment">Comment (required - SOX)</label>
+                    <textarea class="form-control" id="ovComment" rows="3" placeholder="Why is this rate being changed?"></textarea>
+                </div>
+                <div class="form-text">A non-empty comment is mandatory; it is written to the audit log with the old and new rate.</div>
+                <div class="alert alert-danger mt-2 mb-0" id="ovError" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnOverrideConfirm" disabled>
+                    <svg class="bi bi-check-lg me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-lg"></use></svg>Confirm override
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var apiBase = '/api/v1/fi/exchange-rates';
+    var atSign = String.fromCharCode(64);
+    var matrixRows = [];
+    var syncing = false;
+
+    function esc(value) {
+        return String(value === null || value === undefined ? '' : value)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    async function readJson(res) {
+        try { return await res.json(); } catch (e) { return {}; }
+    }
+
+    function errorText(body, fallback) {
+        if (body && body.detail) return body.detail;
+        if (body && body.error) return body.error;
+        if (body && body.title && body.title !== 'An error occurred while processing the request.') return body.title;
+        return fallback;
+    }
+
+    function pad(value) { return String(value).padStart(2, '0'); }
+
+    function fmtDate(value) {
+        if (!value) return '-';
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return String(value);
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    }
+
+    function fmtDateTime(value) {
+        if (!value) return '-';
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return String(value);
+        return fmtDate(value) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    function setSyncing(isSyncing) {
+        syncing = isSyncing;
+        document.getElementById('btnSyncNow').disabled = isSyncing;
+        document.getElementById('syncSpinner').style.display = isSyncing ? 'inline-block' : 'none';
+        document.getElementById('btnSyncNowText').textContent = isSyncing ? 'Syncing...' : 'Sync Now';
+    }
+
+    function showSyncErrors(errors) {
+        var box = document.getElementById('syncErrors');
+        var list = document.getElementById('syncErrorList');
+        if (!errors || !errors.length) { box.style.display = 'none'; list.innerHTML = ''; return; }
+        var html = '';
+        errors.forEach(function (e) { html += '<li>' + esc(e) + '</li>'; });
+        list.innerHTML = html;
+        box.style.display = 'block';
+    }
+
+    function renderStatus(status) {
+        var banner = document.getElementById('syncBanner');
+        var text = document.getElementById('syncBannerText');
+
+        if (!status || (!status.lastResult && !status.lastRunAt)) {
+            banner.className = 'alert alert-secondary d-flex align-items-center gap-2 mt-3';
+            text.textContent = 'Never synced - no exchange rate sync has completed on this host yet.';
+            showSyncErrors(null);
+            return;
+        }
+
+        var result = status.lastResult;
+        var parts = [];
+        if (status.isRunning) parts.push('Sync running now.');
+        if (status.lastRunAt) parts.push('Last sync: ' + fmtDateTime(status.lastRunAt) + '.');
+        if (result) {
+            parts.push('Provider ' + (result.provider || '-') + ' (base ' + (result.baseCurrency || '-') + '): '
+                + (result.ratesFetched || 0) + ' fetched, ' + (result.inserted || 0) + ' inserted, '
+                + (result.updated || 0) + ' updated.');
+            parts.push(result.success ? 'Status: success.' : 'Status: finished with errors.');
+        }
+
+        banner.className = 'alert d-flex align-items-center gap-2 mt-3 ' + (result && result.success ? 'alert-success' : (result ? 'alert-warning' : 'alert-secondary'));
+        text.textContent = parts.join(' ');
+        showSyncErrors(result ? result.errors : null);
+    }
+
+    async function loadStatus() {
+        try {
+            var res = await fetch(apiBase + '/sync-status', { credentials: 'same-origin' });
+            var body = await readJson(res);
+            if (!res.ok) {
+                document.getElementById('syncBannerText').textContent = 'Could not load sync status: ' + errorText(body, 'HTTP ' + res.status);
+                return;
+            }
+            renderStatus(body.data);
+        } catch (e) {
+            document.getElementById('syncBannerText').textContent = 'Could not load sync status: ' + e.message;
+        }
+    }
+
+    function renderMatrix(rows) {
+        var tbody = document.getElementById('matrixBody');
+        var wrap = document.getElementById('matrixWrap');
+        var empty = document.getElementById('matrixEmpty');
+        var loading = document.getElementById('matrixLoading');
+        var count = document.getElementById('matrixCount');
+
+        loading.style.display = 'none';
+
+        if (!rows || !rows.length) {
+            tbody.innerHTML = '';
+            wrap.style.display = 'none';
+            empty.style.display = 'block';
+            count.textContent = '';
+            populateCurrencies([]);
+            return;
+        }
+
+        var html = '';
+        rows.forEach(function (r) {
+            var source = r.source || '';
+            var badge = source === 'Manual'
+                ? '<span class="badge bg-warning text-dark">Manual</span>'
+                : '<span class="badge bg-secondary">' + esc(source || '-') + '</span>';
+            var action = '';
+            if (source === 'Manual') {
+                action = '<button type="button" class="btn btn-outline-secondary btn-sm" title="Override this rate" data-role="edit"'
+                    + ' data-from="' + esc(r.from) + '" data-to="' + esc(r.to) + '" data-rate="' + esc(r.rate) + '">'
+                    + '<svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></button>';
+            }
+            html += '<tr>'
+                + '<td>' + esc(r.from) + '</td>'
+                + '<td>' + esc(r.to) + '</td>'
+                + '<td class="text-end font-monospace">' + esc(r.rate) + '</td>'
+                + '<td class="text-end font-monospace">' + esc(r.inverse) + '</td>'
+                + '<td>' + badge + '</td>'
+                + '<td>' + fmtDate(r.effectiveFrom) + '</td>'
+                + '<td>' + (r.updatedAt ? fmtDateTime(r.updatedAt) : '-') + '</td>'
+                + '<td class="text-end">' + action + '</td>'
+                + '</tr>';
+        });
+
+        tbody.innerHTML = html;
+        wrap.style.display = 'block';
+        empty.style.display = 'none';
+        count.textContent = rows.length + ' rate(s)';
+        populateCurrencies(rows);
+    }
+
+    function populateCurrencies(rows) {
+        var currencies = [];
+        rows.forEach(function (r) {
+            if (r.from && currencies.indexOf(r.from) === -1) currencies.push(r.from);
+            if (r.to && currencies.indexOf(r.to) === -1) currencies.push(r.to);
+        });
+        currencies.sort();
+
+        ['cvFrom', 'cvTo'].forEach(function (id) {
+            var select = document.getElementById(id);
+            var previous = select.value;
+            var html = '<option value="">-- select --</option>';
+            currencies.forEach(function (code) {
+                html += '<option value="' + esc(code) + '">' + esc(code) + '</option>';
+            });
+            select.innerHTML = html;
+            if (previous && currencies.indexOf(previous) !== -1) select.value = previous;
+        });
+    }
+
+    async function loadMatrix() {
+        var loading = document.getElementById('matrixLoading');
+        var errorBox = document.getElementById('matrixError');
+        loading.style.display = 'block';
+        errorBox.style.display = 'none';
+        try {
+            var res = await fetch(apiBase, { credentials: 'same-origin' });
+            var body = await readJson(res);
+            loading.style.display = 'none';
+            if (!res.ok) {
+                errorBox.textContent = errorText(body, 'Could not load exchange rates (HTTP ' + res.status + ').');
+                errorBox.style.display = 'block';
+                return;
+            }
+            matrixRows = body.data || [];
+            renderMatrix(matrixRows);
+        } catch (e) {
+            loading.style.display = 'none';
+            errorBox.textContent = 'Could not load exchange rates: ' + e.message;
+            errorBox.style.display = 'block';
+        }
+    }
+
+    async function syncNow() {
+        if (syncing) return;
+        setSyncing(true);
+        showSyncErrors(null);
+        try {
+            var res = await fetch(apiBase + '/sync', { method: 'POST', credentials: 'same-origin' });
+            var body = await readJson(res);
+            if (res.status === 409) {
+                showSyncErrors([errorText(body, 'A sync run is already in progress.')]);
+            } else if (!res.ok) {
+                showSyncErrors([errorText(body, 'Sync failed (HTTP ' + res.status + ').')]);
+            } else if (body.data && body.data.errors && body.data.errors.length) {
+                showSyncErrors(body.data.errors);
+            }
+        } catch (e) {
+            showSyncErrors(['Sync request failed: ' + e.message]);
+        }
+        await Promise.all([loadStatus(), loadMatrix()]);
+        setSyncing(false);
+    }
+
+    function validateOverride() {
+        var rate = parseFloat(document.getElementById('ovRate').value);
+        var comment = document.getElementById('ovComment').value.trim();
+        document.getElementById('btnOverrideConfirm').disabled = !(isFinite(rate) && rate > 0 && comment.length > 0);
+    }
+
+    function openOverride(from, to, rate) {
+        document.getElementById('ovFrom').value = from;
+        document.getElementById('ovTo').value = to;
+        document.getElementById('ovRate').value = rate;
+        document.getElementById('ovComment').value = '';
+        document.getElementById('ovError').style.display = 'none';
+        validateOverride();
+        new bootstrap.Modal(document.getElementById('overrideModal')).show();
+    }
+
+    async function confirmOverride() {
+        var from = document.getElementById('ovFrom').value;
+        var to = document.getElementById('ovTo').value;
+        var rate = parseFloat(document.getElementById('ovRate').value);
+        var comment = document.getElementById('ovComment').value;
+        var errorBox = document.getElementById('ovError');
+
+        if (!isFinite(rate) || rate <= 0 || !comment.trim()) { validateOverride(); return; }
+
+        try {
+            var res = await fetch(apiBase + '/override', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from: from, to: to, rate: rate, comment: comment })
+            });
+            var body = await readJson(res);
+            if (!res.ok) {
+                errorBox.textContent = errorText(body, 'Override failed (HTTP ' + res.status + ').');
+                errorBox.style.display = 'block';
+                return;
+            }
+            var modal = bootstrap.Modal.getInstance(document.getElementById('overrideModal'));
+            if (modal) modal.hide();
+            await Promise.all([loadMatrix(), loadStatus()]);
+        } catch (e) {
+            errorBox.textContent = 'Override request failed: ' + e.message;
+            errorBox.style.display = 'block';
+        }
+    }
+
+    async function convert() {
+        var resultBox = document.getElementById('convertResult');
+        var errorBox = document.getElementById('convertError');
+        resultBox.style.display = 'none';
+        errorBox.style.display = 'none';
+
+        var amountValue = parseFloat(document.getElementById('cvAmount').value);
+        var from = document.getElementById('cvFrom').value;
+        var to = document.getElementById('cvTo').value;
+
+        if (!isFinite(amountValue) || amountValue < 0) {
+            errorBox.textContent = 'Enter a non-negative amount.';
+            errorBox.style.display = 'block';
+            return;
+        }
+        if (!from || !to) {
+            errorBox.textContent = 'Select both From and To currency.';
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        try {
+            var res = await fetch(apiBase + '/convert', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: amountValue, from: from, to: to })
+            });
+            var body = await readJson(res);
+            if (!res.ok) {
+                errorBox.textContent = errorText(body, 'Conversion failed (HTTP ' + res.status + ').');
+                errorBox.style.display = 'block';
+                return;
+            }
+            var data = body.data || {};
+            resultBox.textContent = data.amount + ' ' + data.from + ' = ' + data.converted + ' ' + data.to
+                + ' ' + atSign + ' ' + data.rate + ' (as of ' + fmtDate(data.asOf) + ')';
+            resultBox.style.display = 'block';
+        } catch (e) {
+            errorBox.textContent = 'Conversion request failed: ' + e.message;
+            errorBox.style.display = 'block';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('btnSyncNow').addEventListener('click', syncNow);
+        document.getElementById('btnConvert').addEventListener('click', convert);
+        document.getElementById('btnOverrideConfirm').addEventListener('click', confirmOverride);
+        document.getElementById('ovRate').addEventListener('input', validateOverride);
+        document.getElementById('ovComment').addEventListener('input', validateOverride);
+
+        document.getElementById('matrixBody').addEventListener('click', function (event) {
+            var button = event.target.closest('[data-role="edit"]');
+            if (!button) return;
+            openOverride(button.getAttribute('data-from'), button.getAttribute('data-to'), button.getAttribute('data-rate'));
+        });
+
+        loadStatus();
+        loadMatrix();
+    });
+})();
+</script>

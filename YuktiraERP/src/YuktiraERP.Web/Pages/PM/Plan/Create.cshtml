@@ -1,11 +1,11 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.PM.Plan.CreateModel
 @{ ViewData["Title"] = "Create Maintenance Plan"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-calendar-check me-2"></i>Create Maintenance Plan</h2>
+        <h2><svg class="bi bi-calendar-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-check"></use></svg>Create Maintenance Plan</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="planForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="planForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/PM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -16,7 +16,7 @@
     <form id="planForm" method="post">
         <div class="ent-form-panel active" data-panel="tabGeneral">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Plan Identification</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Plan Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Plan.PlanCode" class="ent-label required">Plan Number</label>
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-gear"></i> Object Assignment</div>
+                <div class="ent-section-title"><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg> Object Assignment</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Plan.EquipmentCode" class="ent-label">Equipment ID</label>
@@ -67,7 +67,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabSchedule" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-calendar3"></i> Frequency & Scheduling</div>
+                <div class="ent-section-title"><svg class="bi bi-calendar3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar3"></use></svg> Frequency & Scheduling</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field">
                         <label asp-for="Plan.Frequency" class="ent-label">Frequency</label>

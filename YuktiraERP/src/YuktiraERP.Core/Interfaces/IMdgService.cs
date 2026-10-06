@@ -11,4 +11,10 @@ public interface IMdgService
     Task<List<MdgChangeRequestDto>> GetPendingRequestsAsync(Guid tenantId);
     Task<MdgChangeRequestDto?> GetChangeRequestAsync(Guid requestId, Guid tenantId);
     Task<MdgValidationResult> ValidateStagingPayloadAsync(string entityName, string payload, Guid tenantId);
+    Task<MdgPagedResult<MdgChangeRequestDto>> ListRequestsAsync(string? status, string? entityName, string? search, int page, int pageSize);
+    Task<MdgChangeRequestDto?> GetRequestAsync(Guid id);
+    Task<MdgDiffDto?> GetDiffAsync(Guid id);
+    Task<List<MdgAuditTrailDto>?> GetAuditTrailAsync(Guid requestId);
+    Task<MdgChangeRequestDto> CreateDraftAsync(MdgCreateDraftRequest request);
+    Task<MdgChangeRequestDto> SubmitAsync(Guid id);
 }

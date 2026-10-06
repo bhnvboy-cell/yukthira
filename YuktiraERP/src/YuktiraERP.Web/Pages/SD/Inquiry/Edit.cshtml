@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.SD.Inquiry.EditModel
 @{ ViewData["Title"] = "Edit Inquiry"; }
 <link rel="stylesheet" href="~/css/zqm-classic.css" />
@@ -6,17 +6,17 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-pencil me-2"></i>Edit Inquiry</h3>
+            <h3><svg class="bi bi-pencil me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Edit Inquiry</h3>
             <span class="badge">@Model.Inquiry.InquiryNumber</span>
         </div>
         <div class="actions">
-            <button type="submit" form="editForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Update</button>
-            <a asp-page="/SD/Inquiry/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+            <button type="submit" form="editForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Update</button>
+            <a asp-page="/SD/Inquiry/List" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back to List</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-question-circle me-1"></i>Inquiry Data</div>
+        <div class="zqm-section-title"><svg class="bi bi-question-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-question-circle"></use></svg>Inquiry Data</div>
         <form method="post" id="editForm">
             <input type="hidden" asp-for="Inquiry.Id" />
             <div class="zqm-row cols-3">

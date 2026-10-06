@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Core.Security;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
 
@@ -348,12 +350,17 @@ public class SoxComplianceService : ISoxComplianceService
 
     public async Task<AuditChainVerifyResult> VerifyAuditChainAsync(AuditChainVerifyRequest request)
     {
-        var entries = await _db.ImmutableAuditTrails
-            .Where(a => a.TableName == request.EntityType
-                && a.RecordId == request.EntityId.ToString()
-                && a.Timestamp >= request.FromDate
-                && a.Timestamp <= request.ToDate)
-            .OrderBy(a => a.SequenceNumber)
+        var query = _db.ImmutableAuditTrails
+            .Where(a => a.Timestamp >= request.FromDate && a.Timestamp <= request.ToDate);
+        if (!string.IsNullOrEmpty(request.EntityType))
+            query = query.Where(a => a.TableName == request.EntityType);
+        if (request.EntityId != Guid.Empty)
+            query = query.Where(a => a.RecordId == request.EntityId.ToString());
+
+        var entries = await query
+            .OrderBy(a => a.TableName)
+            .ThenBy(a => a.RecordId)
+            .ThenBy(a => a.SequenceNumber)
             .ToListAsync();
 
         var result = new AuditChainVerifyResult
@@ -363,18 +370,25 @@ public class SoxComplianceService : ISoxComplianceService
             BrokenLinks = 0
         };
 
-        for (int i = 1; i < entries.Count; i++)
+        foreach (var chain in entries.GroupBy(a => new { a.TableName, a.RecordId }))
         {
-            if (entries[i].PreviousHash != entries[i - 1].CurrentHash)
+            var previousId = Guid.Empty;
+            string? previousHash = null;
+            foreach (var entry in chain)
             {
-                result.ChainValid = false;
-                result.BrokenLinks++;
-                result.BrokenLinksDetails.Add(new AuditChainLink
+                if (previousHash != null && entry.PreviousHash != previousHash)
                 {
-                    PreviousEntryId = entries[i - 1].Id,
-                    CurrentEntryId = entries[i].Id,
-                    MismatchType = "HashChainBroken"
-                });
+                    result.ChainValid = false;
+                    result.BrokenLinks++;
+                    result.BrokenLinksDetails.Add(new AuditChainLink
+                    {
+                        PreviousEntryId = previousId,
+                        CurrentEntryId = entry.Id,
+                        MismatchType = "HashChainBroken"
+                    });
+                }
+                previousId = entry.Id;
+                previousHash = entry.CurrentHash;
             }
         }
 
@@ -442,6 +456,457 @@ public class SoxComplianceService : ISoxComplianceService
             ContentType = "application/pdf",
             FileSizeBytes = count * 2048L
         };
+    }
+
+    public async Task<List<SoxDutyDto>> GetDutiesAsync(Guid tenantId, bool includeInactive = false)
+    {
+        var query = _db.SoxDuties.Where(d => d.TenantId == tenantId);
+        if (!includeInactive) query = query.Where(d => d.IsActive);
+        var duties = await query.OrderBy(d => d.DutyCode).ToListAsync();
+        return duties.Select(ToDutyDto).ToList();
+    }
+
+    public async Task<SoxDutyDto?> CreateDutyAsync(Guid tenantId, SoxDutySaveRequest request, string actor)
+    {
+        if (string.IsNullOrWhiteSpace(request.DutyCode)) return null;
+        var exists = await _db.SoxDuties.AnyAsync(d => d.TenantId == tenantId && d.DutyCode == request.DutyCode);
+        if (exists) return null;
+
+        var duty = new SoxDutyEntity
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            DutyCode = request.DutyCode,
+            DutyName = request.DutyName,
+            Description = request.Description,
+            Module = request.Module,
+            TransactionCode = request.TransactionCode,
+            ActionType = request.ActionType,
+            MinApprovers = request.MinApprovers,
+            RequiredRoles = JsonSerializer.Serialize(request.RequiredRoles ?? new List<string>()),
+            ConflictDuties = JsonSerializer.Serialize(request.ConflictDuties ?? new List<string>()),
+            IsActive = request.IsActive,
+            EffectiveFrom = request.EffectiveFrom,
+            EffectiveTo = request.EffectiveTo
+        };
+        _db.SoxDuties.Add(duty);
+        await _db.SaveChangesAsync();
+        return ToDutyDto(duty);
+    }
+
+    public async Task<SoxDutyDto?> UpdateDutyAsync(Guid tenantId, Guid dutyId, SoxDutySaveRequest request, string actor)
+    {
+        var duty = await _db.SoxDuties.FirstOrDefaultAsync(d => d.Id == dutyId && d.TenantId == tenantId);
+        if (duty == null) return null;
+
+        duty.DutyCode = request.DutyCode;
+        duty.DutyName = request.DutyName;
+        duty.Description = request.Description;
+        duty.Module = request.Module;
+        duty.TransactionCode = request.TransactionCode;
+        duty.ActionType = request.ActionType;
+        duty.MinApprovers = request.MinApprovers;
+        duty.RequiredRoles = JsonSerializer.Serialize(request.RequiredRoles ?? new List<string>());
+        duty.ConflictDuties = JsonSerializer.Serialize(request.ConflictDuties ?? new List<string>());
+        duty.IsActive = request.IsActive;
+        duty.EffectiveFrom = request.EffectiveFrom;
+        duty.EffectiveTo = request.EffectiveTo;
+        duty.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return ToDutyDto(duty);
+    }
+
+    public async Task<bool> DeleteDutyAsync(Guid tenantId, Guid dutyId)
+    {
+        var duty = await _db.SoxDuties.FirstOrDefaultAsync(d => d.Id == dutyId && d.TenantId == tenantId);
+        if (duty == null) return false;
+        _db.SoxDuties.Remove(duty);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<List<SoxAssignmentDto>> GetAssignmentsAsync(Guid tenantId, string? userId = null, bool activeOnly = true)
+    {
+        var query = _db.SoxAssignments.Where(a => a.TenantId == tenantId);
+        if (!string.IsNullOrEmpty(userId)) query = query.Where(a => a.UserId == userId);
+        if (activeOnly) query = query.Where(a => a.IsActive);
+        var assignments = await query.OrderByDescending(a => a.AssignedAt).ToListAsync();
+        var duties = await _db.SoxDuties.Where(d => d.TenantId == tenantId).ToListAsync();
+        var users = await _db.AdminUsers.ToListAsync();
+
+        var dutyByCode = new Dictionary<string, SoxDutyEntity>(StringComparer.OrdinalIgnoreCase);
+        foreach (var duty in duties) dutyByCode.TryAdd(duty.DutyCode, duty);
+
+        return assignments.Select(assignment =>
+        {
+            dutyByCode.TryGetValue(assignment.DutyCode, out var duty);
+            var user = users.FirstOrDefault(u => MatchesUser(assignment.UserId, u));
+            return ToAssignmentDto(assignment, duty, user);
+        }).ToList();
+    }
+
+    public async Task<DutyAssignmentResult> AssignDutyToUserAsync(Guid tenantId, SoxAssignRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.UserId))
+            return new DutyAssignmentResult { Success = false, Message = "UserId is required" };
+
+        var duty = await _db.SoxDuties
+            .FirstOrDefaultAsync(d => d.TenantId == tenantId && d.DutyCode == request.DutyCode && d.IsActive);
+        if (duty == null)
+            return new DutyAssignmentResult { Success = false, Message = $"Duty {request.DutyCode} not found or inactive" };
+
+        var user = (await _db.AdminUsers.ToListAsync()).FirstOrDefault(u =>
+            string.Equals(u.Id.ToString(), request.UserId, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(u.UserId, request.UserId, StringComparison.OrdinalIgnoreCase));
+
+        var assignment = new SoxAssignmentEntity
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            UserId = request.UserId,
+            UserName = user?.UserName ?? "",
+            Role = user?.Role ?? "",
+            DutyCode = duty.DutyCode,
+            DutyName = duty.DutyName,
+            AssignedAt = DateTime.UtcNow,
+            AssignedBy = string.IsNullOrWhiteSpace(request.AssignedBy) ? "system" : request.AssignedBy,
+            ExpiresAt = request.ExpiresAt,
+            IsActive = true,
+            Notes = request.Notes
+        };
+        _db.SoxAssignments.Add(assignment);
+        await _db.SaveChangesAsync();
+
+        return new DutyAssignmentResult
+        {
+            Success = true,
+            AssignmentId = assignment.Id,
+            Message = "Duty assigned"
+        };
+    }
+
+    public async Task<DutyRevokeResult> DeactivateAssignmentAsync(Guid tenantId, Guid assignmentId, string actor)
+    {
+        var assignment = await _db.SoxAssignments
+            .FirstOrDefaultAsync(a => a.Id == assignmentId && a.TenantId == tenantId);
+        if (assignment == null)
+            return new DutyRevokeResult { Success = false, Message = "Assignment not found" };
+
+        assignment.IsActive = false;
+        assignment.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return new DutyRevokeResult { Success = true, Message = "Assignment revoked" };
+    }
+
+    public async Task<SoDScanResult> RunSoDScanAsync(Guid tenantId, string scannedBy)
+    {
+        var now = DateTime.UtcNow;
+        var duties = await _db.SoxDuties.Where(d => d.TenantId == tenantId && d.IsActive).ToListAsync();
+        var users = await _db.AdminUsers.Where(u => u.IsActive).ToListAsync();
+        var (activeCodes, denyRows, enforcedByCode) = await LoadAccessDataAsync();
+        var tenantAssignments = await _db.SoxAssignments
+            .Where(a => a.TenantId == tenantId && a.IsActive && (!a.ExpiresAt.HasValue || a.ExpiresAt > now))
+            .ToListAsync();
+        var existingOpen = await _db.SoxViolations
+            .Where(v => v.TenantId == tenantId && v.Status == "Open")
+            .ToListAsync();
+
+        var dutyByCode = new Dictionary<string, SoxDutyEntity>(StringComparer.OrdinalIgnoreCase);
+        foreach (var duty in duties) dutyByCode.TryAdd(duty.DutyCode, duty);
+
+        var pairMap = new Dictionary<string, (string DutyA, string DutyB, string TransactionCode, string Severity)>(StringComparer.Ordinal);
+        foreach (var duty in duties)
+        {
+            foreach (var conflictCode in ParseStringList(duty.ConflictDuties))
+            {
+                if (string.Equals(conflictCode, duty.DutyCode, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!dutyByCode.TryGetValue(conflictCode, out var other)) continue;
+
+                var sorted = new[] { duty.DutyCode, conflictCode }.OrderBy(x => x, StringComparer.Ordinal).ToArray();
+                var key = string.Join("|", sorted);
+                if (pairMap.ContainsKey(key)) continue;
+
+                var severity = IsHighRiskAction(duty.ActionType) || IsHighRiskAction(other.ActionType)
+                    || duty.MinApprovers >= 2 || other.MinApprovers >= 2
+                    ? "High"
+                    : "Medium";
+                var transactionCode = !string.IsNullOrEmpty(duty.TransactionCode) ? duty.TransactionCode : other.TransactionCode;
+                pairMap[key] = (sorted[0], sorted[1], transactionCode, severity);
+            }
+        }
+
+        var result = new SoDScanResult { ScannedAt = now };
+
+        foreach (var user in users)
+        {
+            result.UsersScanned++;
+            var allowed = ComputeAllowedCodes(user, activeCodes, denyRows, enforcedByCode);
+
+            var held = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var assignment in tenantAssignments)
+            {
+                if (MatchesUser(assignment.UserId, user)) held.Add(assignment.DutyCode);
+            }
+            foreach (var duty in duties)
+            {
+                if (string.IsNullOrWhiteSpace(duty.TransactionCode)) continue;
+                if (allowed.Contains(duty.TransactionCode)) held.Add(duty.DutyCode);
+            }
+            result.DutiesEvaluated += held.Count;
+
+            var seenPairs = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var duty in duties)
+            {
+                if (!held.Contains(duty.DutyCode)) continue;
+                foreach (var conflictCode in ParseStringList(duty.ConflictDuties))
+                {
+                    if (!held.Contains(conflictCode)) continue;
+
+                    var key = string.Join("|", new[] { duty.DutyCode, conflictCode }.OrderBy(x => x, StringComparer.Ordinal));
+                    if (!pairMap.TryGetValue(key, out var pair)) continue;
+                    if (!seenPairs.Add(key)) continue;
+
+                    var alreadyOpen = existingOpen.Any(v =>
+                        (string.Equals(v.UserId, user.Id.ToString(), StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(v.UserName, user.UserName, StringComparison.OrdinalIgnoreCase))
+                        && IsSamePair(v.DutyCode1, v.DutyCode2, pair.DutyA, pair.DutyB));
+                    if (alreadyOpen)
+                    {
+                        result.ExistingSkipped++;
+                        continue;
+                    }
+
+                    var violation = new SoxViolationEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        TenantId = tenantId,
+                        UserId = user.Id.ToString(),
+                        UserName = user.UserName,
+                        ViolationType = "SoD",
+                        DutyCode1 = pair.DutyA,
+                        DutyCode2 = pair.DutyB,
+                        TransactionCode = pair.TransactionCode,
+                        Severity = pair.Severity,
+                        Status = "Open",
+                        DetectedBy = scannedBy,
+                        DetectedAt = now,
+                        Description = $"User {user.UserName} holds conflicting duties {pair.DutyA} and {pair.DutyB}"
+                    };
+                    _db.SoxViolations.Add(violation);
+                    existingOpen.Add(violation);
+                    result.NewViolations++;
+                    result.Violations.Add(new SoxDetectedViolation
+                    {
+                        ViolationId = violation.Id,
+                        RuleCode = violation.ViolationType,
+                        Description = violation.Description,
+                        Severity = violation.Severity,
+                        DetectedDate = violation.DetectedAt,
+                        UserId = user.Id,
+                        UserName = violation.UserName,
+                        Status = violation.Status
+                    });
+                }
+            }
+        }
+
+        await _db.SaveChangesAsync();
+        return result;
+    }
+
+    public async Task<List<SoxAssignmentDto>> GetEffectiveDutiesAsync(Guid tenantId, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId)) return new List<SoxAssignmentDto>();
+
+        var user = (await _db.AdminUsers.ToListAsync()).FirstOrDefault(u =>
+            string.Equals(u.Id.ToString(), userId, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(u.UserId, userId, StringComparison.OrdinalIgnoreCase));
+        if (user == null) return new List<SoxAssignmentDto>();
+
+        var allDuties = await _db.SoxDuties.Where(d => d.TenantId == tenantId).ToListAsync();
+        var assignments = await _db.SoxAssignments
+            .Where(a => a.TenantId == tenantId && a.IsActive)
+            .ToListAsync();
+        var (activeCodes, denyRows, enforcedByCode) = await LoadAccessDataAsync();
+
+        var dutyByCode = new Dictionary<string, SoxDutyEntity>(StringComparer.OrdinalIgnoreCase);
+        foreach (var duty in allDuties) dutyByCode.TryAdd(duty.DutyCode, duty);
+
+        var result = new List<SoxAssignmentDto>();
+        var explicitDutyCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var assignment in assignments)
+        {
+            if (!MatchesUser(assignment.UserId, user)) continue;
+            if (!explicitDutyCodes.Add(assignment.DutyCode)) continue;
+            dutyByCode.TryGetValue(assignment.DutyCode, out var duty);
+            result.Add(ToAssignmentDto(assignment, duty, user));
+        }
+
+        var allowed = ComputeAllowedCodes(user, activeCodes, denyRows, enforcedByCode);
+        foreach (var duty in allDuties)
+        {
+            if (!duty.IsActive) continue;
+            if (string.IsNullOrWhiteSpace(duty.TransactionCode)) continue;
+            if (!allowed.Contains(duty.TransactionCode)) continue;
+            if (explicitDutyCodes.Contains(duty.DutyCode)) continue;
+
+            result.Add(new SoxAssignmentDto
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                UserName = user.UserName,
+                Role = user.Role,
+                DutyCode = duty.DutyCode,
+                DutyName = duty.DutyName,
+                AssignedAt = duty.CreatedAt,
+                AssignedBy = "derived",
+                ExpiresAt = null,
+                IsActive = true,
+                Notes = "",
+                Source = "TCode"
+            });
+        }
+
+        return result;
+    }
+
+    public async Task ExportViolationsToCsvAsync(Guid tenantId, Stream stream, string? status = null, string? severity = null)
+    {
+        var query = _db.SoxViolations.Where(v => v.TenantId == tenantId);
+        if (!string.IsNullOrEmpty(status)) query = query.Where(v => v.Status == status);
+        if (!string.IsNullOrEmpty(severity)) query = query.Where(v => v.Severity == severity);
+        var violations = await query.OrderByDescending(v => v.DetectedAt).ToListAsync();
+
+        using var writer = new StreamWriter(stream, new UTF8Encoding(false), leaveOpen: true);
+        await writer.WriteLineAsync("DetectedAt,User,Severity,Status,Duty1,Duty2,TransactionCode,Type,Description,ResolvedBy,ResolvedAt");
+        foreach (var v in violations)
+        {
+            await writer.WriteLineAsync(string.Join(",",
+                EscapeCsv(v.DetectedAt.ToString("O")),
+                EscapeCsv(v.UserName),
+                EscapeCsv(v.Severity),
+                EscapeCsv(v.Status),
+                EscapeCsv(v.DutyCode1),
+                EscapeCsv(v.DutyCode2),
+                EscapeCsv(v.TransactionCode),
+                EscapeCsv(v.ViolationType),
+                EscapeCsv(v.Description),
+                EscapeCsv(v.ResolvedBy),
+                EscapeCsv(v.ResolvedAt?.ToString("O"))));
+        }
+    }
+
+    private async Task<(List<TransactionCodeEntity> ActiveCodes, List<TransactionPermissionEntity> DenyRows, Dictionary<string, string> EnforcedByCode)> LoadAccessDataAsync()
+    {
+        var activeCodes = await _db.TransactionCodes.Where(t => t.Status == "Active").ToListAsync();
+        var denyRows = await _db.TransactionPermissions.Where(p => !p.CanAccess).ToListAsync();
+        var enforcedByCode = (await _db.TCodeAuthChecks
+                .Where(c => c.IsActive && c.Enforcement == "Enforced")
+                .ToListAsync())
+            .GroupBy(c => c.TCode.ToUpperInvariant())
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(c => SecurityRoleRank.GetRank(c.RequiredRole)).First().RequiredRole, StringComparer.OrdinalIgnoreCase);
+        return (activeCodes, denyRows, enforcedByCode);
+    }
+
+    private static HashSet<string> ComputeAllowedCodes(AdminUserEntity user, List<TransactionCodeEntity> activeCodes, List<TransactionPermissionEntity> denyRows, Dictionary<string, string> enforcedByCode)
+    {
+        var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (SecurityRoleRank.IsSuperUser(user.Role))
+        {
+            foreach (var code in activeCodes) allowed.Add(code.Code);
+            return allowed;
+        }
+
+        foreach (var code in activeCodes)
+        {
+            if (!SecurityRoleRank.Meets(user.Role, code.RequiredRole)) continue;
+            if (enforcedByCode.TryGetValue(code.Code, out var enforcedRole) && !SecurityRoleRank.Meets(user.Role, enforcedRole)) continue;
+            if (IsDenied(code, user, denyRows)) continue;
+            allowed.Add(code.Code);
+        }
+        return allowed;
+    }
+
+    private static bool IsDenied(TransactionCodeEntity code, AdminUserEntity user, List<TransactionPermissionEntity> denyRows)
+    {
+        foreach (var row in denyRows)
+        {
+            if (row.TransactionCodeId != code.Id) continue;
+            if (string.Equals(row.PrincipalType, "Role", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(row.PrincipalValue, user.Role, StringComparison.OrdinalIgnoreCase)) return true;
+            if (string.Equals(row.PrincipalType, "User", StringComparison.OrdinalIgnoreCase)
+                && (string.Equals(row.PrincipalValue, user.Id.ToString(), StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(row.PrincipalValue, user.UserId, StringComparison.OrdinalIgnoreCase))) return true;
+        }
+        return false;
+    }
+
+    private static bool MatchesUser(string userId, AdminUserEntity user) =>
+        string.Equals(userId, user.Id.ToString(), StringComparison.OrdinalIgnoreCase)
+        || string.Equals(userId, user.UserId, StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsHighRiskAction(string? actionType)
+    {
+        var action = (actionType ?? "").Trim().ToUpperInvariant();
+        return action == "APPROVE" || action == "PAYMENT" || action == "ADMIN";
+    }
+
+    private static bool IsSamePair(string firstA, string firstB, string secondA, string secondB) =>
+        (string.Equals(firstA, secondA, StringComparison.OrdinalIgnoreCase) && string.Equals(firstB, secondB, StringComparison.OrdinalIgnoreCase))
+        || (string.Equals(firstA, secondB, StringComparison.OrdinalIgnoreCase) && string.Equals(firstB, secondA, StringComparison.OrdinalIgnoreCase));
+
+    private static SoxDutyDto ToDutyDto(SoxDutyEntity duty) => new SoxDutyDto
+    {
+        Id = duty.Id,
+        DutyCode = duty.DutyCode,
+        DutyName = duty.DutyName,
+        Description = duty.Description,
+        Module = duty.Module,
+        TransactionCode = duty.TransactionCode,
+        ActionType = duty.ActionType,
+        MinApprovers = duty.MinApprovers,
+        RequiredRoles = ParseStringList(duty.RequiredRoles),
+        ConflictDuties = ParseStringList(duty.ConflictDuties),
+        IsActive = duty.IsActive,
+        EffectiveFrom = duty.EffectiveFrom,
+        EffectiveTo = duty.EffectiveTo
+    };
+
+    private static SoxAssignmentDto ToAssignmentDto(SoxAssignmentEntity assignment, SoxDutyEntity? duty, AdminUserEntity? user) => new SoxAssignmentDto
+    {
+        Id = assignment.Id,
+        UserId = assignment.UserId,
+        UserName = user?.UserName ?? assignment.UserName,
+        Role = assignment.Role,
+        DutyCode = assignment.DutyCode,
+        DutyName = duty?.DutyName ?? assignment.DutyName,
+        AssignedAt = assignment.AssignedAt,
+        AssignedBy = assignment.AssignedBy,
+        ExpiresAt = assignment.ExpiresAt,
+        IsActive = assignment.IsActive,
+        Notes = assignment.Notes,
+        Source = "Explicit"
+    };
+
+    private static List<string> ParseStringList(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return new List<string>();
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+        }
+        catch
+        {
+            return new List<string>();
+        }
+    }
+
+    private static string EscapeCsv(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return "";
+        if (value.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0)
+            return "\"" + value.Replace("\"", "\"\"") + "\"";
+        return value;
     }
 
     private static string ComputeSha256(string data)

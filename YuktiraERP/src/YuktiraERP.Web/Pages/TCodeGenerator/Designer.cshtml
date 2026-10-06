@@ -5,13 +5,13 @@
     ViewData["Title"] = "T-Code Designer";
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-gear me-2"></i>Field Designer: <span id="tcodeName">@Model.Code</span></h2>
-    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addFieldModal"><i class="bi bi-plus"></i> Add Field</button>
+    <h2><svg class="bi bi-gear me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Field Designer: <span id="tcodeName">@Model.Code</span></h2>
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addFieldModal"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Field</button>
 </div>
 <div class="row">
     <div class="col-md-8">
         <div class="card shadow-sm">
-            <div class="card-header"><i class="bi bi-layout-three-columns me-1"></i>Fields</div>
+            <div class="card-header"><svg class="bi bi-layout-three-columns me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-layout-three-columns"></use></svg>Fields</div>
             <div class="card-body">
                 <table class="table table-hover table-sm">
                     <thead><tr><th>#</th><th>Field Name</th><th>Label</th><th>Type</th><th>Required</th><th>Section</th><th>Actions</th></tr></thead>
@@ -24,7 +24,7 @@
     </div>
     <div class="col-md-4">
         <div class="card shadow-sm">
-            <div class="card-header"><i class="bi bi-info-circle me-1"></i>Preview</div>
+            <div class="card-header"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Preview</div>
             <div class="card-body" id="previewBody">
                 <p class="text-muted small">Fields will appear here</p>
             </div>
@@ -81,7 +81,7 @@
                 '<td><span class="badge bg-info">' + f.dataType + '</span></td>' +
                 '<td>' + (f.isRequired ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
                 '<td>' + f.sectionName + '</td>' +
-                '<td><button class="btn btn-outline-danger btn-sm" onclick="removeField(\'' + f.id + '\')"><i class="bi bi-x"></i></button></td></tr>';
+                '<td><button class="btn btn-outline-danger btn-sm" onclick="removeField(\'' + f.id + '\')"><svg class="bi bi-x" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg></button></td></tr>';
 
             preview += '<div class="mb-2"><label class="form-label" style="font-size:11px">' + f.fieldLabel + (f.isRequired ? ' <span class="text-danger">*</span>' : '') + '</label>';
             if (f.dataType === 'TEXTAREA') preview += '<textarea class="form-control" rows="2" style="font-size:12px"></textarea>';

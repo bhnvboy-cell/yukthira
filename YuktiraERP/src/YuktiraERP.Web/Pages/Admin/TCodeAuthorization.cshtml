@@ -1,0 +1,669 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.TCodeAuthorizationModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "T-Code Authorization";
+}
+
+<style>
+    .tc-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .tc-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .tc-table tbody tr:hover { background: #f0f4fa; }
+    .tc-list-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .tc-list-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .tc-row { cursor: pointer; }
+    .tc-row.selected { background: #e8eef6; }
+    .tc-detail-head { background: #1F497D; color: #fff; padding: 12px 16px; border-radius: 8px 8px 0 0; }
+    .tc-detail-head h5 { margin: 0; font-weight: 600; }
+    .tc-empty { padding: 48px 16px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0"><svg class="bi bi-key me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-key"></use></svg>T-Code Authorization</h2>
+</div>
+<p class="text-muted mb-3">Authorization mapping for each transaction code: required role, checks, principal permissions and an access test.</p>
+
+<div id="pageAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="pageAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div id="pageSpinner" class="text-center py-3 d-none" role="status">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-light py-2 fw-semibold">
+                <svg class="bi bi-list-ul me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>Transaction Codes
+            </div>
+            <div class="card-body">
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="form-label fw-bold small mb-1" for="tcModule">Module</label>
+                        <select id="tcModule" class="form-select form-select-sm" onchange="resetList()">
+                            <option value="">All modules</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold small mb-1" for="tcSearch">Search</label>
+                        <input type="text" id="tcSearch" class="form-control form-control-sm" placeholder="Code or name" oninput="debounceList()" onkeydown="if(event.key==='Enter'){event.preventDefault();resetList();}" />
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetList()">
+                        <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+                    </button>
+                    <span class="text-muted small" id="tcCount"></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover tc-list-table mb-0">
+                        <thead>
+                            <tr><th>Code</th><th>Name</th><th>Module</th><th>Role</th><th>Checks</th></tr>
+                        </thead>
+                        <tbody id="tcListBody">
+                            <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-muted small" id="tcPageInfo"></span>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="tcPrev" onclick="prevListPage()">
+                            <svg class="bi bi-chevron-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg>Prev
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="tcNext" onclick="nextListPage()">
+                            Next<svg class="bi bi-chevron-right ms-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div id="tcEmpty" class="text-center text-muted border rounded tc-empty">
+            <svg class="bi bi-key display-4" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-key"></use></svg>
+            <p class="mt-2 mb-0">Select a transaction code on the left to see its authorization mapping.</p>
+        </div>
+
+        <div id="tcDetail" class="d-none">
+            <div class="mb-3">
+                <div class="tc-detail-head d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5><code class="text-white" id="dCode"></code> <span id="dName"></span></h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge bg-light text-dark" id="dModule"></span>
+                        <span id="dStatus"></span>
+                    </div>
+                </div>
+                <div class="border border-top-0 rounded-bottom p-2">
+                    <p class="small text-muted mb-0" id="dDescription"></p>
+                    <small class="text-muted" id="dRoute"></small>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-light py-2 fw-semibold">
+                    <svg class="bi bi-shield-lock me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-lock"></use></svg>Required Role
+                </div>
+                <div class="card-body py-2">
+                    <div class="d-flex gap-2 align-items-end flex-wrap">
+                        <div style="min-width: 220px;">
+                            <label class="form-label fw-bold small mb-1" for="dRole">Role</label>
+                            <select id="dRole" class="form-select form-select-sm"></select>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="saveRequiredRole()">
+                            <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save
+                        </button>
+                        <span class="small text-success d-none" id="dRoleFeedback"></span>
+                    </div>
+                    <div class="alert alert-danger py-1 px-2 mt-2 mb-0 small d-none" id="dRoleError"></div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-light py-2 fw-semibold">
+                    <svg class="bi bi-list-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg>Authorization Checks
+                </div>
+                <div class="card-body py-2">
+                    <div class="row g-2 align-items-end mb-2">
+                        <div class="col-6 col-md-2">
+                            <label class="form-label fw-bold small mb-1" for="ckCode">Check Code</label>
+                            <input type="text" id="ckCode" class="form-control form-control-sm" placeholder="Check code" />
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label fw-bold small mb-1" for="ckAction">Action</label>
+                            <select id="ckAction" class="form-select form-select-sm"></select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label fw-bold small mb-1" for="ckRole">Required Role</label>
+                            <select id="ckRole" class="form-select form-select-sm"></select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label fw-bold small mb-1" for="ckEnforcement">Enforcement</label>
+                            <select id="ckEnforcement" class="form-select form-select-sm">
+                                <option value="Enforced">Enforced</option>
+                                <option value="DisplayOnly">DisplayOnly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small mb-1" for="ckDescription">Description</label>
+                            <input type="text" id="ckDescription" class="form-control form-control-sm" placeholder="What this check guards" />
+                        </div>
+                        <div class="col-md-1 d-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-primary" id="ckSubmit" onclick="saveCheck()">
+                                <svg class="bi bi-plus-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="ckCancel" onclick="cancelCheckEdit()">
+                                <svg class="bi bi-x" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger py-1 px-2 mb-2 small d-none" id="ckError"></div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover tc-table mb-0">
+                            <thead>
+                                <tr><th>Check Code</th><th>Action</th><th>Required Role</th><th>Enforcement</th><th>Description</th><th>Active</th><th></th></tr>
+                            </thead>
+                            <tbody id="ckBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-light py-2 fw-semibold">
+                    <svg class="bi bi-people me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Role / User Permissions
+                </div>
+                <div class="card-body py-2">
+                    <div class="row g-2 align-items-end mb-2">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label fw-bold small mb-1" for="pmPrincipalType">Principal Type</label>
+                            <select id="pmPrincipalType" class="form-select form-select-sm">
+                                <option value="Role">Role</option>
+                                <option value="User">User</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label fw-bold small mb-1" for="pmPrincipalValue">Principal</label>
+                            <input type="text" id="pmPrincipalValue" class="form-control form-control-sm" placeholder="Role or login" />
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="pmCanAccess" checked />
+                                <label class="form-check-label small" for="pmCanAccess">Allow access</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addPermission()">
+                                <svg class="bi bi-plus-lg me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg>Add
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger py-1 px-2 mb-2 small d-none" id="pmError"></div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover tc-table mb-0">
+                            <thead>
+                                <tr><th>Principal Type</th><th>Principal</th><th>Decision</th></tr>
+                            </thead>
+                            <tbody id="pmBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-light py-2 fw-semibold">
+                    <svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Test Access
+                </div>
+                <div class="card-body py-2">
+                    <div class="d-flex gap-2 align-items-end flex-wrap mb-2">
+                        <div style="min-width: 220px;">
+                            <label class="form-label fw-bold small mb-1" for="testRole">Role</label>
+                            <select id="testRole" class="form-select form-select-sm"></select>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="runAccessTest()">
+                            <svg class="bi bi-play me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play"></use></svg>Test
+                        </button>
+                    </div>
+                    <div class="alert alert-danger py-1 px-2 mb-2 small d-none" id="testError"></div>
+                    <div id="testResult" class="d-none border rounded p-2 bg-light"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var tcListPage = 1;
+    var tcListPageSize = 50;
+    var tcTotal = 0;
+    var tcModules = [];
+    var tcListTimer = null;
+    var tcSelectedCode = null;
+    var tcDetail = null;
+    var editingCheckId = null;
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function emptyRow(colspan, message) {
+        return '<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">' + esc(message) + '</td></tr>';
+    }
+
+    function showAlert(message, success) {
+        var box = document.getElementById('pageAlert');
+        document.getElementById('pageAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showAlert._timer);
+            showAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    function setBoxError(id, message) {
+        var box = document.getElementById(id);
+        if (!message) {
+            box.classList.add('d-none');
+            box.textContent = '';
+            return;
+        }
+        box.textContent = message;
+        box.classList.remove('d-none');
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    function statusBadge(status) {
+        var cls = 'bg-secondary';
+        if (status === 'Active') cls = 'bg-success';
+        else if (status === 'Deprecated') cls = 'bg-danger';
+        return '<span class="badge ' + cls + '">' + esc(status || 'Unknown') + '</span>';
+    }
+
+    function enforcementBadge(value) {
+        var cls = value === 'Enforced' ? 'bg-success' : 'bg-secondary';
+        return '<span class="badge ' + cls + '">' + esc(value || '') + '</span>';
+    }
+
+    async function loadList() {
+        var body = document.getElementById('tcListBody');
+        body.innerHTML = emptyRow(5, 'Loading...');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var url = '/api/v1/security/tcode-authz?page=' + tcListPage + '&pageSize=' + tcListPageSize;
+            var module = document.getElementById('tcModule').value;
+            if (module) url += '&module=' + encodeURIComponent(module);
+            var search = document.getElementById('tcSearch').value.trim();
+            if (search) url += '&search=' + encodeURIComponent(search);
+            var data = await apiFetch(url);
+            var items = (data && Array.isArray(data.items)) ? data.items : [];
+            tcTotal = (data && typeof data.total === 'number') ? data.total : items.length;
+            var modules = (data && Array.isArray(data.modules)) ? data.modules : [];
+            if (modules.length) {
+                var current = document.getElementById('tcModule').value;
+                var html = '<option value="">All modules</option>';
+                modules.forEach(function (m) { html += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+                document.getElementById('tcModule').innerHTML = html;
+                if (current) document.getElementById('tcModule').value = current;
+                tcModules = modules;
+            }
+            renderList(items);
+            updateListPagination();
+        } catch (e) {
+            body.innerHTML = emptyRow(5, 'The transaction code list could not be loaded.');
+            document.getElementById('tcCount').textContent = '';
+            document.getElementById('tcPageInfo').textContent = '';
+            document.getElementById('tcPrev').disabled = true;
+            document.getElementById('tcNext').disabled = true;
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function renderList(items) {
+        var body = document.getElementById('tcListBody');
+        document.getElementById('tcCount').textContent = tcTotal + ' codes';
+        if (!items.length) {
+            body.innerHTML = emptyRow(5, 'No transaction codes match the current filters.');
+            return;
+        }
+        var html = '';
+        items.forEach(function (t) {
+            var selected = (tcSelectedCode && t.code === tcSelectedCode) ? ' selected' : '';
+            html += '<tr class="tc-row' + selected + '" onclick="selectCode(\'' + esc(t.code) + '\')">' +
+                '<td><code class="fw-bold">' + esc(t.code) + '</code></td>' +
+                '<td>' + esc(t.name) + '</td>' +
+                '<td><span class="badge bg-light text-dark border">' + esc(t.module) + '</span></td>' +
+                '<td><span class="badge bg-secondary">' + esc(t.requiredRole) + '</span></td>' +
+                '<td class="small">' + esc(t.checkCount) + '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function updateListPagination() {
+        var pages = Math.max(1, Math.ceil(tcTotal / tcListPageSize));
+        document.getElementById('tcPageInfo').textContent = 'Page ' + tcListPage + ' of ' + pages;
+        document.getElementById('tcPrev').disabled = tcListPage <= 1;
+        document.getElementById('tcNext').disabled = tcListPage >= pages;
+    }
+
+    function resetList() {
+        tcListPage = 1;
+        loadList();
+    }
+
+    function debounceList() {
+        window.clearTimeout(tcListTimer);
+        tcListTimer = window.setTimeout(resetList, 350);
+    }
+
+    function prevListPage() {
+        if (tcListPage > 1) { tcListPage--; loadList(); }
+    }
+
+    function nextListPage() {
+        var pages = Math.max(1, Math.ceil(tcTotal / tcListPageSize));
+        if (tcListPage < pages) { tcListPage++; loadList(); }
+    }
+
+    function selectCode(code) {
+        tcSelectedCode = code;
+        var url = new URL(window.location.href);
+        url.searchParams.set('code', code);
+        window.history.replaceState({}, '', url.toString());
+        document.querySelectorAll('.tc-row').forEach(function (row) {
+            var cell = row.querySelector('code');
+            row.classList.toggle('selected', !!cell && cell.textContent === code);
+        });
+        loadDetail();
+    }
+
+    async function loadDetail() {
+        if (!tcSelectedCode) return;
+        document.getElementById('tcEmpty').classList.add('d-none');
+        document.getElementById('tcDetail').classList.remove('d-none');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/security/tcode-authz/' + encodeURIComponent(tcSelectedCode));
+            tcDetail = data || {};
+            renderDetail();
+        } catch (e) {
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function fillSelect(id, values, placeholder) {
+        var select = document.getElementById(id);
+        var html = placeholder ? '<option value="">' + esc(placeholder) + '</option>' : '';
+        (values || []).forEach(function (v) { html += '<option value="' + esc(v) + '">' + esc(v) + '</option>'; });
+        select.innerHTML = html;
+    }
+
+    function renderDetail() {
+        var d = tcDetail;
+        document.getElementById('dCode').textContent = d.code || '';
+        document.getElementById('dName').textContent = d.name || '';
+        document.getElementById('dModule').textContent = d.module || '';
+        document.getElementById('dStatus').innerHTML = statusBadge(d.status);
+        document.getElementById('dDescription').textContent = d.description || 'No description recorded.';
+        document.getElementById('dRoute').textContent = d.route ? 'Route: ' + d.route : '';
+
+        var roles = Array.isArray(d.availableRoles) ? d.availableRoles : [];
+        fillSelect('dRole', roles);
+        fillSelect('ckRole', roles, 'Select role');
+        fillSelect('testRole', roles, 'Select role');
+        fillSelect('ckAction', Array.isArray(d.actionTypes) ? d.actionTypes : [], 'Select action');
+        if (d.requiredRole) document.getElementById('dRole').value = d.requiredRole;
+        setBoxError('dRoleError', '');
+        document.getElementById('dRoleFeedback').classList.add('d-none');
+        cancelCheckEdit();
+        setBoxError('ckError', '');
+        setBoxError('pmError', '');
+        setBoxError('testError', '');
+        document.getElementById('testResult').classList.add('d-none');
+        renderChecks();
+        renderPermissions();
+    }
+
+    async function saveRequiredRole() {
+        setBoxError('dRoleError', '');
+        document.getElementById('dRoleFeedback').classList.add('d-none');
+        var role = document.getElementById('dRole').value;
+        if (!role) {
+            setBoxError('dRoleError', 'Select a role first.');
+            return;
+        }
+        try {
+            var data = await apiFetch('/api/v1/security/tcode-authz/' + encodeURIComponent(tcSelectedCode) + '/required-role', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requiredRole: role })
+            });
+            tcDetail.requiredRole = (data && data.requiredRole) || role;
+            var previous = (data && data.previousRole) || '';
+            var feedback = document.getElementById('dRoleFeedback');
+            feedback.textContent = (previous ? previous + ' → ' : '') + ((data && data.requiredRole) || role);
+            feedback.classList.remove('d-none');
+            loadList();
+        } catch (e) {
+            setBoxError('dRoleError', e.message);
+        }
+    }
+
+    function renderChecks() {
+        var checks = (tcDetail && Array.isArray(tcDetail.checks)) ? tcDetail.checks : [];
+        var body = document.getElementById('ckBody');
+        if (!checks.length) {
+            body.innerHTML = emptyRow(7, 'No authorization checks defined for this transaction code.');
+            return;
+        }
+        var html = '';
+        checks.forEach(function (c) {
+            html += '<tr>' +
+                '<td><code>' + esc(c.checkCode) + '</code></td>' +
+                '<td>' + esc(c.actionType) + '</td>' +
+                '<td><span class="badge bg-secondary">' + esc(c.requiredRole) + '</span></td>' +
+                '<td>' + enforcementBadge(c.enforcement) + '</td>' +
+                '<td class="small">' + esc(c.description) + '</td>' +
+                '<td>' + (c.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') + '</td>' +
+                '<td class="text-nowrap text-end">' +
+                    '<button type="button" class="btn btn-sm btn-outline-primary" onclick="editCheck(\'' + esc(c.id) + '\')" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></button> ' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCheck(\'' + esc(c.id) + '\')" title="Delete"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button>' +
+                '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function editCheck(id) {
+        var checks = (tcDetail && Array.isArray(tcDetail.checks)) ? tcDetail.checks : [];
+        var check = null;
+        checks.forEach(function (c) { if (String(c.id) === String(id)) check = c; });
+        if (!check) return;
+        editingCheckId = check.id;
+        document.getElementById('ckCode').value = check.checkCode || '';
+        document.getElementById('ckAction').value = check.actionType || '';
+        document.getElementById('ckRole').value = check.requiredRole || '';
+        document.getElementById('ckEnforcement').value = check.enforcement || 'Enforced';
+        document.getElementById('ckDescription').value = check.description || '';
+        document.getElementById('ckSubmit').innerHTML = '<svg class="bi bi-save" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>';
+        document.getElementById('ckCancel').classList.remove('d-none');
+        setBoxError('ckError', '');
+    }
+
+    function cancelCheckEdit() {
+        editingCheckId = null;
+        document.getElementById('ckCode').value = '';
+        document.getElementById('ckAction').selectedIndex = 0;
+        document.getElementById('ckRole').selectedIndex = 0;
+        document.getElementById('ckEnforcement').value = 'Enforced';
+        document.getElementById('ckDescription').value = '';
+        document.getElementById('ckSubmit').innerHTML = '<svg class="bi bi-plus-lg" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg>';
+        document.getElementById('ckCancel').classList.add('d-none');
+        setBoxError('ckError', '');
+    }
+
+    async function saveCheck() {
+        setBoxError('ckError', '');
+        var code = document.getElementById('ckCode').value.trim();
+        var actionType = document.getElementById('ckAction').value;
+        var role = document.getElementById('ckRole').value;
+        if (!code || !actionType || !role) {
+            setBoxError('ckError', 'Check Code, Action and Required Role are required.');
+            return;
+        }
+        var payload = {
+            tcode: tcDetail.code,
+            checkCode: code,
+            actionType: actionType,
+            requiredRole: role,
+            enforcement: document.getElementById('ckEnforcement').value,
+            description: document.getElementById('ckDescription').value.trim(),
+            isActive: true
+        };
+        var wasEdit = !!editingCheckId;
+        try {
+            if (wasEdit) {
+                payload.id = editingCheckId;
+                await apiFetch('/api/v1/security/tcode-authz/checks/' + encodeURIComponent(editingCheckId), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                await apiFetch('/api/v1/security/tcode-authz/checks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+            cancelCheckEdit();
+            await loadDetail();
+            showAlert(wasEdit ? 'Authorization check updated.' : 'Authorization check added.', true);
+        } catch (e) {
+            setBoxError('ckError', e.message);
+        }
+    }
+
+    async function deleteCheck(id) {
+        if (!confirm('Delete this authorization check?')) return;
+        try {
+            await apiFetch('/api/v1/security/tcode-authz/checks/' + encodeURIComponent(id), { method: 'DELETE' });
+            showAlert('Authorization check deleted.', true);
+            await loadDetail();
+        } catch (e) {
+            setBoxError('ckError', e.message);
+        }
+    }
+
+    function renderPermissions() {
+        var permissions = (tcDetail && Array.isArray(tcDetail.permissions)) ? tcDetail.permissions : [];
+        var body = document.getElementById('pmBody');
+        if (!permissions.length) {
+            body.innerHTML = emptyRow(3, 'No role or user permissions recorded for this transaction code.');
+            return;
+        }
+        var html = '';
+        permissions.forEach(function (p) {
+            html += '<tr>' +
+                '<td><span class="badge bg-light text-dark border">' + esc(p.principalType) + '</span></td>' +
+                '<td>' + esc(p.principalValue) + '</td>' +
+                '<td>' + (p.canAccess ? '<span class="badge bg-success">Allow</span>' : '<span class="badge bg-danger">Deny</span>') + '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    async function addPermission() {
+        setBoxError('pmError', '');
+        var value = document.getElementById('pmPrincipalValue').value.trim();
+        if (!value) {
+            setBoxError('pmError', 'Enter a role or login to add.');
+            return;
+        }
+        if (!tcDetail || !tcDetail.id) {
+            setBoxError('pmError', 'Transaction code details are not loaded.');
+            return;
+        }
+        try {
+            await apiFetch('/api/v1/transaction/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    transactionCodeId: tcDetail.id,
+                    principalType: document.getElementById('pmPrincipalType').value,
+                    principalValue: value,
+                    canAccess: document.getElementById('pmCanAccess').checked
+                })
+            });
+            document.getElementById('pmPrincipalValue').value = '';
+            await loadDetail();
+            showAlert('Permission added.', true);
+        } catch (e) {
+            setBoxError('pmError', e.message);
+        }
+    }
+
+    async function runAccessTest() {
+        setBoxError('testError', '');
+        document.getElementById('testResult').classList.add('d-none');
+        var role = document.getElementById('testRole').value;
+        if (!role) {
+            setBoxError('testError', 'Select a role to test.');
+            return;
+        }
+        try {
+            var data = await apiFetch('/api/v1/security/tcode-authz/' + encodeURIComponent(tcSelectedCode) + '/test-access', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: role })
+            });
+            var allowed = !!(data && data.allowed);
+            var html = '<div class="d-flex align-items-center gap-2 mb-2">' +
+                '<span class="badge ' + (allowed ? 'bg-success' : 'bg-danger') + '" style="font-size: 1rem; padding: 8px 14px;">' + (allowed ? 'Allow' : 'Deny') + '</span>' +
+                '<span class="small text-muted">' + esc(role) + ' against ' + esc(tcSelectedCode) + '</span></div>' +
+                '<div class="row g-2 small">' +
+                '<div class="col-md-6"><span class="text-muted">Effective role:</span> ' + esc(data && data.effectiveRole) + '</div>' +
+                '<div class="col-md-6"><span class="text-muted">Required role:</span> ' + esc(data && data.requiredRole) + '</div>' +
+                '<div class="col-md-6"><span class="text-muted">Rule source:</span> ' + esc(data && data.ruleSource) + '</div>' +
+                '<div class="col-md-6"><span class="text-muted">Reason:</span> ' + esc(data && data.reason) + '</div>' +
+                '</div>';
+            var panel = document.getElementById('testResult');
+            panel.innerHTML = html;
+            panel.classList.remove('d-none');
+        } catch (e) {
+            setBoxError('testError', e.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var params = new URLSearchParams(window.location.search);
+        var code = params.get('code');
+        loadList().then(function () {
+            if (code) selectCode(code);
+        });
+    });
+</script>

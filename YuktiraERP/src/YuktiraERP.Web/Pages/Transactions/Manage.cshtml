@@ -6,8 +6,8 @@
 }
 <div class="container-fluid py-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-gear-wide me-2"></i>Transaction Code Management</h2>
-        <a href="/Transactions" class="btn btn-outline-primary btn-sm"><i class="bi bi-keyboard"></i> Launcher</a>
+        <h2><svg class="bi bi-gear-wide me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear-wide"></use></svg>Transaction Code Management</h2>
+        <a href="/Transactions" class="btn btn-outline-primary btn-sm"><svg class="bi bi-keyboard" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-keyboard"></use></svg> Launcher</a>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.SuccessMessage))
@@ -22,7 +22,7 @@
     <div class="row g-3">
         <div class="col-md-4">
             <div class="card shadow-sm">
-                <div class="card-header bg-white"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Transaction Code</h5></div>
+                <div class="card-header bg-white"><h5 class="mb-0"><svg class="bi bi-plus-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New Transaction Code</h5></div>
                 <div class="card-body">
                     <form method="post">
                         <div class="mb-2"><label class="form-label small">Code *</label><input name="code" class="form-control form-control-sm" required placeholder="e.g., ZMM01" maxlength="10"></div>
@@ -54,7 +54,7 @@
                                 <option value="SUPER_USER">Super User</option>
                             </select>
                         </div>
-                        <button type="submit" asp-page-handler="Create" class="btn btn-primary btn-sm w-100 mt-2"><i class="bi bi-plus"></i> Create Code</button>
+                        <button type="submit" asp-page-handler="Create" class="btn btn-primary btn-sm w-100 mt-2"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Create Code</button>
                     </form>
                 </div>
             </div>
@@ -63,7 +63,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-list me-2"></i>Transaction Codes (@Model.Codes.Count)</h5>
+                    <h5 class="mb-0"><svg class="bi bi-list me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list"></use></svg>Transaction Codes (@Model.Codes.Count)</h5>
                     <input type="text" id="filterCodes" class="form-control form-control-sm" style="width:200px" placeholder="Filter...">
                 </div>
                 <div class="card-body p-0" style="max-height:500px;overflow-y:auto">
@@ -81,17 +81,17 @@
                                     <td><code>@c.Route</code></td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="@c.Route" class="btn btn-outline-primary" title="Open"><i class="bi bi-box-arrow-up-right"></i></a>
+                                            <a href="@c.Route" class="btn btn-outline-primary" title="Open"><svg class="bi bi-box-arrow-up-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-up-right"></use></svg></a>
                                             @if (!c.IsSystem)
                                             {
                                                 <form method="post" style="display:inline" onsubmit="return confirm('Delete @c.Code?')">
                                                     <input type="hidden" name="id" value="@c.Id">
-                                                    <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                                    <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger" title="Delete"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button>
                                                 </form>
                                             }
                                             else
                                             {
-                                                <button class="btn btn-outline-secondary" disabled title="System code"><i class="bi bi-lock"></i></button>
+                                                <button class="btn btn-outline-secondary" disabled title="System code"><svg class="bi bi-lock" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lock"></use></svg></button>
                                             }
                                         </div>
                                     </td>
@@ -103,7 +103,7 @@
             </div>
 
             <div class="card shadow-sm mt-3">
-                <div class="card-header bg-white"><h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Execution Log (Last 20)</h5></div>
+                <div class="card-header bg-white"><h5 class="mb-0"><svg class="bi bi-journal-text me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-text"></use></svg>Execution Log (Last 20)</h5></div>
                 <div class="card-body p-0" style="max-height:300px;overflow-y:auto">
                     <table class="table table-sm table-hover mb-0">
                         <thead class="table-light"><tr><th>Time</th><th>Code</th><th>User</th><th>Status</th><th>Duration</th><th>Error</th></tr></thead>

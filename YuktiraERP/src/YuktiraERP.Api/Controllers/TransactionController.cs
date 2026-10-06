@@ -109,6 +109,23 @@ public class TransactionController : ControllerBase
         var userId = GetUserId();
         var tenantId = GetTenantId();
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value;
+        var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? User.Identity?.Name ?? "";
+        var check = await _service.CheckAccessDetailedAsync(code, userId, role);
+        await YuktiraERP.Api.Authorization.RequireTCodeAttribute.TraceAsync(
+            HttpContext.RequestServices.GetRequiredService<IAuthorizationTraceService>(),
+            HttpContext, userId, userName, role, check.Allowed, check.RuleSource, check.Reason,
+            code.ToUpperInvariant());
+        if (!check.Allowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                error = "Access denied",
+                tcode = code.ToUpperInvariant(),
+                ruleSource = check.RuleSource,
+                reason = check.Reason
+            });
+        }
         var result = await _service.ExecuteAsync(code, userId, tenantId, ip, request?.Parameters);
         await _audit.LogAsync(new AuditEntryDto
         {

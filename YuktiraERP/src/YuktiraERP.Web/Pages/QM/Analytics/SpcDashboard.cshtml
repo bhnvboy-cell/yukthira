@@ -1,0 +1,473 @@
+@page
+@model YuktiraERP.Web.Pages.QM.Analytics.SpcDashboardModel
+@{
+    ViewData["Title"] = "SPC Control Chart Dashboard";
+}
+<link rel="stylesheet" href="~/css/zqm-classic.css" />
+<style>
+    .spc-caps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+    .spc-cap-card{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:14px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+    .spc-cap-label{font-size:.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px}
+    .spc-cap-value{font-size:1.6rem;font-weight:700;color:#1a237e;margin:4px 0 6px;line-height:1.1}
+    .spc-cap-hint{font-size:.7rem;color:#999;margin-top:6px}
+    .spc-badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.72rem;font-weight:700}
+    .spc-badge.good{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+    .spc-badge.warn{background:#fff8e1;color:#f57f17;border:1px solid #ffe082}
+    .spc-badge.bad{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
+    .spc-meta{background:#fafafa;border:1px solid #e0e0e0;border-radius:6px;padding:8px 14px;font-size:.78rem;color:#555;margin-bottom:12px}
+    .spc-meta strong{color:#1a237e}
+    .spc-chart-block{border-top:1px solid #e0e0e0;padding:14px 16px 10px}
+    .spc-chart-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+    .spc-chart-head h5{margin:0;font-size:.92rem;font-weight:700;color:#1a237e;display:flex;align-items:center;gap:8px}
+    .spc-chart-head .spc-unit{font-size:.72rem;font-weight:600;color:#666;background:#e8eaf6;border:1px solid #c5cae9;border-radius:10px;padding:2px 10px}
+    .spc-svg{width:100%;height:auto;display:block}
+    .spc-axis{font-size:10px;fill:#78909c}
+    .spc-x-label{font-size:9.5px;fill:#607d8b}
+    .spc-line{fill:none;stroke:#1565c0;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+    .spc-pt{fill:#1565c0;stroke:#fff;stroke-width:1.2}
+    .spc-pt-bad{fill:#dc3545;stroke:#fff;stroke-width:1.2}
+    .spc-limit{stroke:#dc3545;stroke-width:1.4;stroke-dasharray:7 5}
+    .spc-cline{stroke:#6c757d;stroke-width:1.4}
+    .spc-limit-t{fill:#dc3545;font-size:10px;font-weight:600}
+    .spc-cl-t{fill:#6c757d;font-size:10px;font-weight:600}
+    .spc-legend{display:flex;flex-wrap:wrap;gap:14px;padding:6px 2px 0;font-size:.73rem;color:#555}
+    .spc-lg{display:inline-flex;align-items:center;gap:6px}
+    .spc-lg-line{display:inline-block;width:22px;height:0;border-top:2px solid #1565c0}
+    .spc-lg-line.ucl,.spc-lg-line.lcl{border-top:2px dashed #dc3545}
+    .spc-lg-line.cl{border-top:2px solid #6c757d}
+    .spc-lg-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#1565c0}
+    .spc-lg-dot.bad{background:#dc3545}
+    .spc-loading{text-align:center;padding:36px 12px;color:#1565c0;font-weight:600;background:#fff;border:1px solid #e0e0e0;border-radius:0 0 6px 6px}
+    .spc-ooc{background:#fff3e0;border:1px solid #ffb74d;border-left:6px solid #ef6c00;border-radius:4px;padding:14px 18px;margin:14px 0}
+    .spc-ooc-head{font-weight:700;color:#e65100;font-size:.92rem;display:flex;align-items:center;gap:6px}
+    .spc-ooc-list{margin:10px 0 8px;padding-left:18px;font-size:.82rem;color:#4e342e}
+    .spc-ooc-list li{margin-bottom:6px}
+    .spc-viol-points{font-size:.76rem;color:#8d6e63}
+    .spc-ooc-link{display:inline-flex;align-items:center;gap:6px;background:#ef6c00;color:#fff;border-radius:4px;padding:7px 14px;font-size:.82rem;font-weight:600;text-decoration:none}
+    .spc-ooc-link:hover{background:#e65100;color:#fff}
+    .spc-empty-chart{text-align:center;padding:24px;color:#999;font-size:.85rem;background:#fafafa;border:1px dashed #ddd;border-radius:4px}
+    @@media (max-width: 900px){ .spc-caps{grid-template-columns:repeat(2,1fr)} }
+</style>
+
+<div class="zqm">
+    <div class="zqm-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+            <h3><svg class="bi bi-graph-up me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>SPC Control Charts</h3>
+            <span class="badge">SPC Analytics</span>
+        </div>
+        <div class="actions">
+            <button type="button" class="zqm-btn" id="btnApply"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Apply</button>
+            <button type="button" class="zqm-btn" id="btnReset"><svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg>Reset</button>
+            <a asp-page="/QM/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
+        </div>
+    </div>
+
+    <div class="zqm-filter">
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Filters</div>
+        <div class="zqm-row cols-5">
+            <div class="zqm-field"><label>Material</label><select id="fMaterial" class="form-select"><option value="">All materials</option></select></div>
+            <div class="zqm-field"><label>Plant</label><select id="fPlant" class="form-select"><option value="">All plants</option></select></div>
+            <div class="zqm-field"><label>Characteristic</label><select id="fCharacteristic" class="form-select"><option value="">All characteristics</option></select></div>
+            <div class="zqm-field"><label>From</label><input type="date" id="fFrom" class="form-control" /></div>
+            <div class="zqm-field"><label>To</label><input type="date" id="fTo" class="form-control" /></div>
+        </div>
+    </div>
+
+    <div id="alertBox" class="zqm-alert"></div>
+    <div id="spcAlert"></div>
+
+    <div id="loadingBox" class="spc-loading" style="display:none">Loading SPC analysis…</div>
+
+    <div id="emptyState" class="zqm-results" style="display:none">
+        <div class="zqm-empty">
+            <svg class="bi bi-graph-up" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>
+            <div>No inspection results match the current filters.</div>
+            <div style="font-size:.78rem;margin-top:6px">Adjust the filters or record inspection results to see control charts.</div>
+        </div>
+    </div>
+
+    <div id="capSection" style="display:none">
+        <div class="spc-caps" id="capRow"></div>
+        <div class="spc-meta" id="capMeta"></div>
+    </div>
+
+    <div class="zqm-results" id="chartsSection" style="display:none">
+        <div class="zqm-results-header">
+            <h4><svg class="bi bi-bar-chart me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bar-chart"></use></svg>Control Charts</h4>
+            <span class="count" id="chartMeta"></span>
+        </div>
+
+        <div class="spc-chart-block">
+            <div class="spc-chart-head">
+                <h5><svg class="bi bi-graph-up me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg><span id="xbarTitle">X̄ Chart</span></h5>
+                <span class="spc-unit" id="xbarUnit"></span>
+            </div>
+            <div id="chartXbar"></div>
+            <div class="spc-legend">
+                <span class="spc-lg"><i class="spc-lg-line"></i>Subgroup mean</span>
+                <span class="spc-lg"><i class="spc-lg-line ucl"></i>UCL</span>
+                <span class="spc-lg"><i class="spc-lg-line cl"></i>CL</span>
+                <span class="spc-lg"><i class="spc-lg-line lcl"></i>LCL</span>
+                <span class="spc-lg"><i class="spc-lg-dot bad"></i>Beyond limits</span>
+            </div>
+        </div>
+
+        <div class="spc-chart-block">
+            <div class="spc-chart-head">
+                <h5><svg class="bi bi-bar-chart me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bar-chart"></use></svg><span id="rTitle">R Chart</span></h5>
+                <span class="spc-unit" id="rUnit"></span>
+            </div>
+            <div id="chartR"></div>
+            <div class="spc-legend">
+                <span class="spc-lg"><i class="spc-lg-line"></i>Range</span>
+                <span class="spc-lg"><i class="spc-lg-line ucl"></i>UCL</span>
+                <span class="spc-lg"><i class="spc-lg-line cl"></i>CL</span>
+                <span class="spc-lg"><i class="spc-lg-line lcl"></i>LCL</span>
+                <span class="spc-lg"><i class="spc-lg-dot bad"></i>Beyond limits</span>
+            </div>
+        </div>
+
+        <div class="spc-chart-block">
+            <div class="spc-chart-head">
+                <h5><svg class="bi bi-sliders me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-sliders"></use></svg><span id="sTitle">S Chart</span></h5>
+                <span class="spc-unit" id="sUnit"></span>
+            </div>
+            <div id="chartS"></div>
+            <div class="spc-legend">
+                <span class="spc-lg"><i class="spc-lg-line"></i>Std deviation</span>
+                <span class="spc-lg"><i class="spc-lg-line ucl"></i>UCL</span>
+                <span class="spc-lg"><i class="spc-lg-line cl"></i>CL</span>
+                <span class="spc-lg"><i class="spc-lg-line lcl"></i>LCL</span>
+                <span class="spc-lg"><i class="spc-lg-dot bad"></i>Beyond limits</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        var API = '/api/v1/qm/spc';
+
+        function el(id) { return document.getElementById(id); }
+
+        function showAlert(msg, type) {
+            var box = el('alertBox');
+            box.style.display = 'block';
+            box.className = 'zqm-alert ' + type;
+            box.textContent = msg;
+        }
+        function hideAlert() { el('alertBox').style.display = 'none'; }
+
+        function esc(value) {
+            return String(value === null || value === undefined ? '' : value)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function fmt(value) {
+            if (value === null || value === undefined || isNaN(value)) return '-';
+            var r = Math.round(Number(value) * 10000) / 10000;
+            return String(r);
+        }
+        function shortLabel(value) {
+            var s = String(value === null || value === undefined ? '' : value);
+            return s.length > 12 ? s.slice(0, 11) + '…' : s;
+        }
+
+        async function getJson(url) {
+            try {
+                var res = await fetch(url, { credentials: 'same-origin' });
+                var body = null;
+                try { body = await res.json(); } catch (e) { body = null; }
+                if (!res.ok) {
+                    var msg = (body && (body.error || body.detail || body.title)) || ('Request failed (HTTP ' + res.status + ')');
+                    return { ok: false, error: msg };
+                }
+                return { ok: true, data: body ? body.data : null };
+            } catch (e) {
+                return { ok: false, error: e.message };
+            }
+        }
+
+        function fillSelect(id, items) {
+            var select = el(id);
+            var previous = select.value;
+            select.innerHTML = '';
+            var all = document.createElement('option');
+            all.value = '';
+            all.textContent = 'All';
+            select.appendChild(all);
+            (items || []).forEach(function (item) {
+                var option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                select.appendChild(option);
+            });
+            if (previous) select.value = previous;
+        }
+
+        async function loadFilters() {
+            var res = await getJson(API + '/filters');
+            if (!res.ok) { showAlert('Failed to load filter options: ' + res.error, 'error'); return; }
+            var opts = res.data || {};
+            fillSelect('fMaterial', opts.materialCodes);
+            fillSelect('fPlant', opts.plants);
+            fillSelect('fCharacteristic', opts.characteristics);
+        }
+
+        function buildUrl() {
+            var params = [];
+            var material = el('fMaterial').value;
+            var plant = el('fPlant').value;
+            var characteristic = el('fCharacteristic').value;
+            var from = el('fFrom').value;
+            var to = el('fTo').value;
+            if (material) params.push('materialCode=' + encodeURIComponent(material));
+            if (plant) params.push('plant=' + encodeURIComponent(plant));
+            if (characteristic) params.push('characteristic=' + encodeURIComponent(characteristic));
+            if (from) params.push('fromDate=' + encodeURIComponent(from));
+            if (to) params.push('toDate=' + encodeURIComponent(to));
+            return API + '/analysis' + (params.length ? '?' + params.join('&') : '');
+        }
+
+        function hideResults() {
+            el('emptyState').style.display = 'none';
+            el('capSection').style.display = 'none';
+            el('chartsSection').style.display = 'none';
+            el('spcAlert').innerHTML = '';
+        }
+
+        async function loadAnalysis() {
+            hideAlert();
+            hideResults();
+            el('loadingBox').style.display = '';
+            var res = await getJson(buildUrl());
+            el('loadingBox').style.display = 'none';
+            if (!res.ok) { showAlert('SPC analysis failed: ' + res.error, 'error'); return; }
+            render(res.data || {});
+        }
+
+        function render(data) {
+            var subgroupCount = data.subgroupCount || 0;
+            if (!subgroupCount) { el('emptyState').style.display = ''; return; }
+
+            el('chartMeta').textContent = (data.characteristic || '') +
+                (data.unit ? ' (' + data.unit + ')' : '') +
+                ' · ' + subgroupCount + ' subgroups · ' + (data.resultCount || 0) + ' results';
+
+            var charts = data.charts || {};
+            setChartHeading('xbar', charts.xbar);
+            setChartHeading('r', charts.r);
+            setChartHeading('s', charts.s);
+
+            renderChart('chartXbar', charts.xbar);
+            renderChart('chartR', charts.r);
+            renderChart('chartS', charts.s);
+
+            renderCapability(data.capability || null);
+            renderViolations(data);
+
+            el('capSection').style.display = '';
+            el('chartsSection').style.display = '';
+        }
+
+        function setChartHeading(prefix, chart) {
+            if (!chart) return;
+            if (chart.title) el(prefix + 'Title').textContent = chart.title;
+            el(prefix + 'Unit').textContent = chart.unit ? 'Unit: ' + chart.unit : '';
+        }
+
+        function renderCapability(capability) {
+            var definitions = [
+                { key: 'cp', label: 'Cp', hint: 'Potential capability' },
+                { key: 'cpk', label: 'Cpk', hint: 'Actual capability' },
+                { key: 'pp', label: 'Pp', hint: 'Potential performance' },
+                { key: 'ppk', label: 'Ppk', hint: 'Actual performance' }
+            ];
+            var html = '';
+            definitions.forEach(function (def) {
+                var value = capability ? capability[def.key] : null;
+                var text = '—';
+                var badge = '';
+                if (value !== null && value !== undefined) {
+                    text = Number(value).toFixed(3);
+                    if (value >= 1.33) badge = '<span class="spc-badge good">Capable</span>';
+                    else if (value >= 1.0) badge = '<span class="spc-badge warn">Marginal</span>';
+                    else badge = '<span class="spc-badge bad">Not capable</span>';
+                }
+                html += '<div class="spc-cap-card">' +
+                    '<div class="spc-cap-label">' + def.label + '</div>' +
+                    '<div class="spc-cap-value">' + text + '</div>' +
+                    badge +
+                    '<div class="spc-cap-hint">' + def.hint + '</div>' +
+                    '</div>';
+            });
+            el('capRow').innerHTML = html;
+
+            if (capability) {
+                el('capMeta').innerHTML =
+                    '<strong>Spec limits:</strong> LSL ' + fmt(capability.lsl) +
+                    ' · USL ' + fmt(capability.usl) +
+                    ' &nbsp;&nbsp; <strong>Mean (μ):</strong> ' + fmt(capability.mu) +
+                    ' &nbsp;&nbsp; <strong>σ within:</strong> ' + fmt(capability.sigmaWithin) +
+                    ' &nbsp;&nbsp; <strong>σ overall:</strong> ' + fmt(capability.sigmaOverall);
+                el('capMeta').style.display = '';
+            } else {
+                el('capMeta').style.display = 'none';
+            }
+        }
+
+        function renderViolations(data) {
+            var host = el('spcAlert');
+            var violations = data.violations || [];
+            if (!data.outOfControl || !violations.length) { host.innerHTML = ''; return; }
+
+            var points = (data.charts && data.charts.xbar && data.charts.xbar.points) || [];
+            var names = [];
+            violations.forEach(function (violation) {
+                if (names.indexOf(violation.ruleName) === -1) names.push(violation.ruleName);
+            });
+
+            var items = violations.map(function (violation) {
+                var labels = (violation.pointIndexes || []).map(function (index) {
+                    return points[index] ? points[index].label : ('#' + index);
+                });
+                return '<li><strong>' + esc(violation.ruleId) + ' — ' + esc(violation.ruleName) + '</strong>: ' +
+                    esc(violation.description) +
+                    '<div class="spc-viol-points">Points: ' + esc(labels.join(', ')) + '</div></li>';
+            });
+
+            host.innerHTML = '<div class="spc-ooc">' +
+                '<div class="spc-ooc-head"><svg class="bi bi-exclamation-triangle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>' +
+                'Process out of control — ' + violations.length + ' rule violation(s): ' + esc(names.join(', ')) + '</div>' +
+                '<ul class="spc-ooc-list">' + items.join('') + '</ul>' +
+                '<a class="spc-ooc-link" href="/QM/ZqmSuite/NonConformanceCapa">' +
+                '<svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>' +
+                'Create Quality Non-Conformance</a>' +
+                '</div>';
+        }
+
+        function renderChart(hostId, chart) {
+            var host = el(hostId);
+            if (!host) return;
+            if (!chart || !chart.points || !chart.points.length) {
+                host.innerHTML = '<div class="spc-empty-chart">No data available for this chart.</div>';
+                return;
+            }
+
+            var points = chart.points;
+            var W = 960, H = 320, padL = 66, padR = 108, padT = 16, padB = 54;
+            var iw = W - padL - padR;
+            var ih = H - padT - padB;
+
+            var values = [];
+            points.forEach(function (point) {
+                if (point.value !== null && point.value !== undefined) values.push(point.value);
+                if (point.ucl !== null && point.ucl !== undefined) values.push(point.ucl);
+                if (point.cl !== null && point.cl !== undefined) values.push(point.cl);
+                if (point.lcl !== null && point.lcl !== undefined) values.push(point.lcl);
+            });
+            if (!values.length) {
+                host.innerHTML = '<div class="spc-empty-chart">No data available for this chart.</div>';
+                return;
+            }
+
+            var min = Math.min.apply(null, values);
+            var max = Math.max.apply(null, values);
+            if (!isFinite(min) || !isFinite(max)) {
+                host.innerHTML = '<div class="spc-empty-chart">No data available for this chart.</div>';
+                return;
+            }
+            if (min === max) { min -= 1; max += 1; }
+            var span = max - min;
+            min -= span * 0.12;
+            max += span * 0.12;
+
+            function x(index) {
+                return points.length === 1 ? padL + iw / 2 : padL + (iw * index) / (points.length - 1);
+            }
+            function y(value) {
+                return padT + ih * (max - value) / (max - min);
+            }
+
+            var svg = [];
+            svg.push('<svg viewBox="0 0 ' + W + ' ' + H + '" class="spc-svg" role="img" aria-label="' + esc(chart.title) + '">');
+
+            var ticks = 5;
+            for (var t = 0; t <= ticks; t++) {
+                var tickValue = min + (max - min) * t / ticks;
+                var tickY = y(tickValue);
+                svg.push('<line x1="' + padL + '" y1="' + tickY + '" x2="' + (W - padR) + '" y2="' + tickY + '" stroke="#eceff1" stroke-width="1" />');
+                svg.push('<text x="' + (padL - 8) + '" y="' + (tickY + 4) + '" text-anchor="end" class="spc-axis">' + fmt(tickValue) + '</text>');
+            }
+
+            var reference = null;
+            for (var r = points.length - 1; r >= 0; r--) {
+                if (points[r].ucl !== null && points[r].ucl !== undefined) { reference = points[r]; break; }
+            }
+
+            if (reference) {
+                if (reference.ucl !== null && reference.ucl !== undefined) {
+                    var uclY = y(reference.ucl);
+                    svg.push('<line x1="' + padL + '" y1="' + uclY + '" x2="' + (W - padR) + '" y2="' + uclY + '" class="spc-limit" />');
+                    svg.push('<text x="' + (W - padR + 8) + '" y="' + (uclY + 4) + '" class="spc-limit-t">UCL ' + fmt(reference.ucl) + '</text>');
+                }
+                if (reference.lcl !== null && reference.lcl !== undefined) {
+                    var lclY = y(reference.lcl);
+                    svg.push('<line x1="' + padL + '" y1="' + lclY + '" x2="' + (W - padR) + '" y2="' + lclY + '" class="spc-limit" />');
+                    svg.push('<text x="' + (W - padR + 8) + '" y="' + (lclY + 4) + '" class="spc-limit-t">LCL ' + fmt(reference.lcl) + '</text>');
+                }
+                if (reference.cl !== null && reference.cl !== undefined) {
+                    var clY = y(reference.cl);
+                    svg.push('<line x1="' + padL + '" y1="' + clY + '" x2="' + (W - padR) + '" y2="' + clY + '" class="spc-cline" />');
+                    svg.push('<text x="' + (W - padR + 8) + '" y="' + (clY + 4) + '" class="spc-cl-t">CL ' + fmt(reference.cl) + '</text>');
+                }
+            }
+
+            var polyline = [];
+            points.forEach(function (point, index) {
+                if (point.value !== null && point.value !== undefined) polyline.push(x(index) + ',' + y(point.value));
+            });
+            if (polyline.length) svg.push('<polyline points="' + polyline.join(' ') + '" class="spc-line" />');
+
+            points.forEach(function (point, index) {
+                if (point.value === null || point.value === undefined) return;
+                var css = point.violating ? 'spc-pt-bad' : 'spc-pt';
+                var suffix = point.violating ? ' (beyond limits)' : '';
+                svg.push('<circle cx="' + x(index) + '" cy="' + y(point.value) + '" r="4.5" class="' + css + '">' +
+                    '<title>' + esc(point.label) + ': ' + fmt(point.value) + suffix + '</title></circle>');
+            });
+
+            var every = Math.max(1, Math.ceil(points.length / 12));
+            points.forEach(function (point, index) {
+                if (index % every !== 0 && index !== points.length - 1) return;
+                svg.push('<text x="' + x(index) + '" y="' + (H - padB + 20) + '" text-anchor="middle" class="spc-axis spc-x-label">' + esc(shortLabel(point.label)) + '</text>');
+            });
+
+            svg.push('<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (H - padB) + '" stroke="#b0bec5" stroke-width="1.2" />');
+            svg.push('<line x1="' + padL + '" y1="' + (H - padB) + '" x2="' + (W - padR) + '" y2="' + (H - padB) + '" stroke="#b0bec5" stroke-width="1.2" />');
+            svg.push('</svg>');
+
+            host.innerHTML = svg.join('');
+        }
+
+        function init() {
+            el('btnApply').addEventListener('click', function () { loadAnalysis(); });
+            el('btnReset').addEventListener('click', function () {
+                el('fMaterial').value = '';
+                el('fPlant').value = '';
+                el('fCharacteristic').value = '';
+                el('fFrom').value = '';
+                el('fTo').value = '';
+                loadAnalysis();
+            });
+            loadFilters().then(function () { return loadAnalysis(); });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
+}

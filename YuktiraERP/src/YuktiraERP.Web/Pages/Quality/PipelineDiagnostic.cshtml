@@ -71,20 +71,20 @@
 </style>
 
 <div class="pipe-header">
-    <h2><i class="bi bi-activity"></i> E2E Pipeline Diagnostic Engine</h2>
+    <h2><svg class="bi bi-activity" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-activity"></use></svg> E2E Pipeline Diagnostic Engine</h2>
     <p>Automated end-to-end verification: PO → GR(101) → Inspection Lot → UD → Quality Release(321) → Delivery(601) → Billing(VF01) → FI Ledger(FB03)</p>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
     <div class="alert alert-danger" style="padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:13px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b;">
-        <i class="bi bi-exclamation-triangle me-2"></i>@Model.ErrorMessage
+        <svg class="bi bi-exclamation-triangle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>@Model.ErrorMessage
     </div>
 }
 
 <form method="post">
     <div class="section-card">
-        <h5><i class="bi bi-funnel me-2"></i>Pipeline Parameters</h5>
+        <h5><svg class="bi bi-funnel me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Pipeline Parameters</h5>
         <div class="form-row">
             <div class="form-group">
                 <label>Material Code</label>
@@ -104,7 +104,7 @@
             </div>
             <div class="form-group" style="display:flex; align-items:end;">
                 <button type="submit" asp-page-handler="Execute" class="btn btn-primary" id="runBtn">
-                    <i class="bi bi-play-fill"></i> Run Full Pipeline
+                    <svg class="bi bi-play-fill" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg> Run Full Pipeline
                 </button>
             </div>
         </div>
@@ -114,7 +114,7 @@
 @if (Model.Result != null)
 {
     <div class="section-card">
-        <h5><i class="bi bi-clipboard-check me-2"></i>Diagnostic Summary</h5>
+        <h5><svg class="bi bi-clipboard-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Diagnostic Summary</h5>
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="label">Overall</div>
@@ -146,7 +146,7 @@
     </div>
 
     <div class="section-card">
-        <h5><i class="bi bi-diagram-3 me-2"></i>Pipeline Flow</h5>
+        <h5><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Pipeline Flow</h5>
         <div class="pipeline-flow">
             @foreach (var step in Model.Result.Steps)
             {
@@ -163,7 +163,7 @@
     </div>
 
     <div class="section-card">
-        <h5><i class="bi bi-list-check me-2"></i>Step-by-Step Verification</h5>
+        <h5><svg class="bi bi-list-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg>Step-by-Step Verification</h5>
         @foreach (var step in Model.Result.Steps)
         {
             <div class="step-card">
@@ -172,7 +172,7 @@
                     <div class="step-name">@step.StepName</div>
                     <span class="step-status @step.Status.ToString().ToLower()">@step.Status</span>
                     <span class="step-duration">@step.DurationMs ms</span>
-                    <i class="bi bi-chevron-down" style="color:#94a3b8; font-size:12px;"></i>
+                    <svg class="bi bi-chevron-down" style="color:#94a3b8; font-size:12px;" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-down"></use></svg>
                 </div>
                 <div class="step-body">
                     <p style="font-size:12px; color:#64748b; margin:0 0 8px 0;">@step.Description</p>
@@ -191,15 +191,15 @@
                     }
                     @if (!string.IsNullOrEmpty(step.ErrorMessage))
                     {
-                        <div class="error-box"><i class="bi bi-exclamation-circle me-1"></i>@step.ErrorMessage</div>
+                        <div class="error-box"><svg class="bi bi-exclamation-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-circle"></use></svg>@step.ErrorMessage</div>
                     }
                     @if (!string.IsNullOrEmpty(step.Resolution))
                     {
-                        <div class="resolution-box"><i class="bi bi-lightbulb me-1"></i>@step.Resolution</div>
+                        <div class="resolution-box"><svg class="bi bi-lightbulb me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lightbulb"></use></svg>@step.Resolution</div>
                     }
                     @if (!string.IsNullOrEmpty(step.Details) && string.IsNullOrEmpty(step.ErrorMessage))
                     {
-                        <p style="font-size:12px; color:#16a34a; margin:8px 0 0 0;"><i class="bi bi-check-circle me-1"></i>@step.Details</p>
+                        <p style="font-size:12px; color:#16a34a; margin:8px 0 0 0;"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>@step.Details</p>
                     }
                 </div>
             </div>
@@ -209,7 +209,7 @@
     @if (Model.Result.Traceability != null)
     {
         <div class="section-card">
-            <h5><i class="bi bi-link-45deg me-2"></i>Document Traceability</h5>
+            <h5><svg class="bi bi-link-45deg me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-link-45deg"></use></svg>Document Traceability</h5>
             <div class="trace-grid">
                 @if (Model.Result.Traceability.PurchaseOrderNumber != null)
                 {
@@ -294,7 +294,7 @@
     @if (Model.Result.CriticalIssues.Any())
     {
         <div class="section-card" style="border-color: #fecaca;">
-            <h5 style="color: #991b1b;"><i class="bi bi-exclamation-octagon me-2"></i>Critical Issues (@Model.Result.CriticalIssues.Count)</h5>
+            <h5 style="color: #991b1b;"><svg class="bi bi-exclamation-octagon me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-octagon"></use></svg>Critical Issues (@Model.Result.CriticalIssues.Count)</h5>
             <ul class="rec-list">
                 @foreach (var issue in Model.Result.CriticalIssues)
                 {
@@ -307,7 +307,7 @@
     @if (Model.Result.Recommendations.Any())
     {
         <div class="section-card" style="border-color: #bfdbfe;">
-            <h5 style="color: #1e40af;"><i class="bi bi-lightbulb me-2"></i>Recommendations (@Model.Result.Recommendations.Count)</h5>
+            <h5 style="color: #1e40af;"><svg class="bi bi-lightbulb me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lightbulb"></use></svg>Recommendations (@Model.Result.Recommendations.Count)</h5>
             <ul class="rec-list">
                 @foreach (var rec in Model.Result.Recommendations)
                 {
@@ -321,7 +321,7 @@
 <script>
     document.getElementById('runBtn')?.addEventListener('click', function() {
         this.disabled = true;
-        this.innerHTML = '<i class="bi bi-hourglass-split"></i> Running Pipeline...';
-        setTimeout(() => { this.disabled = false; this.innerHTML = '<i class="bi bi-play-fill"></i> Run Full Pipeline'; }, 5000);
+        this.innerHTML = '<svg class="bi bi-hourglass-split" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-hourglass-split"></use></svg> Running Pipeline...';
+        setTimeout(() => { this.disabled = false; this.innerHTML = '<svg class="bi bi-play-fill" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg> Run Full Pipeline'; }, 5000);
     });
 </script>

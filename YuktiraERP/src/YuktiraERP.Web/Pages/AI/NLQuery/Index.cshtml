@@ -6,23 +6,23 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-chat-dots me-2"></i>Natural Language Query</h3>
+            <h3><svg class="bi bi-chat-dots me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chat-dots"></use></svg>Natural Language Query</h3>
             <span class="badge">NL2SQL</span>
         </div>
         <div class="actions">
-            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-pencil me-1"></i>Query Input</div>
+        <div class="zqm-section-title"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Query Input</div>
         <form method="post">
             <div class="zqm-field" style="margin-bottom:12px">
                 <label>Enter your question in natural language</label>
                 <textarea asp-for="Query" rows="4" placeholder="e.g. Show me all inspection lots with critical defects from plant 1000" style="width:100%;padding:12px;border:1px solid #ccc;border-radius:4px;font-size:0.9rem;resize:vertical;font-family:inherit"></textarea>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-play-fill me-1"></i>Execute</button>
+                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Execute</button>
                 <div style="display:flex;gap:4px;flex-wrap:wrap">
                     <button type="button" class="zqm-btn" onclick="fillQuery('Show me all inspection lots with critical defects from plant 1000')">Defects by plant</button>
                     <button type="button" class="zqm-btn" onclick="fillQuery('Show current stock levels for all materials across warehouses')">Stock overview</button>
@@ -39,7 +39,7 @@
     {
         <div class="zqm-results">
             <div class="zqm-results-header">
-                <h4><i class="bi bi-code-slash me-1"></i>Translated SQL</h4>
+                <h4><svg class="bi bi-code-slash me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-code-slash"></use></svg>Translated SQL</h4>
                 <span class="count">@Model.ExecutionTime ms | @Model.RowCount rows</span>
             </div>
             <div style="padding:16px">
@@ -54,7 +54,7 @@
         {
             <div class="zqm-results">
                 <div class="zqm-results-header">
-                    <h4><i class="bi bi-table me-1"></i>Query Results</h4>
+                    <h4><svg class="bi bi-table me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-table"></use></svg>Query Results</h4>
                     <span class="count">@Model.RowCount rows returned</span>
                 </div>
                 <div class="zqm-table-wrap">
@@ -89,12 +89,12 @@
         else
         {
             <div class="zqm-results">
-                <div style="padding:20px;text-align:center;color:#666"><i class="bi bi-info-circle" style="font-size:1.5rem;display:block;margin-bottom:8px"></i>Query executed successfully but returned no results.</div>
+                <div style="padding:20px;text-align:center;color:#666"><svg class="bi bi-info-circle" style="font-size:1.5rem;display:block;margin-bottom:8px" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Query executed successfully but returned no results.</div>
             </div>
         }
     }
 
-    <div class="zqm-empty" id="emptyState"><i class="bi bi-chat-dots"></i><div>Enter a natural language question and click Execute to translate and run the query</div></div>
+    <div class="zqm-empty" id="emptyState"><svg class="bi bi-chat-dots" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chat-dots"></use></svg><div>Enter a natural language question and click Execute to translate and run the query</div></div>
 </div>
 
 @section Scripts {

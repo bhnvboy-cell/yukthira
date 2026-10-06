@@ -7,7 +7,7 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Data Sync — Module Master Upload</h2>
+    <h2 class="mb-0"><svg class="bi bi-arrow-left-right me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg>Data Sync — Module Master Upload</h2>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -62,7 +62,7 @@
 @if (step == 1 || (step == 2 && Model.ValidationResult == null) || (step == 3 && Model.ValidationResult == null && Model.SyncResult == null))
 {
 <div class="card shadow-sm">
-    <div class="card-header"><h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Step 1 — Select Module</h5></div>
+    <div class="card-header"><h5 class="mb-0"><svg class="bi bi-list-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg>Step 1 — Select Module</h5></div>
     <div class="card-body">
         <form method="post" asp-page-handler="SelectModule">
             <div class="row g-3">
@@ -83,10 +83,10 @@
                 </div>
                 <div class="col-md-6 d-flex align-items-end gap-2">
                     <button type="submit" asp-page-handler="SelectModule" class="btn btn-primary" id="btnSelect">
-                        <i class="bi bi-check-circle me-1"></i>Select
+                        <svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Select
                     </button>
                     <button type="submit" asp-page-handler="DownloadTemplate" class="btn btn-outline-success" id="btnDownload" disabled>
-                        <i class="bi bi-download me-1"></i>Download Template
+                        <svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Download Template
                     </button>
                 </div>
             </div>
@@ -137,7 +137,7 @@
                 <form method="post" asp-page-handler="DownloadTemplate">
                     <input type="hidden" asp-for="ModuleSelection" />
                     <button type="submit" class="btn btn-success btn-lg">
-                        <i class="bi bi-file-earmark-excel me-2"></i>Download Master Template (.xlsx)
+                        <svg class="bi bi-file-earmark-excel me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-excel"></use></svg>Download Master Template (.xlsx)
                     </button>
                     <small class="text-muted ms-2">Includes Instruction sheet, Schema sheet, and Data entry sheet with validation</small>
                 </form>
@@ -151,14 +151,14 @@
 @if (step == 2 && Model.ValidationResult == null)
 {
 <div class="card shadow-sm mt-4">
-    <div class="card-header"><h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>Step 2 — Upload Filled Template</h5></div>
+    <div class="card-header"><h5 class="mb-0"><svg class="bi bi-cloud-upload me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cloud-upload"></use></svg>Step 2 — Upload Filled Template</h5></div>
     <div class="card-body">
         <form method="post" asp-page-handler="Upload" enctype="multipart/form-data" id="uploadForm">
             <input type="hidden" asp-for="ModuleSelection" />
             <input type="hidden" asp-for="CurrentStep" value="2" />
 
             <div class="upload-zone" id="uploadZone">
-                <i class="bi bi-cloud-arrow-up display-4 text-primary"></i>
+                <svg class="bi bi-cloud-arrow-up display-4 text-primary" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cloud-arrow-up"></use></svg>
                 <p class="mt-2 mb-1 fw-bold">Drag & drop your filled .xlsx template here</p>
                 <p class="text-muted small">or click to browse files</p>
                 <input type="file" asp-for="UploadedFile" accept=".xlsx" class="d-none" id="fileInput" />
@@ -167,7 +167,7 @@
 
             <div class="mt-3 text-center">
                 <button type="submit" class="btn btn-primary btn-lg" id="btnUpload" disabled>
-                    <i class="bi bi-upload me-1"></i>Upload & Validate
+                    <svg class="bi bi-upload me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-upload"></use></svg>Upload & Validate
                 </button>
             </div>
         </form>
@@ -183,7 +183,7 @@
 
 <div class="card shadow-sm mt-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Step 3 — @(sr != null ? "Sync Results" : "Validation Results")</h5>
+        <h5 class="mb-0"><svg class="bi bi-clipboard-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Step 3 — @(sr != null ? "Sync Results" : "Validation Results")</h5>
         @if (vr != null)
         {
             <div>
@@ -200,7 +200,7 @@
                 <div class="col-md-3">
                     <div class="card text-center p-3 @(sr.Success ? "border-success" : "border-danger")">
                         <div class="display-6 @(sr.Success ? "text-success" : "text-danger")">
-                            <i class="bi bi-@(sr.Success ? "check-circle-fill" : "x-circle-fill")"></i>
+                            <svg class="bi bi-@(sr.Success ? "check-circle-fill" : "x-circle-fill")" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-@(sr.Success ? "check-circle-fill" : "x-circle-fill")"></use></svg>
                         </div>
                         <h6 class="mt-2">@(sr.Success ? "Sync Complete" : "Sync Failed")</h6>
                     </div>
@@ -249,7 +249,7 @@
 
             <div class="mt-3">
                 <a asp-page="/Admin/DataSync" class="btn btn-primary">
-                    <i class="bi bi-arrow-repeat me-1"></i>Start New Sync
+                    <svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg>Start New Sync
                 </a>
             </div>
         }
@@ -315,7 +315,7 @@
                     @if (vr.IsValid)
                     {
                         <button type="submit" class="btn btn-success btn-lg">
-                            <i class="bi bi-lightning-charge me-1"></i>Sync Data Now
+                            <svg class="bi bi-lightning-charge me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lightning-charge"></use></svg>Sync Data Now
                         </button>
                     }
                     else
@@ -327,7 +327,7 @@
                             </label>
                         </div>
                         <button type="submit" class="btn btn-warning btn-lg" id="btnSyncWithError">
-                            <i class="bi bi-lightning-charge me-1"></i>Sync (Skip Errors)
+                            <svg class="bi bi-lightning-charge me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-lightning-charge"></use></svg>Sync (Skip Errors)
                         </button>
                     }
                 </form>
@@ -335,7 +335,7 @@
                 <form method="post" asp-page-handler="SelectModule">
                     <input type="hidden" asp-for="ModuleSelection" />
                     <button type="submit" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i>Back to Upload
+                        <svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back to Upload
                     </button>
                 </form>
             </div>

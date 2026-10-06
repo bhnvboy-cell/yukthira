@@ -6,18 +6,18 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-receipt-cutoff me-2"></i>AR Invoice</h3>
+            <h3><svg class="bi bi-receipt-cutoff me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt-cutoff"></use></svg>AR Invoice</h3>
             <span class="badge">FB70 — Quick</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Post Invoice</button>
-            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Post Invoice</button>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
         <form method="post" id="createForm">
-            <div class="zqm-section-title"><i class="bi bi-receipt me-1"></i>Invoice Details</div>
+            <div class="zqm-section-title"><svg class="bi bi-receipt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg>Invoice Details</div>
             <div class="zqm-row cols-3">
                 <div class="zqm-field"><label>Customer Name <span style="color:#c62828">*</span></label><input asp-for="Entry.CustomerName" required /></div>
                 <div class="zqm-field"><label>Amount <span style="color:#c62828">*</span></label><input asp-for="Entry.Amount" type="number" step="0.01" min="0" required /></div>

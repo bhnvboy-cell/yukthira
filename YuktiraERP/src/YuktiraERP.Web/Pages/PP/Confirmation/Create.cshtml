@@ -6,13 +6,13 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-check2-square me-2"></i>Confirm Production Order</h3>
+            <h3><svg class="bi bi-check2-square me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-square"></use></svg>Confirm Production Order</h3>
             <span class="badge">CO11N</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Confirm Production</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Confirm Production</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
@@ -21,20 +21,20 @@
             <input type="hidden" asp-for="Confirmation.Status" value="Confirmed" />
 
             <div class="zqm-tabs" id="confTabs">
-                <button type="button" class="zqm-tab-btn active" data-tab="tab-order"><i class="bi bi-gear me-1"></i>Order & Operation</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-quantities"><i class="bi bi-speedometer me-1"></i>Quantities</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-times"><i class="bi bi-clock me-1"></i>Actual Times</button>
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-order"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Order & Operation</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-quantities"><svg class="bi bi-speedometer me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer"></use></svg>Quantities</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-times"><svg class="bi bi-clock me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock"></use></svg>Actual Times</button>
             </div>
 
             <!-- Tab: Order & Operation -->
             <div class="zqm-tab-panel active" id="tab-order" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-gear me-1"></i>Production Order Reference</div>
+                <div class="zqm-section-title"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Production Order Reference</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Confirmation Number</label><input value="Auto-generated" readonly style="background:#f0f0f0" /></div>
                     <div class="zqm-field"><label>Production Order # <span style="color:#c62828">*</span></label><select asp-for="Confirmation.ProductionOrderNumber" asp-items="Model.OrderOptions"><option value="">-- Select Production Order --</option></select><span asp-validation-for="Confirmation.ProductionOrderNumber" style="color:#c62828;font-size:0.72rem"></span></div>
                     <div class="zqm-field"><label>Operation Number</label><input asp-for="Confirmation.OperationNumber" type="number" min="10" step="10" value="10" /></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-building me-1"></i>Work Center</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-building me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-building"></use></svg>Work Center</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Work Center</label><input asp-for="Confirmation.WorkCenter" placeholder="e.g., WC-01" /></div>
                     <div class="zqm-field"><label>Confirmed By</label><input asp-for="Confirmation.ConfirmedBy" placeholder="Operator name" /></div>
@@ -44,7 +44,7 @@
 
             <!-- Tab: Quantities -->
             <div class="zqm-tab-panel" id="tab-quantities" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-speedometer me-1"></i>Yield & Scrap</div>
+                <div class="zqm-section-title"><svg class="bi bi-speedometer me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer"></use></svg>Yield & Scrap</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Yield Quantity <span style="color:#c62828">*</span></label><input asp-for="Confirmation.YieldQuantity" type="number" min="0" step="1" /><span asp-validation-for="Confirmation.YieldQuantity" style="color:#c62828;font-size:0.72rem"></span></div>
                     <div class="zqm-field"><label>Scrap Quantity</label><input asp-for="Confirmation.ScrapQuantity" type="number" min="0" step="1" value="0" /></div>
@@ -54,7 +54,7 @@
 
             <!-- Tab: Actual Times -->
             <div class="zqm-tab-panel" id="tab-times" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-clock me-1"></i>Actual Activity Times</div>
+                <div class="zqm-section-title"><svg class="bi bi-clock me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock"></use></svg>Actual Activity Times</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Actual Setup Time (hrs)</label><input asp-for="Confirmation.ActualSetupTime" type="number" min="0" step="0.1" value="0" /></div>
                     <div class="zqm-field"><label>Actual Machine Time (hrs)</label><input asp-for="Confirmation.ActualMachineTime" type="number" min="0" step="0.1" value="0" /></div>

@@ -54,3 +54,6 @@ database/backup/*.sql
 .idea/
 *.sublime-workspace
 *.sublime-project
+
+# Planning notes
+.plan/

@@ -6,7 +6,8 @@ namespace YuktiraERP.Api.Controllers;
 
 [ApiController]
 [Route("api/tcode-customize")]
-[Authorize(Roles = "SUPER_USER,ADMIN")]
+[Authorize]
+[Authorize(Policy = "AdminOrAbove")]
 public class TCodeCustomizationController : ControllerBase
 {
     private readonly ITCodeCustomizationService _service;

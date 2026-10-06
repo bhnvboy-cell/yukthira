@@ -24,7 +24,7 @@ public class DairyPlugin : IYuktiraPlugin, IPluginStartupHook, IPluginMenuHook
         return new List<MenuItem>
         {
             new() { Label = "Milk Collection", Url = "/dairy/collection", Icon = "bi-droplet", Order = 1 },
-            new() { Label = "Fat/SNF Testing", Url = "/dairy/testing", Icon = "bi bi-flask", Order = 2 },
+            new() { Label = "Fat/SNF Testing", Url = "/dairy/testing", Icon = "bi-clipboard2-pulse", Order = 2 },
             new() { Label = "Procurement", Url = "/dairy/procurement", Icon = "bi-truck", Order = 3 },
             new() { Label = "Payout Calculation", Url = "/dairy/payout", Icon = "bi-calculator", Order = 4 }
         };

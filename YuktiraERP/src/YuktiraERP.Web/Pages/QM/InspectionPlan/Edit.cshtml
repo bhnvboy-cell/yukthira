@@ -3,15 +3,15 @@
 @{ ViewData["Title"] = "Edit Inspection Plan"; }
 <link rel="stylesheet" href="~/css/enterprise-form.css" />
 <div class="ent-form-wrapper">
-    <div class="ent-form-header"><h3><i class="bi bi-journal-text me-2"></i>Edit Inspection Plan</h3><span class="badge">QM</span></div>
+    <div class="ent-form-header"><h3><svg class="bi bi-journal-text me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-journal-text"></use></svg>Edit Inspection Plan</h3><span class="badge">QM</span></div>
     <form method="post">
         <input type="hidden" asp-for="Plan.Id" />
         <div class="ent-form-tabs">
-            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General Data</button>
-            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-chars')"><i class="bi bi-list-check tab-icon"></i> Characteristics</button>
+            <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><svg class="bi bi-info-circle tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> General Data</button>
+            <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-chars')"><svg class="bi bi-list-check tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg> Characteristics</button>
         </div>
         <div class="ent-form-panel active" id="tab-general">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Plan Identification</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-tag" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-tag"></use></svg> Plan Identification</div>
                 <div class="ent-field-grid ent-grid-3">
                     <div class="ent-field"><label>Plan ID</label><input asp-for="Plan.PlanId" class="ent-input" readonly /></div>
                     <div class="ent-field"><label>Material Name</label><input asp-for="Plan.MaterialName" class="ent-input" /></div>
@@ -29,14 +29,14 @@
             </div>
         </div>
         <div class="ent-form-panel" id="tab-chars">
-            <div class="ent-section"><div class="ent-section-header"><i class="bi bi-list-check"></i> Validity</div>
+            <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-list-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg> Validity</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field"><label>Validity Start</label><input asp-for="Plan.ValidityStart" type="date" class="ent-input" /></div>
                     <div class="ent-field"><label>Validity End</label><input asp-for="Plan.ValidityEnd" type="date" class="ent-input" /></div>
                 </div>
             </div>
         </div>
-        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a><button type="submit" class="ent-btn ent-btn-primary"><i class="bi bi-check-circle me-1"></i> Save Changes</button></div>
+        <div class="ent-form-actions"><a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg> Back</a><button type="submit" class="ent-btn ent-btn-primary"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg> Save Changes</button></div>
     </form>
 </div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Customization";
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-sliders me-2"></i>Customization</h2>
+    <h2><svg class="bi bi-sliders me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-sliders"></use></svg>Customization</h2>
 </div>
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#fields">Custom Fields</a></li>
@@ -17,13 +17,13 @@
 <div class="tab-content">
     <div class="tab-pane fade show active" id="fields">
         <div class="card"><div class="card-body">
-            <div class="mb-3"><button class="btn btn-outline-primary btn-sm"><i class="bi bi-plus"></i> Add Custom Field</button></div>
+            <div class="mb-3"><button class="btn btn-outline-primary btn-sm"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Custom Field</button></div>
             <table class="table table-hover table-sm">
                 <thead><tr><th>Module</th><th>Entity</th><th>Field Name</th><th>Type</th><th>Required</th><th>Default</th><th>Actions</th></tr></thead>
                 <tbody>
-                    <tr><td>MM</td><td>Material Master</td><td>Lead Time (Days)</td><td>Number</td><td><span class="badge bg-success">Yes</span></td><td>0</td><td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td></tr>
-                    <tr><td>SD</td><td>Customer</td><td>Payment Terms</td><td>Dropdown</td><td><span class="badge bg-success">Yes</span></td><td>Net 30</td><td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td></tr>
-                    <tr><td>HR</td><td>Employee</td><td>Emergency Contact</td><td>Text</td><td><span class="badge bg-success">Yes</span></td><td></td><td><i class="bi bi-pencil me-2"></i><i class="bi bi-trash text-danger"></i></td></tr>
+                    <tr><td>MM</td><td>Material Master</td><td>Lead Time (Days)</td><td>Number</td><td><span class="badge bg-success">Yes</span></td><td>0</td><td><svg class="bi bi-pencil me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg><svg class="bi bi-trash text-danger" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></td></tr>
+                    <tr><td>SD</td><td>Customer</td><td>Payment Terms</td><td>Dropdown</td><td><span class="badge bg-success">Yes</span></td><td>Net 30</td><td><svg class="bi bi-pencil me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg><svg class="bi bi-trash text-danger" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></td></tr>
+                    <tr><td>HR</td><td>Employee</td><td>Emergency Contact</td><td>Text</td><td><span class="badge bg-success">Yes</span></td><td></td><td><svg class="bi bi-pencil me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg><svg class="bi bi-trash text-danger" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></td></tr>
                 </tbody>
             </table>
         </div></div>
@@ -39,7 +39,7 @@
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-outline-primary btn-sm" onclick="showAddTCustomField()"><i class="bi bi-plus"></i> Add Field</button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="showAddTCustomField()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Field</button>
                 </div>
             </div>
             <table class="table table-hover table-sm">
@@ -64,7 +64,7 @@
                 </div>
             </div>
             <div id="layoutContainer" class="row"></div>
-            <button class="btn btn-primary btn-sm mt-3" onclick="saveTLayout()"><i class="bi bi-save"></i> Save Layout</button>
+            <button class="btn btn-primary btn-sm mt-3" onclick="saveTLayout()"><svg class="bi bi-save" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg> Save Layout</button>
         </div></div>
     </div>
 
@@ -128,7 +128,7 @@
                 '<td>' + (f.isRequired ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
                 '<td>' + (f.isVisible ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
                 '<td><code class="small">' + (f.validationRuleJson && f.validationRuleJson !== '{}' ? 'Yes' : '-') + '</code></td>' +
-                '<td><button class="btn btn-outline-danger btn-sm" onclick="delTCustomField(\'' + f.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+                '<td><button class="btn btn-outline-danger btn-sm" onclick="delTCustomField(\'' + f.id + '\')"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td></tr>';
         });
         document.getElementById('tcFieldsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No custom fields</td></tr>';
     }

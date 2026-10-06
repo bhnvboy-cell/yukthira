@@ -2,7 +2,7 @@
 @model YuktiraERP.Web.Pages.Notifications.InboxModel
 @using YuktiraERP.Infrastructure.Data.Entities
 @{ ViewData["Title"] = "Notifications Inbox (NO01)"; }
-<h2><i class="bi bi-bell me-2"></i>Notifications Inbox</h2>
+<h2><svg class="bi bi-bell me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bell"></use></svg>Notifications Inbox</h2>
 <div class="card mt-3"><div class="card-body">
 @foreach (var n in Model.Notifications)
 {

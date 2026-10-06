@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model YuktiraERP.Web.Pages.PP.Routing.CreateModel
 @{ ViewData["Title"] = "Create Production Routing"; }
 <link rel="stylesheet" href="~/css/zqm-classic.css" />
@@ -6,13 +6,13 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-diagram-3 me-2"></i>Create Production Routing</h3>
+            <h3><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Create Production Routing</h3>
             <span class="badge">CA01</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-save me-1"></i>Save Routing</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/PP/Routing/List" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save Routing</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/PP/Routing/List" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
@@ -21,14 +21,14 @@
             <input type="hidden" asp-for="Routing.Status" value="Active" />
 
             <div class="zqm-tabs" id="rtTabs">
-                <button type="button" class="zqm-tab-btn active" data-tab="tab-header"><i class="bi bi-info-circle me-1"></i>Routing Header</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-operation"><i class="bi bi-gear me-1"></i>Operation Detail</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-times"><i class="bi bi-clock me-1"></i>Standard Times</button>
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-header"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Routing Header</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-operation"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Operation Detail</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-times"><svg class="bi bi-clock me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock"></use></svg>Standard Times</button>
             </div>
 
             <!-- Tab: Routing Header -->
             <div class="zqm-tab-panel active" id="tab-header" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-info-circle me-1"></i>Routing Identification</div>
+                <div class="zqm-section-title"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>Routing Identification</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Routing ID</label><input value="Auto-generated" readonly style="background:#f0f0f0" /></div>
                     <div class="zqm-field"><label>Routing Group</label><input asp-for="Routing.RoutingGroup" placeholder="e.g., MECH" /></div>
@@ -43,7 +43,7 @@
 
             <!-- Tab: Operation Detail -->
             <div class="zqm-tab-panel" id="tab-operation" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-gear me-1"></i>Operation Details</div>
+                <div class="zqm-section-title"><svg class="bi bi-gear me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg>Operation Details</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Operation Number <span style="color:#c62828">*</span></label><input asp-for="Routing.OperationNo" type="number" min="10" step="10" value="10" /><span asp-validation-for="Routing.OperationNo" style="color:#c62828;font-size:0.72rem"></span></div>
                     <div class="zqm-field"><label>Operation Description</label><input asp-for="Routing.OperationDescription" placeholder="e.g., CNC Turning" /></div>
@@ -53,7 +53,7 @@
 
             <!-- Tab: Standard Times -->
             <div class="zqm-tab-panel" id="tab-times" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-clock me-1"></i>Standard Times</div>
+                <div class="zqm-section-title"><svg class="bi bi-clock me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock"></use></svg>Standard Times</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Setup Time (hrs) <span style="color:#c62828">*</span></label><input asp-for="Routing.SetupTimeHrs" type="number" min="0" step="0.1" /><span asp-validation-for="Routing.SetupTimeHrs" style="color:#c62828;font-size:0.72rem"></span></div>
                     <div class="zqm-field"><label>Machine Time (hrs)</label><input asp-for="Routing.MachineTimeHrs" type="number" min="0" step="0.1" value="0" /></div>

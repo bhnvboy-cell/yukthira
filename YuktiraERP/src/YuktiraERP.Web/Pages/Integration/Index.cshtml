@@ -3,7 +3,7 @@
     ViewData["Title"] = "Integration Hub";
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-diagram-3 me-2"></i>Integration Hub</h2>
+    <h2><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Integration Hub</h2>
 </div>
 <ul class="nav nav-tabs mb-3" role="tablist">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#connectors">Connectors</a></li>
@@ -23,37 +23,37 @@
 
     <!-- ── Connections ── -->
     <div class="tab-pane fade" id="connections">
-        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddConnection()"><i class="bi bi-plus"></i> Add Connection</button>
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddConnection()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Connection</button>
         <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Type</th><th>Base URL</th><th>Auth</th><th>Status</th><th>Actions</th></tr></thead><tbody id="connectionsBody"></tbody></table>
     </div>
 
     <!-- ── Webhooks ── -->
     <div class="tab-pane fade" id="webhooks">
-        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddWebhook()"><i class="bi bi-plus"></i> Add Webhook</button>
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddWebhook()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Webhook</button>
         <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Event Type</th><th>Target URL</th><th>Active</th><th>Last Triggered</th><th>Actions</th></tr></thead><tbody id="webhooksBody"></tbody></table>
     </div>
 
     <!-- ── Data Sync ── -->
     <div class="tab-pane fade" id="sync">
-        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddSyncJob()"><i class="bi bi-plus"></i> Add Sync Job</button>
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddSyncJob()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Sync Job</button>
         <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Type</th><th>Direction</th><th>Schedule</th><th>Last Run</th><th>Result</th><th>Actions</th></tr></thead><tbody id="syncJobsBody"></tbody></table>
     </div>
 
     <!-- ── Mapping Rules ── -->
     <div class="tab-pane fade" id="mappings">
-        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddMapping()"><i class="bi bi-plus"></i> Add Mapping</button>
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddMapping()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Mapping</button>
         <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Source</th><th>Target</th><th>Source Entity</th><th>Target Entity</th><th>Active</th><th>Actions</th></tr></thead><tbody id="mappingsBody"></tbody></table>
     </div>
 
     <!-- ── API Clients ── -->
     <div class="tab-pane fade" id="api-clients">
-        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddApiClient()"><i class="bi bi-plus"></i> Create API Client</button>
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="showAddApiClient()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Create API Client</button>
         <table class="table table-hover table-sm"><thead><tr><th>Name</th><th>Client ID</th><th>Allowed IPs</th><th>Active</th><th>Actions</th></tr></thead><tbody id="apiClientsBody"></tbody></table>
     </div>
 
     <!-- ── Queue ── -->
     <div class="tab-pane fade" id="queue">
-        <button class="btn btn-outline-primary btn-sm mb-3" onclick="processQueue()"><i class="bi bi-play"></i> Process Queue</button>
+        <button class="btn btn-outline-primary btn-sm mb-3" onclick="processQueue()"><svg class="bi bi-play" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play"></use></svg> Process Queue</button>
         <table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Retries</th><th>Target</th><th>Error</th><th>Created</th></tr></thead><tbody id="queueBody"></tbody></table>
         <h6 class="mt-3">Dead Letter Queue</h6>
         <table class="table table-hover table-sm"><thead><tr><th>Type</th><th>Error</th><th>Retries</th><th>Failed At</th><th>Actions</th></tr></thead><tbody id="deadLetterBody"></tbody></table>
@@ -71,7 +71,7 @@
         <div class="mb-2"><label class="form-label">Auth Type</label><select id="cAuth" class="form-select"></select></div>
         <div class="mb-2"><label class="form-label">Timeout (s)</label><input id="cTimeout" type="number" class="form-control" value="30" /></div>
         <div class="mb-2">
-            <button class="btn btn-sm btn-outline-secondary" onclick="testConnection()"><i class="bi bi-plug"></i> Test</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="testConnection()"><svg class="bi bi-plug" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plug"></use></svg> Test</button>
             <span id="testResult" class="ms-2 small"></span>
         </div>
     </div>
@@ -125,7 +125,7 @@
         <div class="col-md-6 mb-2"><label class="form-label">Target Entity</label><input id="mTgtEnt" class="form-control" /></div></div>
         <div class="mb-2"><label class="form-label">Field Mappings</label>
             <div id="fieldMappings"><div class="row mb-1"><div class="col-4"><input class="form-control form-control-sm" placeholder="Source field" /></div><div class="col-4"><input class="form-control form-control-sm" placeholder="Target field" /></div><div class="col-3"><input class="form-control form-control-sm" placeholder="Default" /></div><div class="col-1"><button class="btn btn-outline-danger btn-sm" onclick="this.parentElement.parentElement.remove()">&times;</button></div></div></div>
-            <button class="btn btn-outline-secondary btn-sm mt-1" onclick="addFieldMapping()"><i class="bi bi-plus"></i> Add Field</button>
+            <button class="btn btn-outline-secondary btn-sm mt-1" onclick="addFieldMapping()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Field</button>
         </div>
     </div>
     <div class="modal-footer">
@@ -165,7 +165,7 @@
         var list = await r.json();
         var html = '';
         list.forEach(function(c) {
-            html += '<div class="col-md-4 mb-3"><div class="card h-100"><div class="card-body"><h6><i class="bi bi-plugin me-1"></i>' + c.name + '</h6><small class="text-muted">v' + c.version + '</small><p class="small mt-1 mb-2">' + c.description + '</p><div><span class="badge bg-info me-1">' + c.type + '</span>' + c.supportedAuthTypes.map(function(a) { return '<span class="badge bg-secondary me-1">' + a + '</span>'; }).join('') + '</div></div></div></div>';
+            html += '<div class="col-md-4 mb-3"><div class="card h-100"><div class="card-body"><h6><svg class="bi bi-plugin me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plugin"></use></svg>' + c.name + '</h6><small class="text-muted">v' + c.version + '</small><p class="small mt-1 mb-2">' + c.description + '</p><div><span class="badge bg-info me-1">' + c.type + '</span>' + c.supportedAuthTypes.map(function(a) { return '<span class="badge bg-secondary me-1">' + a + '</span>'; }).join('') + '</div></div></div></div>';
         });
         document.getElementById('connectorCards').innerHTML = html || '<div class="col-12"><p class="text-muted">No connectors loaded</p></div>';
 
@@ -190,7 +190,7 @@
         var list = await r.json();
         var html = '';
         list.forEach(function(c) {
-            html += '<tr><td><strong>' + c.name + '</strong></td><td><span class="badge bg-info">' + c.connectorType + '</span></td><td><code class="small">' + c.baseUrl + '</code></td><td>' + c.authType + '</td><td><span class="badge ' + (c.isActive ? 'bg-success' : 'bg-secondary') + '">' + (c.isActive ? 'Active' : 'Inactive') + '</span><br/><small class="text-muted">' + (c.lastTestResult || '-') + '</small></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteConnection(\'' + c.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+            html += '<tr><td><strong>' + c.name + '</strong></td><td><span class="badge bg-info">' + c.connectorType + '</span></td><td><code class="small">' + c.baseUrl + '</code></td><td>' + c.authType + '</td><td><span class="badge ' + (c.isActive ? 'bg-success' : 'bg-secondary') + '">' + (c.isActive ? 'Active' : 'Inactive') + '</span><br/><small class="text-muted">' + (c.lastTestResult || '-') + '</small></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteConnection(\'' + c.id + '\')"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td></tr>';
         });
         document.getElementById('connectionsBody').innerHTML = html || '<tr><td colspan="6" class="text-muted text-center">No connections</td></tr>';
         // Also populate sync connection dropdown
@@ -225,7 +225,7 @@
         var list = await r.json();
         var html = '';
         list.forEach(function(w) {
-            html += '<tr><td>' + w.name + '</td><td><span class="badge bg-primary">' + w.eventType + '</span></td><td><code class="small">' + w.targetUrl + '</code></td><td><span class="badge ' + (w.isActive ? 'bg-success' : 'bg-secondary') + '">' + (w.isActive ? 'Yes' : 'No') + '</span></td><td><small class="text-muted">' + (w.lastTriggeredAt ? new Date(w.lastTriggeredAt).toLocaleString() : '-') + '</small></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteWebhook(\'' + w.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+            html += '<tr><td>' + w.name + '</td><td><span class="badge bg-primary">' + w.eventType + '</span></td><td><code class="small">' + w.targetUrl + '</code></td><td><span class="badge ' + (w.isActive ? 'bg-success' : 'bg-secondary') + '">' + (w.isActive ? 'Yes' : 'No') + '</span></td><td><small class="text-muted">' + (w.lastTriggeredAt ? new Date(w.lastTriggeredAt).toLocaleString() : '-') + '</small></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteWebhook(\'' + w.id + '\')"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td></tr>';
         });
         document.getElementById('webhooksBody').innerHTML = html || '<tr><td colspan="6" class="text-muted text-center">No webhooks</td></tr>';
     }
@@ -257,7 +257,7 @@
         var list = await r.json();
         var html = '';
         list.forEach(function(j) {
-            html += '<tr><td>' + j.name + '</td><td><span class="badge bg-info">' + j.connectorType + '</span></td><td><span class="badge ' + (j.direction === 'Pull' ? 'bg-success' : 'bg-warning') + '">' + j.direction + '</span></td><td>' + j.scheduleType + '</td><td><small class="text-muted">' + (j.lastRunAt ? new Date(j.lastRunAt).toLocaleString() : '-') + '</small></td><td><span class="badge ' + (j.lastRunResult === 'Success' ? 'bg-success' : 'bg-secondary') + '">' + (j.lastRunResult || '-') + '</span></td><td><button class="btn btn-outline-success btn-sm me-1" onclick="runSyncJob(\'' + j.id + '\')"><i class="bi bi-play"></i></button><button class="btn btn-outline-danger btn-sm" onclick="deleteSyncJob(\'' + j.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+            html += '<tr><td>' + j.name + '</td><td><span class="badge bg-info">' + j.connectorType + '</span></td><td><span class="badge ' + (j.direction === 'Pull' ? 'bg-success' : 'bg-warning') + '">' + j.direction + '</span></td><td>' + j.scheduleType + '</td><td><small class="text-muted">' + (j.lastRunAt ? new Date(j.lastRunAt).toLocaleString() : '-') + '</small></td><td><span class="badge ' + (j.lastRunResult === 'Success' ? 'bg-success' : 'bg-secondary') + '">' + (j.lastRunResult || '-') + '</span></td><td><button class="btn btn-outline-success btn-sm me-1" onclick="runSyncJob(\'' + j.id + '\')"><svg class="bi bi-play" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play"></use></svg></button><button class="btn btn-outline-danger btn-sm" onclick="deleteSyncJob(\'' + j.id + '\')"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td></tr>';
         });
         document.getElementById('syncJobsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No sync jobs</td></tr>';
     }
@@ -294,7 +294,7 @@
         var list = await r.json();
         var html = '';
         list.forEach(function(m) {
-            html += '<tr><td>' + m.name + '</td><td><span class="badge bg-info">' + m.sourceSystem + '</span></td><td><span class="badge bg-warning">' + m.targetSystem + '</span></td><td>' + m.sourceEntity + '</td><td>' + m.targetEntity + '</td><td><span class="badge ' + (m.isActive ? 'bg-success' : 'bg-secondary') + '">' + (m.isActive ? 'Yes' : 'No') + '</span></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteMapping(\'' + m.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+            html += '<tr><td>' + m.name + '</td><td><span class="badge bg-info">' + m.sourceSystem + '</span></td><td><span class="badge bg-warning">' + m.targetSystem + '</span></td><td>' + m.sourceEntity + '</td><td>' + m.targetEntity + '</td><td><span class="badge ' + (m.isActive ? 'bg-success' : 'bg-secondary') + '">' + (m.isActive ? 'Yes' : 'No') + '</span></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteMapping(\'' + m.id + '\')"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td></tr>';
         });
         document.getElementById('mappingsBody').innerHTML = html || '<tr><td colspan="7" class="text-muted text-center">No mapping rules</td></tr>';
     }
@@ -337,7 +337,7 @@
         var list = await r.json();
         var html = '';
         list.forEach(function(c) {
-            html += '<tr><td>' + c.name + '</td><td><code>' + c.clientId + '</code></td><td><small class="text-muted">' + (c.allowedIpAddresses && c.allowedIpAddresses.length ? c.allowedIpAddresses.join(', ') : 'All') + '</small></td><td><span class="badge ' + (c.isActive ? 'bg-success' : 'bg-secondary') + '">' + (c.isActive ? 'Yes' : 'No') + '</span></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteApiClient(\'' + c.id + '\')"><i class="bi bi-trash"></i></button></td></tr>';
+            html += '<tr><td>' + c.name + '</td><td><code>' + c.clientId + '</code></td><td><small class="text-muted">' + (c.allowedIpAddresses && c.allowedIpAddresses.length ? c.allowedIpAddresses.join(', ') : 'All') + '</small></td><td><span class="badge ' + (c.isActive ? 'bg-success' : 'bg-secondary') + '">' + (c.isActive ? 'Yes' : 'No') + '</span></td><td><button class="btn btn-outline-danger btn-sm" onclick="deleteApiClient(\'' + c.id + '\')"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button></td></tr>';
         });
         document.getElementById('apiClientsBody').innerHTML = html || '<tr><td colspan="5" class="text-muted text-center">No API clients</td></tr>';
     }

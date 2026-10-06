@@ -6,13 +6,13 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-people me-2"></i>New Customer</h3>
+            <h3><svg class="bi bi-people me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>New Customer</h3>
             <span class="badge">XD01</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-check-circle me-1"></i>Save Customer</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/SD/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>Save Customer</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/SD/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
@@ -21,19 +21,19 @@
             <input type="hidden" asp-for="Customer.Status" value="Active" />
 
             <div class="zqm-tabs" id="custTabs">
-                <button type="button" class="zqm-tab-btn active" data-tab="tab-general"><i class="bi bi-person-vcard me-1"></i>General Data</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-sales"><i class="bi bi-graph-up me-1"></i>Sales Area</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-finance"><i class="bi bi-calculator me-1"></i>Financial</button>
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-general"><svg class="bi bi-person-vcard me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-vcard"></use></svg>General Data</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-sales"><svg class="bi bi-graph-up me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-graph-up"></use></svg>Sales Area</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-finance"><svg class="bi bi-calculator me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calculator"></use></svg>Financial</button>
             </div>
 
             <!-- Tab: General Data -->
             <div class="zqm-tab-panel active" id="tab-general" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-person me-1"></i>Customer Identification</div>
+                <div class="zqm-section-title"><svg class="bi bi-person me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg>Customer Identification</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Customer Code</label><input asp-for="Customer.Code" placeholder="Auto-generated" /></div>
                     <div class="zqm-field" style="grid-column:span 2"><label>Name <span style="color:#c62828">*</span></label><input asp-for="Customer.Name" placeholder="Company name" required /></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-telephone me-1"></i>Contact & Address</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-telephone me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-telephone"></use></svg>Contact & Address</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Phone</label><input asp-for="Customer.Phone" placeholder="+1 (555) 000-0000" /></div>
                     <div class="zqm-field"><label>Email</label><input type="email" placeholder="contact@company.com" /></div>
@@ -47,13 +47,13 @@
 
             <!-- Tab: Sales Area -->
             <div class="zqm-tab-panel" id="tab-sales" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-diagram-3 me-1"></i>Sales Organization</div>
+                <div class="zqm-section-title"><svg class="bi bi-diagram-3 me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Sales Organization</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Sales Organization</label><select><option value="SO01">SO01 - Domestic Sales</option><option value="SO02">SO02 - Export Sales</option></select></div>
                     <div class="zqm-field"><label>Distribution Channel</label><select><option value="10">10 - Direct Sales</option><option value="20">20 - Wholesale</option><option value="30">30 - Retail</option></select></div>
                     <div class="zqm-field"><label>Division</label><select><option value="01">01 - Main Division</option><option value="02">02 - Secondary</option></select></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-truck me-1"></i>Shipping & Delivery</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-truck me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-truck"></use></svg>Shipping & Delivery</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Shipping Conditions</label><select><option value="Standard">Standard</option><option value="Express">Express</option><option value="Economy">Economy</option></select></div>
                     <div class="zqm-field"><label>Delivery Priority</label><select><option value="Normal">Normal</option><option value="High">High</option><option value="Urgent">Urgent</option></select></div>
@@ -63,13 +63,13 @@
 
             <!-- Tab: Financial -->
             <div class="zqm-tab-panel" id="tab-finance" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-credit-card me-1"></i>Payment & Credit</div>
+                <div class="zqm-section-title"><svg class="bi bi-credit-card me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-credit-card"></use></svg>Payment & Credit</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Payment Terms <span style="color:#c62828">*</span></label><select asp-for="Customer.PaymentTerms"><option value="Net 30">Net 30</option><option value="Net 45">Net 45</option><option value="Net 60">Net 60</option><option value="Net 90">Net 90</option><option value="Due on Receipt">Due on Receipt</option><option value="2/10 Net 30">2/10 Net 30</option></select></div>
                     <div class="zqm-field"><label>Credit Limit</label><input asp-for="Customer.CreditLimit" min="0" step="0.01" placeholder="0.00" /></div>
                     <div class="zqm-field"><label>Reconciliation Account</label><select><option value="113100">113100 - AR Trade</option><option value="113200">113200 - AR Intercompany</option></select></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-receipt me-1"></i>Tax & Risk</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-receipt me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-receipt"></use></svg>Tax & Risk</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Tax Classification</label><select><option value="TAXABLE">Taxable</option><option value="EXEMPT">Tax Exempt</option><option value="ZERO">Zero Rated</option></select></div>
                     <div class="zqm-field"><label>Credit Rating</label><select><option value="A">A - Excellent</option><option value="B">B - Good</option><option value="C">C - Fair</option><option value="D">D - Risk</option></select></div>

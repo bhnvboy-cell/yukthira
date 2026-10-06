@@ -3,15 +3,15 @@
 @{ ViewData["Title"] = "Log Time Entry"; }
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
-        <h2><i class="bi bi-clock-history me-2"></i>Log Time Entry</h2>
+        <h2><svg class="bi bi-clock-history me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>Log Time Entry</h2>
         <div class="ent-form-header-actions">
-            <button type="submit" form="teForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="teForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
 
     <div class="ent-org-banner">
-        <div class="banner-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="banner-icon"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg></div>
         <div class="banner-info">
             <h5>Log Time / Leave</h5>
             <span>Record work hours or leave requests</span>
@@ -27,7 +27,7 @@
     <form id="teForm" method="post">
         <div class="ent-form-panel active" data-panel="tabEntry">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-person"></i><h6>Employee &amp; Entry</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-person" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg><h6>Employee &amp; Entry</h6></div>
                 <div class="ent-field-grid cols-3">
                     <div class="ent-field">
                         <label asp-for="TimeEntry.EmployeeCode" class="ent-label"><span class="required">*</span> Employee Code</label>
@@ -63,7 +63,7 @@
 
         <div class="ent-form-panel" data-panel="tabDetails" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-header"><i class="bi bi-info-circle"></i><h6>Additional Details</h6></div>
+                <div class="ent-section-header"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg><h6>Additional Details</h6></div>
                 <div class="ent-field-grid cols-2">
                     <div class="ent-field">
                         <label asp-for="TimeEntry.ProjectCode" class="ent-label">Project Code</label>
@@ -95,7 +95,7 @@
             <div class="footer-info">Fields marked with <span class="required">*</span> are required</div>
             <div class="footer-actions">
                 <a asp-page="/HR/Index" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+                <button type="submit" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             </div>
         </div>
     </form>

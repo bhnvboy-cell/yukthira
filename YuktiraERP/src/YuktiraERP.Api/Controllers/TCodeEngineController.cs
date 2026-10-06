@@ -16,18 +16,24 @@ public class TCodeEngineController : ControllerBase
 {
     private readonly ITCodeLayoutRegistry _registry;
     private readonly YuktiraDbContext _db;
+    private readonly ITransactionCodeService _tx;
+    private readonly IAuthorizationTraceService _trace;
 
-    public TCodeEngineController(ITCodeLayoutRegistry registry, YuktiraDbContext db)
+    public TCodeEngineController(ITCodeLayoutRegistry registry, YuktiraDbContext db, ITransactionCodeService tx, IAuthorizationTraceService trace)
     {
         _registry = registry;
         _db = db;
+        _tx = tx;
+        _trace = trace;
     }
 
     [HttpGet("layout/{tcode}")]
-    public IActionResult GetLayout(string tcode)
+    public async Task<IActionResult> GetLayout(string tcode)
     {
         var config = _registry.Get(tcode);
         if (config is null) return NotFound(new { error = $"No layout config for '{tcode}'" });
+        var denied = await EnforceAccessAsync(tcode);
+        if (denied is not null) return denied;
         return Ok(config);
     }
 
@@ -42,6 +48,9 @@ public class TCodeEngineController : ControllerBase
     {
         var config = _registry.Get(tcode);
         if (config is null) return NotFound();
+
+        var denied = await EnforceAccessAsync(tcode);
+        if (denied is not null) return denied;
 
         var tenantId = GetTenantId();
         var tcodeEntity = await _db.TransactionCodes.FirstOrDefaultAsync(x => x.Code == tcode);
@@ -68,6 +77,9 @@ public class TCodeEngineController : ControllerBase
     {
         var config = _registry.Get(tcode);
         if (config is null) return NotFound();
+
+        var denied = await EnforceAccessAsync(tcode);
+        if (denied is not null) return denied;
 
         var tenantId = GetTenantId();
         var userId = GetUserId();
@@ -145,6 +157,30 @@ public class TCodeEngineController : ControllerBase
         var claim = System.Security.Claims.ClaimTypes.NameIdentifier;
         var val = User.FindFirst(claim)?.Value;
         return string.IsNullOrEmpty(val) ? Guid.Empty : Guid.Parse(val);
+    }
+
+    private async Task<IActionResult?> EnforceAccessAsync(string tcode)
+    {
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value;
+        var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? User.Identity?.Name ?? "";
+        var userIdRaw = GetUserId();
+        Guid? userId = userIdRaw == Guid.Empty ? null : userIdRaw;
+        var check = await _tx.CheckAccessDetailedAsync(tcode, userId, role);
+        if (check.RuleSource == "UnknownTCode") return null;
+        await YuktiraERP.Api.Authorization.RequireTCodeAttribute.TraceAsync(
+            _trace, HttpContext, userId, userName, role, check.Allowed, check.RuleSource, check.Reason,
+            tcode.ToUpperInvariant());
+        if (!check.Allowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                error = "Access denied",
+                tcode = tcode.ToUpperInvariant(),
+                ruleSource = check.RuleSource,
+                reason = check.Reason
+            });
+        }
+        return null;
     }
 }
 

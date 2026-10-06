@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Infrastructure.Data;
 
-namespace YuktiraERP.Api.GraphQL;
+namespace YuktiraERP.Infrastructure.Hubs;
 
 /// <summary>
 /// Real-time Dashboard Hub - pushes live KPI updates to connected clients.

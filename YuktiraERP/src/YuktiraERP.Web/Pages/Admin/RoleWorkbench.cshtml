@@ -1,0 +1,788 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.RoleWorkbenchModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "Role & T-Code Workbench";
+}
+
+<style>
+    .rw-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .rw-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .rw-table tbody tr:hover { background: #f0f4fa; }
+    .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 3px solid transparent; }
+    .nav-tabs .nav-link.active { color: #1F497D; border-bottom-color: #1F497D; font-weight: 600; }
+    .nav-tabs .nav-link:hover { border-bottom-color: #adb5bd; }
+    .rw-group { max-height: 60vh; overflow: auto; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0"><svg class="bi bi-diagram-3 me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>Role &amp; T-Code Workbench</h2>
+</div>
+<p class="text-muted mb-3">Maintain composite roles, role to transaction code assignments, composite role assignments and the enforced flat security role per user.</p>
+
+<div id="pageAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="pageAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div id="pageSpinner" class="text-center py-3 d-none" role="status">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
+
+<ul class="nav nav-tabs" id="rwTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#rwRoles" role="tab">
+            <svg class="bi bi-people me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-people"></use></svg>Roles
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#rwRoleTcodes" role="tab">
+            <svg class="bi bi-key me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-key"></use></svg>Role &rarr; T-Codes
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#rwUserRoles" role="tab">
+            <svg class="bi bi-person-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-check"></use></svg>User &rarr; Role
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#rwUserSecurity" role="tab">
+            <svg class="bi bi-shield-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>User Security Role
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+
+    <div class="tab-pane fade show active" id="rwRoles" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary" onclick="toggleRoleForm()">
+                    <svg class="bi bi-plus-lg me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg>New role
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadRoles()">
+                    <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+                </button>
+            </div>
+            <span class="text-muted small" id="roleCount"></span>
+        </div>
+
+        <div class="alert py-1 px-2 small d-none" id="roleFeedback"></div>
+
+        <div class="card mb-3 d-none" id="roleFormCard">
+            <div class="card-header bg-light py-2 fw-semibold" id="roleFormTitle">New composite role</div>
+            <div class="card-body py-2">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small mb-1" for="rfCode">Role ID</label>
+                        <input type="text" id="rfCode" class="form-control form-control-sm" placeholder="Unique code" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small mb-1" for="rfName">Role Name</label>
+                        <input type="text" id="rfName" class="form-control form-control-sm" placeholder="Display name" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="rfModule">Module</label>
+                        <input type="text" id="rfModule" class="form-control form-control-sm" placeholder="Module" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small mb-1" for="rfDescription">Description</label>
+                        <input type="text" id="rfDescription" class="form-control form-control-sm" placeholder="What this role covers" />
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn btn-sm btn-primary" id="rfSubmit" onclick="saveRole()">
+                        <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="cancelRoleEdit()">
+                        <svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel
+                    </button>
+                </div>
+                <div class="alert alert-danger py-1 px-2 small mt-2 mb-0 d-none" id="roleFormError"></div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover rw-table mb-0">
+                <thead>
+                    <tr><th>Role ID</th><th>Name</th><th>Module</th><th>Description</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody id="roleBody">
+                    <tr><td colspan="6" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="text-muted small mt-3 mb-0" id="hierStats"></p>
+    </div>
+
+    <div class="tab-pane fade" id="rwRoleTcodes" role="tabpanel">
+        <div class="row g-2 align-items-end mb-2">
+            <div class="col-md-3">
+                <label class="form-label fw-bold small mb-1" for="rtType">Role Type</label>
+                <select id="rtType" class="form-select form-select-sm" onchange="populateRolePicker()">
+                    <option value="Composite">Composite</option>
+                    <option value="Master">Master</option>
+                    <option value="Derived">Derived</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold small mb-1" for="rtRole">Role</label>
+                <select id="rtRole" class="form-select form-select-sm"></select>
+            </div>
+            <div class="col-md-5 d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadExistingAssignments()">
+                    <svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg>Load
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="saveAssignments()">
+                    <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save codes
+                </button>
+                <span class="small text-muted align-self-center" id="rtStatus"></span>
+            </div>
+        </div>
+
+        <div class="alert py-1 px-2 small d-none" id="rtFeedback"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <div class="input-group input-group-sm" style="max-width: 360px;">
+                <span class="input-group-text"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg></span>
+                <input type="text" class="form-control form-control-sm" id="rtSearch" placeholder="Filter by code, name or module" oninput="filterAssignList()" />
+            </div>
+            <span class="text-muted small" id="rtCount"></span>
+        </div>
+
+        <div class="rw-group" id="rtAssignList">
+            <p class="text-muted small mb-0">Loading transaction codes...</p>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="rwUserRoles" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <span class="text-muted small">Composite role assignments are shown read-only.</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadHierarchy(true)">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-7">
+                <h6 class="text-muted">Users</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover rw-table mb-0">
+                        <thead>
+                            <tr><th>User</th><th>Login</th><th>Role</th><th>Composite Role</th></tr>
+                        </thead>
+                        <tbody id="urBody">
+                            <tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h6 class="text-muted">Current Assignments</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover rw-table mb-0">
+                        <thead>
+                            <tr><th>User</th><th>Composite Role</th><th>Status</th><th>Assigned</th></tr>
+                        </thead>
+                        <tbody id="uaBody">
+                            <tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="rwUserSecurity" role="tabpanel">
+        <div class="alert alert-danger py-1 px-2 small d-none" id="secRoleError"></div>
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <span class="small text-muted">Role ranks: SUPER_USER &gt; ADMIN &gt; POWER_USER &gt; NORMAL_USER &gt; READ_ONLY</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadHierarchy(true)">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover rw-table mb-0">
+                <thead>
+                    <tr><th>User</th><th>Login</th><th>Security Role</th><th>Status</th><th>Last Login</th></tr>
+                </thead>
+                <tbody id="srBody">
+                    <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var SECURITY_ROLES = ['SUPER_USER', 'ADMIN', 'POWER_USER', 'NORMAL_USER', 'READ_ONLY'];
+    var hierarchy = null;
+    var compositeRoles = [];
+    var roleItems = [];
+    var tcodes = [];
+    var checkedCodes = {};
+    var editingRoleId = null;
+    var hierarchyLoaded = false;
+    var tcodesLoaded = false;
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function emptyRow(colspan, message) {
+        return '<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">' + esc(message) + '</td></tr>';
+    }
+
+    function fmtDate(value) {
+        if (!value) return '';
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return String(value);
+        return d.toLocaleString();
+    }
+
+    function showAlert(message, success) {
+        var box = document.getElementById('pageAlert');
+        document.getElementById('pageAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showAlert._timer);
+            showAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    function setFeedback(id, message, success) {
+        var box = document.getElementById(id);
+        if (!message) {
+            box.classList.add('d-none');
+            return;
+        }
+        box.textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+    }
+
+    function setBoxError(id, message) {
+        var box = document.getElementById(id);
+        if (!message) {
+            box.classList.add('d-none');
+            box.textContent = '';
+            return;
+        }
+        box.textContent = message;
+        box.classList.remove('d-none');
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    function statusBadge(status) {
+        var cls = 'bg-secondary';
+        if (status === 'Active') cls = 'bg-success';
+        else if (status === 'Inactive') cls = 'bg-danger';
+        return '<span class="badge ' + cls + '">' + esc(status || 'Unknown') + '</span>';
+    }
+
+    async function loadRoles() {
+        var body = document.getElementById('roleBody');
+        body.innerHTML = emptyRow(6, 'Loading...');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/security/roles');
+            roleItems = (data && Array.isArray(data.items)) ? data.items : [];
+            renderRoles();
+        } catch (e) {
+            body.innerHTML = emptyRow(6, 'Composite roles could not be loaded.');
+            document.getElementById('roleCount').textContent = '';
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function renderRoles() {
+        var body = document.getElementById('roleBody');
+        document.getElementById('roleCount').textContent = roleItems.length + ' composite roles';
+        if (!roleItems.length) {
+            body.innerHTML = emptyRow(6, 'No composite roles yet. Use New role to create the first one.');
+            return;
+        }
+        var html = '';
+        roleItems.forEach(function (r, idx) {
+            html += '<tr>' +
+                '<td><code class="fw-bold">' + esc(r.compositeRoleId) + '</code></td>' +
+                '<td>' + esc(r.compositeRoleName) + '</td>' +
+                '<td><span class="badge bg-light text-dark border">' + esc(r.module) + '</span></td>' +
+                '<td class="small">' + esc(r.description) + '</td>' +
+                '<td>' + statusBadge(r.status) + '</td>' +
+                '<td class="text-nowrap text-end">' +
+                    '<button type="button" class="btn btn-sm btn-outline-primary" onclick="editRole(' + idx + ')" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></button> ' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRole(' + idx + ')" title="Deactivate"><svg class="bi bi-x-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg></button>' +
+                '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function toggleRoleForm() {
+        var card = document.getElementById('roleFormCard');
+        if (card.classList.contains('d-none')) {
+            resetRoleForm();
+            card.classList.remove('d-none');
+            document.getElementById('rfCode').focus();
+        } else {
+            card.classList.add('d-none');
+        }
+    }
+
+    function resetRoleForm() {
+        editingRoleId = null;
+        document.getElementById('rfCode').value = '';
+        document.getElementById('rfCode').disabled = false;
+        document.getElementById('rfName').value = '';
+        document.getElementById('rfModule').value = '';
+        document.getElementById('rfDescription').value = '';
+        document.getElementById('roleFormTitle').textContent = 'New composite role';
+        setBoxError('roleFormError', '');
+    }
+
+    function cancelRoleEdit() {
+        resetRoleForm();
+        document.getElementById('roleFormCard').classList.add('d-none');
+    }
+
+    function editRole(index) {
+        var role = roleItems[index];
+        if (!role) return;
+        editingRoleId = role.id;
+        document.getElementById('roleFormCard').classList.remove('d-none');
+        document.getElementById('roleFormTitle').textContent = 'Edit composite role';
+        document.getElementById('rfCode').value = role.compositeRoleId || '';
+        document.getElementById('rfCode').disabled = true;
+        document.getElementById('rfName').value = role.compositeRoleName || '';
+        document.getElementById('rfModule').value = role.module || '';
+        document.getElementById('rfDescription').value = role.description || '';
+        setBoxError('roleFormError', '');
+        document.getElementById('rfName').focus();
+    }
+
+    async function saveRole() {
+        setBoxError('roleFormError', '');
+        var name = document.getElementById('rfName').value.trim();
+        var module = document.getElementById('rfModule').value.trim();
+        var code = document.getElementById('rfCode').value.trim();
+        if (!name || !module || (!editingRoleId && !code)) {
+            setBoxError('roleFormError', 'Role ID, name and module are required.');
+            return;
+        }
+        try {
+            if (editingRoleId) {
+                await apiFetch('/api/v1/security/roles/' + encodeURIComponent(editingRoleId), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ compositeRoleName: name, module: module, description: document.getElementById('rfDescription').value.trim() })
+                });
+                setFeedback('roleFeedback', 'Role updated.', true);
+            } else {
+                await apiFetch('/api/v1/security/roles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ compositeRoleId: code, compositeRoleName: name, module: module, description: document.getElementById('rfDescription').value.trim() })
+                });
+                setFeedback('roleFeedback', 'Role created.', true);
+            }
+            cancelRoleEdit();
+            await loadRoles();
+        } catch (e) {
+            setBoxError('roleFormError', e.message);
+        }
+    }
+
+    async function deleteRole(index) {
+        var role = roleItems[index];
+        if (!role) return;
+        if (!confirm('Deactivate role ' + (role.compositeRoleName || role.compositeRoleId) + '?')) return;
+        try {
+            await apiFetch('/api/v1/security/roles/' + encodeURIComponent(role.id), { method: 'DELETE' });
+            setFeedback('roleFeedback', 'Role deactivated.', true);
+            await loadRoles();
+        } catch (e) {
+            showAlert(e.message);
+        }
+    }
+
+    async function loadHierarchy(force) {
+        if (hierarchyLoaded && !force && hierarchy) return hierarchy;
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            hierarchy = await apiFetch('/api/v1/security/matrix/hierarchy');
+            hierarchyLoaded = true;
+            compositeRoles = (hierarchy && Array.isArray(hierarchy.compositeRoles)) ? hierarchy.compositeRoles : [];
+            populateRolePicker();
+            renderUserRoles();
+            renderUserAssignments();
+            renderSecurityRoles();
+            renderHierarchyStats();
+            return hierarchy;
+        } catch (e) {
+            showAlert(e.message);
+            return null;
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function renderHierarchyStats() {
+        if (!hierarchy) return;
+        var masters = (Array.isArray(hierarchy.masterRoles) ? hierarchy.masterRoles : []).length;
+        var derived = (Array.isArray(hierarchy.derivedRoles) ? hierarchy.derivedRoles : []).length;
+        document.getElementById('hierStats').textContent = 'Master roles: ' + masters + ' · Derived roles: ' + derived;
+    }
+
+    function populateRolePicker() {
+        var type = document.getElementById('rtType').value;
+        var select = document.getElementById('rtRole');
+        if (!hierarchy) {
+            select.innerHTML = '<option value="">Load hierarchy first</option>';
+            return;
+        }
+        var list = [];
+        if (type === 'Composite') {
+            list = (Array.isArray(hierarchy.compositeRoles) ? hierarchy.compositeRoles : []).map(function (r) {
+                return { value: r.compositeRoleId, label: r.compositeRoleName + ' (' + (r.module || '') + ')' };
+            });
+        } else if (type === 'Master') {
+            list = (Array.isArray(hierarchy.masterRoles) ? hierarchy.masterRoles : []).map(function (r) {
+                return { value: r.roleId, label: r.roleName + ' (' + (r.module || '') + ')' };
+            });
+        } else {
+            list = (Array.isArray(hierarchy.derivedRoles) ? hierarchy.derivedRoles : []).map(function (r) {
+                return { value: r.derivedRoleId, label: r.derivedRoleName + ' (' + (r.module || '') + ')' };
+            });
+        }
+        if (!list.length) {
+            select.innerHTML = '<option value="">No roles of this type</option>';
+            return;
+        }
+        var html = '';
+        list.forEach(function (r) { html += '<option value="' + esc(r.value) + '">' + esc(r.label) + '</option>'; });
+        select.innerHTML = html;
+    }
+
+    async function loadTcodes() {
+        if (tcodesLoaded && tcodes.length) return tcodes;
+        var host = document.getElementById('rtAssignList');
+        host.innerHTML = '<p class="text-muted small mb-0">Loading transaction codes...</p>';
+        try {
+            var data = await apiFetch('/api/v1/security/tcode-authz?page=1&pageSize=500');
+            tcodes = (data && Array.isArray(data.items)) ? data.items : [];
+            tcodesLoaded = true;
+            renderAssignList();
+            return tcodes;
+        } catch (e) {
+            host.innerHTML = '<p class="text-danger small mb-0">' + esc(e.message) + '</p>';
+            return [];
+        }
+    }
+
+    function renderAssignList() {
+        var host = document.getElementById('rtAssignList');
+        document.getElementById('rtCount').textContent = tcodes.length + ' transaction codes';
+        if (!tcodes.length) {
+            host.innerHTML = '<p class="text-muted small mb-0">No transaction codes available.</p>';
+            return;
+        }
+        var groups = {};
+        var order = [];
+        tcodes.forEach(function (t) {
+            var module = t.module || 'Other';
+            if (!groups[module]) {
+                groups[module] = [];
+                order.push(module);
+            }
+            groups[module].push(t);
+        });
+        var html = '';
+        order.forEach(function (module, groupIdx) {
+            html += '<div class="mb-3 am-module-group">' +
+                '<div class="d-flex justify-content-between align-items-center mb-1">' +
+                '<strong class="small text-uppercase">' + esc(module) + '</strong>' +
+                '<div class="form-check">' +
+                '<input type="checkbox" class="form-check-input" id="rtAll-' + groupIdx + '" onchange="toggleModule(this)" />' +
+                '<label class="form-check-label small" for="rtAll-' + groupIdx + '">Select all</label>' +
+                '</div></div>' +
+                '<div class="table-responsive"><table class="table table-sm table-hover rw-table mb-0"><tbody>';
+            groups[module].forEach(function (t) {
+                var haystack = ((t.code || '') + ' ' + (t.name || '') + ' ' + (t.module || '')).toLowerCase();
+                html += '<tr data-search="' + esc(haystack) + '">' +
+                    '<td style="width: 28px;"><input type="checkbox" class="form-check-input" data-code="' + esc(t.code) + '" onchange="syncModuleToggle(this)" /></td>' +
+                    '<td style="width: 110px;"><code>' + esc(t.code) + '</code></td>' +
+                    '<td class="small">' + esc(t.name) + '</td>' +
+                    '</tr>';
+            });
+            html += '</tbody></table></div></div>';
+        });
+        host.innerHTML = html;
+        applyCheckedCodes();
+    }
+
+    function applyCheckedCodes() {
+        document.querySelectorAll('#rtAssignList input[data-code]').forEach(function (box) {
+            box.checked = !!checkedCodes[box.getAttribute('data-code')];
+        });
+        refreshModuleToggles();
+    }
+
+    function refreshModuleToggles() {
+        document.querySelectorAll('#rtAssignList .am-module-group').forEach(function (group) {
+            var toggle = group.querySelector('.form-check-input[id^="rtAll-"]');
+            if (!toggle) return;
+            var boxes = group.querySelectorAll('tbody input[data-code]');
+            var checked = group.querySelectorAll('tbody input[data-code]:checked');
+            toggle.checked = boxes.length > 0 && boxes.length === checked.length;
+        });
+    }
+
+    function selectedRoleLabel() {
+        var select = document.getElementById('rtRole');
+        if (!select.selectedIndex || select.selectedIndex < 0) return '';
+        return select.options[select.selectedIndex].text;
+    }
+
+    async function loadExistingAssignments() {
+        await loadHierarchy();
+        var roleId = document.getElementById('rtRole').value;
+        var roleType = document.getElementById('rtType').value;
+        if (!hierarchy || !roleId) {
+            setFeedback('rtFeedback', 'Select a role first.', false);
+            return;
+        }
+        checkedCodes = {};
+        var assignments = (Array.isArray(hierarchy.roleTcodeAssignments) ? hierarchy.roleTcodeAssignments : []);
+        assignments.forEach(function (a) {
+            var sameRole = String(a.roleId) === String(roleId);
+            var sameType = String(a.roleType || '').toLowerCase() === roleType.toLowerCase();
+            if (sameRole && sameType && a.hasAccess !== false && a.transactionCode) {
+                checkedCodes[a.transactionCode] = true;
+            }
+        });
+        var count = Object.keys(checkedCodes).length;
+        document.getElementById('rtStatus').textContent = count + ' codes currently assigned';
+        applyCheckedCodes();
+        setFeedback('rtFeedback', 'Loaded ' + count + ' assigned codes for ' + selectedRoleLabel() + '.', true);
+    }
+
+    async function saveAssignments() {
+        var roleId = document.getElementById('rtRole').value;
+        var roleType = document.getElementById('rtType').value;
+        if (!roleId) {
+            setFeedback('rtFeedback', 'Select a role first.', false);
+            return;
+        }
+        var codes = [];
+        document.querySelectorAll('#rtAssignList input[data-code]:checked').forEach(function (box) {
+            codes.push(box.getAttribute('data-code'));
+        });
+        try {
+            await apiFetch('/api/v1/security/matrix/role-tcodes', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roleType: roleType, roleId: roleId, codes: codes })
+            });
+            setFeedback('rtFeedback', 'Saved ' + codes.length + ' codes for ' + selectedRoleLabel() + '.', true);
+        } catch (e) {
+            setFeedback('rtFeedback', e.message, false);
+        }
+    }
+
+    function filterAssignList() {
+        var query = document.getElementById('rtSearch').value.trim().toLowerCase();
+        var visible = 0;
+        document.querySelectorAll('#rtAssignList .am-module-group').forEach(function (group) {
+            var shown = 0;
+            group.querySelectorAll('tbody tr').forEach(function (row) {
+                var match = !query || (row.getAttribute('data-search') || '').indexOf(query) >= 0;
+                row.style.display = match ? '' : 'none';
+                if (match) shown++;
+            });
+            group.style.display = shown ? '' : 'none';
+            visible += shown;
+        });
+        document.getElementById('rtCount').textContent = visible + ' of ' + tcodes.length + ' transaction codes';
+    }
+
+    function toggleModule(el) {
+        var group = el.closest('.am-module-group');
+        if (!group) return;
+        group.querySelectorAll('tbody tr').forEach(function (row) {
+            if (row.style.display === 'none') return;
+            var box = row.querySelector('input[data-code]');
+            if (box) box.checked = el.checked;
+        });
+    }
+
+    function syncModuleToggle(box) {
+        var group = box.closest('.am-module-group');
+        if (!group) return;
+        var toggle = group.querySelector('.form-check-input[id^="rtAll-"]');
+        if (!toggle) return;
+        var boxes = group.querySelectorAll('tbody input[data-code]');
+        var checked = group.querySelectorAll('tbody input[data-code]:checked');
+        toggle.checked = boxes.length > 0 && boxes.length === checked.length;
+    }
+
+    function renderUserRoles() {
+        var body = document.getElementById('urBody');
+        if (!hierarchy) {
+            body.innerHTML = emptyRow(4, 'Hierarchy data could not be loaded.');
+            return;
+        }
+        var users = Array.isArray(hierarchy.users) ? hierarchy.users : [];
+        var assignments = Array.isArray(hierarchy.userRoleAssignments) ? hierarchy.userRoleAssignments : [];
+        if (!users.length) {
+            body.innerHTML = emptyRow(4, 'No users found.');
+            return;
+        }
+        var html = '';
+        users.forEach(function (u) {
+            var assignment = null;
+            assignments.forEach(function (a) { if (String(a.userId) === String(u.userId)) assignment = a; });
+            var compositeName = '';
+            if (assignment) {
+                compositeRoles.forEach(function (r) {
+                    if (String(r.compositeRoleId) === String(assignment.compositeRoleId)) compositeName = r.compositeRoleName;
+                });
+            }
+            html += '<tr>' +
+                '<td>' + esc(u.userName) + '</td>' +
+                '<td><code class="small">' + esc(u.userId) + '</code></td>' +
+                '<td><span class="badge bg-secondary">' + esc(u.role) + '</span></td>' +
+                '<td class="small">' + (compositeName ? esc(compositeName) : '<span class="text-muted">None</span>') + '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function renderUserAssignments() {
+        var body = document.getElementById('uaBody');
+        if (!hierarchy) {
+            body.innerHTML = emptyRow(4, 'Hierarchy data could not be loaded.');
+            return;
+        }
+        var assignments = Array.isArray(hierarchy.userRoleAssignments) ? hierarchy.userRoleAssignments : [];
+        if (!assignments.length) {
+            body.innerHTML = emptyRow(4, 'No composite role assignments recorded.');
+            return;
+        }
+        var html = '';
+        assignments.forEach(function (a) {
+            var compositeName = '';
+            compositeRoles.forEach(function (r) {
+                if (String(r.compositeRoleId) === String(a.compositeRoleId)) compositeName = r.compositeRoleName;
+            });
+            var userName = '';
+            (Array.isArray(hierarchy.users) ? hierarchy.users : []).forEach(function (u) {
+                if (String(u.userId) === String(a.userId)) userName = u.userName;
+            });
+            html += '<tr>' +
+                '<td>' + esc(userName || a.userId) + '</td>' +
+                '<td>' + esc(compositeName || a.compositeRoleId) + '</td>' +
+                '<td>' + statusBadge(a.status) + '</td>' +
+                '<td class="small">' + esc(fmtDate(a.assignedAt) || '-') + '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function renderSecurityRoles() {
+        var body = document.getElementById('srBody');
+        if (!hierarchy) {
+            body.innerHTML = emptyRow(5, 'Hierarchy data could not be loaded.');
+            return;
+        }
+        var users = Array.isArray(hierarchy.users) ? hierarchy.users : [];
+        if (!users.length) {
+            body.innerHTML = emptyRow(5, 'No users found.');
+            return;
+        }
+        var html = '';
+        users.forEach(function (u) {
+            var options = '';
+            SECURITY_ROLES.forEach(function (role) {
+                options += '<option value="' + esc(role) + '"' + (u.role === role ? ' selected' : '') + '>' + esc(role) + '</option>';
+            });
+            html += '<tr>' +
+                '<td>' + esc(u.userName) + '</td>' +
+                '<td><code class="small">' + esc(u.userId) + '</code></td>' +
+                '<td style="min-width: 170px;"><select class="form-select form-select-sm" data-user-guid="' + esc(u.id) + '" data-user-name="' + esc(u.userName) + '" data-user-email="' + esc(u.email) + '" data-user-active="' + (u.isActive ? 'true' : 'false') + '" data-original="' + esc(u.role) + '" onchange="changeSecurityRole(this)">' + options + '</select></td>' +
+                '<td>' + (u.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') + '</td>' +
+                '<td class="small text-muted">' + esc(u.lastLogin || u.lastLoginAt || '-') + '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    async function changeSecurityRole(select) {
+        var userGuid = select.getAttribute('data-user-guid');
+        var userName = select.getAttribute('data-user-name');
+        var original = select.getAttribute('data-original');
+        var value = select.value;
+        var errorBox = document.getElementById('secRoleError');
+        errorBox.classList.add('d-none');
+        if (value === original) return;
+        if (!confirm('Change the security role of ' + userName + ' to ' + value + '? This role governs which transaction codes the user can run.')) {
+            select.value = original;
+            return;
+        }
+        try {
+            var data = await apiFetch('/api/v1/admin/users/' + encodeURIComponent(userGuid), {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: select.getAttribute('data-user-email') || '',
+                    role: value,
+                    isActive: select.getAttribute('data-user-active') !== 'false'
+                })
+            });
+            select.setAttribute('data-original', value);
+            showAlert('Security role for ' + userName + ' is now ' + ((data && data.role) || value) + '.', true);
+        } catch (e) {
+            select.value = original;
+            var message = (e.status === 404)
+                ? 'The user could not be found (HTTP 404). Nothing was changed.'
+                : e.message;
+            errorBox.textContent = message;
+            errorBox.classList.remove('d-none');
+        }
+    }
+
+    document.getElementById('rwTabs').addEventListener('shown.bs.tab', function (e) {
+        var href = e.target.getAttribute('href');
+        if (href === '#rwRoleTcodes') {
+            loadHierarchy();
+            loadTcodes();
+        }
+        if (href === '#rwUserRoles' || href === '#rwUserSecurity') loadHierarchy();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadRoles();
+        loadHierarchy();
+        loadTcodes();
+    });
+</script>

@@ -103,9 +103,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("SuperUser", p => p.RequireClaim("IsSuperUser", "true"));
-    options.AddPolicy("AdminOrAbove", p => p.RequireRole("SUPER_USER", "ADMIN"));
-    options.AddPolicy("PowerUserOrAbove", p => p.RequireRole("SUPER_USER", "ADMIN", "POWER_USER"));
+    options.AddPolicy("SuperUser", new AuthorizationPolicyBuilder("Bearer", "WebAuth").RequireClaim("IsSuperUser", "true").Build());
+    options.AddPolicy("AdminOrAbove", new AuthorizationPolicyBuilder("Bearer", "WebAuth").RequireRole("SUPER_USER", "ADMIN").Build());
+    options.AddPolicy("PowerUserOrAbove", new AuthorizationPolicyBuilder("Bearer", "WebAuth").RequireRole("SUPER_USER", "ADMIN", "POWER_USER").Build());
     options.DefaultPolicy = new AuthorizationPolicyBuilder("Bearer", "WebAuth")
         .RequireAuthenticatedUser()
         .Build();

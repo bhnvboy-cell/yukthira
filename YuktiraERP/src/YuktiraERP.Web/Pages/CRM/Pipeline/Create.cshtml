@@ -4,7 +4,7 @@
 <div class="ent-form-wrapper">
     <div class="ent-form-header">
         <div class="ent-form-header-content">
-            <div class="ent-form-header-icon"><i class="bi bi-kanban"></i></div>
+            <div class="ent-form-header-icon"><svg class="bi bi-kanban" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-kanban"></use></svg></div>
             <div>
                 <h2>New Deal</h2>
                 <p class="ent-form-subtitle">Add deal to sales pipeline</p>
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="ent-form-header-actions">
-            <button type="submit" form="pipelineForm" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+            <button type="submit" form="pipelineForm" class="btn btn-primary"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save</button>
             <a asp-page="/CRM/Index" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </div>
@@ -24,7 +24,7 @@
     <form id="pipelineForm" method="post">
         <div class="ent-form-panel active" data-panel="tabDeal">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-info-circle"></i> Deal Information</div>
+                <div class="ent-section-title"><svg class="bi bi-info-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> Deal Information</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Pipeline.PipelineId" class="ent-label">Pipeline ID</label>
@@ -64,7 +64,7 @@
         </div>
         <div class="ent-form-panel" data-panel="tabSales" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-diagram-3"></i> Sales Details</div>
+                <div class="ent-section-title"><svg class="bi bi-diagram-3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-diagram-3"></use></svg> Sales Details</div>
                 <div class="ent-field-grid ent-grid-2">
                     <div class="ent-field">
                         <label asp-for="Pipeline.SalesOrg" class="ent-label">Sales Organization</label>
@@ -100,14 +100,14 @@
         </div>
         <div class="ent-form-panel" data-panel="tabTimeline" style="display:none">
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-calendar-event"></i> Timeline</div>
+                <div class="ent-section-title"><svg class="bi bi-calendar-event" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-event"></use></svg> Timeline</div>
                 <div class="ent-field">
                     <label asp-for="Pipeline.ExpectedCloseDate" class="ent-label required">Expected Close Date</label>
                     <input asp-for="Pipeline.ExpectedCloseDate" class="ent-input" type="date" required />
                 </div>
             </div>
             <div class="ent-section">
-                <div class="ent-section-title"><i class="bi bi-text-left"></i> Notes</div>
+                <div class="ent-section-title"><svg class="bi bi-text-left" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-text-left"></use></svg> Notes</div>
                 <div class="ent-field">
                     <label asp-for="Pipeline.Notes" class="ent-label">Notes</label>
                     <textarea asp-for="Pipeline.Notes" class="ent-input" rows="4" placeholder="Enter any notes about this deal"></textarea>

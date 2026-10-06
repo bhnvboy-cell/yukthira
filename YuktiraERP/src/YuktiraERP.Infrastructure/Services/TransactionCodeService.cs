@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using YuktiraERP.Core.Domain.Transaction;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Core.Security;
 using YuktiraERP.Infrastructure.Data;
 using YuktiraERP.Infrastructure.Data.Entities;
 
@@ -304,24 +305,144 @@ public class TransactionCodeService : ITransactionCodeService
     public async Task<List<TransactionCodeDto>> GetPermittedCodesAsync(Guid? userId, string? role)
     {
         await EnsureSeedAsync();
-        var deniedCodes = await _db.TransactionPermissions
-            .Where(p => !p.CanAccess && ((p.PrincipalType == "Role" && p.PrincipalValue == role) || (p.PrincipalType == "User" && p.PrincipalValue == userId.ToString())))
+        var effectiveRole = await ResolveRoleAsync(userId, role);
+        var codes = await _db.TransactionCodes
+            .Where(t => t.Status == "Active")
+            .OrderBy(t => t.SortOrder)
+            .ToListAsync();
+        if (SecurityRoleRank.IsSuperUser(effectiveRole)) return codes.Select(ToDto).ToList();
+
+        var userValue = userId.HasValue ? userId.Value.ToString().ToLowerInvariant() : "";
+        var roleValue = (effectiveRole ?? "").ToLowerInvariant();
+        var deniedIds = await _db.TransactionPermissions
+            .Where(p => !p.CanAccess &&
+                ((p.PrincipalType == "Role" && p.PrincipalValue.ToLower() == roleValue) ||
+                 (p.PrincipalType == "User" && p.PrincipalValue.ToLower() == userValue && userValue != "")))
             .Select(p => p.TransactionCodeId)
             .ToListAsync();
-        return (await _db.TransactionCodes
-            .Where(t => t.Status == "Active" && !deniedCodes.Contains(t.Id))
-            .OrderBy(t => t.SortOrder)
-            .ToListAsync()).Select(ToDto).ToList();
+        var checkRoles = await GetEnforcedCheckRolesAsync();
+        return codes
+            .Where(t => !deniedIds.Contains(t.Id))
+            .Where(t => SecurityRoleRank.Meets(effectiveRole, t.RequiredRole))
+            .Where(t => !checkRoles.TryGetValue(t.Code, out var required) || SecurityRoleRank.Meets(effectiveRole, required))
+            .Select(ToDto)
+            .ToList();
     }
 
     public async Task<bool> ValidateAccessAsync(string code, Guid? userId, string? role)
     {
-        var entity = await _db.TransactionCodes.FirstOrDefaultAsync(t => t.Code == code.ToUpperInvariant());
-        if (entity is null) return false;
+        var result = await CheckAccessDetailedAsync(code, userId, role);
+        return result.Allowed;
+    }
+
+    public async Task<AccessCheckResult> CheckAccessDetailedAsync(string code, Guid? userId, string? role)
+    {
+        await EnsureSeedAsync();
+        var upper = (code ?? "").Trim().ToUpperInvariant();
+        var effectiveRole = await ResolveRoleAsync(userId, role);
+        var entity = await _db.TransactionCodes.FirstOrDefaultAsync(t => t.Code == upper);
+        if (entity is null)
+        {
+            return new AccessCheckResult
+            {
+                Allowed = false,
+                RuleSource = "UnknownTCode",
+                Reason = $"Transaction code '{upper}' does not exist",
+                EffectiveRole = SecurityRoleRank.Describe(effectiveRole)
+            };
+        }
+        if (SecurityRoleRank.IsSuperUser(effectiveRole))
+        {
+            return new AccessCheckResult
+            {
+                Allowed = true,
+                RuleSource = "SuperUserBypass",
+                Reason = "SUPER_USER bypasses transaction authorization checks",
+                EffectiveRole = SecurityRoleRank.Describe(effectiveRole),
+                RequiredRole = entity.RequiredRole
+            };
+        }
+
+        var userValue = userId.HasValue ? userId.Value.ToString().ToLowerInvariant() : "";
+        var roleValue = (effectiveRole ?? "").ToLowerInvariant();
         var denied = await _db.TransactionPermissions.AnyAsync(p =>
             p.TransactionCodeId == entity.Id && !p.CanAccess &&
-            ((p.PrincipalType == "Role" && p.PrincipalValue == role) || (p.PrincipalType == "User" && p.PrincipalValue == userId.ToString())));
-        return !denied;
+            ((p.PrincipalType == "Role" && p.PrincipalValue.ToLower() == roleValue) ||
+             (p.PrincipalType == "User" && p.PrincipalValue.ToLower() == userValue && userValue != "")));
+        if (denied)
+        {
+            return new AccessCheckResult
+            {
+                Allowed = false,
+                RuleSource = "DenyList",
+                Reason = $"An explicit deny rule applies to {SecurityRoleRank.Describe(effectiveRole)} on {upper}",
+                EffectiveRole = SecurityRoleRank.Describe(effectiveRole),
+                RequiredRole = entity.RequiredRole
+            };
+        }
+
+        if (!SecurityRoleRank.Meets(effectiveRole, entity.RequiredRole))
+        {
+            return new AccessCheckResult
+            {
+                Allowed = false,
+                RuleSource = "RequiredRole",
+                Reason = $"Role rank {SecurityRoleRank.Describe(effectiveRole)} does not meet required role {entity.RequiredRole}",
+                EffectiveRole = SecurityRoleRank.Describe(effectiveRole),
+                RequiredRole = entity.RequiredRole
+            };
+        }
+
+        var checkRoles = await GetEnforcedCheckRolesAsync();
+        if (checkRoles.TryGetValue(upper, out var checkRole) && !SecurityRoleRank.Meets(effectiveRole, checkRole))
+        {
+            return new AccessCheckResult
+            {
+                Allowed = false,
+                RuleSource = "AuthCheck",
+                Reason = $"An enforced authorization check on {upper} requires {checkRole}",
+                EffectiveRole = SecurityRoleRank.Describe(effectiveRole),
+                RequiredRole = entity.RequiredRole
+            };
+        }
+
+        return new AccessCheckResult
+        {
+            Allowed = true,
+            RuleSource = "Granted",
+            Reason = $"Role {SecurityRoleRank.Describe(effectiveRole)} satisfies all checks for {upper}",
+            EffectiveRole = SecurityRoleRank.Describe(effectiveRole),
+            RequiredRole = entity.RequiredRole
+        };
+    }
+
+    private async Task<string?> ResolveRoleAsync(Guid? userId, string? role)
+    {
+        if (!string.IsNullOrWhiteSpace(role)) return role.Trim();
+        if (userId.HasValue)
+        {
+            var user = await _db.AdminUsers.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId.Value);
+            if (user is not null) return user.Role;
+        }
+        return null;
+    }
+
+    private async Task<Dictionary<string, string>> GetEnforcedCheckRolesAsync()
+    {
+        var checks = await _db.TCodeAuthChecks.AsNoTracking()
+            .Where(c => c.IsActive && c.Enforcement == "Enforced")
+            .ToListAsync();
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var check in checks)
+        {
+            if (!result.TryGetValue(check.TCode, out var current) ||
+                SecurityRoleRank.GetRank(check.RequiredRole) > SecurityRoleRank.GetRank(current))
+            {
+                result[check.TCode] = check.RequiredRole;
+            }
+        }
+        return result;
     }
 
     public async Task<TransactionPermissionDto?> SetPermissionAsync(TransactionPermissionDto dto)
@@ -662,7 +783,7 @@ public class TransactionCodeService : ITransactionCodeService
     {
         "MM" => "bi-boxes", "SD" => "bi-cart3", "PP" => "bi-gear", "QM" => "bi-clipboard-check",
         "WM" => "bi-house-door", "FI" => "bi-calculator", "CO" => "bi-pie-chart",
-        "HR" => "bi-people", "CRM" => "bi-person-lines-fill", "LIMS" => "bi-flask",
+        "HR" => "bi-people", "CRM" => "bi-person-lines-fill", "LIMS" => "bi-clipboard2-pulse",
         "BI" => "bi-graph-up", "PLG" => "bi-puzzle", "WF" => "bi-arrow-repeat",
         "APP" => "bi-check2-square", "NOT" => "bi-bell", "TCD" => "bi-keyboard",
         "AUD" => "bi-journal-text", "ADM" => "bi-gear-wide", "CST" => "bi-sliders",

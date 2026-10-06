@@ -8,8 +8,8 @@
     var all = ApprovalRequestStore.GetAll();
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-check2-square me-2"></i>Approvals</h2>
-    <div><a asp-page="/Approval/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> New Request</a></div>
+    <h2><svg class="bi bi-check2-square me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check2-square"></use></svg>Approvals</h2>
+    <div><a asp-page="/Approval/Create" class="btn btn-primary btn-sm"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> New Request</a></div>
 </div>
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#pending">Pending (@pending.Count)</a></li>
@@ -30,10 +30,10 @@
                             <td>@(a.Amount.HasValue ? a.Amount.Value.ToString("C2") : "--")</td>
                             <td>
                                 <form method="post" asp-page-handler="Approve" asp-route-id="@a.RequestId" style="display:inline">
-                                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check"></i></button>
+                                    <button type="submit" class="btn btn-success btn-sm"><svg class="bi bi-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check"></use></svg></button>
                                 </form>
                                 <form method="post" asp-page-handler="Reject" asp-route-id="@a.RequestId" style="display:inline">
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-x"></i></button>
+                                    <button type="submit" class="btn btn-danger btn-sm"><svg class="bi bi-x" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg></button>
                                 </form>
                             </td>
                         </tr>

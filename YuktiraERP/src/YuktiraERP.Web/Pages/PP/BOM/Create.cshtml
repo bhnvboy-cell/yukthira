@@ -6,13 +6,13 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-box-seam me-2"></i>Create Bill of Materials</h3>
+            <h3><svg class="bi bi-box-seam me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-seam"></use></svg>Create Bill of Materials</h3>
             <span class="badge">CS01</span>
         </div>
         <div class="actions">
-            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-save me-1"></i>Save BOM</button>
-            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><i class="bi bi-x-circle me-1"></i>Clear</button>
-            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <button type="submit" form="createForm" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save BOM</button>
+            <button type="button" class="zqm-btn" onclick="document.getElementById('createForm').reset()"><svg class="bi bi-x-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x-circle"></use></svg>Clear</button>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
@@ -21,20 +21,20 @@
             <input type="hidden" asp-for="Bom.Status" value="Active" />
 
             <div class="zqm-tabs" id="bomTabs">
-                <button type="button" class="zqm-tab-btn active" data-tab="tab-header"><i class="bi bi-info-circle me-1"></i>BOM Header</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-components"><i class="bi bi-list-nested me-1"></i>Component Detail</button>
-                <button type="button" class="zqm-tab-btn" data-tab="tab-validity"><i class="bi bi-calendar-range me-1"></i>Validity</button>
+                <button type="button" class="zqm-tab-btn active" data-tab="tab-header"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>BOM Header</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-components"><svg class="bi bi-list-nested me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-nested"></use></svg>Component Detail</button>
+                <button type="button" class="zqm-tab-btn" data-tab="tab-validity"><svg class="bi bi-calendar-range me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-range"></use></svg>Validity</button>
             </div>
 
             <!-- Tab: BOM Header -->
             <div class="zqm-tab-panel active" id="tab-header" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-info-circle me-1"></i>BOM Identification</div>
+                <div class="zqm-section-title"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>BOM Identification</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>BOM ID</label><input value="Auto-generated" readonly style="background:#f0f0f0" /></div>
                     <div class="zqm-field"><label>Material Code (Parent) <span style="color:#c62828">*</span></label><input asp-for="Bom.MaterialCode" placeholder="e.g., FG-10001" /><span asp-validation-for="Bom.MaterialCode" style="color:#c62828;font-size:0.72rem"></span></div>
                     <div class="zqm-field"><label>Material Description <span style="color:#c62828">*</span></label><input asp-for="Bom.ProductName" placeholder="Parent material description" /><span asp-validation-for="Bom.ProductName" style="color:#c62828;font-size:0.72rem"></span></div>
                 </div>
-                <div class="zqm-section-title" style="margin-top:12px"><i class="bi bi-sliders me-1"></i>BOM Configuration</div>
+                <div class="zqm-section-title" style="margin-top:12px"><svg class="bi bi-sliders me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-sliders"></use></svg>BOM Configuration</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>BOM Usage <span style="color:#c62828">*</span></label><select asp-for="Bom.BOMUsage"><option value="Production">Production</option><option value="Engineering">Engineering</option><option value="Costing">Costing</option><option value="Plant Maintenance">Plant Maintenance</option></select></div>
                     <div class="zqm-field"><label>Base Quantity</label><input asp-for="Bom.BaseQuantity" type="number" min="0.01" step="0.01" value="1" /></div>
@@ -44,7 +44,7 @@
 
             <!-- Tab: Component Detail -->
             <div class="zqm-tab-panel" id="tab-components" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-list-nested me-1"></i>Component Information</div>
+                <div class="zqm-section-title"><svg class="bi bi-list-nested me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-nested"></use></svg>Component Information</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Component Code <span style="color:#c62828">*</span></label><input asp-for="Bom.ComponentCode" placeholder="e.g., RM-20001" /><span asp-validation-for="Bom.ComponentCode" style="color:#c62828;font-size:0.72rem"></span></div>
                     <div class="zqm-field"><label>Component Description <span style="color:#c62828">*</span></label><input asp-for="Bom.ComponentName" placeholder="Component name" /><span asp-validation-for="Bom.ComponentName" style="color:#c62828;font-size:0.72rem"></span></div>
@@ -59,14 +59,14 @@
 
             <!-- Tab: Validity -->
             <div class="zqm-tab-panel" id="tab-validity" style="padding-top:12px">
-                <div class="zqm-section-title"><i class="bi bi-calendar-range me-1"></i>Validity Period</div>
+                <div class="zqm-section-title"><svg class="bi bi-calendar-range me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-calendar-range"></use></svg>Validity Period</div>
                 <div class="zqm-row cols-3">
                     <div class="zqm-field"><label>Valid From <span style="color:#c62828">*</span></label><input asp-for="Bom.ValidFrom" type="date" /></div>
                     <div class="zqm-field"><label>Valid To <span style="color:#c62828">*</span></label><input asp-for="Bom.ValidTo" type="date" /></div>
                     <div class="zqm-field"><label>Plant</label><input value="1000" readonly style="background:#f0f0f0" /></div>
                 </div>
                 <div style="background:#f5f5f5;border-radius:6px;padding:14px;border:1px dashed #ccc;margin-top:12px">
-                    <p style="color:#888;margin:0;font-size:0.83rem"><i class="bi bi-info-circle me-1"></i> BOM validity defines the date range during which this BOM is active for production. BOMs outside this range will not be selected for new production orders.</p>
+                    <p style="color:#888;margin:0;font-size:0.83rem"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> BOM validity defines the date range during which this BOM is active for production. BOMs outside this range will not be selected for new production orders.</p>
                 </div>
             </div>
         </form>

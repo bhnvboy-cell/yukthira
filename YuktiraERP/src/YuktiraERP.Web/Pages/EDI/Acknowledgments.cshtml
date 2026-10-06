@@ -8,20 +8,20 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-clipboard-check me-2"></i>Acknowledgment Logs</h3>
+            <h3><svg class="bi bi-clipboard-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Acknowledgment Logs</h3>
             <span class="badge">997/MDN</span>
         </div>
         <div class="actions">
-            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/EDI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Filter</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Filter</div>
         <div class="zqm-row cols-3">
             <div class="zqm-field"><label>Partner Code</label><input id="filterPartner" placeholder="Partner code..." /></div>
             <div class="zqm-field"><label>Ack Code</label><input id="filterAckCode" placeholder="e.g. 997, MDN" /></div>
-            <div class="zqm-field"><label>&nbsp;</label><button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0;width:100%" onclick="loadAcks()"><i class="bi bi-search me-1"></i>Search</button></div>
+            <div class="zqm-field"><label>&nbsp;</label><button type="button" class="zqm-btn" style="background:#1565c0;border-color:#1565c0;width:100%" onclick="loadAcks()"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Search</button></div>
         </div>
     </div>
 
@@ -45,15 +45,15 @@
                     </tr>
                 </thead>
                 <tbody id="ackTableBody">
-                    <tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>Loading acknowledgments...</div></td></tr>
+                    <tr><td colspan="8" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>Loading acknowledgments...</div></td></tr>
                 </tbody>
             </table>
         </div>
         <div class="zqm-footer">
             <div id="paginationInfo">Page 1</div>
             <div style="display:flex;gap:4px">
-                <button type="button" class="zqm-btn" id="btnPrev" onclick="prevPage()" disabled><i class="bi bi-chevron-left me-1"></i>Prev</button>
-                <button type="button" class="zqm-btn" id="btnNext" onclick="nextPage()"><i class="bi bi-chevron-right me-1"></i>Next</button>
+                <button type="button" class="zqm-btn" id="btnPrev" onclick="prevPage()" disabled><svg class="bi bi-chevron-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg>Prev</button>
+                <button type="button" class="zqm-btn" id="btnNext" onclick="nextPage()"><svg class="bi bi-chevron-right me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg>Next</button>
             </div>
         </div>
     </div>
@@ -76,13 +76,13 @@ function fetchAcks() {
     if (partner) params += '&partnerCode=' + encodeURIComponent(partner);
     if (ackCode) params += '&ackCode=' + encodeURIComponent(ackCode);
 
-    document.getElementById('ackTableBody').innerHTML = '<tr><td colspan="8" class="zqm-empty"><i class="bi bi-hourglass"></i><div>Loading...</div></td></tr>';
+    document.getElementById('ackTableBody').innerHTML = '<tr><td colspan="8" class="zqm-empty"><svg class="bi bi-hourglass" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-hourglass"></use></svg><div>Loading...</div></td></tr>';
 
-    fetch('/api/integration/edi/acknowledgments?' + params)
+    fetch('/api/v1/integration/edi/acknowledgments?' + params)
     .then(function(r) { return r.json(); })
     .then(function(data) {
-        var items = Array.isArray(data) ? data : (data.items || []);
-        var total = data.totalCount || items.length;
+        var items = (data && Array.isArray(data.data)) ? data.data : [];
+        var total = (data && data.total) || items.length;
         renderAcks(items);
         document.getElementById('paginationInfo').textContent = 'Page ' + currentPage + ' of ' + Math.max(1, Math.ceil(total / pageSize));
         document.getElementById('btnPrev').disabled = currentPage <= 1;
@@ -97,7 +97,7 @@ function fetchAcks() {
 function renderAcks(items) {
     var tbody = document.getElementById('ackTableBody');
     if (!items.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="zqm-empty"><i class="bi bi-inbox"></i><div>No acknowledgment records found</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="zqm-empty"><svg class="bi bi-inbox" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-inbox"></use></svg><div>No acknowledgment records found</div></td></tr>';
         return;
     }
     tbody.innerHTML = items.map(function(a) {

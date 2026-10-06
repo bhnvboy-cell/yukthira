@@ -1,6 +1,11 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using YuktiraERP.Core.Dtos;
+using YuktiraERP.Core.Enums;
 using YuktiraERP.Core.Interfaces;
+using YuktiraERP.Infrastructure.Data;
+using YuktiraERP.Infrastructure.Data.Entities;
 
 namespace YuktiraERP.Infrastructure.Services;
 
@@ -9,6 +14,15 @@ public class EdiService : IEdiService
     private const string SegmentTerminator = "'";
     private const string ElementSeparator = "+";
     private const char DataSeparator = ':';
+
+    private readonly YuktiraDbContext? _db;
+    private readonly ITenantContext? _tenant;
+
+    public EdiService(YuktiraDbContext? db = null, ITenantContext? tenant = null)
+    {
+        _db = db;
+        _tenant = tenant;
+    }
 
     public Task<string> ConvertToEdifactAsync(object data, string documentType)
     {
@@ -193,6 +207,203 @@ public class EdiService : IEdiService
         if (lineItems.Count > 0) result["LineItems"] = lineItems;
         return Task.FromResult<object>(result);
     }
+
+    // ── Message type mapping ──
+
+    public EdiMessageType? ParseMessageType(string? documentType)
+    {
+        if (string.IsNullOrWhiteSpace(documentType)) return null;
+
+        var key = documentType.Trim().ToUpperInvariant();
+        switch (key)
+        {
+            case "PO":
+            case "PURCHASEORDER":
+            case "850":
+            case "ORDERS":
+                return EdiMessageType.PurchaseOrder;
+            case "INVOICE":
+            case "810":
+            case "INVOIC":
+                return EdiMessageType.Invoice;
+            case "GRN":
+            case "856":
+            case "DESADV":
+            case "RECADV":
+                return EdiMessageType.AdvanceShipNotice;
+            case "855":
+            case "ORDRSP":
+                return EdiMessageType.PurchaseOrderAck;
+            case "997":
+            case "CONTRL":
+                return EdiMessageType.FunctionalAck;
+        }
+
+        return Enum.TryParse(key, true, out EdiMessageType messageType) ? messageType : null;
+    }
+
+    public string GetDocumentTypeLabel(EdiMessageType messageType)
+    {
+        switch (messageType)
+        {
+            case EdiMessageType.PurchaseOrder: return "850/ORDERS";
+            case EdiMessageType.AdvanceShipNotice: return "856/DESADV";
+            case EdiMessageType.Invoice: return "810/INVOIC";
+            case EdiMessageType.PurchaseOrderAck: return "855/ORDRSP";
+            case EdiMessageType.FunctionalAck: return "997/CONTRL";
+            default: return messageType.ToString();
+        }
+    }
+
+    // ── Interchange log ──
+
+    public async Task<EdiTransmissionPageResult> GetTransmissionsAsync(Guid tenantId, EdiTransmissionQuery query)
+    {
+        var db = RequireDb();
+
+        IQueryable<EdiTransmissionEntity> q = db.EdiTransmissions.Where(t => t.TenantId == tenantId);
+
+        if (!string.IsNullOrWhiteSpace(query.Direction))
+        {
+            var direction = query.Direction.Trim();
+            q = q.Where(t => t.Direction == direction);
+        }
+        if (query.Status.HasValue)
+        {
+            var status = query.Status.Value;
+            q = q.Where(t => t.Status == status);
+        }
+        if (query.MessageType.HasValue)
+        {
+            var messageType = query.MessageType.Value;
+            q = q.Where(t => t.MessageType == messageType);
+        }
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var search = query.Search.Trim();
+            q = q.Where(t => t.SenderId.Contains(search)
+                || t.ReceiverId.Contains(search)
+                || t.PartnerCode.Contains(search)
+                || t.DocumentType.Contains(search));
+        }
+
+        var page = query.Page < 1 ? 1 : query.Page;
+        var pageSize = query.PageSize < 1 ? 20 : Math.Min(query.PageSize, 200);
+        var totalCount = await q.CountAsync();
+        var items = await q
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(t => new EdiTransmissionEntry
+            {
+                Id = t.Id,
+                CreatedAt = t.CreatedAt,
+                Direction = t.Direction,
+                MessageType = t.MessageType,
+                Protocol = t.Protocol,
+                Status = t.Status,
+                SenderId = t.SenderId,
+                ReceiverId = t.ReceiverId,
+                PartnerCode = t.PartnerCode,
+                DocumentType = t.DocumentType,
+                ErrorMessage = t.ErrorMessage,
+                AcknowledgmentId = t.AcknowledgmentId
+            })
+            .ToListAsync();
+
+        return new EdiTransmissionPageResult
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
+
+    public async Task<EdiTransmissionDetail?> GetTransmissionAsync(Guid tenantId, Guid id)
+    {
+        var db = RequireDb();
+        var transmission = await db.EdiTransmissions
+            .FirstOrDefaultAsync(t => t.Id == id && t.TenantId == tenantId);
+        if (transmission == null) return null;
+
+        return new EdiTransmissionDetail
+        {
+            Id = transmission.Id,
+            CreatedAt = transmission.CreatedAt,
+            Direction = transmission.Direction,
+            MessageType = transmission.MessageType,
+            Protocol = transmission.Protocol,
+            Status = transmission.Status,
+            SenderId = transmission.SenderId,
+            ReceiverId = transmission.ReceiverId,
+            PartnerCode = transmission.PartnerCode,
+            DocumentType = transmission.DocumentType,
+            ErrorMessage = transmission.ErrorMessage,
+            AcknowledgmentId = transmission.AcknowledgmentId,
+            RawPayload = transmission.RawPayload
+        };
+    }
+
+    public async Task<EdiTransmissionStatsResult> GetTransmissionStatsAsync(Guid tenantId)
+    {
+        var db = RequireDb();
+        var q = db.EdiTransmissions.Where(t => t.TenantId == tenantId);
+
+        var stats = new EdiTransmissionStatsResult
+        {
+            Total = await q.CountAsync(),
+            Inbound = await q.CountAsync(t => t.Direction == "Inbound"),
+            Outbound = await q.CountAsync(t => t.Direction == "Outbound"),
+            Failed = await q.CountAsync(t => t.Status == EdiTransactionStatus.Error || t.Status == EdiTransactionStatus.Rejected)
+        };
+
+        var byDirection = await q
+            .GroupBy(t => t.Direction)
+            .Select(g => new { Direction = g.Key, Count = g.Count() })
+            .ToListAsync();
+        foreach (var group in byDirection)
+            stats.ByDirection[group.Direction ?? ""] = group.Count;
+
+        var byStatus = await q
+            .GroupBy(t => t.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+        foreach (var group in byStatus)
+            stats.ByStatus[group.Status.ToString()] = group.Count;
+
+        return stats;
+    }
+
+    public async Task LogTransmissionAsync(Guid tenantId, EdiTransmissionLogEntry entry)
+    {
+        var db = RequireDb();
+        if (entry == null) throw new ArgumentNullException(nameof(entry));
+
+        db.EdiTransmissions.Add(new EdiTransmissionEntity
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            TenantId = tenantId != Guid.Empty ? tenantId : (_tenant?.TenantId ?? Guid.Empty),
+            Direction = entry.Direction,
+            MessageType = entry.MessageType ?? EdiMessageType.MdReceipt,
+            Protocol = entry.Protocol,
+            Status = entry.Status,
+            SenderId = entry.SenderId,
+            ReceiverId = entry.ReceiverId,
+            PartnerCode = entry.PartnerCode,
+            DocumentType = entry.DocumentType,
+            RawPayload = entry.RawPayload,
+            AcknowledgmentId = entry.AcknowledgmentId,
+            ErrorMessage = entry.ErrorMessage
+        });
+
+        await db.SaveChangesAsync();
+    }
+
+    private YuktiraDbContext RequireDb() =>
+        _db ?? throw new InvalidOperationException(
+            "EdiService requires a database context for interchange log operations.");
 
     // ── EDIFACT builders ──
 

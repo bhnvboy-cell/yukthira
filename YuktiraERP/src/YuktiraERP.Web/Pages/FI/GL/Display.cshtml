@@ -7,21 +7,21 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-book me-2"></i>G/L Account Display</h3>
+            <h3><svg class="bi bi-book me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-book"></use></svg>G/L Account Display</h3>
             <span class="badge">FS10N</span>
         </div>
         <div class="actions">
-            <a asp-page="/FI/GL/LineItems" class="zqm-btn"><i class="bi bi-list-columns me-1"></i>Line Items</a>
-            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/FI/GL/LineItems" class="zqm-btn"><svg class="bi bi-list-columns me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-columns"></use></svg>Line Items</a>
+            <a asp-page="/FI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
         <form method="get">
-            <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Select Account</div>
+            <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Select Account</div>
             <div class="zqm-row cols-4">
                 <div class="zqm-field"><label>Account Code</label><select name="AccountCode"><option value="">-- Select Account --</option>@foreach (var a in Model.Accounts) { <option value="@a.AccountCode" selected="@(a.AccountCode==Model.AccountCode)">@a.AccountCode - @a.AccountName</option> }</select></div>
-                <div class="zqm-field" style="display:flex;align-items:flex-end"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0;height:34px"><i class="bi bi-search me-1"></i>Display</button></div>
+                <div class="zqm-field" style="display:flex;align-items:flex-end"><button type="submit" class="zqm-btn" style="background:#1565c0;border-color:#1565c0;height:34px"><svg class="bi bi-search me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg>Display</button></div>
                 <div></div><div></div>
             </div>
         </form>

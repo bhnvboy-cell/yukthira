@@ -6,23 +6,23 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-cpu me-2"></i>MRP Run (MD01)</h3>
+            <h3><svg class="bi bi-cpu me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg>MRP Run (MD01)</h3>
             <span class="badge">Material Requirements Planning</span>
         </div>
         <div class="actions">
-            <a asp-page="/PP/Mrp" class="zqm-btn"><i class="bi bi-cpu me-1"></i>MRP & Capacity</a>
-            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/PP/Mrp" class="zqm-btn"><svg class="bi bi-cpu me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-cpu"></use></svg>MRP & Capacity</a>
+            <a asp-page="/PP/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-play-circle me-1"></i>MRP Parameters</div>
+        <div class="zqm-section-title"><svg class="bi bi-play-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-circle"></use></svg>MRP Parameters</div>
         <form method="post">
             <div class="zqm-row cols-4">
                 <div class="zqm-field"><label>Material Filter <span style="font-weight:400;color:#888;text-transform:none">(optional)</span></label><input asp-for="ProductName" placeholder="Filter by material name" /></div>
                 <div class="zqm-field"><label>Planning Horizon (Days)</label><input asp-for="HorizonDays" type="number" min="1" max="365" /></div>
                 <div class="zqm-field"><label>Service Level (%)</label><input asp-for="ServiceLevel" type="number" min="0.5" max="1" step="0.01" /></div>
-                <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><i class="bi bi-play me-1"></i>Run MRP</button></div>
+                <div class="zqm-field" style="display:flex;align-items:end;gap:6px;padding-bottom:1px"><button type="submit" class="zqm-btn" style="background:#4caf50;border-color:#4caf50"><svg class="bi bi-play me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play"></use></svg>Run MRP</button></div>
             </div>
         </form>
     </div>
@@ -30,7 +30,7 @@
     <div class="zqm-results">
         @if (!string.IsNullOrEmpty(Model.Result))
         {
-            <div class="zqm-alert @(Model.Result.Contains("failed") ? "error" : "success")" style="display:block"><i class="bi bi-info-circle me-1"></i>@Model.Result</div>
+            <div class="zqm-alert @(Model.Result.Contains("failed") ? "error" : "success")" style="display:block"><svg class="bi bi-info-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg>@Model.Result</div>
         }
 
         @if (Model.Suggestions.Any())
@@ -58,7 +58,7 @@
 
         @if (Model.Exceptions.Any())
         {
-            <div style="padding:12px 16px"><div class="zqm-section-title" style="color:#e65100;border-bottom-color:#ffe0b2"><i class="bi bi-exclamation-triangle me-1"></i>Exceptions</div></div>
+            <div style="padding:12px 16px"><div class="zqm-section-title" style="color:#e65100;border-bottom-color:#ffe0b2"><svg class="bi bi-exclamation-triangle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>Exceptions</div></div>
             <div class="zqm-table-wrap">
                 <table class="zqm-table">
                     <thead><tr><th>Material</th><th>Type</th><th>Severity</th><th>Message</th><th>Suggested Action</th></tr></thead>

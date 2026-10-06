@@ -5,15 +5,15 @@
     ViewData["Title"] = "New " + Model.Code;
 }
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-plus-circle me-2"></i>New @Model.Code</h2>
-    <a href="/TCode/List?tcodeId=@Model.TCodeId&code=@Model.Code" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+    <h2><svg class="bi bi-plus-circle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg>New @Model.Code</h2>
+    <a href="/TCode/List?tcodeId=@Model.TCodeId&code=@Model.Code" class="btn btn-outline-secondary btn-sm"><svg class="bi bi-arrow-left" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg> Back</a>
 </div>
 <div class="card shadow-sm">
     <div class="card-body">
         <div id="formContainer">
             <p class="text-muted">Loading form fields...</p>
         </div>
-        <button class="btn btn-primary mt-3" onclick="submitForm()"><i class="bi bi-check"></i> Create</button>
+        <button class="btn btn-primary mt-3" onclick="submitForm()"><svg class="bi bi-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check"></use></svg> Create</button>
     </div>
 </div>
 

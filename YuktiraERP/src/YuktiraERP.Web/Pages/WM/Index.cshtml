@@ -7,49 +7,49 @@
 <div class="module-root" data-module-root="wm">
     <div class="module-header">
         <div class="module-header-left">
-            <h2><i class="bi bi-house-door me-2"></i>Warehouse Management</h2>
+            <h2><svg class="bi bi-house-door me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-house-door"></use></svg>Warehouse Management</h2>
             <span class="module-badge">WM</span>
         </div>
         <div class="module-header-right">
-            <a asp-page="/WM/Bin/Create" class="btn btn-primary module-action-btn" data-action-tab="bins"><i class="bi bi-plus-circle me-1"></i> Create Storage Bin</a>
-            <a asp-page="/WM/TransferOrder/Create" class="btn btn-primary module-action-btn" data-action-tab="transfers" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Transfer Order</a>
-            <a asp-page="/WM/Movement/Create" class="btn btn-primary module-action-btn" data-action-tab="movements" style="display:none"><i class="bi bi-plus-circle me-1"></i> Post Goods Movement</a>
-            <a asp-page="/WM/Wave/Create" class="btn btn-primary module-action-btn" data-action-tab="waves" style="display:none"><i class="bi bi-plus-circle me-1"></i> Create Picking Wave</a>
-            <a asp-page="/WM/InventoryCount/Create" class="btn btn-primary module-action-btn" data-action-tab="counts" style="display:none"><i class="bi bi-plus-circle me-1"></i> Start Cycle Count</a>
+            <a asp-page="/WM/Bin/Create" class="btn btn-primary module-action-btn" data-action-tab="bins"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Storage Bin</a>
+            <a asp-page="/WM/TransferOrder/Create" class="btn btn-primary module-action-btn" data-action-tab="transfers" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Transfer Order</a>
+            <a asp-page="/WM/Movement/Create" class="btn btn-primary module-action-btn" data-action-tab="movements" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Post Goods Movement</a>
+            <a asp-page="/WM/Wave/Create" class="btn btn-primary module-action-btn" data-action-tab="waves" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Create Picking Wave</a>
+            <a asp-page="/WM/InventoryCount/Create" class="btn btn-primary module-action-btn" data-action-tab="counts" style="display:none"><svg class="bi bi-plus-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-circle"></use></svg> Start Cycle Count</a>
         </div>
     </div>
 
     <div class="module-kpi-grid">
         <div class="module-kpi-card">
-            <div class="module-kpi-icon amber"><i class="bi bi-grid-3x3"></i></div>
+            <div class="module-kpi-icon amber"><svg class="bi bi-grid-3x3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-grid-3x3"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@(Model.Bins.Count > 0 ? Math.Round((double)Model.Bins.Count(b => b.Status == "Active") / Model.Bins.Count * 100, 1).ToString() : "0")%</div>
                 <div class="module-kpi-label">Bin Occupancy</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon blue"><i class="bi bi-arrow-left-right"></i></div>
+            <div class="module-kpi-icon blue"><svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.TransferOrders.Count(t => t.Status == "Created" || t.Status == "In Progress")</div>
                 <div class="module-kpi-label">Open Transfer Orders</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon purple"><i class="bi bi-bag-check"></i></div>
+            <div class="module-kpi-icon purple"><svg class="bi bi-bag-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bag-check"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.Waves.Count(w => w.Status == "Planned" || w.Status == "In Progress")</div>
                 <div class="module-kpi-label">Pending Picks</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon green"><i class="bi bi-currency-dollar"></i></div>
+            <div class="module-kpi-icon green"><svg class="bi bi-currency-dollar" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-currency-dollar"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@(Model.StockItems.Sum(s => s.Value).ToString("C0"))</div>
                 <div class="module-kpi-label">Inventory Valuation</div>
             </div>
         </div>
         <div class="module-kpi-card">
-            <div class="module-kpi-icon red"><i class="bi bi-speedometer"></i></div>
+            <div class="module-kpi-icon red"><svg class="bi bi-speedometer" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-speedometer"></use></svg></div>
             <div class="module-kpi-info">
                 <div class="module-kpi-value">@Model.Bins.Count(b => b.CurrentWeight < b.MaxWeight * 0.1m && b.Status == "Active")</div>
                 <div class="module-kpi-label">Low Velocity Bins</div>
@@ -58,11 +58,11 @@
     </div>
 
     <div class="module-tabs" id="wmTabs">
-        <button type="button" class="module-tab active" data-tab="bins"><i class="bi bi-grid-3x3"></i> Storage Bins <span class="tab-count">@Model.Bins.Count</span></button>
-        <button type="button" class="module-tab" data-tab="transfers"><i class="bi bi-arrow-left-right"></i> Transfer Orders <span class="tab-count">@Model.TransferOrders.Count</span></button>
-        <button type="button" class="module-tab" data-tab="movements"><i class="bi bi-box-arrow-in-right"></i> Stock Movement <span class="tab-count">@Model.Movements.Count</span></button>
-        <button type="button" class="module-tab" data-tab="waves"><i class="bi bi-water"></i> Wave Picking <span class="tab-count">@Model.Waves.Count</span></button>
-        <button type="button" class="module-tab" data-tab="counts"><i class="bi bi-clipboard-check"></i> Physical Inventory <span class="tab-count">@Model.InventoryCounts.Count</span></button>
+        <button type="button" class="module-tab active" data-tab="bins"><svg class="bi bi-grid-3x3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-grid-3x3"></use></svg> Storage Bins <span class="tab-count">@Model.Bins.Count</span></button>
+        <button type="button" class="module-tab" data-tab="transfers"><svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg> Transfer Orders <span class="tab-count">@Model.TransferOrders.Count</span></button>
+        <button type="button" class="module-tab" data-tab="movements"><svg class="bi bi-box-arrow-in-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-in-right"></use></svg> Stock Movement <span class="tab-count">@Model.Movements.Count</span></button>
+        <button type="button" class="module-tab" data-tab="waves"><svg class="bi bi-water" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-water"></use></svg> Wave Picking <span class="tab-count">@Model.Waves.Count</span></button>
+        <button type="button" class="module-tab" data-tab="counts"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg> Physical Inventory <span class="tab-count">@Model.InventoryCounts.Count</span></button>
     </div>
 
     <!-- ═══ TAB: Storage Bins ═══ -->
@@ -70,7 +70,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search bins..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search bins..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right">
                     <span class="sheet-selected-count"></span>
@@ -109,8 +109,8 @@
                                     <td><span class="status-badge @(b.Status == "Active" ? "success" : b.Status == "Full" ? "warning" : "danger")">@b.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/WM/Bin/Edit" asp-route-id="@b.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/WM/Bin/Display" asp-route-id="@b.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/WM/Bin/Edit" asp-route-id="@b.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/WM/Bin/Display" asp-route-id="@b.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -118,7 +118,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="10" class="sheet-empty"><i class="bi bi-grid-3x3"></i><div>No storage bins found</div></td></tr>
+                            <tr><td colspan="10" class="sheet-empty"><svg class="bi bi-grid-3x3" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-grid-3x3"></use></svg><div>No storage bins found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -135,7 +135,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search transfer orders..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search transfer orders..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -176,8 +176,8 @@
                                     <td><span class="status-badge @(t.Status == "Completed" ? "success" : t.Status == "In Progress" ? "info" : t.Status == "Cancelled" ? "danger" : "warning")">@t.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/WM/Transfer/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                                            <a asp-page="/WM/Transfer/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/WM/Transfer/Edit" asp-route-id="@t.Id" class="action-btn edit" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></a>
+                                            <a asp-page="/WM/Transfer/Display" asp-route-id="@t.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -185,7 +185,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="12" class="sheet-empty"><i class="bi bi-arrow-left-right"></i><div>No transfer orders found</div></td></tr>
+                            <tr><td colspan="12" class="sheet-empty"><svg class="bi bi-arrow-left-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left-right"></use></svg><div>No transfer orders found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -202,7 +202,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search movements..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search movements..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -243,7 +243,7 @@
                                     <td>@m.MovementDate.ToString("dd MMM yyyy")</td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/WM/Movement/Display" asp-route-id="@m.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/WM/Movement/Display" asp-route-id="@m.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -251,7 +251,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="12" class="sheet-empty"><i class="bi bi-box-arrow-in-right"></i><div>No stock movements found</div></td></tr>
+                            <tr><td colspan="12" class="sheet-empty"><svg class="bi bi-box-arrow-in-right" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-box-arrow-in-right"></use></svg><div>No stock movements found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -268,7 +268,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search waves..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search waves..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -303,7 +303,7 @@
                                     <td><span class="status-badge @(w.Status == "Completed" ? "success" : w.Status == "In Progress" ? "info" : "warning")">@w.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/WM/Wave/Display" asp-route-id="@w.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/WM/Wave/Display" asp-route-id="@w.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -311,7 +311,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="9" class="sheet-empty"><i class="bi bi-water"></i><div>No picking waves found</div></td></tr>
+                            <tr><td colspan="9" class="sheet-empty"><svg class="bi bi-water" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-water"></use></svg><div>No picking waves found</div></td></tr>
                         }
                     </tbody>
                 </table>
@@ -328,7 +328,7 @@
         <div class="sheet-view-container">
             <div class="sheet-toolbar">
                 <div class="sheet-toolbar-left">
-                    <div class="sheet-search"><i class="bi bi-search"></i><input type="text" placeholder="Search cycle counts..." class="sheet-search-input" /></div>
+                    <div class="sheet-search"><svg class="bi bi-search" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-search"></use></svg><input type="text" placeholder="Search cycle counts..." class="sheet-search-input" /></div>
                 </div>
                 <div class="sheet-toolbar-right"><span class="sheet-selected-count"></span></div>
             </div>
@@ -373,7 +373,7 @@
                                     <td><span class="status-badge @(c.Status == "Completed" ? "success" : c.Status == "In Progress" ? "info" : "warning")">@c.Status</span></td>
                                     <td class="actions-col">
                                         <div class="action-btns">
-                                            <a asp-page="/WM/InventoryCount/Display" asp-route-id="@c.Id" class="action-btn view" title="View"><i class="bi bi-eye"></i></a>
+                                            <a asp-page="/WM/InventoryCount/Display" asp-route-id="@c.Id" class="action-btn view" title="View"><svg class="bi bi-eye" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-eye"></use></svg></a>
                                         </div>
                                     </td>
                                 </tr>
@@ -381,7 +381,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="11" class="sheet-empty"><i class="bi bi-clipboard-check"></i><div>No cycle counts found</div></td></tr>
+                            <tr><td colspan="11" class="sheet-empty"><svg class="bi bi-clipboard-check" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg><div>No cycle counts found</div></td></tr>
                         }
                     </tbody>
                 </table>

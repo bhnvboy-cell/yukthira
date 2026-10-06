@@ -2,7 +2,7 @@
 @model YuktiraERP.Web.Pages.MM.PO.EditModel
 @{ ViewData["Title"] = "Edit Purchase Order"; }
 <div class="row justify-content-center"><div class="col-lg-10">
-<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Purchase Order</h5></div>
+<div class="card shadow-sm"><div class="card-header bg-warning text-dark"><h5 class="mb-0"><svg class="bi bi-pencil me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg>Edit Purchase Order</h5></div>
 <div class="card-body">
 <form method="post">
 <input type="hidden" asp-for="Order.Id" />
@@ -24,7 +24,7 @@
 <div class="col-md-4"><label class="form-label">Release Status</label><input asp-for="Order.ReleaseStatus" class="form-control" readonly /></div>
 </div>
 
-<h6 class="mt-3 mb-2"><i class="bi bi-list-ul me-1"></i>Line Items</h6>
+<h6 class="mt-3 mb-2"><svg class="bi bi-list-ul me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-ul"></use></svg>Line Items</h6>
 <div id="lineItems">
 @for (int i = 0; i < Model.LineItems.Count; i++)
 {
@@ -47,11 +47,11 @@
 </div>
 }
 </div>
-<button type="button" class="btn btn-outline-success btn-sm mb-3" onclick="addLine()"><i class="bi bi-plus"></i> Add Line</button>
+<button type="button" class="btn btn-outline-success btn-sm mb-3" onclick="addLine()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Add Line</button>
 
 <div class="d-flex gap-2">
-<button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Update</button>
-<a asp-page="/MM/Index" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>Cancel</a>
+<button type="submit" class="btn btn-warning"><svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Update</button>
+<a asp-page="/MM/Index" class="btn btn-outline-secondary"><svg class="bi bi-x me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-x"></use></svg>Cancel</a>
 </div>
 </form>
 </div></div>

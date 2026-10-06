@@ -3,34 +3,24 @@
 @inject IStringLocalizer<SharedResources> L
 @{ ViewData["Title"] = L["Settings"]; Layout = "_Layout"; }
 
-<h2><i class="bi bi-gear"></i> @L["Settings"]</h2>
+<h2><svg class="bi bi-gear" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-gear"></use></svg> @L["Settings"]</h2>
 <hr class="mb-4" />
 
 <!-- Theme Selection -->
 <div class="card mb-4">
-    <div class="card-header fw-semibold"><i class="bi bi-palette"></i> @L["Theme"]</div>
+    <div class="card-header fw-semibold"><svg class="bi bi-palette" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-palette"></use></svg> @L["Theme"]</div>
     <div class="card-body">
         <p class="text-muted mb-3">@L["ThemeDesc"]</p>
         <div class="settings-theme-grid">
             <div class="settings-theme-card" data-theme="modern" onclick="selectTheme('modern')">
-                <div class="settings-theme-preview"><i class="bi bi-window-stack text-white"></i></div>
-                <div class="settings-theme-name">Modern</div>
-                <div class="settings-theme-desc">Clean, rounded, light with blue-teal accents</div>
+                <div class="settings-theme-preview"><svg class="bi bi-sun text-white" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-sun"></use></svg></div>
+                <div class="settings-theme-name">Light</div>
+                <div class="settings-theme-desc">Soft, rounded surfaces with blue-teal accents</div>
             </div>
-            <div class="settings-theme-card" data-theme="classic" onclick="selectTheme('classic')">
-                <div class="settings-theme-preview"><i class="bi bi-window text-white"></i></div>
-                <div class="settings-theme-name">Classical</div>
-                <div class="settings-theme-desc">Compact, sharp edges, professional blue tones</div>
-            </div>
-            <div class="settings-theme-card" data-theme="minimal" onclick="selectTheme('minimal')">
-                <div class="settings-theme-preview"><i class="bi bi-square text-white"></i></div>
-                <div class="settings-theme-name">Minimal</div>
-                <div class="settings-theme-desc">Clean, no shadows, monochrome, distraction-free</div>
-            </div>
-            <div class="settings-theme-card" data-theme="futuristic" onclick="selectTheme('futuristic')">
-                <div class="settings-theme-preview"><i class="bi bi-cpu text-white"></i></div>
-                <div class="settings-theme-name">Futuristic</div>
-                <div class="settings-theme-desc">Dark, gold accents, premium feel</div>
+            <div class="settings-theme-card" data-theme="dark" onclick="selectTheme('dark')">
+                <div class="settings-theme-preview"><svg class="bi bi-moon-stars text-white" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-moon-stars"></use></svg></div>
+                <div class="settings-theme-name">Dark</div>
+                <div class="settings-theme-desc">Easy on the eyes, cool navy tones</div>
             </div>
         </div>
     </div>
@@ -38,7 +28,7 @@
 
 <!-- Session Timeout -->
 <div class="card mb-4">
-    <div class="card-header fw-semibold"><i class="bi bi-clock-history"></i> @L["SessionTimeout"]</div>
+    <div class="card-header fw-semibold"><svg class="bi bi-clock-history" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg> @L["SessionTimeout"]</div>
     <div class="card-body">
         <p class="text-muted mb-3">@L["SessionTimeoutDesc"]</p>
         <div class="row g-3">
@@ -66,7 +56,7 @@
             </div>
             <div class="col-md-4 d-flex align-items-end">
                 <div id="timeoutStatus" class="text-success small d-none">
-                    <i class="bi bi-check-circle"></i> Saved
+                    <svg class="bi bi-check-circle" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg> Saved
                 </div>
             </div>
         </div>
@@ -75,7 +65,7 @@
 
 <!-- General -->
 <div class="card mb-4">
-    <div class="card-header fw-semibold"><i class="bi bi-sliders"></i> @L["General"]</div>
+    <div class="card-header fw-semibold"><svg class="bi bi-sliders" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-sliders"></use></svg> @L["General"]</div>
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-4">
@@ -125,14 +115,11 @@
     })();
 
     function selectTheme(theme) {
+        if (window.yuktiraApplyTheme) { window.yuktiraApplyTheme(theme); return; }
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('yuktira_theme', theme);
         document.querySelectorAll('.settings-theme-card').forEach(function(c) {
             c.classList.toggle('active', c.getAttribute('data-theme') === theme);
-        });
-        document.querySelectorAll('.theme-btn').forEach(function(b) {
-            b.style.borderColor = b.getAttribute('data-theme') === theme ? '#fff' : 'transparent';
-            b.setAttribute('aria-checked', b.getAttribute('data-theme') === theme ? 'true' : 'false');
         });
     }
 

@@ -6,16 +6,16 @@
 <div class="zqm">
     <div class="zqm-toolbar">
         <div style="display:flex;align-items:center;gap:10px">
-            <h3><i class="bi bi-camera me-2"></i>Vision Inspection</h3>
+            <h3><svg class="bi bi-camera me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-camera"></use></svg>Vision Inspection</h3>
             <span class="badge">ZQM-V01</span>
         </div>
         <div class="actions">
-            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><i class="bi bi-arrow-left me-1"></i>Back</a>
+            <a asp-page="/AI/Index" class="zqm-btn zqm-btn-back"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg>Back</a>
         </div>
     </div>
 
     <div class="zqm-filter">
-        <div class="zqm-section-title"><i class="bi bi-funnel me-1"></i>Inspection Parameters</div>
+        <div class="zqm-section-title"><svg class="bi bi-funnel me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-funnel"></use></svg>Inspection Parameters</div>
         <form method="post" enctype="multipart/form-data" id="inspectForm">
             <div class="zqm-row cols-2">
                 <div class="zqm-field">
@@ -37,7 +37,7 @@
                 <div class="zqm-field"><label>Inspection Lot Number</label><input asp-for="InspectionLotNumber" placeholder="e.g. IL-20260001" /></div>
             </div>
             <div style="margin-top:10px">
-                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><i class="bi bi-play-fill me-1"></i>Run Inspection</button>
+                <button type="submit" class="zqm-btn" style="background:#1565c0;color:#fff;border-color:#1565c0"><svg class="bi bi-play-fill me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play-fill"></use></svg>Run Inspection</button>
             </div>
         </form>
     </div>
@@ -48,7 +48,7 @@
     {
         <div class="zqm-results">
             <div class="zqm-results-header">
-                <h4><i class="bi bi-clipboard-check me-1"></i>Inspection Result</h4>
+                <h4><svg class="bi bi-clipboard-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clipboard-check"></use></svg>Inspection Result</h4>
                 <span class="count">@Model.Result.ImageName</span>
             </div>
             <div style="padding:20px">
@@ -79,7 +79,7 @@
                 @if (Model.Result.DefectRegions != null && Model.Result.DefectRegions.Any())
                 {
                     <div style="margin-top:16px">
-                        <h5 style="font-size:0.9rem;color:#1a237e;margin-bottom:8px"><i class="bi bi-bounding-box me-1"></i>Defect Regions</h5>
+                        <h5 style="font-size:0.9rem;color:#1a237e;margin-bottom:8px"><svg class="bi bi-bounding-box me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bounding-box"></use></svg>Defect Regions</h5>
                         <div class="zqm-table-wrap">
                             <table class="zqm-table">
                                 <thead><tr><th>Region ID</th><th>Location</th><th>Area</th><th>Severity</th></tr></thead>
@@ -105,11 +105,11 @@
                         <label>Non-Conformance</label>
                         @if (Model.Result.NCRequired)
                         {
-                            <div style="padding:10px;background:#ffcdd2;border:1px solid #ef9a9a;border-radius:4px;color:#c62828;font-weight:600"><i class="bi bi-exclamation-triangle me-1"></i>NC Auto-Created: @Model.Result.NCNumber</div>
+                            <div style="padding:10px;background:#ffcdd2;border:1px solid #ef9a9a;border-radius:4px;color:#c62828;font-weight:600"><svg class="bi bi-exclamation-triangle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>NC Auto-Created: @Model.Result.NCNumber</div>
                         }
                         else
                         {
-                            <div style="padding:10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;color:#2e7d32;font-weight:500"><i class="bi bi-check-circle me-1"></i>No NC Required</div>
+                            <div style="padding:10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;color:#2e7d32;font-weight:500"><svg class="bi bi-check-circle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-check-circle"></use></svg>No NC Required</div>
                         }
                     </div>
                 </div>
@@ -117,7 +117,7 @@
         </div>
     }
 
-    <div class="zqm-empty" id="emptyState"><i class="bi bi-camera"></i><div>Upload an image and run inspection to see results</div></div>
+    <div class="zqm-empty" id="emptyState"><svg class="bi bi-camera" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-camera"></use></svg><div>Upload an image and run inspection to see results</div></div>
 </div>
 
 @section Scripts {

@@ -3,13 +3,13 @@
 @{ ViewData["Title"] = "Certificate of Analysis Details"; }
 <link rel="stylesheet" href="~/css/enterprise-form.css" />
 <div class="ent-form-wrapper">
-    <div class="ent-form-header"><h3><i class="bi bi-file-earmark-check me-2"></i>Certificate of Analysis</h3><span class="badge">QM</span></div>
+    <div class="ent-form-header"><h3><svg class="bi bi-file-earmark-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-file-earmark-check"></use></svg>Certificate of Analysis</h3><span class="badge">QM</span></div>
     <div class="ent-form-tabs">
-        <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><i class="bi bi-info-circle tab-icon"></i> General</button>
-        <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-customer')"><i class="bi bi-person tab-icon"></i> Customer</button>
+        <button type="button" class="ent-form-tab active" onclick="showTab(this,'tab-general')"><svg class="bi bi-info-circle tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-info-circle"></use></svg> General</button>
+        <button type="button" class="ent-form-tab" onclick="showTab(this,'tab-customer')"><svg class="bi bi-person tab-icon" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg> Customer</button>
     </div>
     <div class="ent-form-panel active" id="tab-general">
-        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-tag"></i> Certificate Details</div>
+        <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-tag" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-tag"></use></svg> Certificate Details</div>
             <div class="ent-field-grid ent-grid-3">
                 <div class="ent-field"><label>COA #</label><div class="ent-readonly">@Model.Certificate.COANumber</div></div>
                 <div class="ent-field"><label>Inspection Lot #</label><div class="ent-readonly">@Model.Certificate.InspectionLotNumber</div></div>
@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="ent-form-panel" id="tab-customer">
-        <div class="ent-section"><div class="ent-section-header"><i class="bi bi-person"></i> Customer & Issuance</div>
+        <div class="ent-section"><div class="ent-section-header"><svg class="bi bi-person" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person"></use></svg> Customer & Issuance</div>
             <div class="ent-field-grid ent-grid-3">
                 <div class="ent-field"><label>Customer Name</label><div class="ent-readonly">@Model.Certificate.CustomerName</div></div>
                 <div class="ent-field"><label>Customer PO #</label><div class="ent-readonly">@Model.Certificate.CustomerPO</div></div>
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="ent-form-actions">
-        <a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
-        <a asp-page="/QM/COA/Edit" asp-route-id="@Model.Certificate.Id" class="ent-btn ent-btn-primary"><i class="bi bi-pencil me-1"></i> Edit</a>
+        <a asp-page="/QM/Index" class="ent-btn ent-btn-secondary"><svg class="bi bi-arrow-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-left"></use></svg> Back</a>
+        <a asp-page="/QM/COA/Edit" asp-route-id="@Model.Certificate.Id" class="ent-btn ent-btn-primary"><svg class="bi bi-pencil me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg> Edit</a>
     </div>
 </div>

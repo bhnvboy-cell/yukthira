@@ -1,0 +1,1026 @@
+@page
+@model YuktiraERP.Web.Pages.Admin.SoxComplianceModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@{
+    ViewData["Title"] = "SOX Compliance & SoD";
+}
+
+<style>
+    .sx-table th { background: #1F497D; color: #fff; font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+    .sx-table td { font-size: 13px; padding: 6px 10px; vertical-align: middle; }
+    .sx-table tbody tr:hover { background: #f0f4fa; }
+    .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 3px solid transparent; }
+    .nav-tabs .nav-link.active { color: #1F497D; border-bottom-color: #1F497D; font-weight: 600; }
+    .nav-tabs .nav-link:hover { border-bottom-color: #adb5bd; }
+    .stat-card { border: none; border-radius: 8px; transition: transform .15s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; color: #1F497D; }
+    .stat-card .stat-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; color: #6c757d; }
+    .sx-chip { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e8eef6; color: #1F497D; margin-right: 4px; display: inline-block; }
+    .filter-bar { background: #f8f9fa; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0"><svg class="bi bi-shield-check me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>SOX Compliance &amp; SoD</h2>
+</div>
+<p class="text-muted mb-3">Segregation of duties rules, duty assignments, conflict scans, violations and audit chain verification.</p>
+
+<div id="pageAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+    <span id="pageAlertText"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div id="pageSpinner" class="text-center py-3 d-none" role="status">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+</div>
+
+<ul class="nav nav-tabs" id="sxTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#sxSummary" role="tab">
+            <svg class="bi bi-bar-chart me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-bar-chart"></use></svg>Summary
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#sxDuties" role="tab">
+            <svg class="bi bi-list-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-list-check"></use></svg>Duties
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#sxAssignments" role="tab">
+            <svg class="bi bi-person-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-check"></use></svg>Assignments
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#sxScan" role="tab">
+            <svg class="bi bi-exclamation-triangle me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-exclamation-triangle"></use></svg>Scan &amp; Violations
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#sxChain" role="tab">
+            <svg class="bi bi-clock-history me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>Audit Chain
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+
+    <div class="tab-pane fade show active" id="sxSummary" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <span class="text-muted small">Current state of duties, assignments and open conflicts.</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadSummary()">
+                <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+            </button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-2"><div class="card stat-card shadow-sm text-center p-3 h-100"><div class="stat-value" id="sumDuties">--</div><div class="stat-label">Duties</div></div></div>
+            <div class="col-md-2"><div class="card stat-card shadow-sm text-center p-3 h-100"><div class="stat-value" id="sumActive">--</div><div class="stat-label">Active Duties</div></div></div>
+            <div class="col-md-2"><div class="card stat-card shadow-sm text-center p-3 h-100"><div class="stat-value" id="sumAssignments">--</div><div class="stat-label">Assignments</div></div></div>
+            <div class="col-md-2"><div class="card stat-card shadow-sm text-center p-3 h-100"><div class="stat-value" id="sumOpen">--</div><div class="stat-label">Open Violations</div></div></div>
+            <div class="col-md-2"><div class="card stat-card shadow-sm text-center p-3 h-100"><div class="stat-value" id="sumOpenHigh">--</div><div class="stat-label">Open High</div></div></div>
+            <div class="col-md-2"><div class="card stat-card shadow-sm text-center p-3 h-100"><div class="stat-value" id="sumResolved">--</div><div class="stat-label">Resolved</div></div></div>
+        </div>
+        <div id="sumEmpty" class="text-center text-muted py-4 d-none">
+            <svg class="bi bi-shield-check display-4" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-shield-check"></use></svg>
+            <p class="mt-2 mb-0">No compliance summary available yet.</p>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="sxDuties" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <button type="button" class="btn btn-sm btn-primary" onclick="toggleDutyForm()">
+                    <svg class="bi bi-plus-lg me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus-lg"></use></svg>New duty
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadDuties()">
+                    <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+                </button>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="dtyIncludeInactive" onchange="loadDuties()" />
+                    <label class="form-check-label small" for="dtyIncludeInactive">Include inactive</label>
+                </div>
+            </div>
+            <span class="text-muted small" id="dtyCount"></span>
+        </div>
+
+        <div class="alert py-1 px-2 small d-none" id="dtyFeedback"></div>
+
+        <div class="card mb-3 d-none" id="dutyFormCard">
+            <div class="card-header bg-light py-2 fw-semibold" id="dutyFormTitle">New duty</div>
+            <div class="card-body py-2">
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfCode">Duty Code</label>
+                        <input type="text" id="dfCode" class="form-control form-control-sm" placeholder="Unique code" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold small mb-1" for="dfName">Duty Name</label>
+                        <input type="text" id="dfName" class="form-control form-control-sm" placeholder="Display name" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfModule">Module</label>
+                        <input type="text" id="dfModule" class="form-control form-control-sm" placeholder="Module" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfTcode">T-Code</label>
+                        <input type="text" id="dfTcode" class="form-control form-control-sm" placeholder="Transaction code" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfAction">Action</label>
+                        <select id="dfAction" class="form-select form-select-sm">
+                            <option value="CREATE">CREATE</option>
+                            <option value="CHANGE">CHANGE</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="DISPLAY">DISPLAY</option>
+                            <option value="APPROVE">APPROVE</option>
+                            <option value="RECEIVE">RECEIVE</option>
+                            <option value="PAYMENT">PAYMENT</option>
+                            <option value="POST">POST</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfMinApprovers">Min Approvers</label>
+                        <input type="number" id="dfMinApprovers" class="form-control form-control-sm" min="0" value="1" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small mb-1" for="dfDescription">Description</label>
+                        <input type="text" id="dfDescription" class="form-control form-control-sm" placeholder="What this duty covers" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfConflicts">Conflict Duties</label>
+                        <select id="dfConflicts" class="form-select form-select-sm" multiple size="5"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold small mb-1" for="dfRoles">Required Roles</label>
+                        <select id="dfRoles" class="form-select form-select-sm" multiple size="5"></select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="dfIsActive" checked />
+                            <label class="form-check-label small" for="dfIsActive">Active</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="saveDuty()">
+                        <svg class="bi bi-save me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-save"></use></svg>Save
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="cancelDutyEdit()">Cancel</button>
+                </div>
+                <div class="alert alert-danger py-1 px-2 small mt-2 mb-0 d-none" id="dutyFormError"></div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover sx-table mb-0">
+                <thead>
+                    <tr><th>Code</th><th>Name</th><th>Module</th><th>T-Code</th><th>Action</th><th>Min Approvers</th><th>Conflicts</th><th>Active</th><th></th></tr>
+                </thead>
+                <tbody id="dtyBody">
+                    <tr><td colspan="9" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="sxAssignments" role="tabpanel">
+        <div class="filter-bar">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small mb-1" for="asgUserFilter">User</label>
+                    <select id="asgUserFilter" class="form-select form-select-sm" onchange="loadAssignments()">
+                        <option value="">All users</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="asgActiveOnly" checked onchange="loadAssignments()" />
+                        <label class="form-check-label small" for="asgActiveOnly">Active only</label>
+                    </div>
+                </div>
+                <div class="col-md-7 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="loadAssignments()">
+                        <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-light py-2 fw-semibold">
+                        <svg class="bi bi-person-plus me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-person-plus"></use></svg>Assign Duty
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small mb-1" for="asgFormUser">User</label>
+                                <select id="asgFormUser" class="form-select form-select-sm"><option value="">Select user</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small mb-1" for="asgFormDuty">Duty</label>
+                                <select id="asgFormDuty" class="form-select form-select-sm"><option value="">Select duty</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small mb-1" for="asgFormNotes">Notes</label>
+                                <input type="text" id="asgFormNotes" class="form-control form-control-sm" placeholder="Why this duty is assigned" />
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-sm btn-primary w-100" onclick="assignDuty()">Assign</button>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger py-1 px-2 small mt-2 mb-0 d-none" id="asgFormError"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover sx-table mb-0">
+                <thead>
+                    <tr><th>User</th><th>Role</th><th>Duty</th><th>Source</th><th>Assigned At</th><th>Assigned By</th><th>Notes</th><th></th></tr>
+                </thead>
+                <tbody id="asgBody">
+                    <tr><td colspan="8" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="sxScan" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-primary" id="scanBtn" onclick="runScan()">
+                <svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg>Run SoD scan
+            </button>
+            <span class="text-muted small">Scanning compares every user against active duties and conflict rules.</span>
+        </div>
+
+        <div class="alert py-1 px-2 small d-none" id="scanBanner"></div>
+
+        <div class="filter-bar">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small mb-1" for="vioStatus">Status</label>
+                    <select id="vioStatus" class="form-select form-select-sm" onchange="resetViolations()">
+                        <option value="">All</option>
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small mb-1" for="vioSeverity">Severity</label>
+                    <select id="vioSeverity" class="form-select form-select-sm" onchange="resetViolations()">
+                        <option value="">All</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="col-md-8 d-flex gap-2 justify-content-end flex-wrap">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetViolations()">
+                        <svg class="bi bi-arrow-clockwise me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>Refresh
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportViolations()">
+                        <svg class="bi bi-download me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-download"></use></svg>Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover sx-table mb-0">
+                <thead>
+                    <tr><th>Detected</th><th>User</th><th>Duty Pair</th><th>T-Code</th><th>Severity</th><th>Status</th><th>Description</th><th></th></tr>
+                </thead>
+                <tbody id="vioBody">
+                    <tr><td colspan="8" class="text-center text-muted py-3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted small" id="vioPageInfo"></span>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="vioPrev" onclick="prevViolations()">
+                    <svg class="bi bi-chevron-left me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-left"></use></svg>Prev
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="vioNext" onclick="nextViolations()">
+                    Next<svg class="bi bi-chevron-right ms-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-chevron-right"></use></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="sxChain" role="tabpanel">
+        <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold small mb-1" for="acFrom">From</label>
+                <input type="date" id="acFrom" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold small mb-1" for="acTo">To</label>
+                <input type="date" id="acTo" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-sm btn-primary" id="acVerifyBtn" onclick="verifyChain()">
+                    <svg class="bi bi-patch-check me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-patch-check"></use></svg>Verify
+                </button>
+            </div>
+        </div>
+
+        <div id="acResult" class="d-none">
+            <div class="alert mb-2" id="acBanner"></div>
+            <p class="small text-muted" id="acLength"></p>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover sx-table mb-0">
+                    <thead>
+                        <tr><th>Previous Entry</th><th>Current Entry</th><th>Mismatch Type</th></tr>
+                    </thead>
+                    <tbody id="acBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="acEmpty" class="text-center text-muted py-4">
+            <svg class="bi bi-clock-history display-4" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-clock-history"></use></svg>
+            <p class="mt-2 mb-0">Choose a date range and verify the hash chain of audit entries.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="resolveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Resolve Violation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger py-1 px-2 small d-none" id="resolveError"></div>
+                <p class="small mb-2">Violation <strong id="resolveViolation"></strong></p>
+                <label class="form-label fw-bold small" for="resolveResolution">Resolution <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="resolveResolution" rows="3" oninput="syncResolveButton()" placeholder="How the conflicting duties were remediated..."></textarea>
+                <div class="form-text" id="resolveHint">A non-empty resolution is required to close the violation.</div>
+                <label class="form-label fw-bold small mt-2" for="resolveRootCause">Root Cause</label>
+                <input type="text" class="form-control" id="resolveRootCause" placeholder="Why the duties were combined" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="resolveSubmit" disabled onclick="submitResolve()">Resolve</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var SECURITY_ROLES = ['SUPER_USER', 'ADMIN', 'POWER_USER', 'NORMAL_USER', 'READ_ONLY'];
+    var soxDuties = [];
+    var soxUsers = [];
+    var editingDutyId = null;
+    var vioPage = 1;
+    var vioPageSize = 50;
+    var vioTotal = 0;
+    var resolvingViolationId = null;
+    var resolveModal = null;
+    var dutiesLoaded = false;
+    var usersLoaded = false;
+    var assignmentsLoaded = false;
+    var violationsLoaded = false;
+
+    function esc(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function emptyRow(colspan, message) {
+        return '<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">' + esc(message) + '</td></tr>';
+    }
+
+    function fmtDate(value) {
+        if (!value) return '';
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return String(value);
+        return d.toLocaleString();
+    }
+
+    function showAlert(message, success) {
+        var box = document.getElementById('pageAlert');
+        document.getElementById('pageAlertText').textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+        if (success) {
+            window.clearTimeout(showAlert._timer);
+            showAlert._timer = window.setTimeout(function () { box.classList.add('d-none'); }, 5000);
+        }
+    }
+
+    function setFeedback(id, message, success) {
+        var box = document.getElementById(id);
+        if (!message) {
+            box.classList.add('d-none');
+            return;
+        }
+        box.textContent = message;
+        box.classList.remove('alert-danger', 'alert-success');
+        box.classList.add(success ? 'alert-success' : 'alert-danger');
+        box.classList.remove('d-none');
+    }
+
+    function setBoxError(id, message) {
+        var box = document.getElementById(id);
+        if (!message) {
+            box.classList.add('d-none');
+            box.textContent = '';
+            return;
+        }
+        box.textContent = message;
+        box.classList.remove('d-none');
+    }
+
+    async function apiFetch(url, options) {
+        var res = await fetch(url, Object.assign({ credentials: 'same-origin' }, options || {}));
+        var body = null;
+        try { body = await res.json(); } catch (e) { body = null; }
+        if (!res.ok) {
+            var detail = body ? (body.detail || body.error || body.message || body.title) : null;
+            var error = new Error(detail || ('Request failed with status ' + res.status));
+            error.status = res.status;
+            throw error;
+        }
+        return body;
+    }
+
+    async function loadSummary() {
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/sox/summary');
+            document.getElementById('sumDuties').textContent = (data && data.duties) !== undefined ? data.duties : '--';
+            document.getElementById('sumActive').textContent = (data && data.activeDuties) !== undefined ? data.activeDuties : '--';
+            document.getElementById('sumAssignments').textContent = (data && data.assignments) !== undefined ? data.assignments : '--';
+            document.getElementById('sumOpen').textContent = (data && data.openViolations) !== undefined ? data.openViolations : '--';
+            document.getElementById('sumOpenHigh').textContent = (data && data.openHigh) !== undefined ? data.openHigh : '--';
+            document.getElementById('sumResolved').textContent = (data && data.resolved) !== undefined ? data.resolved : '--';
+            document.getElementById('sumEmpty').classList.add('d-none');
+        } catch (e) {
+            ['sumDuties', 'sumActive', 'sumAssignments', 'sumOpen', 'sumOpenHigh', 'sumResolved'].forEach(function (id) {
+                document.getElementById(id).textContent = '--';
+            });
+            document.getElementById('sumEmpty').classList.remove('d-none');
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    async function loadDuties() {
+        var body = document.getElementById('dtyBody');
+        body.innerHTML = emptyRow(9, 'Loading...');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var includeInactive = document.getElementById('dtyIncludeInactive').checked;
+            var data = await apiFetch('/api/v1/sox/duties?includeInactive=' + (includeInactive ? 'true' : 'false'));
+            soxDuties = Array.isArray(data) ? data : [];
+            dutiesLoaded = true;
+            renderDuties();
+            fillDutySelects();
+        } catch (e) {
+            body.innerHTML = emptyRow(9, 'Duties could not be loaded.');
+            document.getElementById('dtyCount').textContent = '';
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function renderDuties() {
+        var body = document.getElementById('dtyBody');
+        document.getElementById('dtyCount').textContent = soxDuties.length + ' duties';
+        if (!soxDuties.length) {
+            body.innerHTML = emptyRow(9, 'No duties defined yet. Use New duty to create the first one.');
+            return;
+        }
+        var html = '';
+        soxDuties.forEach(function (d, idx) {
+            var conflicts = '';
+            (Array.isArray(d.conflictDuties) ? d.conflictDuties : []).forEach(function (c) {
+                conflicts += '<span class="sx-chip">' + esc(c) + '</span>';
+            });
+            if (!conflicts) conflicts = '<span class="text-muted">&mdash;</span>';
+            html += '<tr>' +
+                '<td><code class="fw-bold">' + esc(d.dutyCode) + '</code></td>' +
+                '<td>' + esc(d.dutyName) + '</td>' +
+                '<td><span class="badge bg-light text-dark border">' + esc(d.module) + '</span></td>' +
+                '<td><code>' + esc(d.transactionCode) + '</code></td>' +
+                '<td><span class="badge bg-secondary">' + esc(d.actionType) + '</span></td>' +
+                '<td>' + esc(d.minApprovers) + '</td>' +
+                '<td class="small">' + conflicts + '</td>' +
+                '<td>' + (d.isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>') + '</td>' +
+                '<td class="text-nowrap text-end">' +
+                    '<button type="button" class="btn btn-sm btn-outline-primary" onclick="editDuty(' + idx + ')" title="Edit"><svg class="bi bi-pencil" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-pencil"></use></svg></button> ' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDuty(' + idx + ')" title="Delete"><svg class="bi bi-trash" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-trash"></use></svg></button>' +
+                '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function fillDutySelects() {
+        var conflictSelect = document.getElementById('dfConflicts');
+        var previousConflicts = selectedValues(conflictSelect);
+        var html = '';
+        soxDuties.forEach(function (d) { html += '<option value="' + esc(d.dutyCode) + '">' + esc(d.dutyCode) + ' — ' + esc(d.dutyName) + '</option>'; });
+        conflictSelect.innerHTML = html;
+        restoreSelection(conflictSelect, previousConflicts);
+
+        var roleSelect = document.getElementById('dfRoles');
+        var previousRoles = selectedValues(roleSelect);
+        var roleHtml = '';
+        SECURITY_ROLES.forEach(function (r) { roleHtml += '<option value="' + esc(r) + '">' + esc(r) + '</option>'; });
+        roleSelect.innerHTML = roleHtml;
+        restoreSelection(roleSelect, previousRoles);
+
+        var assignDuty = document.getElementById('asgFormDuty');
+        var currentAssignDuty = assignDuty.value;
+        var assignHtml = '<option value="">Select duty</option>';
+        soxDuties.forEach(function (d) { assignHtml += '<option value="' + esc(d.dutyCode) + '">' + esc(d.dutyCode) + ' — ' + esc(d.dutyName) + '</option>'; });
+        assignDuty.innerHTML = assignHtml;
+        if (currentAssignDuty) assignDuty.value = currentAssignDuty;
+    }
+
+    function selectedValues(select) {
+        var values = [];
+        Array.prototype.forEach.call(select.options, function (option) { if (option.selected) values.push(option.value); });
+        return values;
+    }
+
+    function restoreSelection(select, values) {
+        Array.prototype.forEach.call(select.options, function (option) {
+            option.selected = values.indexOf(option.value) >= 0;
+        });
+    }
+
+    function toggleDutyForm() {
+        var card = document.getElementById('dutyFormCard');
+        if (card.classList.contains('d-none')) {
+            resetDutyForm();
+            card.classList.remove('d-none');
+            document.getElementById('dfCode').focus();
+        } else {
+            card.classList.add('d-none');
+        }
+    }
+
+    function resetDutyForm() {
+        editingDutyId = null;
+        document.getElementById('dfCode').value = '';
+        document.getElementById('dfCode').disabled = false;
+        document.getElementById('dfName').value = '';
+        document.getElementById('dfModule').value = '';
+        document.getElementById('dfTcode').value = '';
+        document.getElementById('dfAction').selectedIndex = 0;
+        document.getElementById('dfMinApprovers').value = 1;
+        document.getElementById('dfDescription').value = '';
+        document.getElementById('dfIsActive').checked = true;
+        Array.prototype.forEach.call(document.getElementById('dfConflicts').options, function (o) { o.selected = false; });
+        Array.prototype.forEach.call(document.getElementById('dfRoles').options, function (o) { o.selected = false; });
+        document.getElementById('dutyFormTitle').textContent = 'New duty';
+        setBoxError('dutyFormError', '');
+    }
+
+    function cancelDutyEdit() {
+        resetDutyForm();
+        document.getElementById('dutyFormCard').classList.add('d-none');
+    }
+
+    function editDuty(index) {
+        var duty = soxDuties[index];
+        if (!duty) return;
+        editingDutyId = duty.id;
+        document.getElementById('dutyFormCard').classList.remove('d-none');
+        document.getElementById('dutyFormTitle').textContent = 'Edit duty';
+        document.getElementById('dfCode').value = duty.dutyCode || '';
+        document.getElementById('dfCode').disabled = true;
+        document.getElementById('dfName').value = duty.dutyName || '';
+        document.getElementById('dfModule').value = duty.module || '';
+        document.getElementById('dfTcode').value = duty.transactionCode || '';
+        document.getElementById('dfAction').value = duty.actionType || 'CREATE';
+        document.getElementById('dfMinApprovers').value = duty.minApprovers !== undefined ? duty.minApprovers : 1;
+        document.getElementById('dfDescription').value = duty.description || '';
+        document.getElementById('dfIsActive').checked = duty.isActive !== false;
+        restoreSelection(document.getElementById('dfConflicts'), Array.isArray(duty.conflictDuties) ? duty.conflictDuties : []);
+        restoreSelection(document.getElementById('dfRoles'), Array.isArray(duty.requiredRoles) ? duty.requiredRoles : []);
+        setBoxError('dutyFormError', '');
+        document.getElementById('dfName').focus();
+    }
+
+    async function saveDuty() {
+        setBoxError('dutyFormError', '');
+        var code = document.getElementById('dfCode').value.trim();
+        var name = document.getElementById('dfName').value.trim();
+        if (!code || !name) {
+            setBoxError('dutyFormError', 'Duty code and name are required.');
+            return;
+        }
+        var payload = {
+            dutyCode: code,
+            dutyName: name,
+            description: document.getElementById('dfDescription').value.trim(),
+            module: document.getElementById('dfModule').value.trim(),
+            transactionCode: document.getElementById('dfTcode').value.trim(),
+            actionType: document.getElementById('dfAction').value,
+            minApprovers: parseInt(document.getElementById('dfMinApprovers').value, 10) || 0,
+            requiredRoles: selectedValues(document.getElementById('dfRoles')),
+            conflictDuties: selectedValues(document.getElementById('dfConflicts')),
+            isActive: document.getElementById('dfIsActive').checked
+        };
+        try {
+            if (editingDutyId) {
+                await apiFetch('/api/v1/sox/duties/' + encodeURIComponent(editingDutyId), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                setFeedback('dtyFeedback', 'Duty updated.', true);
+            } else {
+                await apiFetch('/api/v1/sox/duties', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                setFeedback('dtyFeedback', 'Duty created.', true);
+            }
+            cancelDutyEdit();
+            await loadDuties();
+        } catch (e) {
+            setBoxError('dutyFormError', e.message);
+        }
+    }
+
+    async function deleteDuty(index) {
+        var duty = soxDuties[index];
+        if (!duty) return;
+        if (!confirm('Delete duty ' + (duty.dutyCode || '') + '?')) return;
+        try {
+            await apiFetch('/api/v1/sox/duties/' + encodeURIComponent(duty.id), { method: 'DELETE' });
+            setFeedback('dtyFeedback', 'Duty deleted.', true);
+            await loadDuties();
+        } catch (e) {
+            showAlert(e.message);
+        }
+    }
+
+    async function loadSoxUsers() {
+        if (usersLoaded && soxUsers.length) return soxUsers;
+        try {
+            var data = await apiFetch('/api/v1/sox/users');
+            soxUsers = (data && Array.isArray(data.users)) ? data.users : [];
+            usersLoaded = true;
+            var filter = document.getElementById('asgUserFilter');
+            var formUser = document.getElementById('asgFormUser');
+            var currentFilter = filter.value;
+            var currentUser = formUser.value;
+            var html = '<option value="">All users</option>';
+            var formHtml = '<option value="">Select user</option>';
+            soxUsers.forEach(function (u) {
+                html += '<option value="' + esc(u.userId) + '">' + esc(u.userName) + '</option>';
+                formHtml += '<option value="' + esc(u.userId) + '">' + esc(u.userName) + ' — ' + esc(u.role) + '</option>';
+            });
+            filter.innerHTML = html;
+            formUser.innerHTML = formHtml;
+            if (currentFilter) filter.value = currentFilter;
+            if (currentUser) formUser.value = currentUser;
+            return soxUsers;
+        } catch (e) {
+            showAlert(e.message);
+            return [];
+        }
+    }
+
+    async function loadAssignments() {
+        var body = document.getElementById('asgBody');
+        body.innerHTML = emptyRow(8, 'Loading...');
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var url = '/api/v1/sox/assignments?activeOnly=' + (document.getElementById('asgActiveOnly').checked ? 'true' : 'false');
+            var user = document.getElementById('asgUserFilter').value;
+            if (user) url += '&userId=' + encodeURIComponent(user);
+            var data = await apiFetch(url);
+            var items = Array.isArray(data) ? data : [];
+            assignmentsLoaded = true;
+            renderAssignments(items);
+        } catch (e) {
+            body.innerHTML = emptyRow(8, 'Assignments could not be loaded.');
+            showAlert(e.message);
+        } finally {
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    function renderAssignments(items) {
+        var body = document.getElementById('asgBody');
+        if (!items.length) {
+            body.innerHTML = emptyRow(8, 'No duty assignments match the current filter.');
+            return;
+        }
+        var html = '';
+        items.forEach(function (a) {
+            var sourceCls = a.source === 'TCode' ? 'bg-info' : 'bg-primary';
+            html += '<tr>' +
+                '<td>' + esc(a.userName) + '</td>' +
+                '<td><span class="badge bg-secondary">' + esc(a.role) + '</span></td>' +
+                '<td>' + esc(a.dutyCode) + ' <span class="text-muted small">' + esc(a.dutyName) + '</span></td>' +
+                '<td><span class="badge ' + sourceCls + '">' + esc(a.source || 'Explicit') + '</span></td>' +
+                '<td class="small text-nowrap">' + esc(fmtDate(a.assignedAt) || '-') + '</td>' +
+                '<td class="small">' + esc(a.assignedBy) + '</td>' +
+                '<td class="small text-muted">' + esc(a.notes) + '</td>' +
+                '<td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" onclick="revokeAssignment(\'' + esc(a.id) + '\')">Revoke</button></td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    async function assignDuty() {
+        setBoxError('asgFormError', '');
+        var userId = document.getElementById('asgFormUser').value;
+        var dutyCode = document.getElementById('asgFormDuty').value;
+        if (!userId || !dutyCode) {
+            setBoxError('asgFormError', 'Select a user and a duty.');
+            return;
+        }
+        try {
+            var data = await apiFetch('/api/v1/sox/assignments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId, dutyCode: dutyCode, notes: document.getElementById('asgFormNotes').value.trim() })
+            });
+            if (data && data.success === false) {
+                setBoxError('asgFormError', data.message || 'Assignment was rejected.');
+                return;
+            }
+            document.getElementById('asgFormNotes').value = '';
+            showAlert((data && data.message) || 'Duty assigned.', true);
+            loadSummary();
+            loadAssignments();
+        } catch (e) {
+            setBoxError('asgFormError', e.message);
+        }
+    }
+
+    async function revokeAssignment(id) {
+        if (!confirm('Revoke this duty assignment?')) return;
+        try {
+            var data = await apiFetch('/api/v1/sox/assignments/' + encodeURIComponent(id), { method: 'DELETE' });
+            showAlert((data && data.message) || 'Assignment revoked.', true);
+            loadSummary();
+            loadAssignments();
+        } catch (e) {
+            showAlert(e.message);
+        }
+    }
+
+    async function runScan() {
+        var button = document.getElementById('scanBtn');
+        button.disabled = true;
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/sox/scan', { method: 'POST' });
+            var scanned = (data && data.usersScanned) || 0;
+            var fresh = (data && data.newViolations) || 0;
+            var skipped = (data && data.existingSkipped) || 0;
+            setFeedback('scanBanner', 'Scanned ' + scanned + ' users · ' + fresh + ' new violations · ' + skipped + ' already recorded — ' + fmtDate(data && data.scannedAt), true);
+            loadSummary();
+            loadViolations();
+        } catch (e) {
+            setFeedback('scanBanner', e.message, false);
+        } finally {
+            button.disabled = false;
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    async function loadViolations() {
+        var body = document.getElementById('vioBody');
+        body.innerHTML = emptyRow(8, 'Loading...');
+        try {
+            var url = '/api/v1/sox/violations?page=' + vioPage + '&pageSize=' + vioPageSize;
+            var status = document.getElementById('vioStatus').value;
+            url += '&status=' + encodeURIComponent(status);
+            var severity = document.getElementById('vioSeverity').value;
+            if (severity) url += '&severity=' + encodeURIComponent(severity);
+            var data = await apiFetch(url);
+            var violations = (data && Array.isArray(data.violations)) ? data.violations : [];
+            vioTotal = (data && typeof data.totalCount === 'number') ? data.totalCount : violations.length;
+            violationsLoaded = true;
+            renderViolations(violations);
+            updateViolationPagination();
+        } catch (e) {
+            body.innerHTML = emptyRow(8, 'Violations could not be loaded.');
+            document.getElementById('vioPageInfo').textContent = '';
+            document.getElementById('vioPrev').disabled = true;
+            document.getElementById('vioNext').disabled = true;
+            showAlert(e.message);
+        }
+    }
+
+    function severityBadge(severity) {
+        var cls = 'bg-secondary';
+        if (severity === 'High') cls = 'bg-danger';
+        else if (severity === 'Medium') cls = 'bg-warning text-dark';
+        return '<span class="badge ' + cls + '">' + esc(severity || 'Unknown') + '</span>';
+    }
+
+    function violationStatusBadge(status) {
+        var cls = 'bg-secondary';
+        if (status === 'Open') cls = 'bg-warning text-dark';
+        else if (status === 'Resolved') cls = 'bg-success';
+        return '<span class="badge ' + cls + '">' + esc(status || 'Unknown') + '</span>';
+    }
+
+    function truncate(value, length) {
+        var text = value === null || value === undefined ? '' : String(value);
+        if (text.length <= length) return esc(text);
+        return esc(text.substring(0, length)) + '&hellip;';
+    }
+
+    function renderViolations(violations) {
+        var body = document.getElementById('vioBody');
+        if (!violations.length) {
+            body.innerHTML = emptyRow(8, 'No violations match the current filter.');
+            return;
+        }
+        var html = '';
+        violations.forEach(function (v) {
+            var pair = '';
+            if (v.dutyCode1 || v.dutyCode2) pair = esc(v.dutyCode1) + ' &#8596; ' + esc(v.dutyCode2);
+            else pair = '<code>' + esc(v.ruleCode) + '</code>';
+            var actions = '';
+            if (v.status === 'Open') {
+                actions = '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openResolve(\'' + esc(v.violationId) + '\', \'' + esc(v.ruleCode) + '\')">Resolve</button>';
+            }
+            html += '<tr>' +
+                '<td class="small text-nowrap">' + esc(fmtDate(v.detectedDate) || '-') + '</td>' +
+                '<td>' + esc(v.userName) + '</td>' +
+                '<td class="small">' + pair + '</td>' +
+                '<td class="small"><code>' + (v.transactionCode || v.tcode ? esc(v.transactionCode || v.tcode) : '&mdash;') + '</code></td>' +
+                '<td>' + severityBadge(v.severity) + '</td>' +
+                '<td>' + violationStatusBadge(v.status) + '</td>' +
+                '<td class="small"><span title="' + esc(v.description) + '">' + truncate(v.description, 80) + '</span></td>' +
+                '<td class="text-end">' + actions + '</td>' +
+                '</tr>';
+        });
+        body.innerHTML = html;
+    }
+
+    function updateViolationPagination() {
+        var pages = Math.max(1, Math.ceil(vioTotal / vioPageSize));
+        document.getElementById('vioPageInfo').textContent = 'Page ' + vioPage + ' of ' + pages + ' · ' + vioTotal + ' violations';
+        document.getElementById('vioPrev').disabled = vioPage <= 1;
+        document.getElementById('vioNext').disabled = vioPage >= pages;
+    }
+
+    function resetViolations() {
+        vioPage = 1;
+        loadViolations();
+    }
+
+    function prevViolations() {
+        if (vioPage > 1) { vioPage--; loadViolations(); }
+    }
+
+    function nextViolations() {
+        var pages = Math.max(1, Math.ceil(vioTotal / vioPageSize));
+        if (vioPage < pages) { vioPage++; loadViolations(); }
+    }
+
+    async function exportViolations() {
+        try {
+            var url = '/api/v1/sox/violations/export?';
+            var status = document.getElementById('vioStatus').value;
+            if (status) url += 'status=' + encodeURIComponent(status) + '&';
+            var severity = document.getElementById('vioSeverity').value;
+            if (severity) url += 'severity=' + encodeURIComponent(severity) + '&';
+            var r = await fetch(url, { credentials: 'same-origin' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            var blob = await r.blob();
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sox-violations-' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+        } catch (e) {
+            showAlert('Export failed: ' + e.message);
+        }
+    }
+
+    function openResolve(violationId, ruleCode) {
+        resolvingViolationId = violationId;
+        document.getElementById('resolveViolation').textContent = ruleCode || violationId;
+        document.getElementById('resolveResolution').value = '';
+        document.getElementById('resolveRootCause').value = '';
+        document.getElementById('resolveSubmit').disabled = true;
+        setBoxError('resolveError', '');
+        resolveModal.show();
+    }
+
+    function syncResolveButton() {
+        var text = document.getElementById('resolveResolution').value;
+        document.getElementById('resolveSubmit').disabled = text.trim().length === 0;
+    }
+
+    async function submitResolve() {
+        if (!resolvingViolationId) return;
+        var resolution = document.getElementById('resolveResolution').value.trim();
+        if (!resolution) return;
+        var button = document.getElementById('resolveSubmit');
+        button.disabled = true;
+        try {
+            await apiFetch('/api/v1/sox/violations/' + encodeURIComponent(resolvingViolationId) + '/resolve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolution: resolution, rootCause: document.getElementById('resolveRootCause').value.trim() })
+            });
+            resolveModal.hide();
+            showAlert('Violation resolved.', true);
+            loadSummary();
+            loadViolations();
+        } catch (e) {
+            setBoxError('resolveError', e.message);
+            button.disabled = false;
+        }
+    }
+
+    async function verifyChain() {
+        var from = document.getElementById('acFrom').value;
+        var to = document.getElementById('acTo').value;
+        if (!from || !to) {
+            showAlert('Select both a from and a to date.');
+            return;
+        }
+        var button = document.getElementById('acVerifyBtn');
+        button.disabled = true;
+        document.getElementById('pageSpinner').classList.remove('d-none');
+        try {
+            var data = await apiFetch('/api/v1/sox/audit-chain?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to));
+            var valid = !!(data && data.chainValid);
+            var broken = (data && typeof data.brokenLinks === 'number') ? data.brokenLinks : 0;
+            var banner = document.getElementById('acBanner');
+            banner.textContent = valid
+                ? 'Chain valid \u2713'
+                : 'Chain INVALID \u2717 (' + broken + ' broken links)';
+            banner.className = 'alert mb-2 ' + (valid ? 'alert-success' : 'alert-danger');
+            document.getElementById('acLength').textContent = 'Chain length: ' + ((data && data.chainLength) || 0) + ' entries checked.';
+            var details = (data && Array.isArray(data.brokenLinksDetails)) ? data.brokenLinksDetails : [];
+            var body = document.getElementById('acBody');
+            if (!details.length) {
+                body.innerHTML = emptyRow(3, 'No broken links found in this range.');
+            } else {
+                var html = '';
+                details.forEach(function (link) {
+                    html += '<tr>' +
+                        '<td><code class="small">' + esc(link.previousEntryId) + '</code></td>' +
+                        '<td><code class="small">' + esc(link.currentEntryId) + '</code></td>' +
+                        '<td><span class="badge bg-danger">' + esc(link.mismatchType) + '</span></td>' +
+                        '</tr>';
+                });
+                body.innerHTML = html;
+            }
+            document.getElementById('acResult').classList.remove('d-none');
+            document.getElementById('acEmpty').classList.add('d-none');
+        } catch (e) {
+            showAlert(e.message);
+        } finally {
+            button.disabled = false;
+            document.getElementById('pageSpinner').classList.add('d-none');
+        }
+    }
+
+    document.getElementById('sxTabs').addEventListener('shown.bs.tab', function (e) {
+        var href = e.target.getAttribute('href');
+        if (href === '#sxDuties') {
+            if (!dutiesLoaded) loadDuties();
+        }
+        if (href === '#sxAssignments') {
+            loadSoxUsers().then(function () {
+                if (!dutiesLoaded) loadDuties();
+                if (!assignmentsLoaded) loadAssignments();
+            });
+        }
+        if (href === '#sxScan') {
+            if (!violationsLoaded) loadViolations();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        resolveModal = new bootstrap.Modal(document.getElementById('resolveModal'));
+        var today = new Date();
+        var from = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        document.getElementById('acFrom').value = from.toISOString().slice(0, 10);
+        document.getElementById('acTo').value = today.toISOString().slice(0, 10);
+        loadSummary();
+        loadDuties();
+        loadSoxUsers();
+    });
+</script>
