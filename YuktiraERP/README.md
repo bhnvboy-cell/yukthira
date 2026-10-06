@@ -49,17 +49,81 @@ Then open **http://localhost:5001** and login with:
     ├── architecture.md             Architecture overview
     ├── api-reference.md            REST API reference
     ├── user-guide.md               Full user guide
-    └── plugin-development.md       Plugin SDK & hooks guide
+    ├── plugin-development.md       Plugin SDK & hooks guide
+    └── screenshots/                Application screenshots (PNG)
 ```
 
 ---
 
 ## Screenshots
 
-*Visuals for the screens below are available in the live demo environment.*
+*All images below were captured from the running application (Web UI, port 5001) and are stored in [`docs/screenshots/`](docs/screenshots/).*
 
 ### Dashboard
+
+![Dashboard — KPI widgets and real-time activity feed](docs/screenshots/dashboard.png)
+
+![Dashboard — global module search](docs/screenshots/dashboard-search.png)
+
 Multi-widget KPI dashboard: open POs, pending approvals, monthly revenue (chart), stock overview, quality alerts, production status. Role-based widget visibility. System widgets pre-seeded (OPEN_PO, PENDING_APPROVALS, MONTHLY_REVENUE, STOCK_OVERVIEW, QUALITY_ALERTS, PRODUCTION_STATUS).
+
+### Module Screens
+
+**Materials Management (MM)** — material master, MRP views, stock & valuation
+
+![Materials Management](docs/screenshots/materials-management.png)
+
+**Sales & Distribution (SD)** — sales orders, deliveries, billing
+
+![Sales & Distribution](docs/screenshots/sales-distribution.png)
+
+**Warehouse Management (WM)** — bins, transfers, putaway & picking
+
+![Warehouse Management](docs/screenshots/warehouse-management.png)
+
+**Production Planning (PP)** — production orders, routing, capacity
+
+![Production Planning](docs/screenshots/production-planning.png)
+
+**Quality Management (QM)** — inspection lots, results, usage decision
+
+![Quality Management](docs/screenshots/quality-management.png)
+
+**Plant Maintenance (PM)** — maintenance orders, plans, notifications
+
+![Plant Maintenance](docs/screenshots/plant-maintenance.png)
+
+**Controlling (CO)** — cost elements, profit centers, internal orders
+
+![Controlling](docs/screenshots/controlling.png)
+
+**Human Resources (HR)** — employee master, org, attendance, payroll
+
+![Human Resources](docs/screenshots/human-resources.png)
+
+**AI & Machine Learning Suite** — vision inspection gate with anomaly scoring
+
+![AI & Machine Learning Suite](docs/screenshots/ai-ml-vision-inspection.png)
+
+**Customer Complaint & Return Order (CRRETURN)** — complaints, returns, quality & financial tabs
+
+![Customer Complaint & Return Order](docs/screenshots/customer-complaint-return.png)
+
+**RF Scanner Menu (RFSCAN)** — handheld session menu, scan & task queues
+
+![RF Scanner Menu](docs/screenshots/rf-scanner.png)
+
+**Wave Pick Management (WAVEPK)** — wave creation, release, pick assignment
+
+![Wave Pick Management](docs/screenshots/wave-pick-management.png)
+
+**SOX Compliance Administration (SOXADM)** — SoD duties, assignments, violations, audit trail
+
+![SOX Compliance Administration](docs/screenshots/sox-compliance.png)
+
+**Administration** — users, roles, tenants, plugins, system config, dynamic dashboard & workflow designer tiles
+
+![Administration](docs/screenshots/administration.png)
 
 ### Workflow Designer
 BPMN-style node editor with Start → Approval → Task → Decision → Email → End pipeline. Node types: START, TASK, APPROVAL, DECISION, TIMER, API_CALL, EMAIL, SMS, CONDITION, END. Conditional edges with expression evaluation. DB-backed persistence via `yuktira_workflow` schema.
@@ -67,8 +131,14 @@ BPMN-style node editor with Start → Approval → Task → Decision → Email �
 ### MRP Screen
 Material requirements planning grid: BOM explosion across finished goods → sub-assemblies → raw materials. Shortage alerts, planned orders, safety stock calculation, capacity load view. Single-click convert planned orders to production/release POs.
 
+**MRP Event Monitor** — event-driven MRP (v2.3.0): publish material events, inspect the live event stream, pending/processed counters, and trigger MRP runs.
+
+![MRP Event Monitor](docs/screenshots/mrp-event-monitor.png)
+
 ### Plugin Marketplace
 Plugin registry with per-tenant enable/disable. Currently ships with AdvancedQC (SPC charts, control charts, auto COA), DairyExtension (milk collection, fat/SNF testing, procurement), ExtraReports (profitability, variance, executive summary). API endpoints: `GET /api/v1/plugins`, `POST /api/v1/plugins/{code}/install`.
+
+![Plugin registry](docs/screenshots/plugins.png)
 
 ### Transaction Code Sidebar
 107 SAP-style codes (MM01, VA01, FB50, MIRO, PS01, PM01, etc.) organized by module with search, favorites, and role-based visibility. Enter-key triggers direct API execution fallback when debounced search results aren't ready. Includes the PS/PM module codes (PS01–PS04, PM01–PM04). All creation forms now use standardized transaction codes: MM01 (material), FK01 (vendor), ME21N (PO), VA01 (SO), XD01 (customer), QA01 (inspection lot), QA32 (results), CO01 (production order), FB60 (AP), FB70 (AR), AS01 (asset), OX09 (storage location).
