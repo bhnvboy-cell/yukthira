@@ -224,8 +224,8 @@ public class CustomerComplaintReturnService : ICustomerComplaintReturnService
                                 request.RootCause?.Contains("vendor", StringComparison.OrdinalIgnoreCase) == true;
 
         // Update complaint
-        complaint.RootCause = request.RootCause;
-        complaint.RootCauseCode = request.RootCauseCode;
+        complaint.RootCause = request.RootCause ?? "";
+        complaint.RootCauseCode = request.RootCauseCode ?? "";
         complaint.InspectionCompletedDate = DateTime.UtcNow;
         complaint.Status = "INSPECTION_COMPLETED";
         complaint.CurrentStep = "CR-03";
@@ -249,7 +249,7 @@ public class CustomerComplaintReturnService : ICustomerComplaintReturnService
                 ? $"Root cause traced to supplier batch {complaint.SupplierBatchNumber}. Supplier claim required."
                 : $"Root cause analysis completed: {request.RootCause}",
             InspectionReturnId = inspection.Id,
-            RootCause = request.RootCause,
+            RootCause = request.RootCause ?? "",
             DefectCode = request.DefectCode,
             IsSupplierDefect = isSupplierDefect
         };

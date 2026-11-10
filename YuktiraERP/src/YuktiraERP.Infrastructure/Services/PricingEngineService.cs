@@ -49,7 +49,7 @@ public class PricingEngineService : IPricingEngineService
 
         decimal basePrice = context.BaseUnitPrice > 0
             ? context.BaseUnitPrice
-            : EvaluateConditionAmount(basePriceCondition, context.Quantity);
+            : (basePriceCondition != null ? EvaluateConditionAmount(basePriceCondition, context.Quantity) : 0m);
 
         lineResult.BaseAmount = Math.Round(basePrice * context.Quantity, 2);
         runningSubTotal = lineResult.BaseAmount;

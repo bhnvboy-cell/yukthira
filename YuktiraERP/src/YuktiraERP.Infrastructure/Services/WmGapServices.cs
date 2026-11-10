@@ -97,16 +97,24 @@ public class CrossDockService : ICrossDockService
                 .Where(d => d.Status == "Pending" || d.Status == "InTransit")
                 .ToListAsync();
 
-            var matchingDemand = pendingDeliveries.Any();
+            var matchingSalesLines = await _db.SalesOrderLines
+                .Where(s => s.MaterialName == request.MaterialCode)
+                .ToListAsync();
 
-            var eligible = request.Quantity > 0 && matchingDemand;
+            var matchingDemandQty = matchingSalesLines.Sum(s => s.Quantity);
+            var eligible = request.Quantity > 0 && (matchingDemandQty > 0 || pendingDeliveries.Any());
+
+            var laneChar = (char)('A' + (Math.Abs(request.MaterialCode.GetHashCode()) % 4));
+            var gateNum = (Math.Abs(request.MaterialCode.GetHashCode()) % 6) + 1;
+            var assignedBin = eligible ? $"XDOCK-{laneChar}{gateNum}" : null;
+            var matchQty = eligible ? Math.Min(request.Quantity, matchingDemandQty > 0 ? matchingDemandQty : request.Quantity) : 0m;
 
             return new CrossDockResult
             {
                 Success = true,
                 EligibleForCrossDock = eligible,
-                AssignedBin = eligible ? "XDOCK-001" : null,
-                DemandMatchQuantity = eligible ? Math.Min(request.Quantity, request.Quantity) : 0
+                AssignedBin = assignedBin,
+                DemandMatchQuantity = matchQty
             };
         }
         catch (Exception ex)

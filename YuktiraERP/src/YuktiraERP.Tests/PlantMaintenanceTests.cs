@@ -218,7 +218,7 @@ public class PlantMaintenanceTests
 
         var refreshedOrder = await db.MaintenanceOrders.FindAsync(order.Id);
         Assert.Equal("TECO", refreshedOrder!.Status);
-        Assert.NotNull(refreshedOrder.CompletedDate);
+        Assert.NotEqual(default, refreshedOrder.CompletedDate);
     }
 
     // ════════════════════════════════════════════════════════════════

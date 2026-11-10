@@ -53,6 +53,7 @@
 
     <!-- ── Queue ── -->
     <div class="tab-pane fade" id="queue">
+        <button class="btn btn-outline-success btn-sm mb-3 me-2" onclick="showEnqueueModal()"><svg class="bi bi-plus" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-plus"></use></svg> Enqueue Message</button>
         <button class="btn btn-outline-primary btn-sm mb-3" onclick="processQueue()"><svg class="bi bi-play" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-play"></use></svg> Process Queue</button>
         <table class="table table-hover table-sm"><thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Retries</th><th>Target</th><th>Error</th><th>Created</th></tr></thead><tbody id="queueBody"></tbody></table>
         <h6 class="mt-3">Dead Letter Queue</h6>
@@ -156,6 +157,20 @@
         <p class="text-warning small">Save these credentials — secret won't be shown again</p>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button></div>
+</div></div></div>
+
+<!-- ── Enqueue Message Modal ── -->
+<div class="modal fade" id="enqueueModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Enqueue Integration Message</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-2"><label class="form-label">Message Type</label><input id="qMsgType" class="form-control" placeholder="e.g. order.sync, inventory.delta" /></div>
+        <div class="mb-2"><label class="form-label">Target System</label><input id="qTargetSys" class="form-control" placeholder="e.g. EXTERNAL_ERP, SAP, SALESFORCE" /></div>
+        <div class="mb-2"><label class="form-label">Payload (JSON)</label><textarea id="qPayload" class="form-control" rows="4" placeholder='{"orderId": "SO-50001", "status": "CONFIRMED"}'></textarea></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveEnqueueMessage()">Enqueue</button>
+    </div>
 </div></div></div>
 
 <script>
@@ -373,9 +388,43 @@
         var dead = await d.json();
         var dh = '';
         dead.forEach(function(q) {
-            dh += '<tr><td>' + q.messageType + '</td><td><small class="text-danger">' + q.errorMessage + '</small></td><td>' + q.retryAttempts + '</td><td><small class="text-muted">' + new Date(q.failedAt).toLocaleString() + '</small></td><td>-</td></tr>';
+            dh += '<tr><td>' + q.messageType + '</td><td><small class="text-danger">' + q.errorMessage + '</small></td><td>' + q.retryAttempts + '</td><td><small class="text-muted">' + new Date(q.failedAt).toLocaleString() + '</small></td><td><button class="btn btn-outline-warning btn-sm" onclick="requeueDeadLetter(\'' + q.id + '\')"><svg class="bi bi-arrow-repeat me-1" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-arrow-repeat"></use></svg>Requeue</button></td></tr>';
         });
         document.getElementById('deadLetterBody').innerHTML = dh || '<tr><td colspan="5" class="text-muted text-center">No dead letters</td></tr>';
+    }
+
+    function showEnqueueModal() {
+        resetModal('enqueueModal', ['qMsgType', 'qTargetSys', 'qPayload']);
+        document.getElementById('qPayload').value = '{\n  "orderId": "SO-50001",\n  "status": "CONFIRMED"\n}';
+        showModal('enqueueModal');
+    }
+
+    async function saveEnqueueMessage() {
+        var msgType = get('qMsgType') || 'order.sync';
+        var targetSys = get('qTargetSys') || 'EXTERNAL_ERP';
+        var payloadRaw = get('qPayload');
+        var payloadObj = {};
+        try { payloadObj = JSON.parse(payloadRaw); } catch(e) { payloadObj = { data: payloadRaw }; }
+        var res = await fetch('/api/v1/integration/queue/enqueue', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageType: msgType, targetSystem: targetSys, payload: payloadObj })
+        });
+        if (res.ok) {
+            hideModal('enqueueModal');
+            loadQueue();
+        } else {
+            alert('Failed to enqueue message');
+        }
+    }
+
+    async function requeueDeadLetter(id) {
+        var res = await fetch('/api/v1/integration/queue/requeue/' + id, { method: 'POST' });
+        if (res.ok) {
+            loadQueue();
+        } else {
+            alert('Failed to requeue message');
+        }
     }
 
     async function processQueue() {

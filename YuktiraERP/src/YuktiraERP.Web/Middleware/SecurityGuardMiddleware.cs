@@ -85,7 +85,7 @@ public class SecurityGuardMiddleware
             context.Response.StatusCode = 403;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(
-                $"{{\"error\":\"Access denied\",\"path\":\"{System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(deniedBy)}\",\"ruleSource\":\"{ruleSource}\",\"reason\":\"{System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(reason)}\"}}");
+                $"{{\"error\":\"Access denied\",\"path\":\"{System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(deniedBy)}\",\"ruleSource\":\"{ruleSource}\",\"reason\":\"{System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(reason ?? "")}\"}}");
             return;
         }
 

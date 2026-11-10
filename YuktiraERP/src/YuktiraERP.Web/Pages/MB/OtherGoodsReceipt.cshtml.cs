@@ -22,7 +22,7 @@ public class OtherGoodsReceiptModel : PageModel
     public int MovementType { get; set; } = 561;
 
     [BindProperty]
-    public OtherReceiptRequest Request { get; set; } = new()
+    public new OtherReceiptRequest Request { get; set; } = new()
     {
         PostingDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
         DocumentDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),

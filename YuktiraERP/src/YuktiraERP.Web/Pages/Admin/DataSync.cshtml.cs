@@ -84,6 +84,14 @@ public class DataSyncModel : PageModel
             Metadata = await _syncService.GetEntityMetadataAsync(parsed);
         }
 
+        if (!module.HasValue)
+        {
+            Message = "Invalid or unselected module. Please select a valid module.";
+            IsError = true;
+            CurrentStep = 1;
+            return Page();
+        }
+
         if (UploadedFile == null || UploadedFile.Length == 0)
         {
             Message = "No file selected. Please choose an .xlsx file.";

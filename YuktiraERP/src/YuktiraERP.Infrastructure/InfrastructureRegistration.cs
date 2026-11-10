@@ -117,6 +117,8 @@ public static class InfrastructureRegistration
             return reg;
         });
         services.AddScoped<IEdiService, EdiService>();
+        services.AddScoped<IFxValuationService, FxValuationService>();
+        services.AddScoped<IFinancialAnomalyService, FinancialAnomalyService>();
         services.AddScoped<IKpiService, KpiService>();
         services.AddScoped<ILiveUpdateService, LiveUpdateService>();
         services.AddScoped<IMrpService, MrpService>();
@@ -241,6 +243,8 @@ public static class InfrastructureRegistration
         services.AddScoped<IMdgService, MdgService>();
         // SPC
         services.AddScoped<ISpcEngineService, SpcEngineService>();
+        // DDMRP Demand-Driven MRP Buffer Engine
+        services.AddScoped<IDdmrpBufferService, DdmrpBufferService>();
 
         // Exchange Rate Sync (background job + providers + status store)
         services.Configure<ExchangeRateSyncOptions>(configuration.GetSection(ExchangeRateSyncOptions.SectionName));

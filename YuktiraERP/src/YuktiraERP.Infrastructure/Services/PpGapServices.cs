@@ -84,9 +84,15 @@ public class CapacityGapService : ICapacityGapService
         }
     }
 
-    public Task<List<CapacitySegmentDto>> GetCapacityOverviewAsync(string workCenterCode, DateTime from, DateTime to, Guid tenantId)
+    public async Task<List<CapacitySegmentDto>> GetCapacityOverviewAsync(string workCenterCode, DateTime from, DateTime to, Guid tenantId)
     {
-        return Task.FromResult(new List<CapacitySegmentDto>());
+        var eval = await EvaluateCapacityAsync(new CapacityEvaluationRequest
+        {
+            WorkCenterCode = workCenterCode,
+            FromDate = from,
+            ToDate = to
+        });
+        return eval.Segments;
     }
 }
 

@@ -28,7 +28,7 @@ public class TransferPostingModel : PageModel
     public string? ToStorageLocation { get; set; }
 
     [BindProperty]
-    public TransferRequest Request { get; set; } = new()
+    public new TransferRequest Request { get; set; } = new()
     {
         PostingDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
         DocumentDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),

@@ -25,7 +25,7 @@ public class PostGoodsIssueModel : PageModel
     public string? CostCenter { get; set; }
 
     [BindProperty]
-    public PostGoodsMovementRequest Request { get; set; } = new()
+    public new PostGoodsMovementRequest Request { get; set; } = new()
     {
         PostingDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
         DocumentDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),

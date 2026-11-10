@@ -122,7 +122,7 @@ public class SpcEngineService : ISpcEngineService
             N = values == null ? 0 : values.Count
         };
 
-        if (subgroup.N == 0) return subgroup;
+        if (values == null || values.Count == 0) return subgroup;
 
         var doubles = new List<double>(subgroup.N);
         foreach (var v in values) doubles.Add((double)v);

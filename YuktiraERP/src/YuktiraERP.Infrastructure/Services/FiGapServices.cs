@@ -69,9 +69,70 @@ public class IntercompanyAccountingService : IIntercompanyAccountingService
         }
     }
 
-    public Task<List<IntercompanyTransactionResult>> ReconcileIntercompanyAsync(string companyCode, int fiscalYear, int period, Guid tenantId)
+    public async Task<List<IntercompanyTransactionResult>> ReconcileIntercompanyAsync(string companyCode, int fiscalYear, int period, Guid tenantId)
     {
-        return Task.FromResult(new List<IntercompanyTransactionResult>());
+        try
+        {
+            var results = new List<IntercompanyTransactionResult>();
+            var entries = await _db.JournalEntries
+                .Where(j => j.Account.StartsWith("IC-Receivable") || j.Account.StartsWith("IC-Payable"))
+                .ToListAsync();
+
+            var receivables = entries.Where(e => e.Account.StartsWith("IC-Receivable")).ToList();
+            var payables = entries.Where(e => e.Account.StartsWith("IC-Payable")).ToList();
+
+            foreach (var rec in receivables)
+            {
+                var counterCode = rec.Account.Replace("IC-Receivable-", "");
+                var recAmount = rec.Debit ?? 0m;
+                var matchingPayable = payables.FirstOrDefault(p => p.Account == $"IC-Payable-{companyCode}" && Math.Abs((p.Credit ?? 0m) - recAmount) < 0.01m);
+
+                if (matchingPayable != null)
+                {
+                    var payAmount = matchingPayable.Credit ?? 0m;
+                    var elimDoc = $"IC-ELIM-{companyCode}-{counterCode}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+                    _db.JournalEntries.Add(new JournalEntryEntity
+                    {
+                        DocumentNumber = elimDoc,
+                        EntryDate = DateTime.UtcNow,
+                        Account = $"IC-Elimination-{companyCode}",
+                        Debit = payAmount,
+                        Credit = recAmount,
+                        Reference = $"Consolidation elimination between {companyCode} and {counterCode}"
+                    });
+
+                    results.Add(new IntercompanyTransactionResult
+                    {
+                        Success = true,
+                        SendingDocumentNumber = rec.DocumentNumber,
+                        ReceivingDocumentNumber = matchingPayable.DocumentNumber,
+                        ExchangeRate = 1.0m,
+                        LocalAmount = recAmount
+                    });
+                }
+                else
+                {
+                    results.Add(new IntercompanyTransactionResult
+                    {
+                        Success = false,
+                        SendingDocumentNumber = rec.DocumentNumber,
+                        LocalAmount = recAmount,
+                        Errors = { $"Unreconciled intercompany balance of {recAmount:C} pending matching payable in company {counterCode}." }
+                    });
+                }
+            }
+
+            await _db.SaveChangesAsync();
+            return results;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "ReconcileIntercompany failed for {Company}", companyCode);
+            return new List<IntercompanyTransactionResult>
+            {
+                new() { Success = false, Errors = { ex.Message } }
+            };
+        }
     }
 }
 

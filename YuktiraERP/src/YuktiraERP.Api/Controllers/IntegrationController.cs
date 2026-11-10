@@ -268,6 +268,14 @@ public class IntegrationController : ControllerBase
         return Ok(await qsvc.GetPendingAsync(GetTenantId()));
     }
 
+    [HttpPost("queue/enqueue")]
+    public async Task<IActionResult> EnqueueMessage([FromBody] EnqueueMessageRequest req)
+    {
+        var qsvc = HttpContext.RequestServices.GetRequiredService<IIntegrationQueueService>();
+        await qsvc.EnqueueAsync(GetTenantId(), req.MessageType, req.Payload, req.TargetSystem ?? "");
+        return Ok(new { message = "Message enqueued successfully", messageType = req.MessageType });
+    }
+
     [HttpPost("queue/process")]
     public async Task<IActionResult> ProcessQueue()
     {
@@ -283,7 +291,73 @@ public class IntegrationController : ControllerBase
         return Ok(await qsvc.GetDeadLetterAsync(GetTenantId()));
     }
 
+    [HttpPost("queue/requeue/{id}")]
+    public async Task<IActionResult> RequeueDeadLetter(Guid id)
+    {
+        var qsvc = HttpContext.RequestServices.GetRequiredService<IIntegrationQueueService>();
+        await qsvc.RequeueDeadLetterAsync(id);
+        return Ok(new { message = "Message requeued successfully", id });
+    }
+
+    // ── Client Validation (Public/Anonymous allowed) ──
+
+    [HttpPost("validate")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ValidateApiClient([FromBody] ValidateApiClientRequest req)
+    {
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+        var isValid = await _hub.ValidateApiClientAsync(req.ClientId, req.ClientSecret, ip);
+        return Ok(new { valid = isValid, clientId = req.ClientId });
+    }
+
+    // ── Event Dispatching ──
+
+    [HttpPost("dispatch")]
+    public async Task<IActionResult> DispatchEvent([FromBody] IntegrationDispatchRequest req)
+    {
+        await _hub.DispatchWebhookEventAsync(new WebhookEvent
+        {
+            TenantId = GetTenantId(),
+            EventType = req.EventType,
+            EntityType = req.EntityType,
+            EntityId = req.EntityId,
+            Payload = req.Payload
+        });
+        return Ok(new { message = "Webhook event dispatched successfully", eventType = req.EventType, entityId = req.EntityId });
+    }
+
     // ── EDI conversion ──
+
+    [HttpPost("edi/convert")]
+    public async Task<IActionResult> ConvertEdi([FromBody] EdiUnifiedConvertRequest req)
+    {
+        try
+        {
+            var svc = HttpContext.RequestServices.GetRequiredService<IEdiService>();
+            var isTargetJson = string.Equals(req.TargetFormat, "JSON", StringComparison.OrdinalIgnoreCase);
+            if (isTargetJson)
+            {
+                var isX12 = string.Equals(req.SourceFormat, "X12", StringComparison.OrdinalIgnoreCase);
+                var parsed = isX12
+                    ? await svc.ParseX12Async(req.EdiContent ?? "")
+                    : await svc.ParseEdifactAsync(req.EdiContent ?? "");
+                return Ok(new { sourceFormat = req.SourceFormat, targetFormat = req.TargetFormat, result = parsed });
+            }
+            else
+            {
+                var isX12 = string.Equals(req.TargetFormat, "X12", StringComparison.OrdinalIgnoreCase);
+                var docType = string.IsNullOrWhiteSpace(req.DocumentType) ? "ORDERS" : req.DocumentType;
+                var output = isX12
+                    ? await svc.ConvertToX12Async(req.EdiContent ?? "{}", docType)
+                    : await svc.ConvertToEdifactAsync(req.EdiContent ?? "{}", docType);
+                return Ok(new { sourceFormat = req.SourceFormat, targetFormat = req.TargetFormat, content = output });
+            }
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 
     [HttpPost("edi/convert/edifact")]
     public async Task<IActionResult> ConvertToEdifact([FromBody] EdiConversionRequest req)
@@ -309,11 +383,24 @@ public class IntegrationController : ControllerBase
         catch (ArgumentException ex) { return BadRequest(new { error = ex.Message }); }
     }
 
-    private Guid GetTenantId() =>
-        Guid.TryParse(User.FindFirst("TenantId")?.Value, out var tid) ? tid : Guid.Empty;
+    private Guid GetTenantId()
+    {
+        if (Guid.TryParse(User.FindFirst("TenantId")?.Value, out var tid) && tid != Guid.Empty)
+            return tid;
+        if (HttpContext.Items.TryGetValue("TenantId", out var itemVal) && itemVal is Guid gid && gid != Guid.Empty)
+            return gid;
+        if (itemVal is string strVal && Guid.TryParse(strVal, out var parsedGid) && parsedGid != Guid.Empty)
+            return parsedGid;
+        var fallback = _db.Tenants.Select(t => t.Id).FirstOrDefault();
+        return fallback != Guid.Empty ? fallback : Guid.Empty;
+    }
 }
 
-public record CreateWebhookRequest(string Name, string EventType, string TargetUrl, string? SecretKey);
+public record CreateWebhookRequest(string Name, string EventType, string TargetUrl, string? SecretKey = null);
 public record CreateApiClientRequest(string Name, string[]? AllowedIpAddresses);
 public record EdiConversionRequest(string DocumentType, object Data);
 public record EdiParseRequest(string Content);
+public record EnqueueMessageRequest(string MessageType, object Payload, string? TargetSystem = null);
+public record ValidateApiClientRequest(string ClientId, string ClientSecret);
+public record IntegrationDispatchRequest(string EventType, string EntityType, string EntityId, Dictionary<string, object>? Payload = null);
+public record EdiUnifiedConvertRequest(string EdiContent, string? SourceFormat = "EDIFACT", string? TargetFormat = "JSON", string? DocumentType = "ORDERS");

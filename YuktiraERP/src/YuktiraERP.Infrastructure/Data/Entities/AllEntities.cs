@@ -2018,7 +2018,6 @@ public class StockReservationHeaderEntity : EntityBase
     public string Plant { get; set; } = "1000";
     public string Status { get; set; } = "Active";
     public string CreatedBy { get; set; } = "";
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string? DeletedBy { get; set; }
     public DateTime? DeletedAt { get; set; }
 }

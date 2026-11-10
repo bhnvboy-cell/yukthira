@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 namespace YuktiraERP.Api.Controllers;
 
 /// <summary>
-/// Prefixes every controller route with the current API version,
-/// turning "api/foo" into "api/v1/foo".
+/// Dual-routes API controllers to both the current API version ("api/v1/foo")
+/// and the direct route ("api/foo") for backwards compatibility with integration scripts.
 /// </summary>
 public class ApiVersionRouteConvention : IApplicationModelConvention
 {
@@ -14,6 +14,7 @@ public class ApiVersionRouteConvention : IApplicationModelConvention
     {
         foreach (var controller in application.Controllers)
         {
+            var selectorsToAdd = new List<SelectorModel>();
             foreach (var selector in controller.Selectors)
             {
                 var route = selector.AttributeRouteModel;
@@ -22,18 +23,29 @@ public class ApiVersionRouteConvention : IApplicationModelConvention
                 var template = route.Template;
                 if (template.StartsWith("api/", StringComparison.OrdinalIgnoreCase))
                 {
-                    selector.AttributeRouteModel = new AttributeRouteModel
+                    selectorsToAdd.Add(new SelectorModel(selector)
                     {
-                        Template = "api/" + Version + "/" + template.Substring(4)
-                    };
+                        AttributeRouteModel = new AttributeRouteModel
+                        {
+                            Template = "api/" + Version + "/" + template.Substring(4)
+                        }
+                    });
                 }
                 else if (template.Equals("api", StringComparison.OrdinalIgnoreCase))
                 {
-                    selector.AttributeRouteModel = new AttributeRouteModel
+                    selectorsToAdd.Add(new SelectorModel(selector)
                     {
-                        Template = "api/" + Version
-                    };
+                        AttributeRouteModel = new AttributeRouteModel
+                        {
+                            Template = "api/" + Version
+                        }
+                    });
                 }
+            }
+
+            foreach (var newSelector in selectorsToAdd)
+            {
+                controller.Selectors.Add(newSelector);
             }
         }
     }

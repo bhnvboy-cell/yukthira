@@ -475,7 +475,7 @@ public class UoM_MdG_QmTests
 
         Assert.Equal("5", plan.Usage);
         Assert.Equal("4", plan.OverallStatus);
-        Assert.Equal(1, plan.Operations.Count);
+        Assert.Single(plan.Operations);
         Assert.Equal("0010", plan.Operations[0].OperationNo);
     }
 

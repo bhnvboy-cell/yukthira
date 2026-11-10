@@ -19,7 +19,7 @@ public class PipelineDiagnosticModel : PageModel
     }
 
     [BindProperty]
-    public PipelineDiagnosticRequest Request { get; set; } = new();
+    public new PipelineDiagnosticRequest Request { get; set; } = new();
 
     public PipelineDiagnosticResult? Result { get; set; }
     public string? ErrorMessage { get; set; }

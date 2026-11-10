@@ -6,5 +6,7 @@
     <Company>YuktiraERP</Company>
     <Product>Yuktira ERP Suite</Product>
     <Copyright>Copyright © 2026</Copyright>
+    <!-- Suppress upstream HotChocolate.Language advisory until upstream 15.1.x patch for .NET 10 is published -->
+    <NoWarn>$(NoWarn);NU1904</NoWarn>
   </PropertyGroup>
 </Project>

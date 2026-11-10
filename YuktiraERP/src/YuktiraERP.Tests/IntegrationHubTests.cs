@@ -88,4 +88,50 @@ public class IntegrationHubTests
         var denied = await service.ValidateApiClientAsync("client-1", "secret-1", "10.0.0.1");
         Assert.False(denied);
     }
+
+    [Fact]
+    public async Task IntegrationQueue_EnqueueAndRequeue_WorksCorrectly()
+    {
+        var options = new DbContextOptionsBuilder<YuktiraDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        var db = new YuktiraDbContext(options);
+        var busMock = new Mock<IMessageBus>();
+        var httpClient = new HttpClient();
+        var qsvc = new IntegrationQueueService(db, httpClient, busMock.Object);
+
+        var tenantId = Guid.NewGuid();
+        await qsvc.EnqueueAsync(tenantId, "order.sync", new { orderId = "SO-101" }, "EXTERNAL_ERP");
+
+        var pending = await qsvc.GetPendingAsync(tenantId);
+        Assert.Single(pending);
+        Assert.Equal("order.sync", pending[0].MessageType);
+        Assert.Equal("Pending", pending[0].Status);
+
+        // Simulate dead-letter creation
+        var deadLetter = new IntegrationDeadLetterEntity
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            OriginalQueueId = pending[0].Id,
+            MessageType = "order.sync",
+            Payload = "{\"orderId\":\"SO-101\"}",
+            ErrorMessage = "Target unreachable",
+            RetryAttempts = 3,
+            FailedAt = DateTime.UtcNow
+        };
+        db.IntegrationDeadLetters.Add(deadLetter);
+        await db.SaveChangesAsync();
+
+        var deadLetters = await qsvc.GetDeadLetterAsync(tenantId);
+        Assert.Single(deadLetters);
+
+        // Requeue dead letter
+        await qsvc.RequeueDeadLetterAsync(deadLetter.Id);
+        var deadAfter = await qsvc.GetDeadLetterAsync(tenantId);
+        Assert.Empty(deadAfter);
+
+        var pendingAfter = await qsvc.GetPendingAsync(tenantId);
+        Assert.Equal(2, pendingAfter.Count);
+    }
 }

@@ -117,7 +117,6 @@ public class InventoryReportingService : IInventoryReportingService
 
         var balances = await query.OrderBy(s => s.MaterialCode).ThenBy(s => s.Plant).ToListAsync();
 
-        IEnumerable<IGrouping<string, StockBalanceEntity>> stringKeyed;
         Func<StockBalanceEntity, string> keySelector = filter.GroupBy switch
         {
             MbStockOverviewLevel.Plant => s => $"{s.MaterialCode}|{s.MaterialName}|{s.Plant}",

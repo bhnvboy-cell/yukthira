@@ -352,8 +352,9 @@ public class FiniteCapacityScheduler : IFiniteCapacityScheduler
             var ops = group.OrderBy(o => o.PlannedStart).ToList();
             for (int i = 0; i < ops.Count - 1; i++)
             {
-                if (ops[i].PlannedEnd.HasValue && ops[i + 1].PlannedStart.HasValue &&
-                    ops[i].PlannedEnd > ops[i + 1].PlannedStart)
+                var end1 = ops[i].PlannedEnd;
+                var start2 = ops[i + 1].PlannedStart;
+                if (end1.HasValue && start2.HasValue && end1.Value > start2.Value)
                 {
                     conflicts.Add(new ScheduleConflict
                     {
@@ -364,7 +365,7 @@ public class FiniteCapacityScheduler : IFiniteCapacityScheduler
                         AffectedOrder1 = ops[i].ProductionOrderNumber,
                         AffectedOrder2 = ops[i + 1].ProductionOrderNumber,
                         AffectedWorkCenter = group.Key,
-                        ConflictDateTime = ops[i].PlannedEnd.Value
+                        ConflictDateTime = end1.Value
                     });
                 }
             }

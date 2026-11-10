@@ -41,7 +41,10 @@ public class ConvertToPoModel : PageModel
             DeliveryDate = Request.Form["DeliveryDate"].FirstOrDefault() ?? "",
             Plant = Request.Form["Plant"].FirstOrDefault() ?? "",
             Notes = Request.Form["Notes"].FirstOrDefault() ?? "",
-            SelectedItemIds = Request.Form["SelectedItemIds"].Select(Guid.Parse).ToList()
+            SelectedItemIds = Request.Form["SelectedItemIds"]
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Select(s => Guid.Parse(s!))
+                .ToList()
         };
 
         try

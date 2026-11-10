@@ -39,6 +39,7 @@ public class InspectionResultService : IInspectionResultService
     public async Task<InspectionResultDetailEntity> RecordDefectAsync(string lotNumber, string defectCodeGroup, string defectCode, string defectDescription, string defectCategory, int quantity, string reportType, string userId)
     {
         var existing = await _db.InspectionResultDetails.FirstOrDefaultAsync(r => r.LotNumber == lotNumber && r.ResultStatus == "RECORDED");
+        InspectionResultDetailEntity? defect = null;
         if (existing != null)
         {
             existing.DefectCodeGroup = defectCodeGroup;
@@ -52,7 +53,7 @@ public class InspectionResultService : IInspectionResultService
         }
         else
         {
-            var defect = new InspectionResultDetailEntity
+            defect = new InspectionResultDetailEntity
             {
                 LotNumber = lotNumber,
                 DefectCodeGroup = defectCodeGroup,
@@ -69,7 +70,7 @@ public class InspectionResultService : IInspectionResultService
             _db.InspectionResultDetails.Add(defect);
         }
         await _db.SaveChangesAsync();
-        return existing ?? await _db.InspectionResultDetails.FirstOrDefaultAsync(r => r.LotNumber == lotNumber && r.ResultStatus == "DEFECT_RECORDED")!;
+        return existing ?? defect!;
     }
 
     public async Task<List<InspectionResultDetailEntity>> GetResultsByLotAsync(string lotNumber) =>
