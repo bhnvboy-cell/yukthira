@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>YuktiraERP.Mes.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageReference Include="xunit" Version="2.9.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YuktiraERP.Mes.Core\YuktiraERP.Mes.Core.csproj" />
+    <ProjectReference Include="..\YuktiraERP.Mes.Infrastructure\YuktiraERP.Mes.Infrastructure.csproj" />
+    <ProjectReference Include="..\YuktiraERP.Mes.Plugin\YuktiraERP.Mes.Plugin.csproj" />
+    <ProjectReference Include="..\YuktiraERP.Mes.EdgeGateway\YuktiraERP.Mes.EdgeGateway.csproj" />
+    <ProjectReference Include="..\..\..\YuktiraERP.PluginSdk\YuktiraERP.PluginSdk.csproj" />
+  </ItemGroup>
+</Project>

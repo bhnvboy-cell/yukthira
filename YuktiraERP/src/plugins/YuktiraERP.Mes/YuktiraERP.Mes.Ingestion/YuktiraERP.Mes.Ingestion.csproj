@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>YuktiraERP.Mes.Ingestion</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YuktiraERP.Mes.Core\YuktiraERP.Mes.Core.csproj" />
+    <ProjectReference Include="..\YuktiraERP.Mes.Infrastructure\YuktiraERP.Mes.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,7 +1,9 @@
 @page
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOrAbove")]
+@inject YuktiraERP.PluginSdk.PluginLoader PluginLoader
 @{
     ViewData["Title"] = "Plugins";
+    var loaded = PluginLoader.LoadedPlugins.Values.OrderBy(p => p.Code).ToList();
 }
 <h2><svg class="bi bi-puzzle me-2" aria-hidden="true" focusable="false"><use href="/images/sprite.svg#bi-puzzle"></use></svg>Plugin Manager</h2>
 <div class="card mt-3">
@@ -9,6 +11,20 @@
         <table class="table table-hover">
             <thead><tr><th>Name</th><th>Code</th><th>Version</th><th>Global</th><th>Tenant</th><th>Actions</th></tr></thead>
             <tbody>
+                @foreach (var p in loaded)
+                {
+                    <tr>
+                        <td>
+                            <strong>@p.Name</strong>
+                            <div class="text-muted small">@p.Description</div>
+                        </td>
+                        <td><code>@p.Code</code></td>
+                        <td>@p.Version</td>
+                        <td><span class="badge bg-success">@p.Lifecycle</span></td>
+                        <td><span class="badge bg-success">Enabled</span></td>
+                        <td><button class="btn btn-sm btn-outline-danger">Disable</button></td>
+                    </tr>
+                }
                 <tr><td>Dairy Extension</td><td>DAIRY_EXT</td><td>1.0.0</td><td><span class="badge bg-success">Enabled</span></td><td><span class="badge bg-success">Enabled</span></td><td><button class="btn btn-sm btn-outline-danger">Disable</button></td></tr>
                 <tr><td>Advanced QC</td><td>ADV_QC</td><td>1.0.0</td><td><span class="badge bg-success">Enabled</span></td><td><span class="badge bg-success">Enabled</span></td><td><button class="btn btn-sm btn-outline-danger">Disable</button></td></tr>
                 <tr><td>Extra Reports</td><td>EXTRA_REPORTS</td><td>1.0.0</td><td><span class="badge bg-success">Enabled</span></td><td><span class="badge bg-warning">Disabled</span></td><td><button class="btn btn-sm btn-outline-success">Enable</button></td></tr>

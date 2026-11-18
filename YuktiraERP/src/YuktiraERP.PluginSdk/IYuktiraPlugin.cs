@@ -1,3 +1,8 @@
+using System.Reflection;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace YuktiraERP.PluginSdk;
 
 public interface IYuktiraPlugin
@@ -111,4 +116,15 @@ public class PluginPermission
     public string Label { get; set; } = "";
     public string Description { get; set; } = "";
     public string Group { get; set; } = "General";
+}
+
+/// <summary>
+/// Optional hook for full-featured plugins that contribute DI services, EF DbContexts,
+/// MVC/API controllers, and SignalR endpoints to the host application.
+/// </summary>
+public interface IPluginWebModule
+{
+    void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+    void ConfigureEndpoints(IEndpointRouteBuilder endpoints);
+    IEnumerable<Assembly> GetControllerAssemblies() => new[] { GetType().Assembly };
 }

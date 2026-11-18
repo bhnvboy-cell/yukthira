@@ -48,12 +48,32 @@ builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptio
     options.RequestCultureProviders.Add(new Microsoft.AspNetCore.Localization.CookieRequestCultureProvider());
 });
 
-builder.Services.AddControllers(options => options.Conventions.Add(new ApiVersionRouteConvention()))
+var mvcBuilder = builder.Services.AddControllers(options => options.Conventions.Add(new ApiVersionRouteConvention()))
     .AddJsonOptions(o =>
     {
         o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
         o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
+
+var pluginWebModules = new List<YuktiraERP.PluginSdk.IPluginWebModule>();
+var bootstrapPluginLoader = new YuktiraERP.PluginSdk.PluginLoader();
+try
+{
+    bootstrapPluginLoader.LoadAll();
+    foreach (var webModule in bootstrapPluginLoader.GetAllPluginHooks<YuktiraERP.PluginSdk.IPluginWebModule>())
+    {
+        webModule.ConfigureServices(builder.Services, builder.Configuration);
+        foreach (var asm in webModule.GetControllerAssemblies())
+        {
+            mvcBuilder.AddApplicationPart(asm);
+        }
+        pluginWebModules.Add(webModule);
+    }
+}
+catch (Exception ex)
+{
+    System.Console.WriteLine($"[PluginLoader] Web module registration skipped: {ex.Message}");
+}
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -211,6 +231,10 @@ app.MapMetrics();
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHub<DashboardHub>("/hubs/dashboard");
+foreach (var webModule in pluginWebModules)
+{
+    webModule.ConfigureEndpoints(app);
+}
 app.MapGraphQL("/api/graphql");
 
 app.Run();

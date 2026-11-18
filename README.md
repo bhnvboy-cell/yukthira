@@ -38,9 +38,10 @@ Then open **http://localhost:5001** and login with:
 │   ├── YuktiraERP.WorkflowEngine/  BPMN workflow runtime (legacy in-memory)
 │   ├── YuktiraERP.AIEngine/        ML forecasting (MA, WMA, ES, LR, Seasonal, HW, ARIMA)
 │   ├── YuktiraERP.ExportEngine/    XLSX/CSV/PDF/HTML export — 9 templates
-│   ├── YuktiraERP.PluginSdk/       Plugin SDK — interfaces, assembly loader, 4 hook types, hot reload, sandboxing
-│   └── plugins/                    Example plugins (AdvancedQC, Dairy, Reports) — see `docs/plugin-development.md`
+│   ├── YuktiraERP.PluginSdk/       Plugin SDK — interfaces, assembly loader, 5 hook types (incl. IPluginWebModule), hot reload, sandboxing
+│   └── plugins/                    Plugins: AdvancedQC, DairyExtension, ExtraReports, and YuktiraERP.Mes/ (MESA-11 Shop-Floor Execution)
 ├── database/
+│   ├── mes_schema_partitions.sql   PostgreSQL 18 yuktira_mes schema & daily partitioning setup
 │   ├── scripts/                    SQL migration scripts (001–051)
 │   └── backup/                     Disaster recovery runbook
 ├── scripts/                        Docker, deploy, build scripts
@@ -52,6 +53,23 @@ Then open **http://localhost:5001** and login with:
     ├── plugin-development.md       Plugin SDK & hooks guide
     └── screenshots/                Application screenshots (PNG)
 ```
+
+---
+
+## MES Plugin (MESA-11 Shop-Floor Execution)
+
+![Plugin Manager — Yukthira MES (MESA-11)](docs/screenshots/plugins.png)
+
+The **YukthiraERP MES** is packaged as a separate plugin under `src/plugins/YuktiraERP.Mes/` using `IPluginWebModule` in `YuktiraERP.PluginSdk`:
+
+- **`YuktiraERP.Mes.Core`** — Domain entities, ISO 22400/ISA-18.2/21 CFR Part 11 models, `OeeCalculator`, `SpcRuleEngine` (Western Electric rules 1–4, `Cp`/`Cpk`), and `ResourceStateEngine`.
+- **`YuktiraERP.Mes.Infrastructure`** — `MesDbContext` (PostgreSQL schema `yuktira_mes` with `TenantSaveChangesInterceptor`), services for all 11 MESA-11 functions, `MesOutboxPublisherService`, and `MesErpPostingBridge`.
+- **`YuktiraERP.Mes.Plugin`** — `YuktiraMesPlugin` (`MES01`–`MES07` menu & permissions, configurable settings), SignalR hub (`/hubs/mes`), and REST endpoints under `/api/v1/mes/{resources,scheduling,dispatch,documents,telemetry,labor,quality,process,maintenance,genealogy,performance,exceptions}`. Building this project automatically deploys the plugin DLLs into `YuktiraERP.Api`'s `plugins/` folder.
+- **`YuktiraERP.Mes.Ingestion`** — Separate Worker Service with bounded `Channel<T>` backpressure and `mes_dead_letter` overflow handling.
+- **`YuktiraERP.Mes.EdgeGateway`** — Plant-floor worker with `IProtocolDriver` abstractions (`OPC_UA`, `MODBUS_TCP`, `SIEMENS_S7`, `MQTT_SPARKPLUG_B`), `DeadbandFilter`, and 72-hour `EdgeStoreAndForwardBuffer`.
+- **`YuktiraERP.Mes.Tests`** — xUnit test suite (`dotnet test src/plugins/YuktiraERP.Mes/YuktiraERP.Mes.Tests/YuktiraERP.Mes.Tests.csproj`).
+
+For PostgreSQL 18 daily partitioning on `mes_tag_value_raw` and `mes_resource_state_log`, run `database/mes_schema_partitions.sql`.
 
 ---
 
