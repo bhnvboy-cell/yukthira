@@ -7,7 +7,7 @@ using YuktiraERP.Core.Interfaces;
 namespace YuktiraERP.Web.Pages.MM;
 
 [Authorize]
-public class StockOverviewModel : PageModel
+public class StockOverviewModel : YuktiraPageModel
 {
     private readonly IStockOverviewService _service;
     private readonly ITenantContext _tenant;

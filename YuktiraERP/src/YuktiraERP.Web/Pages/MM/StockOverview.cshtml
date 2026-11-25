@@ -222,8 +222,8 @@
                     <td class="@(node.TransferStockPlant == 0 ? "zero" : "")">@fmt(node.TransferStockPlant)</td>
                     <td class="@(node.TransferStockSL == 0 ? "zero" : "")">@fmt(node.TransferStockSL)</td>
                     <td class="total-col">@node.TotalStock.ToString("N2")</td>
-                    <td>@(node.UnitPrice > 0 ? node.UnitPrice.ToString("C2") : "-")</td>
-                    <td class="total-col">@(node.TotalValue > 0 ? node.TotalValue.ToString("C2") : "-")</td>
+                    <td>@(node.UnitPrice > 0 ? YuktiraERP.Web.Helpers.CurrencyFormatter.Format(node.UnitPrice, Model.ActiveCurrencyCode) : "-")</td>
+                    <td class="total-col">@(node.TotalValue > 0 ? YuktiraERP.Web.Helpers.CurrencyFormatter.Format(node.TotalValue, Model.ActiveCurrencyCode) : "-")</td>
                 </tr>
             }
         </tbody>

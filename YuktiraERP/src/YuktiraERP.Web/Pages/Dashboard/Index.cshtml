@@ -438,10 +438,11 @@
             var item = document.createElement('div');
             item.className = 'realtime-item';
             var time = new Date(data.timestamp).toLocaleTimeString();
+            var sym = window.YuktiraConfig && window.YuktiraConfig.currencySymbol ? window.YuktiraConfig.currencySymbol : '$';
             item.innerHTML = '<span class="rt-time">' + time + '</span>' +
                 '<span class="rt-msg">Materials: ' + data.materials +
-                ' | Stock: â‚¹' + (data.stockValue || 0).toLocaleString() +
-                ' | Revenue: â‚¹' + (data.totalRevenue || 0).toLocaleString() +
+                ' | Stock: ' + sym + (data.stockValue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                ' | Revenue: ' + sym + (data.totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
                 ' | Open Orders: ' + data.openOrders +
                 ' | QM Pass: ' + data.qmPassRate + '%</span>';
             body.insertBefore(item, body.firstChild);

@@ -223,7 +223,10 @@
     {
         if (string.IsNullOrEmpty(val)) return "";
         if (decimal.TryParse(val, System.Globalization.NumberStyles.Currency | System.Globalization.NumberStyles.Number, null, out var num))
-            return num.ToString("C2");
+        {
+            var tenantCurr = Context.Items["TenantCurrencyCode"]?.ToString() ?? "USD";
+            return YuktiraERP.Web.Helpers.CurrencyFormatter.Format(num, tenantCurr);
+        }
         return val;
     }
 

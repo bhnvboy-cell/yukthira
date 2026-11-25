@@ -18,6 +18,6 @@ public abstract class YuktiraPageModel : PageModel
 
     protected string FormatCurrency(decimal amount)
     {
-        return amount.ToString("C", System.Globalization.CultureInfo.CurrentCulture);
+        return YuktiraERP.Web.Helpers.CurrencyFormatter.Format(amount, ActiveCurrencyCode);
     }
 }
