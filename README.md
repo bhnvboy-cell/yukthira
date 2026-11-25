@@ -1,8 +1,52 @@
-# Yuktira ERP Suite
+# YuktiraERP Suite
 
-Enterprise ERP Platform — Intelligence Driven (Sanskrit: युक्ति - "logic, strategy")
+**Enterprise ERP Platform — Intelligence Driven (NR LABS)**  
+*Motto: "Nothing happens without planning."*
 
-**Version 2.3.0** | **October 2026**
+**Version 3.0.0 (Modular Monolith)** | **November 2026**
+
+---
+
+## What is YuktiraERP?
+
+**YuktiraERP** is an enterprise-grade ERP designed to beat legacy solutions (such as SAP Business One and S/4HANA Cloud Public Edition) on **speed of deployment, usability, configurability without high-cost external consultants, total cost of ownership (TCO), and local-first/self-hosted operational independence**.
+
+Built on **.NET 10**, **C# 13/14**, and **PostgreSQL with schema isolation**, YuktiraERP provides zero cross-module joins on the write path, transactional outbox event publishing, mathematically enforced double-entry financial balance, strict document immutability, Segregation-of-Duties (SoD) with Maker-Checker conflict detection, and real-time recursive MRP.
+
+---
+
+## Key Architectural Upgrades (v3.0.0)
+
+### 1. Core Modular Infrastructure & Security
+- **Topological DAG Module Loader**: `IYuktiraModule` contract with cycle detection and strict dependency ordering for external assemblies.
+- **Automated Audit Trail & Interceptor**: `AuditingSaveChangesInterceptor` captures entity PKs, timestamps, actors, and field-level diffs with automated sanitization/redaction of sensitive credentials, tokens, and hashes.
+- **RBAC & Segregation-of-Duties (SoD) Engine**: Hard Maker-Checker enforcement and automated toxic combination detection (`SOD-001` through `SOD-006`).
+- **Dynamic Authorization Rules**: Multi-tiered approval thresholds and real-time budget exposure limits.
+- **Transactional Outbox**: Atomic database persistence and background event dispatching (`OutboxBackgroundProcessor`).
+
+### 2. Organization, Master Data & Multi-Tier UOM
+- **Multi-Company & Multi-Branch Structure**: Independent currencies, tax registration numbers, and bin-enabled warehouses.
+- **Multi-Hop UOM Conversion Engine**: Handles exact direct multipliers, reverse divisions, SKU-specific overrides, and transitive multi-hop paths (e.g. `PALLET` $\rightarrow$ `BOX` $\rightarrow$ `PCS`).
+- **Configurable Numbering Series**: Formatted, thread-safe, zero-padded document numbering with fiscal year rollover.
+
+### 3. Inventory Valuation & Batch Lifecycle (FEFO / FIFO)
+- **Moving Average Valuation**: Real-time receipt cost recalculation:
+  $$\text{NewAvg} = \frac{(\text{CurrentOnHand} \times \text{CurrentAvg}) + (\text{ReceiptQty} \times \text{ReceiptCost})}{\text{CurrentOnHand} + \text{ReceiptQty}}$$
+- **FEFO / FIFO Batch Depletion**: Automated allocation prioritizing earliest-expiring active batches across warehouses.
+- **Zero-Quantity Batch Auto-Hiding**: Depleted batches ($\text{Qty} \le 0$) are automatically flagged `IsHidden = true` to optimize allocation queries and eliminate UI noise.
+
+### 4. Order-to-Cash (O2C) & Procure-to-Pay (P2P) Lineage
+- **Full Document Flow Graph**: Immutable lineage (`common.document_references`) tracking predecessor/successor tuples from Quotation $\rightarrow$ Order $\rightarrow$ Delivery $\rightarrow$ Invoice, and Requisition $\rightarrow$ PO $\rightarrow$ Goods Receipt $\rightarrow$ AP Invoice.
+- **Strict Document Immutability**: Posted documents disallow in-place updates; corrections are strictly performed via reversal documents.
+- **3-Way Match & Pre-Posting Validation**: Real-time comparison of PO, Goods Receipt, and AP Invoice with configurable quantity and price tolerance thresholds, plus customer credit exposure checks.
+
+### 5. Finance, Costing & Master Planning (MRP)
+- **General Ledger Double-Entry Invariant**: Mathematically verified double-entry balance ($\sum \text{Debits} = \sum \text{Credits}$) on every posted journal voucher.
+- **Fiscal Period Locking**: Multi-tier locking (`Open`, `SoftLocked` for adjustments, and `HardLocked` for permanent freeze) with period-end checklist tasks.
+- **Foreign Exchange (FX) Revaluation**: Unrealized gain/loss calculation on foreign currency accounts based on date-effective closing rates.
+- **Cost Center Budgets**: Real-time exposure tracking ($\text{ActualSpend} + \text{CommittedSpend}$) and variance reporting.
+- **Recursive MRP Engine**: Automated net requirement calculation ($\text{Net} = \max(0, \text{Gross} - (\text{OnHand} + \text{ScheduledReceipts})))$ with multi-level BOM explosion and lead-time offsetting.
+- **Dynamic OData Querying**: Composable filtering (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `contains`, `startswith`), sorting, and paged results.
 
 ---
 

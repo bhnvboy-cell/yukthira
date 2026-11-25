@@ -1,5 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using YuktiraERP.Core.Domain.Audit;
+using YuktiraERP.Core.Domain.Common;
+using YuktiraERP.Core.Domain.Costing;
+using YuktiraERP.Core.Domain.Finance;
+using YuktiraERP.Core.Domain.Inventory;
+using YuktiraERP.Core.Domain.MasterData;
+using YuktiraERP.Core.Domain.Planning;
+using YuktiraERP.Core.Domain.Procurement;
+using YuktiraERP.Core.Domain.Sales;
+using YuktiraERP.Core.Domain.Security;
+using YuktiraERP.Infrastructure.Data.Configurations;
 using YuktiraERP.Infrastructure.Data.Entities;
+using TenantEntity = YuktiraERP.Infrastructure.Data.Entities.TenantEntity;
 
 namespace YuktiraERP.Infrastructure.Data;
 
@@ -321,10 +333,76 @@ public class YuktiraDbContext : DbContext
     public DbSet<EmissionFactorEntity> EmissionFactors => Set<EmissionFactorEntity>();
     public DbSet<EmissionLogEntity> EmissionLogs => Set<EmissionLogEntity>();
     public DbSet<MassBalanceResultEntity> MassBalanceResults => Set<MassBalanceResultEntity>();
+
+    // Core Modular Infrastructure (Governance, Security, Outbox)
+    public DbSet<AuditChangeLog> AuditChangeLogs => Set<AuditChangeLog>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    public DbSet<IdentityUser> IdentityUsers => Set<IdentityUser>();
+    public DbSet<IdentityRole> IdentityRoles => Set<IdentityRole>();
+    public DbSet<IdentityPermission> IdentityPermissions => Set<IdentityPermission>();
+    public DbSet<IdentityUserRole> IdentityUserRoles => Set<IdentityUserRole>();
+    public DbSet<IdentityRolePermission> IdentityRolePermissions => Set<IdentityRolePermission>();
+    public DbSet<SodRuleEntity> SodRules => Set<SodRuleEntity>();
+    public DbSet<AuthorizationRule> AuthorizationRules => Set<AuthorizationRule>();
+
+    // Phase 3: Master Data, Inventory, Sales & Procurement
+    public DbSet<DocumentReference> DocumentReferences => Set<DocumentReference>();
+    public DbSet<Company> Companies => Set<Company>();
+    public DbSet<Branch> Branches => Set<Branch>();
+    public DbSet<Currency> MasterCurrencies => Set<Currency>();
+    public DbSet<CurrencyExchangeRate> MasterCurrencyExchangeRates => Set<CurrencyExchangeRate>();
+    public DbSet<MasterItem> MasterItems => Set<MasterItem>();
+    public DbSet<UomDefinition> MasterUoms => Set<UomDefinition>();
+    public DbSet<UomConversion> MasterUomConversions => Set<UomConversion>();
+    public DbSet<Warehouse> MasterWarehouses => Set<Warehouse>();
+    public DbSet<WarehouseBin> MasterWarehouseBins => Set<WarehouseBin>();
+    public DbSet<BusinessPartner> MasterBusinessPartners => Set<BusinessPartner>();
+    public DbSet<NumberingSeries> MasterNumberingSeries => Set<NumberingSeries>();
+
+    public DbSet<ItemBatch> InventoryBatches => Set<ItemBatch>();
+    public DbSet<ItemSerial> InventorySerials => Set<ItemSerial>();
+    public DbSet<StockMovement> InventoryStockMovements => Set<StockMovement>();
+    public DbSet<InventoryValuation> InventoryValuations => Set<InventoryValuation>();
+
+    public DbSet<SalesQuotation> SalesQuotations => Set<SalesQuotation>();
+    public DbSet<SalesQuotationLine> SalesQuotationLines => Set<SalesQuotationLine>();
+    public DbSet<SalesOrder> DomainSalesOrders => Set<SalesOrder>();
+    public DbSet<SalesOrderLine> DomainSalesOrderLines => Set<SalesOrderLine>();
+    public DbSet<SalesDelivery> DomainSalesDeliveries => Set<SalesDelivery>();
+    public DbSet<SalesDeliveryLine> DomainSalesDeliveryLines => Set<SalesDeliveryLine>();
+    public DbSet<SalesInvoice> DomainSalesInvoices => Set<SalesInvoice>();
+    public DbSet<SalesInvoiceLine> DomainSalesInvoiceLines => Set<SalesInvoiceLine>();
+
+    public DbSet<PurchaseOrder> DomainPurchaseOrders => Set<PurchaseOrder>();
+    public DbSet<PurchaseOrderLine> DomainPurchaseOrderLines => Set<PurchaseOrderLine>();
+    public DbSet<GoodsReceiptPo> DomainGoodsReceiptPos => Set<GoodsReceiptPo>();
+    public DbSet<GoodsReceiptPoLine> DomainGoodsReceiptPoLines => Set<GoodsReceiptPoLine>();
+    public DbSet<ApInvoice> DomainApInvoices => Set<ApInvoice>();
+    public DbSet<ApInvoiceLine> DomainApInvoiceLines => Set<ApInvoiceLine>();
+
+    // Phase 4: Finance, Costing, Planning
+    public DbSet<ChartOfAccount> DomainChartOfAccounts => Set<ChartOfAccount>();
+    public DbSet<JournalEntry> DomainJournalEntries => Set<JournalEntry>();
+    public DbSet<JournalEntryLine> DomainJournalEntryLines => Set<JournalEntryLine>();
+    public DbSet<FiscalCalendarPeriod> DomainFiscalPeriods => Set<FiscalCalendarPeriod>();
+    public DbSet<PeriodCloseChecklistTask> DomainPeriodCloseTasks => Set<PeriodCloseChecklistTask>();
+
+    public DbSet<CostCenter> DomainCostCenters => Set<CostCenter>();
+    public DbSet<CostCenterBudget> DomainCostCenterBudgets => Set<CostCenterBudget>();
+
+    public DbSet<WorkCenterMaster> DomainWorkCenters => Set<WorkCenterMaster>();
+    public DbSet<BillOfMaterialHeader> DomainBoms => Set<BillOfMaterialHeader>();
+    public DbSet<BillOfMaterialComponent> DomainBomComponents => Set<BillOfMaterialComponent>();
+    public DbSet<ManufacturingRouting> DomainRoutings => Set<ManufacturingRouting>();
+    public DbSet<RoutingOperationStep> DomainRoutingOperations => Set<RoutingOperationStep>();
+    public DbSet<PlannedOrder> DomainPlannedOrders => Set<PlannedOrder>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureEntities(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(YuktiraDbContext).Assembly);
+        modelBuilder.ApplyPhase3Configurations();
+        modelBuilder.ApplyPhase4Configurations();
         base.OnModelCreating(modelBuilder);
     }
 

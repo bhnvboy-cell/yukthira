@@ -57,3 +57,7 @@ database/backup/*.sql
 
 # Planning notes
 .plan/
+
+# Local build caches & scratch
+.nuget_appdata/
+scratch/

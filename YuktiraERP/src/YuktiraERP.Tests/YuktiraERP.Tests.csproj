@@ -24,6 +24,7 @@
     <ProjectReference Include="..\YuktiraERP.WorkflowEngine\YuktiraERP.WorkflowEngine.csproj" />
     <ProjectReference Include="..\YuktiraERP.AIEngine\YuktiraERP.AIEngine.csproj" />
     <ProjectReference Include="..\YuktiraERP.ExportEngine\YuktiraERP.ExportEngine.csproj" />
+    <ProjectReference Include="..\YuktiraERP.PluginSdk\YuktiraERP.PluginSdk.csproj" />
   </ItemGroup>
 
 </Project>
