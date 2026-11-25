@@ -214,7 +214,16 @@
                                     <td>
                                         <span class="badge bg-@res.StateColor">@res.Status</span>
                                     </td>
-                                    <td>@(res.CurrentOrder == "-" ? "<span class=\"text-muted\">Idle</span>" : res.CurrentOrder)</td>
+                                    <td>
+                                        @if (res.CurrentOrder == "-")
+                                        {
+                                            <span class="text-muted">Idle</span>
+                                        }
+                                        else
+                                        {
+                                            @res.CurrentOrder
+                                        }
+                                    </td>
                                     <td>@(res.SpeedRpm > 0 ? res.SpeedRpm.ToString("N0") : "-")</td>
                                     <td>@(res.TempC > 0 ? $"{res.TempC:F1} °C" : "-")</td>
                                     <td>
