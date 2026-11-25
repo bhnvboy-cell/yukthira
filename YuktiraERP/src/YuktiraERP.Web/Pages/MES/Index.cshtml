@@ -1,0 +1,367 @@
+@page "/MES"
+@model YuktiraERP.Web.Pages.MES.IndexModel
+@{
+    ViewData["Title"] = "MES Shop Floor Execution (MESA-11)";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid py-3">
+    <!-- Header banner -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="h4 mb-0 text-primary">
+                <svg class="bi bi-cpu me-2" width="24" height="24" fill="currentColor"><use href="/images/sprite.svg#bi-cpu"></use></svg>
+                Shop-Floor Execution System (MESA-11)
+            </h2>
+            <small class="text-muted">ISA-95 Level 3 MOM &bull; Connected to Level 4 ERP (PP/MM/QM/CO) &bull; Edge Gateway &bull; SignalR Telemetry</small>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                <span class="spinner-grow spinner-grow-sm me-1" role="status" aria-hidden="true"></span>
+                Plugin: Yukthira MES v1.0.0 (Active)
+            </span>
+            <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
+                <svg class="bi bi-arrow-clockwise me-1" width="14" height="14" fill="currentColor"><use href="/images/sprite.svg#bi-arrow-clockwise"></use></svg>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Active Work Orders</small>
+                    <span class="h4 fw-bold text-primary">@Model.Kpis.ActiveWorkOrders</span>
+                    <small class="text-success d-block">Dispatch Queue Live</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Machines Running</small>
+                    <span class="h4 fw-bold text-success">@Model.Kpis.RunningMachines / @Model.Kpis.TotalMachines</span>
+                    <small class="text-muted d-block">85.7% On-Line</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Plant OEE</small>
+                    <span class="h4 fw-bold text-info">@Model.Kpis.PlantOee%</span>
+                    <small class="text-success d-block">&uarr; +1.2% World-Class</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Availability</small>
+                    <span class="h4 fw-bold text-dark">@Model.Kpis.Availability%</span>
+                    <small class="text-muted d-block">Target &ge; 90%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Performance</small>
+                    <span class="h4 fw-bold text-dark">@Model.Kpis.Performance%</span>
+                    <small class="text-muted d-block">Speed Adherence</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Quality Rate</small>
+                    <span class="h4 fw-bold text-success">@Model.Kpis.QualityRate%</span>
+                    <small class="text-muted d-block">First-Pass Yield</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs for MESA-11 Areas -->
+    <ul class="nav nav-tabs mb-3" id="mesTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dispatch-tab" data-bs-toggle="tab" data-bs-target="#dispatch" type="button" role="tab">
+                <svg class="bi bi-kanban me-1" width="16" height="16" fill="currentColor"><use href="/images/sprite.svg#bi-kanban"></use></svg>
+                MES01 Dispatch Queue
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="resources-tab" data-bs-toggle="tab" data-bs-target="#resources" type="button" role="tab">
+                <svg class="bi bi-hdd-rack me-1" width="16" height="16" fill="currentColor"><use href="/images/sprite.svg#bi-hdd-rack"></use></svg>
+                MES02 Resource Status
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="oee-tab" data-bs-toggle="tab" data-bs-target="#oee" type="button" role="tab">
+                <svg class="bi bi-speedometer2 me-1" width="16" height="16" fill="currentColor"><use href="/images/sprite.svg#bi-speedometer2"></use></svg>
+                MES06 OEE & Losses
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="genealogy-tab" data-bs-toggle="tab" data-bs-target="#genealogy" type="button" role="tab">
+                <svg class="bi bi-diagram-3 me-1" width="16" height="16" fill="currentColor"><use href="/images/sprite.svg#bi-diagram-3"></use></svg>
+                MES03 Genealogy Trace
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="alarms-tab" data-bs-toggle="tab" data-bs-target="#alarms" type="button" role="tab">
+                <svg class="bi bi-bell me-1" width="16" height="16" fill="currentColor"><use href="/images/sprite.svg#bi-bell"></use></svg>
+                MES05 Process Alarms (@Model.Alarms.Count)
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="mesTabContent">
+        <!-- 1. Dispatch Queue -->
+        <div class="tab-pane fade show active" id="dispatch" role="tabpanel">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold">Live Shop-Floor Dispatching & Execution</span>
+                    <span class="badge bg-primary">Auto-Dispatched by Priority</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Work Order #</th>
+                                <th>Product</th>
+                                <th>Operation</th>
+                                <th>Assigned Work Center</th>
+                                <th>Planned Qty</th>
+                                <th>Completed</th>
+                                <th>Scrap</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var wo in Model.DispatchQueue)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@wo.WorkOrder</td>
+                                    <td>
+                                        <span class="badge bg-secondary me-1">@wo.MaterialCode</span>
+                                        @wo.MaterialName
+                                    </td>
+                                    <td>@wo.Operation</td>
+                                    <td><code>@wo.Resource</code></td>
+                                    <td>@wo.PlannedQty.ToString("N0")</td>
+                                    <td class="text-success fw-bold">@wo.CompletedQty.ToString("N0")</td>
+                                    <td class="@(wo.ScrapQty > 0 ? "text-danger fw-bold" : "text-muted")">@wo.ScrapQty.ToString("N0")</td>
+                                    <td>
+                                        <span class="badge bg-@(wo.Status == "RUNNING" ? "success" : wo.Status == "READY" ? "primary" : "secondary")">
+                                            @wo.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (wo.Status == "READY")
+                                        {
+                                            <button class="btn btn-sm btn-success py-0 px-2" onclick="alert('Started operation for @wo.WorkOrder');">Start</button>
+                                        }
+                                        else if (wo.Status == "RUNNING")
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="alert('Operation confirmation dialog for @wo.WorkOrder');">Confirm</button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Done</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Resource Status -->
+        <div class="tab-pane fade" id="resources" role="tabpanel">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-2">
+                    <span class="fw-semibold">Machine & Resource State Monitor (OPC UA / Telemetry)</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Resource ID</th>
+                                <th>Equipment Description</th>
+                                <th>Work Center</th>
+                                <th>Current State</th>
+                                <th>Active Order</th>
+                                <th>Speed (RPM)</th>
+                                <th>Temp (°C)</th>
+                                <th>Utilization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var res in Model.Resources)
+                            {
+                                <tr>
+                                    <td class="fw-bold"><code>@res.ResourceId</code></td>
+                                    <td>@res.Name</td>
+                                    <td>@res.WorkCenter</td>
+                                    <td>
+                                        <span class="badge bg-@res.StateColor">@res.Status</span>
+                                    </td>
+                                    <td>@(res.CurrentOrder == "-" ? "<span class=\"text-muted\">Idle</span>" : res.CurrentOrder)</td>
+                                    <td>@(res.SpeedRpm > 0 ? res.SpeedRpm.ToString("N0") : "-")</td>
+                                    <td>@(res.TempC > 0 ? $"{res.TempC:F1} °C" : "-")</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-@res.StateColor" style="width: @res.Utilization%"></div>
+                                            </div>
+                                            <small class="fw-bold">@res.Utilization%</small>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. OEE Cockpit -->
+        <div class="tab-pane fade" id="oee" role="tabpanel">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-2">
+                    <span class="fw-semibold">OEE Analysis & Six Big Losses Breakdown</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Work Center</th>
+                                <th>Availability (A)</th>
+                                <th>Performance (P)</th>
+                                <th>Quality (Q)</th>
+                                <th>Overall OEE</th>
+                                <th>Primary Loss Factor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in Model.OeeMetrics)
+                            {
+                                <tr>
+                                    <td class="fw-bold"><code>@o.WorkCenter</code></td>
+                                    <td>@o.Availability%</td>
+                                    <td>@o.Performance%</td>
+                                    <td>@o.Quality%</td>
+                                    <td>
+                                        <span class="badge bg-@(o.OverallOee >= 85 ? "success" : o.OverallOee >= 75 ? "warning" : "danger") fs-6">
+                                            @o.OverallOee%
+                                        </span>
+                                    </td>
+                                    <td class="text-muted"><small>@o.LossReason</small></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Genealogy Trace -->
+        <div class="tab-pane fade" id="genealogy" role="tabpanel">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-2">
+                    <span class="fw-semibold">Forward & Backward Lot Pedigree / Genealogy</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Trace Level</th>
+                                <th>Lot / Batch #</th>
+                                <th>Item Code</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Produced / Consumed At</th>
+                                <th>Certified By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var g in Model.GenealogyNodes)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (g.Level == 0)
+                                        {
+                                            <span class="badge bg-primary">Parent Lot</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary ms-@(g.Level * 2)">&rarr; Component L@(g.Level)</span>
+                                        }
+                                    </td>
+                                    <td class="fw-bold"><code>@g.LotNumber</code></td>
+                                    <td><span class="badge bg-light text-dark border">@g.ItemCode</span></td>
+                                    <td>@g.ItemName</td>
+                                    <td>@g.Qty</td>
+                                    <td><small class="text-muted">@g.Timestamp</small></td>
+                                    <td><span class="badge bg-info-subtle text-info">@g.Operator</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Process Alarms -->
+        <div class="tab-pane fade" id="alarms" role="tabpanel">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-2">
+                    <span class="fw-semibold">Process Alarms & Interlock States</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Alarm ID</th>
+                                <th>Equipment</th>
+                                <th>Severity</th>
+                                <th>Alarm Message</th>
+                                <th>Occurred At</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var alm in Model.Alarms)
+                            {
+                                <tr>
+                                    <td class="fw-bold"><code>@alm.Id</code></td>
+                                    <td><code>@alm.MachineId</code></td>
+                                    <td>
+                                        <span class="badge bg-@(alm.Severity == "CRITICAL" ? "danger" : alm.Severity == "WARNING" ? "warning text-dark" : "info")">
+                                            @alm.Severity
+                                        </span>
+                                    </td>
+                                    <td>@alm.Message</td>
+                                    <td><small class="text-muted">@alm.Timestamp</small></td>
+                                    <td>
+                                        <span class="badge bg-light text-success border border-success">
+                                            @(alm.Acknowledged ? "Acknowledged" : "Active")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

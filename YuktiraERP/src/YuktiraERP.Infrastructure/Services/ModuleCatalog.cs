@@ -20,6 +20,7 @@ public class ModuleCatalog : IModuleCatalog
         new() { Code = "SD", Name = "Sales & Distribution",  Category = "Operations", BaseRoute = "/SD", Icon = "bi-cart3",              Color = "#059669" },
         new() { Code = "WM", Name = "Warehouse Management",  Category = "Operations", BaseRoute = "/WM", Icon = "bi-house-door",         Color = "#d97706" },
         new() { Code = "PP", Name = "Production Planning",   Category = "Operations", BaseRoute = "/PP", Icon = "bi-gear",               Color = "#7c3aed" },
+        new() { Code = "MES", Name = "Shop Floor (MESA-11)",  Category = "Operations", BaseRoute = "/MES", Icon = "bi-cpu",                Color = "#0284c7" },
         new() { Code = "QM", Name = "Quality Management",    Category = "Operations", BaseRoute = "/QM", Icon = "bi-clipboard-check",    Color = "#dc2626" },
         new() { Code = "PM", Name = "Plant Maintenance",     Category = "Operations", BaseRoute = "/PM", Icon = "bi-tools",              Color = "#0891b2" },
         new() { Code = "CR", Name = "Customer Complaints",   Category = "Operations", BaseRoute = "/Transactions/Engine/CRRETURN", Icon = "bi-exclamation-triangle", Color = "#ea580c" },
